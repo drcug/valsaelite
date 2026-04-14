@@ -14,11 +14,11 @@
   --FD:'Rajdhani',sans-serif;--FM:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
 
 /* ─ Canvas ─ */
-#cv{position:fixed;inset:0;z-index:0}
+#cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 120px rgba(0,0,0,.45)}
 #dmgov{position:fixed;inset:0;z-index:4;pointer-events:none}
 @keyframes dfl{0%{background:rgba(220,30,0,.45)}100%{background:transparent}}
 .dfl{animation:dfl .35s ease-out}
@@ -68,7 +68,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 }
 #story-banner .sc{font-size:10px;color:#8844cc;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
 #story-banner .st{font-size:22px;font-weight:700;color:var(--bright);margin-bottom:6px}
-#story-banner .sd{font-size:12px;color:#7799bb;font-family:var(--FM);line-height:1.6}
+#story-banner .sd{font-size:12px;color:#7799bb;font-family:var(--FM);line-height:1.65;max-height:min(38vh,220px);overflow-y:auto;padding-right:6px}
 
 /* Dock prompt */
 #dprompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);
@@ -590,60 +590,65 @@ const CREW_POOL = [
 // 5 capitoli, ognuno sbloccato dopo il precedente
 const STORY = {
   chapter: 0,  // current chapter (0=not started)
+  prologue:'Nel 2087 il Sistema Valsamoggio brilla come un anello sul dito del Sole: cinque mondi, cinque orgogli, un solo cielo stellato che tutti pretendono di possedere. Un tempo le fazioni giurarono sul "Patto del Molino", un trattato scritto a Bazzano quando ancora si divideva solo il vino e non l\'orbita. Poi il documento scomparve — o fu nascosto — e ogni cometa divenne un pretesto per litigare. Tu sei il messaggero che il Consiglio ha scelto quando gli altri avevano smesso di fidarsi: non perché tu sia il migliore, ma perché sei l\'unico abbastanza testardo da attraversare tutto il sistema e tornare vivo.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'Un tempo le cinque fazioni erano unite dal "Patto del Molino", firmato a Bazzano. Il documento originale e\' scomparso. Senza il patto, le fazioni si stanno sgretolando. Il Consiglio di Bazzano ti ha incaricato di recuperare i frammenti.',
+      intro:'Il Consiglio di Bazzano Prime ti ha convocato in notturna: niente fanfare, solo un ologramma tremulo e l\'odore di carta bruciata. Il Patto originale non esiste più come volume unico: qualcuno lo ha smembrato in tre sigilli. Il primo frammento, dicono, dorme nell\'archivio di Crespellano — classificato come "niente", perché lì il catalogo è più importante della storia. Recuperalo prima che Calcara lo "autentichi" al posto loro.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Il Consiglio crede che un frammento del Patto sia conservato a Crespellano — archivio comunale. Probabilmente catalogato come "niente".',
+        desc:'Porta le credenziali diplomatiche (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
       num:2, title:'Niente e\' Qualcosa',
-      intro:'"A Crespellano hanno il frammento del Patto. Lo archiviano come \'niente\' perche\' non sanno cosa sia. Recuperalo e portalo a Calcara per autenticazione." — Ha senso quanto una scuola media costruita alla rovescia.',
+      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto, con la filigrana del mulino. Calcara pretende di certificarla: ufficialmente per sicurezza, in pratica per metterci il loro timbro — e il loro prezzo. Se accetti, entrerai nel gioco delle copie: chi controlla l\'archivio, controlla la memoria.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
-        desc:'Porta il Frammento del Patto a Calcara per l\'autenticazione. Attenzione: si dice che Calcara abbia una copia forgiata pronta.',
+        desc:'Porta il Frammento del Patto a Calcara Station. Osserva chi firma troppo in fretta: l\'Oligarchia non ama i testimoni che ricordano il testo originale.',
         reward:700, repGain:{crespellano:12,calcara:-5}, cargo:{type:'frammento',qty:1}, done:false, active:false},
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'"Calcara ha confermato l\'autenticita\' — troppo in fretta. Qualcosa non va. Il Castellano di Monteveglio vuole che tu recuperi il secondo frammento, custodito alla Rocca. Dovrai guadagnartelo in combattimento."',
+      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\' — e\' marketing." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto come in un torneo — solo che qui le "frecce di luce" lasciano il segno.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
-        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara per guadagnarti il rispetto del Castellano e il secondo frammento.',
+        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema. Il Castellano osserva: vuole sangue cosmico, non scuse da bollo.',
         reward:900, repGain:{monteveglio:20,calcara:-25}, killFaction:'calcara',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'"Hai il secondo frammento. Ma il terzo — il sigillo originale — e\' custodito a Savigno Deep. I savignesi non lo vendono. Ma potrebbero... barattarlo. Con tartufi. Ovviamente."',
+      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo, orgoglio e silenzio. Savigno Deep custodisce l\'anello finale del Patto, ma i savignesi non vendono la storia — la scambiano. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali, come tre giuramenti sul palato del cosmo.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Consegna 3 Kg di Tartufi Spaziali al Consiglio di Savigno in cambio del sigillo del Patto. (Compra tartufi prima a Savigno e poi consegna.)',
+        desc:'Consegna 3 kg di Tartufi Spaziali al Consiglio di Savigno Deep per ottenere il sigillo. Compra i tartufi a Savigno o nelle stazioni tartuifere prima di tornare.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, done:false, active:false},
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'"Hai tutti e tre i frammenti. Riportali a Bazzano Prime. Il Consiglio si riunisce. Le fazioni possono essere riunite — o Calcara tenterà di bloccare tutto. Preparati a combattere per il Patto."',
+      intro:'Hai ricomposto il trittico: carta, sangue, tartufo. Ora Bazzano deve decidere se riaccendere il mulino o lasciare che Calcara lo trasformi in concessionaria. Il cielo sopra Prime si riempie di scie ostili — non e\' piu\' una consegna, e\' una processione armata. Riporta i frammenti al Consiglio: se atterri, la storia respira di nuovo.',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
-        desc:'Porta i frammenti del Patto a Bazzano Prime. Attenzione alle navi di Calcara in viaggio — potrebbero tentare di fermarti.',
+        desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
   ],
 };
 
+function showStoryBanner(label,title,body,holdMs){
+  document.getElementById('sc').textContent=label;
+  document.getElementById('stit').textContent=title;
+  document.getElementById('sdesc').textContent=body;
+  const b=document.getElementById('story-banner');
+  b.style.display='block';
+  setTimeout(()=>{b.style.display='none';},holdMs||9000);
+}
+
 function advanceStory(ch){
   STORY.chapter = ch;
   const chapter = STORY.chapters[ch-1];
   if(!chapter)return;
-  document.getElementById('sc').textContent = 'CAPITOLO '+ch;
-  document.getElementById('stit').textContent = chapter.title;
-  document.getElementById('sdesc').textContent = chapter.intro;
-  const b = document.getElementById('story-banner');
-  b.style.display = 'block';
-  setTimeout(()=>{b.style.display='none';},7000);
+  showStoryBanner('CAPITOLO '+ch,chapter.title,chapter.intro,9000);
   // auto-add story mission to relevant station
   const st = stations.find(s=>s.sd.id===chapter.mission.sid);
   if(st){
@@ -657,32 +662,32 @@ function advanceStory(ch){
 // ─────────────────────────────────────────────────
 const DIALOGUES = {
   bazzano:[
-    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.']},
-    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.']},
-    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.']},
+    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.','Le stelle non mentono: se il Patto torna, qualcuno a Prime smettera\' di dormire col comunicatore acceso.']},
+    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.','Ho visto navi partire per Crespellano con la speranza e tornare con la modulistica: stessa rotta, altra anima.']},
+    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.','Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante in orbita.']},
   ],
   crespellano:[
-    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.']},
-    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.']},
-    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.']},
+    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.','L\'archivio dice "niente" ma puzza di storia: chi entra senza permesso trova solo polvere... e ambizione.']},
+    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.','Se cerchi il Patto, non cercarlo nei discorsi: cercalo nei cassetti etichettati male.']},
+    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.','Tra una piadina e un frammento antico, a volte e\' la piadina a salvarti la pelle.']},
   ],
   calcara:[
-    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.']},
-    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.']},
-    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.']},
+    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.','La verita\' qui ha timbro e IVA: se non e\' fatturata, non esiste.']},
+    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.','Autenticazione rapida, file sigillato, cliente soddisfatto — cosi\' funziona l\'universo, comandante.']},
+    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.','Se porti roba "sensibile", abbassa i fari: non tutti vogliono vedere cosa timbriamo.']},
   ],
   monteveglio:[
-    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.']},
-    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.']},
-    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.']},
+    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.','Il Patto non si riconquista con inchini: si riconquista con prove nel vuoto.']},
+    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.','Quando Calcara dice "certificato", noi sentiamo "copia": la Rocca non ascolta i fogli, ascolta il sangue.']},
+    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.','Compro storie solo se hanno un manico: il resto e\' politica orbitale.']},
   ],
   savigno:[
-    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.']},
-    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.']},
-    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.']},
+    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.','Il sigillo del Patto non si paga in slogan: si paga in aroma.']},
+    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.','Le stelle qui sono fredde apposta: cosi\' capisci cosa e\' davvero caldo.']},
+    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.','Se torni da Bazzano con carta vecchia, portaci anche fame: la fame si traduce in accordi.']},
   ],
   pirate:[
-    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.']},
+    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.','Il Patto? Io lo vendo al peso — come tutto il resto.']},
   ],
 };
 
@@ -692,25 +697,30 @@ const TAVERN = {
     {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta. Taebol chi si stupisce."'},
     {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — teba i cavalieri col fiasco pieno."'},
     {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
+    {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
     {s:'Pirati in pausa caffe\'',  t:'"Siamo diventati pirati nel 2038. L\'alternativa era fare i burocrati a Calcara. Abbiamo scelto il male minore."'},
     {s:'Prof della scuola rovescia',t:'"Insegno da dieci anni nell\'istituto costruito alla rovescia. I ragazzi entrano dal tetto. Lo trovano normale. Siamo noi che ci siamo adattati."'},
+    {s:'Custode dell\'archivio',   t:'"Qui dentro c\'e\' roba classificata male. A volte \'male\' e\' un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
   monteveglio:[
     {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser."'},
     {s:'Castellano (il vero)',     t:'"La nuova torre e\' quasi pronta. 200 metri. L\'ho promesso in campagna elettorale. Al contrario di Calcara che promette hangar e li costruisce davvero, troppo e troppi."'},
     {s:'Bardo Spaziale',           t:'"Ho cantato la ballata di Crespellano — quella del popolo che aspetta il semaforo. Mi hanno pagato in piadine. Tagiov la canz? Forse. Le piadine erano ottime."'},
+    {s:'Scriba dell\'Ordine',      t:'"Le stelle sopra la Rocca sembrano punte di lancia. Se il Patto torna, qualcuno dovra\' smetterla di usarle solo per il turismo."'},
   ],
   savigno:[
     {s:'Commerciante di tartufi',  t:'"Il prezzo e\' 420. Non tratto. Non abbasso. Non saldo. Il tartufo spaziale non conosce crisi economica."'},
     {s:'Vecchio isolazionista',    t:'"Vivo qui da 40 anni. L\'isolamento e\' una scelta. Quando voglio compagnia insulto qualcuno di Crespellano sul comunicatore."'},
     {s:'Sommelier di funghi',      t:'"Il porcino stellare si abbina al silenzio cosmico. Savigno capisce queste cose. Gli altri no, toronto."'},
+    {s:'Astrologa da taverna',     t:'"Ho letto il futuro nel fondo di una tazza: vedo tartufi, vedo sangue, vedo un timbro calcarese che brucia da solo."'},
   ],
   castelletto:[
     {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffe\'. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
     {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
+    {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
   ],
 };
 
@@ -1214,7 +1224,8 @@ const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-per
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
-if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;}
+if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;}
+if(renderer.physicallyCorrectLights!==undefined)renderer.physicallyCorrectLights=true;
 document.getElementById('cv').appendChild(renderer.domElement);
 // Rich multi-source lighting so ships are lit from all angles
 scene.add(new THREE.AmbientLight(0xb8c8ee,0.62));
@@ -1511,6 +1522,11 @@ const nebVeilTex=(()=>{
   t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
   return t;
 })();
+const nebWarmTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(640,320,28));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
 
 // ─────────────────────────────────────────────────
 // PARTICLES
@@ -1529,7 +1545,7 @@ function boom(pos,col,n,sp){n=n||60;sp=sp||1;for(let i=0;i<n;i++){const p=getP()
 // ─────────────────────────────────────────────────
 // ENVIRONMENT
 // ─────────────────────────────────────────────────
-// Stars — layered colors + twinkle data
+// Stars — layered colors (distant world shell)
 function fillStarBuffer(geo,count,minR2,maxR2,warmChance){
   const pos=[],col=[];
   let tries=0;
@@ -1546,35 +1562,73 @@ function fillStarBuffer(geo,count,minR2,maxR2,warmChance){
 }
 const STAR_MATS=[];
 const sGeo=new THREE.BufferGeometry();
-fillStarBuffer(sGeo,9000,27000000,2.2e13,.12);
+fillStarBuffer(sGeo,12000,27000000,2.2e13,.12);
 const smA=new THREE.PointsMaterial({
-  size:3.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.92,
+  size:3.5,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.94,
   blending:THREE.AdditiveBlending,depthWrite:false
 });
 scene.add(new THREE.Points(sGeo,smA));STAR_MATS.push(smA);
 const sGeo2=new THREE.BufferGeometry();
-fillStarBuffer(sGeo2,4200,5e7,2.2e13,.08);
+fillStarBuffer(sGeo2,5500,5e7,2.2e13,.08);
 const smB=new THREE.PointsMaterial({
-  color:0xaaccff,size:2.2,sizeAttenuation:true,transparent:true,opacity:.55,
+  color:0xaaccff,size:2.4,sizeAttenuation:true,transparent:true,opacity:.58,
   blending:THREE.AdditiveBlending,depthWrite:false
 });
 scene.add(new THREE.Points(sGeo2,smB));STAR_MATS.push(smB);
 const sGeo3=new THREE.BufferGeometry(),sv3=[];
-for(let i=0;i<1400;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
+for(let i=0;i<2200;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
 sGeo3.setAttribute('position',new THREE.Float32BufferAttribute(sv3,3));
-const smC=new THREE.PointsMaterial({color:0xffffff,size:5.2,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false});
+const smC=new THREE.PointsMaterial({color:0xffffff,size:5.6,transparent:true,opacity:.38,blending:THREE.AdditiveBlending,depthWrite:false});
 scene.add(new THREE.Points(sGeo3,smC));STAR_MATS.push(smC);
 
-// Nebula backdrop — deep dome + colored gas + additive second shell
+// Sky rig — nebulae + dense starfield follow camera (infinite sky illusion)
+const skyRig=new THREE.Group();
+scene.add(skyRig);
 const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false});
-const skyDome=new THREE.Mesh(new THREE.SphereGeometry(144000,48,32),skyMat);
-scene.add(skyDome);
-const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(143200,24,20),new THREE.MeshBasicMaterial({color:0x020412,side:THREE.BackSide,depthWrite:false}));
-scene.add(skyDeep);
-const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(141000,32,24),new THREE.MeshBasicMaterial({
-  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff
-}));
-scene.add(nebVeil);
+const skyDome=new THREE.Mesh(new THREE.SphereGeometry(92000,48,32),skyMat);skyRig.add(skyDome);
+const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(90500,24,20),new THREE.MeshBasicMaterial({color:0x020412,side:THREE.BackSide,depthWrite:false}));skyRig.add(skyDeep);
+const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(88000,32,24),new THREE.MeshBasicMaterial({
+  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.52,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff
+}));skyRig.add(nebVeil);
+const nebWarm=new THREE.Mesh(new THREE.SphereGeometry(85000,28,20),new THREE.MeshBasicMaterial({
+  map:nebWarmTex,side:THREE.BackSide,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,color:0xffaa66
+}));skyRig.add(nebWarm);
+
+function fillDiskStars(geo,n,radius,thick,biasZ,warmChance){
+  const pos=[],col=[];
+  for(let i=0;i<n;i++){
+    const u=Math.random()*2-1,v=Math.random()*2-1,w=Math.random()*2-1;
+    const len=Math.sqrt(u*u+v*v+w*w)||1;
+    let x=u/len*radius,y=v/len*radius,z=w/len*radius;
+    x+=(Math.random()-.5)*thick*2;y+=(Math.random()-.5)*thick*2;z+=(Math.random()-.5)*thick*2+biasZ;
+    pos.push(x,y,z);
+    const r=Math.random();
+    if(r<warmChance){col.push(1,.88,.62);}else if(r<warmChance+.28){col.push(.75,.88,1);}else{col.push(.92,.95,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const GAL_BAND=new THREE.BufferGeometry();
+fillDiskStars(GAL_BAND,14000,78000,4200,0,.09);
+const galMat=new THREE.PointsMaterial({
+  size:2.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.72,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(GAL_BAND,galMat));STAR_MATS.push(galMat);
+const NEAR1=new THREE.BufferGeometry();
+fillDiskStars(NEAR1,11000,76000,900,0,.11);
+const nm1=new THREE.PointsMaterial({
+  size:1.35,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.88,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(NEAR1,nm1));STAR_MATS.push(nm1);
+const NEAR2=new THREE.BufferGeometry();
+fillDiskStars(NEAR2,6500,74000,500,0,.07);
+const nm2=new THREE.PointsMaterial({
+  color:0xdde8ff,size:2.1,sizeAttenuation:true,transparent:true,opacity:.62,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(NEAR2,nm2));STAR_MATS.push(nm2);
 
 // Sun
 const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(SUN_R,64,64),
@@ -3379,7 +3433,7 @@ function triggerVictory(){
   gstate='gameover';
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
-  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio sono di nuovo unite.<br>Il Consorzio Valsamoggio vive. Anche Crespellano ha (quasi) avuto il semaforo.<br>Taproblem — il sistema e\' in pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
+  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br>Crespellano ha (quasi) avuto il semaforo. Calcara ha (quasi) smesso di contare i timbri.<br>Taproblem: per ora, il vuoto sa di pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
 }
 
 // ─────────────────────────────────────────────────
@@ -3387,8 +3441,9 @@ function triggerVictory(){
 // ─────────────────────────────────────────────────
 const clock=new THREE.Clock();
 renderRep();
-// Start story after 5 seconds
-setTimeout(()=>advanceStory(1),5000);
+// Prologue then chapter 1 (staggered so text does not overlap)
+setTimeout(()=>showStoryBanner('PROLOGO','Sistema Valsamoggio — 2087',STORY.prologue,11000),4200);
+setTimeout(()=>advanceStory(1),15500);
 
 function animate(){
   requestAnimationFrame(animate);
@@ -3504,7 +3559,12 @@ function animate(){
   STAR_MATS[0].opacity=.88+Math.sin(twT)*.08;
   STAR_MATS[1].opacity=.48+Math.sin(twT*1.3+1.2)*.12;
   STAR_MATS[2].opacity=.28+Math.sin(twT*1.7+2.4)*.14;
-  skyDome.rotation.y+=0.000012*dt*1000;nebVeil.rotation.y-=0.000008*dt*1000;
+  if(STAR_MATS[3])STAR_MATS[3].opacity=.68+Math.sin(twT*.9+.5)*.1;
+  if(STAR_MATS[4])STAR_MATS[4].opacity=.82+Math.sin(twT*1.5+.8)*.1;
+  if(STAR_MATS[5])STAR_MATS[5].opacity=.55+Math.sin(twT*1.1+2.1)*.12;
+  skyRig.position.lerp(cam.position,1);
+  skyDome.rotation.y+=0.000014*dt*1000;nebVeil.rotation.y-=0.000009*dt*1000;
+  if(nebWarm)nebWarm.rotation.y+=0.000006*dt*1000;
   renderer.render(scene,cam);
 }
 animate();
