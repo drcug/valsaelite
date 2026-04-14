@@ -1208,19 +1208,21 @@ function rebuildPlayerMesh(){
 // THREE.JS SETUP
 // ─────────────────────────────────────────────────
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x000102,0.000085);
+scene.fog=new THREE.FogExp2(0x030612,0.000072);
 const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,40000);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
+if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;}
 document.getElementById('cv').appendChild(renderer.domElement);
 // Rich multi-source lighting so ships are lit from all angles
-scene.add(new THREE.AmbientLight(0xaabbdd,0.55));
-const hemiLight=new THREE.HemisphereLight(0x223366,0x110a00,0.7);scene.add(hemiLight);
-const backFill=new THREE.DirectionalLight(0x334466,0.45);backFill.position.set(-300,200,400);scene.add(backFill);
-const rimLight=new THREE.DirectionalLight(0x6688aa,0.3);rimLight.position.set(0,300,-200);scene.add(rimLight);
-const sunLt=new THREE.PointLight(0xffeecc,9,66000);scene.add(sunLt);
-const sunLt2=new THREE.PointLight(0xff7700,4,12000);scene.add(sunLt2);
+scene.add(new THREE.AmbientLight(0xb8c8ee,0.62));
+const hemiLight=new THREE.HemisphereLight(0x3355aa,0x1a1208,0.82);scene.add(hemiLight);
+const backFill=new THREE.DirectionalLight(0x446699,0.58);backFill.position.set(-300,200,400);scene.add(backFill);
+const rimLight=new THREE.DirectionalLight(0x88aadd,0.42);rimLight.position.set(0,300,-200);scene.add(rimLight);
+const sunLt=new THREE.PointLight(0xffeecc,12,66000);scene.add(sunLt);
+const sunLt2=new THREE.PointLight(0xff8833,5.5,12000);scene.add(sunLt2);
 window.addEventListener('resize',()=>{
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);resizeGM();
@@ -1308,12 +1310,19 @@ function hToNorm(h,sz,str){
 function cv2t(c){const t=new THREE.CanvasTexture(c);t.anisotropy=renderer.capabilities.getMaxAnisotropy();t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;}
 
 // Make {map, normalMap, roughnessMap} triple from a height function + color mapper
+function smooth01(t){t=cl(t,0,1);return t*t*(3-2*t);}
 function mkPTex(hFn,colFn,normStr,roughFn){
   const h=genH(hFn,TS);
   // diffuse
   const cc=document.createElement('canvas');cc.width=cc.height=TS;
   const cx=cc.getContext('2d'),ci=cx.createImageData(TS,TS);
-  for(let i=0;i<TS*TS;i++){const [r,g,b]=colFn(h[i]);ci.data.set([r,g,b,255],i*4);}
+  for(let i=0;i<TS*TS;i++){
+    const xi=i%TS, yi=(i/TS)|0;
+    const u=xi/TS,v=yi/TS;
+    const micro=0.04*Math.sin(u*93.7+yi*2.1)+0.035*Math.sin(v*111.3+xi*1.7);
+    const [r,g,b]=colFn(h[i]+micro);
+    ci.data.set([r,g,b,255],i*4);
+  }
   cx.putImageData(ci,0,0);
   // normal
   const nc=document.createElement('canvas');nc.width=nc.height=TS;
@@ -1338,22 +1347,23 @@ const TX={
   earth:mkPTex(
     (x,y)=>warp(Nn.e,x*2.2,y*2.2,8,0.55,2),
     h=>{
-      if(h<.35){const d=h/.35;return [Math.round(4+d*18),Math.round(16+d*52),Math.round(88+d*90)];}  // deep→shallow ocean
-      if(h<.40){return [Math.round(50+h*120),Math.round(100+h*80),Math.round(50)];}  // coast/beach
-      if(h<.55){const g=h-.40;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];} // lowland vegetation
-      if(h<.72){const g=h-.55;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];} // upland
-      if(h<.85){const g=h-.72;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];} // rock
-      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];  // snow/ice cap
+      const w=(a,b,t)=>a+(b-a)*smooth01(t);
+      if(h<.35){const d=h/.35;return [Math.round(4+w(4,22,d)),Math.round(16+w(16,68,d)),Math.round(88+w(88,178,d))];}
+      if(h<.40){const t=(h-.35)/.05;return [Math.round(w(22,62,t)),Math.round(w(72,140,t)),Math.round(w(165,55,t))];}
+      if(h<.55){const g=(h-.40)/.15;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];}
+      if(h<.72){const g=(h-.55)/.17;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];}
+      if(h<.85){const g=(h-.72)/.13;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];}
+      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];
     }, 16, h=>h<.38?.04:h<.7?.82:.55
   ),
   // ── Barren: terracotta craters, pale dust ridges ──
   barren:mkPTex(
     (x,y)=>{const b=warp(Nn.b,x*2.8,y*2.8,8,0.5);const r=rfbm(Nn.b,x*4,y*4,5)*.35;return cl(b*.72+r*.28,0,1);},
     h=>{
-      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];} // crater shadow
-      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];} // warm terracotta
-      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];} // pale dust ridge
-      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)]; // mid-tone rust
+      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];}
+      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];}
+      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];}
+      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)];
     }, 15, h=>.75+h*.18
   ),
   // ── Industrial: dark metal with orange glow grid, bright windows ──
@@ -1392,10 +1402,11 @@ const TX={
       return cl(base*.55+crack*.45,0,1);
     },
     h=>{
-      if(h<.22){return [2,10,32];} // deep crevasse
-      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];} // blue shadow
-      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];} // mid ice
-      const g=(h-.65)/.35;return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)]; // bright surface
+      if(h<.22){return [2,10,32];}
+      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];}
+      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];}
+      const g=(h-.65)/.35;
+      return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)];
     }, 18, h=>h<.3?.03:.12
   ),
   // ── Rock: cratered rubble ──
@@ -1428,10 +1439,10 @@ const TX={
   green:mkPTex(
     (x,y)=>warp(Nn.gr,x*2.8,y*2.8,8,0.5,2),
     h=>{
-      if(h<.28){return [6,20,8];} // deep shadow
+      if(h<.28){return [6,20,8];}
       if(h<.55){const g=(h-.28)/.27;return [Math.round(14+g*40),Math.round(50+g*90),Math.round(10+g*22)];}
       if(h<.78){const g=(h-.55)/.23;return [Math.round(42+g*65),Math.round(100+g*65),Math.round(20+g*30)];}
-      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)]; // bright ridge
+      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)];
     }, 12, h=>.72+h*.2
   ),
   // ── Particle sprite ──
@@ -1467,6 +1478,40 @@ const sunCC=(()=>{
   }
   ctx.putImageData(ci,0,0);return cv2t(c);
 })();
+TX.sunTex=sunCC;
+
+// Procedural nebula panoramas (equirectangular) for sky dome + additive veil
+const Nneb=mkN(3.7);
+function mkNebulaCanvas(w,h,seedHue){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d'),img=x.createImageData(w,h);
+  const dh=seedHue||220;
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const u=i/w,v=j/h;
+    const n1=fbm(Nneb,u*2.1+0.4,v*2.1,6,2.05,.5);
+    const n2=fbm(Nneb,u*3.7+11,v*3.2+2.1,5,2.1,.48);
+    const wv=warp(Nneb,u*1.8,v*1.8,5,0.38,2);
+    const gas=cl(n1*.45+n2*.35+wv*.2,0,1);
+    const ridge=Math.pow(Math.max(0,gas-.35),1.4);
+    const r=Math.round(4+ridge*85+gas*22+(Math.sin(dh*.02+u)*8));
+    const g=Math.round(8+ridge*40+gas*55+(Math.cos(dh*.03+v)*10));
+    const b=Math.round(18+ridge*120+gas*90);
+    const a=Math.round(cl(ridge*220+gas*35,0,255));
+    const k=(j*w+i)*4;img.data[k]=r;img.data[k+1]=g;img.data[k+2]=b;img.data[k+3]=a;
+  }
+  x.putImageData(img,0,0);return c;
+}
+const nebBaseTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(1024,512,268));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  return t;
+})();
+const nebVeilTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(768,384,312));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
+
 // ─────────────────────────────────────────────────
 // PARTICLES
 // ─────────────────────────────────────────────────
@@ -1484,23 +1529,58 @@ function boom(pos,col,n,sp){n=n||60;sp=sp||1;for(let i=0;i<n;i++){const p=getP()
 // ─────────────────────────────────────────────────
 // ENVIRONMENT
 // ─────────────────────────────────────────────────
-// Stars
-const sGeo=new THREE.BufferGeometry(),sv=[];
-for(let i=0;i<7000;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>27000000)sv.push(x,y,z);}
-sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
-scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:2.8,transparent:true,opacity:.8})));
-// Faint second star layer with slight blue tint
-const sGeo2=new THREE.BufferGeometry(),sv2=[];
-for(let i=0;i<2500;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>70000000)sv2.push(x,y,z);}
-sGeo2.setAttribute('position',new THREE.Float32BufferAttribute(sv2,3));
-scene.add(new THREE.Points(sGeo2,new THREE.PointsMaterial({color:0xaabbff,size:1.8,transparent:true,opacity:.45})));
-// Nebula backdrop
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(144000,16,16),new THREE.MeshBasicMaterial({color:0x010210,side:THREE.BackSide})));
+// Stars — layered colors + twinkle data
+function fillStarBuffer(geo,count,minR2,maxR2,warmChance){
+  const pos=[],col=[];
+  let tries=0;
+  while(pos.length/3<count&&tries<count*12){
+    tries++;
+    const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;
+    const d2=x*x+y*y+z*z;if(d2<minR2||d2>maxR2)continue;
+    pos.push(x,y,z);
+    const w=Math.random();
+    if(w<warmChance){col.push(1,.92,.78);}else if(w<warmChance+.35){col.push(.78,.88,1);}else{col.push(.95,.98,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const STAR_MATS=[];
+const sGeo=new THREE.BufferGeometry();
+fillStarBuffer(sGeo,9000,27000000,2.2e13,.12);
+const smA=new THREE.PointsMaterial({
+  size:3.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.92,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+scene.add(new THREE.Points(sGeo,smA));STAR_MATS.push(smA);
+const sGeo2=new THREE.BufferGeometry();
+fillStarBuffer(sGeo2,4200,5e7,2.2e13,.08);
+const smB=new THREE.PointsMaterial({
+  color:0xaaccff,size:2.2,sizeAttenuation:true,transparent:true,opacity:.55,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+scene.add(new THREE.Points(sGeo2,smB));STAR_MATS.push(smB);
+const sGeo3=new THREE.BufferGeometry(),sv3=[];
+for(let i=0;i<1400;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
+sGeo3.setAttribute('position',new THREE.Float32BufferAttribute(sv3,3));
+const smC=new THREE.PointsMaterial({color:0xffffff,size:5.2,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false});
+scene.add(new THREE.Points(sGeo3,smC));STAR_MATS.push(smC);
+
+// Nebula backdrop — deep dome + colored gas + additive second shell
+const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false});
+const skyDome=new THREE.Mesh(new THREE.SphereGeometry(144000,48,32),skyMat);
+scene.add(skyDome);
+const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(143200,24,20),new THREE.MeshBasicMaterial({color:0x020412,side:THREE.BackSide,depthWrite:false}));
+scene.add(skyDeep);
+const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(141000,32,24),new THREE.MeshBasicMaterial({
+  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff
+}));
+scene.add(nebVeil);
 
 // Sun
 const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(SUN_R,64,64),
-  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xdd3300,emissiveMap:TX.sunTex,emissiveIntensity:1.0,roughness:.8}));
+  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xff4400,emissiveMap:TX.sunTex,emissiveIntensity:1.35,roughness:.72}));
 scene.add(sunMesh);
+sunLt.position.copy(sunMesh.position);sunLt2.position.copy(sunMesh.position);
 [{r:SUN_R+210,op:.14,col:0xff8800},{r:SUN_R+540,op:.07,col:0xff5500},{r:SUN_R+1140,op:.03,col:0xff2200}].forEach(g=>{
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending})));
 });
@@ -1553,11 +1633,12 @@ function buildStationMesh(sd){
     ...(sd.pType==='earth'?{emissive:0x000e1a,emissiveIntensity:.06}:{}),
   };
   const mat=new THREE.MeshStandardMaterial(matOpts);
+  mat.normalScale=new THREE.Vector2(1.08,1.08);
   const mesh=new THREE.Mesh(geo,mat);
   // Atmosphere glow
   const f=FACTIONS[sd.faction];const gc=f?f.hex:0x334455;
   if(['earth','fortress','ice','green'].includes(sd.pType)){
-    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
+    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
   }
   // Rings
   if(sd.pType==='fortress'){const ring=new THREE.Mesh(new THREE.TorusGeometry(sd.pR+sd.pR*.45,3.5,8,64),new THREE.MeshStandardMaterial({color:0x886633,roughness:.9}));ring.rotation.x=Math.PI/2.3;mesh.add(ring);}
@@ -1598,21 +1679,21 @@ class Ship{
 
     // ── Material palette ──────────────────────────
     const hullCol = new THREE.Color(bc);
-    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.28,metalness:.82,envMapIntensity:1.0});
+    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.22,metalness:.86,envMapIntensity:1.25});
     // Secondary hull panel (slightly lighter)
-    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.35),roughness:.22,metalness:.88});
+    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.42),roughness:.16,metalness:.9});
     // Dark underside
-    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.55),roughness:.5,metalness:.6});
+    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.58),roughness:.42,metalness:.68});
     // Cockpit glass
-    const ck = new THREE.MeshStandardMaterial({color:0x050c18,roughness:.04,metalness:.95,transparent:true,opacity:.88});
+    const ck = new THREE.MeshStandardMaterial({color:0x0a1830,roughness:.03,metalness:.96,transparent:true,opacity:.9,emissive:0x112244,emissiveIntensity:.35});
     // Engine nacelle
-    const em = new THREE.MeshStandardMaterial({color:0x080808,roughness:.75,metalness:.5});
+    const em = new THREE.MeshStandardMaterial({color:0x101418,roughness:.65,metalness:.62});
     // Glowing accent (faction color, additive)
-    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false});
+    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false});
     // Emissive trim (faction color, lights up dark side)
-    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.95,emissive:ah,emissiveIntensity:1.2});
+    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.96,emissive:ah,emissiveIntensity:1.85});
     // Thruster inner glow
-    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.9,blending:THREE.AdditiveBlending});
+    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:1,blending:THREE.AdditiveBlending});
 
     // ── HULL CONSTRUCTION ─────────────────────────
 
@@ -1785,13 +1866,13 @@ class Ship{
     this.energy-=13;this.fireCooldown=.22;
     const fwd=new THREE.Vector3(0,0,-1).applyEuler(this.mesh.rotation);
     const fire1=()=>{
-      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x00ffff:this.faction==='pirate'?0xff6600:0xff2200}));
+      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x66ffff:this.faction==='pirate'?0xff9933:0xff4422}));
       m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
       PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
       scene.add(m);
     };
     fire1();
-    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x00ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
+    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
     if(this.isPlayer&&PS.bigShot){const pm=PROJS[PROJS.length-1];if(pm)pm.mesh.scale.set(2,2,2);}
   }
   takeDamage(amt){
@@ -2932,14 +3013,20 @@ const MAP={
 };
 const BASE_SC=()=>Math.min(innerWidth,innerHeight)/78000;
 
-function worldToMap(wx,wz,cv){
+function mapClientToCanvas(cv,clientX,clientY){
+  const r=cv.getBoundingClientRect();
+  const sx=cv.width/Math.max(r.width,1),sy=cv.height/Math.max(r.height,1);
+  return {mx:(clientX-r.left)*sx,my:(clientY-r.top)*sy};
+}
+
+function worldToMap(wx,wz){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:cx+wx*sc, y:cy+wz*sc};
 }
-function mapToWorld(mx,my,cv){
+function mapToWorld(mx,my){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:(mx-cx)/sc, z:(my-cy)/sc};
 }
 
@@ -2951,24 +3038,37 @@ function resizeGM(){
 
 function drawMap(){
   const cv=document.getElementById('gmcv');const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  ctx.fillStyle='#000102';ctx.fillRect(0,0,W,H);
+  const W=innerWidth,H=innerHeight;
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#030818';ctx.fillRect(0,0,W,H);
 
-  // Cached star field
-  if(!MAP.starCache){
+  // Cached star field + nebula wash
+  if(!MAP.starCache||MAP.starCache.width!==W||MAP.starCache.height!==H){
     MAP.starCache=document.createElement('canvas');
     MAP.starCache.width=W;MAP.starCache.height=H;
     const sc2=MAP.starCache.getContext('2d');
-    for(let i=0;i<600;i++){
-      const a=0.08+Math.random()*.55;
+    const g0=sc2.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,Math.max(W,H)*.75);
+    g0.addColorStop(0,'rgba(40,20,90,.45)');g0.addColorStop(.35,'rgba(12,30,80,.22)');g0.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g0;sc2.fillRect(0,0,W,H);
+    const g1=sc2.createRadialGradient(W*.82,H*.12,0,W*.82,H*.12,Math.max(W,H)*.55);
+    g1.addColorStop(0,'rgba(90,30,60,.32)');g1.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g1;sc2.fillRect(0,0,W,H);
+    for(let i=0;i<900;i++){
+      const a=0.06+Math.random()*.62;
       sc2.fillStyle=`rgba(255,255,255,${a})`;
-      sc2.fillRect(Math.random()*W,Math.random()*H,Math.random()<.08?2:1,Math.random()<.08?2:1);
+      const s=Math.random()<.06?2:1;
+      sc2.fillRect(Math.random()*W,Math.random()*H,s,s);
+    }
+    for(let i=0;i<80;i++){
+      sc2.fillStyle=`rgba(180,210,255,${0.03+Math.random()*.08})`;
+      sc2.beginPath();sc2.arc(Math.random()*W,Math.random()*H,1.5+Math.random()*4,0,Math.PI*2);sc2.fill();
     }
   }
   ctx.drawImage(MAP.starCache,0,0);
 
   const sc=BASE_SC()*MAP.zoom;
-  const cx=W/2+MAP.panX, cy=H/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
 
   // Orbit rings (non-satellites)
   ctx.setLineDash([]);
@@ -3001,7 +3101,7 @@ function drawMap(){
   // Satellite orbit rings (drawn around parent position)
   smeshes.filter(s=>s.sd.sat).forEach(s=>{
     const par=getSM(s.sd.parentId);if(!par)return;
-    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z,cv);
+    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z);
     const f=FACTIONS[s.sd.faction];
     ctx.strokeStyle=(f?f.color+'33':'#223344');ctx.lineWidth=.8;ctx.setLineDash([2*MAP.zoom,4*MAP.zoom]);
     ctx.beginPath();ctx.arc(pp.x,pp.y,s.sd.satR*sc,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
@@ -3009,7 +3109,7 @@ function drawMap(){
 
   // Stations
   smeshes.forEach(sm=>{
-    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
     const f=FACTIONS[sm.sd.faction];const col=f?f.color:'#888';
     const r=Math.max(3,sm.sd.pR*sc*1.6);
     // Glow
@@ -3040,7 +3140,7 @@ function drawMap(){
   });
 
   // Player position
-  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z,cv);
+  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z);
   ctx.save();ctx.translate(ppx,ppy);
   // Rotate triangle to match ship heading
   ctx.rotate(-playerShip.mesh.rotation.y);
@@ -3055,7 +3155,7 @@ function drawMap(){
   if(navDestId){
     const sm=getSM(navDestId);
     if(sm){
-      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
       ctx.setLineDash([6,8]);ctx.strokeStyle='rgba(0,255,200,.35)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(dx,dy);ctx.stroke();
       ctx.setLineDash([]);
@@ -3066,9 +3166,8 @@ function drawMap(){
 
 function handleMapClick(e){
   const cv=document.getElementById('gmcv');
-  const rect=cv.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const {x:wx,z:wz}=mapToWorld(mx,my,cv);
+  const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+  const {x:wx,z:wz}=mapToWorld(mx,my);
   const sc=BASE_SC()*MAP.zoom;
   // Find closest station within click radius
   let best=null,bestD=Infinity;
@@ -3125,12 +3224,11 @@ function setupMapEvents(){
     const oldZoom=MAP.zoom;
     MAP.zoom=cl(MAP.zoom*Math.exp(-e.deltaY*.001),.12,8);
     // Zoom toward cursor
-    const rect=cv.getBoundingClientRect();
-    const mx=e.clientX-rect.left-cv.width/2;
-    const my=e.clientY-rect.top-cv.height/2;
+    const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+    const mx2=mx-cv.width/2,my2=my-cv.height/2;
     const zr=MAP.zoom/oldZoom;
-    MAP.panX=(MAP.panX+mx)*zr-mx;
-    MAP.panY=(MAP.panY+my)*zr-my;
+    MAP.panX=(MAP.panX+mx2)*zr-mx2;
+    MAP.panY=(MAP.panY+my2)*zr-my2;
     drawMap();
   },{passive:false});
 
@@ -3402,6 +3500,11 @@ function animate(){
     const nc=document.getElementById('navcv');
     if(nc&&nc.width){nc.getContext('2d').clearRect(0,0,nc.width,nc.height);}
   }
+  const twT=performance.now()*.00115;
+  STAR_MATS[0].opacity=.88+Math.sin(twT)*.08;
+  STAR_MATS[1].opacity=.48+Math.sin(twT*1.3+1.2)*.12;
+  STAR_MATS[2].opacity=.28+Math.sin(twT*1.7+2.4)*.14;
+  skyDome.rotation.y+=0.000012*dt*1000;nebVeil.rotation.y-=0.000008*dt*1000;
   renderer.render(scene,cam);
 }
 animate();
