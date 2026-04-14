@@ -14,11 +14,11 @@
   --FD:'Rajdhani',sans-serif;--FM:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
 
 /* ─ Canvas ─ */
-#cv{position:fixed;inset:0;z-index:0}
+#cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 120px rgba(0,0,0,.45)}
 #dmgov{position:fixed;inset:0;z-index:4;pointer-events:none}
 @keyframes dfl{0%{background:rgba(220,30,0,.45)}100%{background:transparent}}
 .dfl{animation:dfl .35s ease-out}
@@ -61,14 +61,19 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 /* Story chapter banner */
 #story-banner{
   display:none;position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);
-  z-index:45;text-align:center;pointer-events:none;
-  background:rgba(2,5,18,.9);border:1px solid rgba(130,60,200,.4);
-  border-radius:10px;padding:18px 28px;backdrop-filter:blur(14px);
-  font-family:var(--FD);max-width:420px;
+  z-index:45;text-align:center;pointer-events:auto;
+  background:linear-gradient(165deg,rgba(8,14,32,.94) 0%,rgba(3,6,18,.92) 55%,rgba(12,8,28,.93) 100%);
+  border:1px solid rgba(130,60,200,.45);box-shadow:0 0 0 1px rgba(34,119,238,.12),0 22px 60px rgba(0,0,0,.55),0 0 40px rgba(100,60,200,.15);
+  border-radius:12px;padding:18px 26px 14px;backdrop-filter:blur(16px);
+  font-family:var(--FD);max-width:min(520px,92vw);
 }
-#story-banner .sc{font-size:10px;color:#8844cc;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
-#story-banner .st{font-size:22px;font-weight:700;color:var(--bright);margin-bottom:6px}
-#story-banner .sd{font-size:12px;color:#7799bb;font-family:var(--FM);line-height:1.6}
+#story-banner .sc{font-size:10px;color:#aa77ee;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
+#story-banner .st{font-size:clamp(20px,3.2vw,26px);font-weight:700;color:var(--bright);margin-bottom:8px;text-shadow:0 0 24px rgba(100,160,255,.25)}
+#story-banner .sd{font-size:12px;color:#8aa8cc;font-family:var(--FM);line-height:1.68;max-height:min(40vh,260px);overflow-y:auto;padding:10px 8px 10px 2px;margin:0 -4px 10px 0;text-align:left;border-left:2px solid rgba(34,119,238,.35);padding-left:12px}
+#story-banner .sb-foot{font-size:9px;color:#445577;font-family:var(--FM);letter-spacing:.12em;margin-top:2px}
+#story-banner .sb-dismiss{margin-top:4px;padding:8px 22px;border-radius:6px;border:1px solid rgba(44,100,190,.45);
+  background:rgba(34,119,238,.18);color:var(--bright);font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.1em;cursor:pointer;transition:background .15s,border-color .15s}
+#story-banner .sb-dismiss:hover{background:rgba(34,119,238,.32);border-color:rgba(34,119,238,.65)}
 
 /* Dock prompt */
 #dprompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);
@@ -285,7 +290,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 <div id="navarrow" style="display:none;position:fixed;inset:0;z-index:9;pointer-events:none">
   <canvas id="navcv" style="width:100%;height:100%;display:block"></canvas>
 </div>
-<div id="story-banner"><div class="sc" id="sc"></div><div class="st" id="stit"></div><div class="sd" id="sdesc"></div></div>
+<div id="story-banner"><div class="sc" id="sc"></div><div class="st" id="stit"></div><div class="sd" id="sdesc"></div><div class="sb-foot" id="sbhint">[INVIO] o clic per continuare</div><button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button></div>
 
 <div id="dprompt">
   <div class="dn" id="dpnm"></div>
@@ -590,60 +595,80 @@ const CREW_POOL = [
 // 5 capitoli, ognuno sbloccato dopo il precedente
 const STORY = {
   chapter: 0,  // current chapter (0=not started)
+  prologue:'Nel 2087 il Sistema Valsamoggio brilla come un anello sul dito del Sole: cinque mondi, cinque orgogli, un solo cielo stellato che tutti pretendono di possedere. Un tempo le fazioni giurarono sul "Patto del Molino", un trattato scritto a Bazzano quando ancora si divideva solo il vino e non l\'orbita. Poi il documento scomparve — o fu nascosto — e ogni cometa divenne un pretesto per litigare. Tu sei il messaggero che il Consiglio ha scelto quando gli altri avevano smesso di fidarsi: non perché tu sia il migliore, ma perché sei l\'unico abbastanza testardo da attraversare tutto il sistema e tornare vivo.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'Un tempo le cinque fazioni erano unite dal "Patto del Molino", firmato a Bazzano. Il documento originale e\' scomparso. Senza il patto, le fazioni si stanno sgretolando. Il Consiglio di Bazzano ti ha incaricato di recuperare i frammenti.',
+      intro:'Il Consiglio di Bazzano Prime ti ha convocato in notturna: niente fanfare, solo un ologramma tremulo e l\'odore di carta bruciata. Il Patto originale non esiste più come volume unico: qualcuno lo ha smembrato in tre sigilli. Il primo frammento, dicono, dorme nell\'archivio di Crespellano — classificato come "niente", perché lì il catalogo è più importante della storia. Recuperalo prima che Calcara lo "autentichi" al posto loro.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Il Consiglio crede che un frammento del Patto sia conservato a Crespellano — archivio comunale. Probabilmente catalogato come "niente".',
+        desc:'Porta le credenziali diplomatiche (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
       num:2, title:'Niente e\' Qualcosa',
-      intro:'"A Crespellano hanno il frammento del Patto. Lo archiviano come \'niente\' perche\' non sanno cosa sia. Recuperalo e portalo a Calcara per autenticazione." — Ha senso quanto una scuola media costruita alla rovescia.',
+      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto, con la filigrana del mulino. Calcara pretende di certificarla: ufficialmente per sicurezza, in pratica per metterci il loro timbro — e il loro prezzo. Se accetti, entrerai nel gioco delle copie: chi controlla l\'archivio, controlla la memoria.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
-        desc:'Porta il Frammento del Patto a Calcara per l\'autenticazione. Attenzione: si dice che Calcara abbia una copia forgiata pronta.',
+        desc:'Porta il Frammento del Patto a Calcara Station. Osserva chi firma troppo in fretta: l\'Oligarchia non ama i testimoni che ricordano il testo originale.',
         reward:700, repGain:{crespellano:12,calcara:-5}, cargo:{type:'frammento',qty:1}, done:false, active:false},
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'"Calcara ha confermato l\'autenticita\' — troppo in fretta. Qualcosa non va. Il Castellano di Monteveglio vuole che tu recuperi il secondo frammento, custodito alla Rocca. Dovrai guadagnartelo in combattimento."',
+      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\' — e\' marketing." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto come in un torneo — solo che qui le "frecce di luce" lasciano il segno.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
-        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara per guadagnarti il rispetto del Castellano e il secondo frammento.',
+        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema. Il Castellano osserva: vuole sangue cosmico, non scuse da bollo.',
         reward:900, repGain:{monteveglio:20,calcara:-25}, killFaction:'calcara',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'"Hai il secondo frammento. Ma il terzo — il sigillo originale — e\' custodito a Savigno Deep. I savignesi non lo vendono. Ma potrebbero... barattarlo. Con tartufi. Ovviamente."',
+      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo, orgoglio e silenzio. Savigno Deep custodisce l\'anello finale del Patto, ma i savignesi non vendono la storia — la scambiano. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali, come tre giuramenti sul palato del cosmo.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Consegna 3 Kg di Tartufi Spaziali al Consiglio di Savigno in cambio del sigillo del Patto. (Compra tartufi prima a Savigno e poi consegna.)',
+        desc:'Consegna 3 kg di Tartufi Spaziali al Consiglio di Savigno Deep per ottenere il sigillo. Compra i tartufi a Savigno o nelle stazioni tartuifere prima di tornare.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, done:false, active:false},
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'"Hai tutti e tre i frammenti. Riportali a Bazzano Prime. Il Consiglio si riunisce. Le fazioni possono essere riunite — o Calcara tenterà di bloccare tutto. Preparati a combattere per il Patto."',
+      intro:'Hai ricomposto il trittico: carta, sangue, tartufo. Ora Bazzano deve decidere se riaccendere il mulino o lasciare che Calcara lo trasformi in concessionaria. Il cielo sopra Prime si riempie di scie ostili — non e\' piu\' una consegna, e\' una processione armata. Riporta i frammenti al Consiglio: se atterri, la storia respira di nuovo.',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
-        desc:'Porta i frammenti del Patto a Bazzano Prime. Attenzione alle navi di Calcara in viaggio — potrebbero tentare di fermarti.',
+        desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
   ],
 };
 
+let storyBannerTimer=null;
+function hideStoryBanner(){
+  if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
+  document.getElementById('story-banner').style.display='none';
+}
+function showStoryBanner(label,title,body,holdMs){
+  document.getElementById('sc').textContent=label;
+  document.getElementById('stit').textContent=title;
+  document.getElementById('sdesc').textContent=body;
+  const b=document.getElementById('story-banner');
+  b.style.display='block';
+  if(storyBannerTimer)clearTimeout(storyBannerTimer);
+  storyBannerTimer=setTimeout(hideStoryBanner,holdMs||9000);
+}
+(function setupStoryBannerUi(){
+  const b=document.getElementById('story-banner');
+  document.getElementById('sbdismiss').addEventListener('click',hideStoryBanner);
+  b.addEventListener('click',e=>{if(e.target===b)hideStoryBanner();});
+  window.addEventListener('keydown',e=>{
+    if(b.style.display!=='block')return;
+    if(e.code==='Enter'||e.code==='Escape'||e.code==='Space'){e.preventDefault();hideStoryBanner();}
+  });
+})();
+
 function advanceStory(ch){
   STORY.chapter = ch;
   const chapter = STORY.chapters[ch-1];
   if(!chapter)return;
-  document.getElementById('sc').textContent = 'CAPITOLO '+ch;
-  document.getElementById('stit').textContent = chapter.title;
-  document.getElementById('sdesc').textContent = chapter.intro;
-  const b = document.getElementById('story-banner');
-  b.style.display = 'block';
-  setTimeout(()=>{b.style.display='none';},7000);
+  showStoryBanner('CAPITOLO '+ch,chapter.title,chapter.intro,9000);
   // auto-add story mission to relevant station
   const st = stations.find(s=>s.sd.id===chapter.mission.sid);
   if(st){
@@ -657,32 +682,32 @@ function advanceStory(ch){
 // ─────────────────────────────────────────────────
 const DIALOGUES = {
   bazzano:[
-    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.']},
-    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.']},
-    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.']},
+    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.','Le stelle non mentono: se il Patto torna, qualcuno a Prime smettera\' di dormire col comunicatore acceso.']},
+    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.','Ho visto navi partire per Crespellano con la speranza e tornare con la modulistica: stessa rotta, altra anima.']},
+    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.','Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante in orbita.']},
   ],
   crespellano:[
-    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.']},
-    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.']},
-    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.']},
+    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.','L\'archivio dice "niente" ma puzza di storia: chi entra senza permesso trova solo polvere... e ambizione.']},
+    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.','Se cerchi il Patto, non cercarlo nei discorsi: cercalo nei cassetti etichettati male.']},
+    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.','Tra una piadina e un frammento antico, a volte e\' la piadina a salvarti la pelle.']},
   ],
   calcara:[
-    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.']},
-    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.']},
-    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.']},
+    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.','La verita\' qui ha timbro e IVA: se non e\' fatturata, non esiste.']},
+    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.','Autenticazione rapida, file sigillato, cliente soddisfatto — cosi\' funziona l\'universo, comandante.']},
+    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.','Se porti roba "sensibile", abbassa i fari: non tutti vogliono vedere cosa timbriamo.']},
   ],
   monteveglio:[
-    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.']},
-    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.']},
-    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.']},
+    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.','Il Patto non si riconquista con inchini: si riconquista con prove nel vuoto.']},
+    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.','Quando Calcara dice "certificato", noi sentiamo "copia": la Rocca non ascolta i fogli, ascolta il sangue.']},
+    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.','Compro storie solo se hanno un manico: il resto e\' politica orbitale.']},
   ],
   savigno:[
-    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.']},
-    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.']},
-    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.']},
+    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.','Il sigillo del Patto non si paga in slogan: si paga in aroma.']},
+    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.','Le stelle qui sono fredde apposta: cosi\' capisci cosa e\' davvero caldo.']},
+    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.','Se torni da Bazzano con carta vecchia, portaci anche fame: la fame si traduce in accordi.']},
   ],
   pirate:[
-    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.']},
+    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.','Il Patto? Io lo vendo al peso — come tutto il resto.']},
   ],
 };
 
@@ -692,25 +717,30 @@ const TAVERN = {
     {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta. Taebol chi si stupisce."'},
     {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — teba i cavalieri col fiasco pieno."'},
     {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
+    {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
     {s:'Pirati in pausa caffe\'',  t:'"Siamo diventati pirati nel 2038. L\'alternativa era fare i burocrati a Calcara. Abbiamo scelto il male minore."'},
     {s:'Prof della scuola rovescia',t:'"Insegno da dieci anni nell\'istituto costruito alla rovescia. I ragazzi entrano dal tetto. Lo trovano normale. Siamo noi che ci siamo adattati."'},
+    {s:'Custode dell\'archivio',   t:'"Qui dentro c\'e\' roba classificata male. A volte \'male\' e\' un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
   monteveglio:[
     {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser."'},
     {s:'Castellano (il vero)',     t:'"La nuova torre e\' quasi pronta. 200 metri. L\'ho promesso in campagna elettorale. Al contrario di Calcara che promette hangar e li costruisce davvero, troppo e troppi."'},
     {s:'Bardo Spaziale',           t:'"Ho cantato la ballata di Crespellano — quella del popolo che aspetta il semaforo. Mi hanno pagato in piadine. Tagiov la canz? Forse. Le piadine erano ottime."'},
+    {s:'Scriba dell\'Ordine',      t:'"Le stelle sopra la Rocca sembrano punte di lancia. Se il Patto torna, qualcuno dovra\' smetterla di usarle solo per il turismo."'},
   ],
   savigno:[
     {s:'Commerciante di tartufi',  t:'"Il prezzo e\' 420. Non tratto. Non abbasso. Non saldo. Il tartufo spaziale non conosce crisi economica."'},
     {s:'Vecchio isolazionista',    t:'"Vivo qui da 40 anni. L\'isolamento e\' una scelta. Quando voglio compagnia insulto qualcuno di Crespellano sul comunicatore."'},
     {s:'Sommelier di funghi',      t:'"Il porcino stellare si abbina al silenzio cosmico. Savigno capisce queste cose. Gli altri no, toronto."'},
+    {s:'Astrologa da taverna',     t:'"Ho letto il futuro nel fondo di una tazza: vedo tartufi, vedo sangue, vedo un timbro calcarese che brucia da solo."'},
   ],
   castelletto:[
     {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffe\'. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
     {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
+    {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
   ],
 };
 
@@ -913,18 +943,35 @@ function bpCost(){
   return total;
 }
 
-function bpCountOf(id){
-  let n=0;for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpGrid[r][c]===id)n++;
+// Count placed modules once each (1×1 = per cell; larger = top-left anchor of w×h block)
+function bpCountModules(id){
+  const m=BP_MODULES.find(x=>x.id===id);if(!m)return 0;
+  if(m.w===1&&m.h===1){
+    let n=0;for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpGrid[r][c]===id)n++;
+    return n;
+  }
+  let n=0;
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    if(bpGrid[r][c]!==id)continue;
+    const left=c===0||bpGrid[r][c-1]!==id;
+    const top=r===0||bpGrid[r-1][c]!==id;
+    if(!left||!top)continue;
+    let ok=true;
+    for(let dr=0;dr<m.h&&ok;dr++)for(let dc=0;dc<m.w;dc++){
+      if(r+dr>=BP_ROWS||c+dc>=BP_COLS||bpGrid[r+dr][c+dc]!==id)ok=false;
+    }
+    if(ok)n++;
+  }
   return n;
 }
 
 function bpStats(){
-  const engines=bpCountOf('engine')+bpCountOf('engine2')*2+bpCountOf('boost_eng')*1.5;
-  const weapons=bpCountOf('weapon')+bpCountOf('weapon2')*2;
-  const shields=bpCountOf('shield');
-  const cargo=bpCountOf('cargo')*8;
-  const wings=bpCountOf('wing_l')+bpCountOf('wing_r');
-  const hasBoost=bpCountOf('boost_eng')>0;
+  const engines=bpCountModules('engine')+bpCountModules('engine2')*2+bpCountModules('boost_eng')*1.5;
+  const weapons=bpCountModules('weapon')+bpCountModules('weapon2')*2;
+  const shields=bpCountModules('shield');
+  const cargo=bpCountModules('cargo')*8;
+  const wings=bpCountModules('wing_l')+bpCountModules('wing_r');
+  const hasBoost=bpCountModules('boost_eng')>0;
   return {engines,weapons,shields,cargo,wings,hasBoost,
     speed:Math.round(85+engines*8), thrust:Math.round(50+engines*6),
     dmg:Math.round(100+weapons*20), shieldHp:shields*20,
@@ -1020,6 +1067,7 @@ function openBlueprintModal(){
 }
 
 function closeBlueprintModal(){
+  if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');return;}
   document.getElementById('blueprint-modal').classList.remove('show');
   // Apply blueprint stats to player
   const stats=bpStats();
@@ -1058,29 +1106,57 @@ function setupBpEvents(){
   const cv=document.getElementById('bp-cv');if(!cv)return;
   function getCellAt(e){
     const rect=cv.getBoundingClientRect();
-    const x=e.clientX-rect.left, y=e.clientY-rect.top;
+    const sx=cv.width/Math.max(rect.width,1),sy=cv.height/Math.max(rect.height,1);
+    const x=(e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
     return {r:Math.floor(y/BP_CELL),c:Math.floor(x/BP_CELL)};
+  }
+  function bpClearRect(r0,c0,w,h){
+    for(let dr=0;dr<h;dr++)for(let dc=0;dc<w;dc++){
+      const r=r0+dr,c=c0+dc;if(r>=0&&r<BP_ROWS&&c>=0&&c<BP_COLS)bpGrid[r][c]=null;
+    }
   }
   function placeAt(r,c){
     if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return;
-    if(bpSelected==='__erase'){bpGrid[r][c]=null;}
-    else if(bpSelected){
+    if(bpSelected==='__erase'){
+      const id=bpGrid[r][c];if(!id)return;
+      const m=BP_MODULES.find(x=>x.id===id);
+      if(m){let r0=r,c0=c;
+        while(c0>0&&bpGrid[r][c0-1]===id)c0--;
+        while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
+        bpClearRect(r0,c0,m.w,m.h);
+      }else bpGrid[r][c]=null;
+      drawBlueprint();return;
+    }
+    if(bpSelected){
       const m=BP_MODULES.find(x=>x.id===bpSelected);
       if(!m)return;
-      // Check width fits
       if(c+m.w>BP_COLS||r+m.h>BP_ROWS)return;
+      for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
+        const c0=bpGrid[r+dr][c+dc];
+        if(c0&&c0!==bpSelected){
+          const om=BP_MODULES.find(x=>x.id===c0);if(om){let rr=r+dr,cc=c+dc;
+            while(cc>0&&bpGrid[rr][cc-1]===c0)cc--;
+            while(rr>0&&bpGrid[rr-1][cc]===c0)rr--;
+            bpClearRect(rr,cc,om.w,om.h);
+          }else bpGrid[r+dr][c+dc]=null;
+        }
+      }
       for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++)bpGrid[r+dr][c+dc]=bpSelected;
     }
     drawBlueprint();
   }
-  cv.addEventListener('mousedown',e=>{const {r,c}=getCellAt(e);placeAt(r,c);bpDragFrom={r,c};});
-  cv.addEventListener('mousemove',e=>{if(!bpDragFrom)return;const {r,c}=getCellAt(e);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}});
+  cv.addEventListener('mousedown',e=>{if(e.button!==0)return;const {r,c}=getCellAt(e);placeAt(r,c);bpDragFrom={r,c};});
+  cv.addEventListener('mousemove',e=>{if(!bpDragFrom||e.buttons!==1)return;const {r,c}=getCellAt(e);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}});
   cv.addEventListener('mouseup',()=>{bpDragFrom=null;});
+  cv.addEventListener('mouseleave',()=>{bpDragFrom=null;});
   cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const {r,c}=getCellAt(t);placeAt(r,c);bpDragFrom={r,c};},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();if(!bpDragFrom)return;const t=e.touches[0];const {r,c}=getCellAt(t);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}},{passive:false});
   cv.addEventListener('touchend',()=>{bpDragFrom=null;});
-  // Right-click to erase
-  cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);bpGrid[r][c]=null;drawBlueprint();});
+  cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);const id=bpGrid[r][c];if(!id)return;
+    const m=BP_MODULES.find(x=>x.id===id);
+    if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;bpClearRect(r0,c0,m.w,m.h);}
+    else bpGrid[r][c]=null;
+    drawBlueprint();});
 }
 
 // ── Rebuild player 3D mesh from blueprint ─────────
@@ -1100,29 +1176,37 @@ function rebuildPlayerMesh(){
   const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.95,emissive:ah,emissiveIntensity:1.2});
   const boostMat=new THREE.MeshStandardMaterial({color:0xff4400,roughness:.2,metalness:.5,emissive:0xff2200,emissiveIntensity:.8});
 
-  // Count module types from blueprint
-  const engCount=bpCountOf('engine')+bpCountOf('engine2')+bpCountOf('boost_eng');
-  const weapCount=bpCountOf('weapon')+bpCountOf('weapon2');
-  const wingL=bpCountOf('wing_l'), wingR=bpCountOf('wing_r');
-  const cargoCount2=bpCountOf('cargo');
-  const hasBoostEng=bpCountOf('boost_eng')>0;
-  const shieldCount=bpCountOf('shield');
-  const finCount=bpCountOf('fin');
+  // Count module types from blueprint (per placed module, not per cell)
+  const engCount=bpCountModules('engine')+bpCountModules('engine2')+bpCountModules('boost_eng');
+  const weapCount=bpCountModules('weapon')+bpCountModules('weapon2');
+  const wingL=bpCountModules('wing_l'), wingR=bpCountModules('wing_r');
+  const cargoCount2=bpCountModules('cargo');
+  const hasBoostEng=bpCountModules('boost_eng')>0;
+  const shieldCount=bpCountModules('shield');
+  const finCount=bpCountModules('fin');
+  const hullBlocks=bpCountModules('hull');
+  const cockpitPlaced=bpCountModules('cockpit')>0;
 
   // Wing span derived from blueprint
   const wingSpan=7+wingL*2+wingR*2;
+  const fuselageLen=10+Math.min(hullBlocks,8)*0.55;
+  const fuselageW=2.6+Math.min(hullBlocks,6)*0.08;
+  const fuselageH=1.45+Math.min(hullBlocks,6)*0.05;
 
-  // ── Core fuselage (always present) ────────────
-  playerShip.mesh.add(new THREE.Mesh(new THREE.BoxGeometry(3.2,1.8,12),hm));
-  const nb=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.3,6),hm2);nb.position.set(0,0,-9);playerShip.mesh.add(nb);
-  const ntGeo=new THREE.ConeGeometry(1.1,4.5,4);ntGeo.rotateX(Math.PI/2);ntGeo.rotateY(Math.PI/4);
-  const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.1,-13.5);playerShip.mesh.add(nt);
-  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.35,1.8,4),tm);ntCap.rotation.x=Math.PI/2;ntCap.rotation.y=Math.PI/4;ntCap.position.set(0,.1,-16.2);playerShip.mesh.add(ntCap);
+  // ── Core fuselage (length from hull blocks) ────────────
+  playerShip.mesh.add(new THREE.Mesh(new THREE.BoxGeometry(fuselageW,fuselageH,fuselageLen),hm));
+  const noseZ=-fuselageLen/2-3;
+  const nb=new THREE.Mesh(new THREE.BoxGeometry(fuselageW*.85,fuselageH*.78,5),hm2);nb.position.set(0,0,noseZ+2.2);playerShip.mesh.add(nb);
+  const ntGeo=new THREE.ConeGeometry(1.05,4.2,4);ntGeo.rotateX(Math.PI/2);ntGeo.rotateY(Math.PI/4);
+  const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.08,noseZ-.8);playerShip.mesh.add(nt);
+  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.32,1.6,4),tm);ntCap.rotation.x=Math.PI/2;ntCap.rotation.y=Math.PI/4;ntCap.position.set(0,.08,noseZ-3.4);playerShip.mesh.add(ntCap);
 
-  // ── Cockpit ──────────────────────────────────
-  const ckFrame=new THREE.Mesh(new THREE.BoxGeometry(2.4,.4,3.5),tm);ckFrame.position.set(0,1.1,-5);playerShip.mesh.add(ckFrame);
-  const cgGeo=new THREE.SphereGeometry(1,14,10);cgGeo.scale(.7,.45,1.2);cgGeo.translate(0,1.2,-5);playerShip.mesh.add(new THREE.Mesh(cgGeo,ck));
-  const scanLine=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,3.3),gm);scanLine.position.set(0,1.42,-5);playerShip.mesh.add(scanLine);
+  // ── Cockpit (only if placed on blueprint) ──────────────────────────────────
+  if(cockpitPlaced){
+    const ckFrame=new THREE.Mesh(new THREE.BoxGeometry(2.4,.4,3.5),tm);ckFrame.position.set(0,1.1,-5);playerShip.mesh.add(ckFrame);
+    const cgGeo=new THREE.SphereGeometry(1,14,10);cgGeo.scale(.7,.45,1.2);cgGeo.translate(0,1.2,-5);playerShip.mesh.add(new THREE.Mesh(cgGeo,ck));
+    const scanLine=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,3.3),gm);scanLine.position.set(0,1.42,-5);playerShip.mesh.add(scanLine);
+  }
 
   // ── Spine / keel ─────────────────────────────
   const spine=new THREE.Mesh(new THREE.BoxGeometry(.7,1,10),hm2);spine.position.set(0,1.4,0);playerShip.mesh.add(spine);
@@ -1133,27 +1217,27 @@ function rebuildPlayerMesh(){
     const panel=new THREE.Mesh(new THREE.BoxGeometry(.08,1.1,5.5),tm);panel.position.set(s*1.62,0,-1.5);playerShip.mesh.add(panel);
   });
 
-  // ── Wings (width from blueprint) ─────────────
+  // ── Wings (width from blueprint; skip side if no wing module) ─────────────
   [-1,1].forEach(side=>{
     const span=(side<0?wingL:wingR);
-    const ww=6+span*2.5;
+    if(span<=0)return;
+    const ww=Math.max(3.2,wingSpan+span*2.2);
     const wGeo=new THREE.BoxGeometry(ww,.28,7);
     const w=new THREE.Mesh(wGeo,hm);w.position.set(side*(ww/2+1.6),.15,.8);w.rotation.y=side*-.18;playerShip.mesh.add(w);
-    // Wingtip
     const finGeo=new THREE.BoxGeometry(.25,2.8+span*.5,2.4);
     const fin=new THREE.Mesh(finGeo,hm);fin.position.set(side*(ww+2),1.2,-.4);playerShip.mesh.add(fin);
     const finTip=new THREE.Mesh(new THREE.BoxGeometry(.22,.25,2.2),tm);finTip.position.set(side*(ww+2),2.65,-.3);playerShip.mesh.add(finTip);
-    // Wing emissive channel
     const wChan=new THREE.Mesh(new THREE.BoxGeometry(ww*.8,.06,1.2),gm);wChan.position.set(side*(ww/2+1.6),-.02,0);wChan.rotation.y=side*-.18;playerShip.mesh.add(wChan);
-    // Wing trim stripe
     const wt=new THREE.Mesh(new THREE.BoxGeometry(ww,.26,1.2),tm);wt.position.set(side*(ww/2+1.6),.12,-1.2);wt.rotation.y=side*-.18;playerShip.mesh.add(wt);
   });
 
-  // ── Engines (number from blueprint) ──────────
+  // ── Engines (one mesh per engine / engine2 / boost module) ──────────
   const engPositions=[];
-  if(engCount<=2){engPositions.push([-2.5,-.6],[2.5,-.6]);}
-  else if(engCount<=4){engPositions.push([-4,-.6],[-1.5,-.8],[1.5,-.8],[4,-.6]);}
-  else{engPositions.push([-5,-.5],[-2.5,-.8],[0,-.9],[2.5,-.8],[5,-.5]);}
+  const spread=2.4+Math.min(engCount,6)*0.55;
+  for(let i=0;i<engCount;i++){
+    const t=engCount<=1?0:(i/(engCount-1))*2-1;
+    engPositions.push([t*spread,-.65-Math.abs(t)*.12]);
+  }
 
   engPositions.forEach(([ex,ey],i)=>{
     const isBoostPos=hasBoostEng&&i===Math.floor(engPositions.length/2);
@@ -1168,10 +1252,12 @@ function rebuildPlayerMesh(){
   });
 
   // ── Weapon mounts ─────────────────────────────
-  for(let i=0;i<Math.min(weapCount,4);i++){
-    const wx=(i%2===0?-1:1)*(1.5+Math.floor(i/2)*2.5);
-    const wp=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,2.2),hmd);wp.position.set(wx,-.9,-3.5);playerShip.mesh.add(wp);
-    const wTip=new THREE.Mesh(new THREE.ConeGeometry(i>1?.25:.18,.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,-.9,-5);playerShip.mesh.add(wTip);
+  const weapon2n=bpCountModules('weapon2');
+  for(let i=0;i<Math.min(weapCount,6);i++){
+    const wx=(i%2===0?-1:1)*(1.4+Math.floor(i/2)*2.2);
+    const big=i>=bpCountModules('weapon')&&weapon2n>0;
+    const wp=new THREE.Mesh(new THREE.BoxGeometry(big?.42:.35,big?.42:.35,big?2.8:2.2),hmd);wp.position.set(wx,-.9,-3.5);playerShip.mesh.add(wp);
+    const wTip=new THREE.Mesh(new THREE.ConeGeometry(big?.3:.18,big?1.1:.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,-.9,big?-5.6:-5);playerShip.mesh.add(wTip);
   }
 
   // ── Cargo pods ────────────────────────────────
@@ -1208,19 +1294,22 @@ function rebuildPlayerMesh(){
 // THREE.JS SETUP
 // ─────────────────────────────────────────────────
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x000102,0.000085);
+scene.fog=new THREE.FogExp2(0x030612,0.000064);
 const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,40000);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
+if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;}
+if(renderer.physicallyCorrectLights!==undefined)renderer.physicallyCorrectLights=true;
 document.getElementById('cv').appendChild(renderer.domElement);
 // Rich multi-source lighting so ships are lit from all angles
-scene.add(new THREE.AmbientLight(0xaabbdd,0.55));
-const hemiLight=new THREE.HemisphereLight(0x223366,0x110a00,0.7);scene.add(hemiLight);
-const backFill=new THREE.DirectionalLight(0x334466,0.45);backFill.position.set(-300,200,400);scene.add(backFill);
-const rimLight=new THREE.DirectionalLight(0x6688aa,0.3);rimLight.position.set(0,300,-200);scene.add(rimLight);
-const sunLt=new THREE.PointLight(0xffeecc,9,66000);scene.add(sunLt);
-const sunLt2=new THREE.PointLight(0xff7700,4,12000);scene.add(sunLt2);
+scene.add(new THREE.AmbientLight(0xb8c8ee,0.62));
+const hemiLight=new THREE.HemisphereLight(0x3355aa,0x1a1208,0.82);scene.add(hemiLight);
+const backFill=new THREE.DirectionalLight(0x446699,0.58);backFill.position.set(-300,200,400);scene.add(backFill);
+const rimLight=new THREE.DirectionalLight(0x88aadd,0.42);rimLight.position.set(0,300,-200);scene.add(rimLight);
+const sunLt=new THREE.PointLight(0xffeecc,12,66000);scene.add(sunLt);
+const sunLt2=new THREE.PointLight(0xff8833,5.5,12000);scene.add(sunLt2);
 window.addEventListener('resize',()=>{
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);resizeGM();
@@ -1308,12 +1397,19 @@ function hToNorm(h,sz,str){
 function cv2t(c){const t=new THREE.CanvasTexture(c);t.anisotropy=renderer.capabilities.getMaxAnisotropy();t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;}
 
 // Make {map, normalMap, roughnessMap} triple from a height function + color mapper
+function smooth01(t){t=cl(t,0,1);return t*t*(3-2*t);}
 function mkPTex(hFn,colFn,normStr,roughFn){
   const h=genH(hFn,TS);
   // diffuse
   const cc=document.createElement('canvas');cc.width=cc.height=TS;
   const cx=cc.getContext('2d'),ci=cx.createImageData(TS,TS);
-  for(let i=0;i<TS*TS;i++){const [r,g,b]=colFn(h[i]);ci.data.set([r,g,b,255],i*4);}
+  for(let i=0;i<TS*TS;i++){
+    const xi=i%TS, yi=(i/TS)|0;
+    const u=xi/TS,v=yi/TS;
+    const micro=0.04*Math.sin(u*93.7+yi*2.1)+0.035*Math.sin(v*111.3+xi*1.7);
+    const [r,g,b]=colFn(h[i]+micro);
+    ci.data.set([r,g,b,255],i*4);
+  }
   cx.putImageData(ci,0,0);
   // normal
   const nc=document.createElement('canvas');nc.width=nc.height=TS;
@@ -1338,22 +1434,23 @@ const TX={
   earth:mkPTex(
     (x,y)=>warp(Nn.e,x*2.2,y*2.2,8,0.55,2),
     h=>{
-      if(h<.35){const d=h/.35;return [Math.round(4+d*18),Math.round(16+d*52),Math.round(88+d*90)];}  // deep→shallow ocean
-      if(h<.40){return [Math.round(50+h*120),Math.round(100+h*80),Math.round(50)];}  // coast/beach
-      if(h<.55){const g=h-.40;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];} // lowland vegetation
-      if(h<.72){const g=h-.55;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];} // upland
-      if(h<.85){const g=h-.72;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];} // rock
-      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];  // snow/ice cap
+      const w=(a,b,t)=>a+(b-a)*smooth01(t);
+      if(h<.35){const d=h/.35;return [Math.round(4+w(4,22,d)),Math.round(16+w(16,68,d)),Math.round(88+w(88,178,d))];}
+      if(h<.40){const t=(h-.35)/.05;return [Math.round(w(22,62,t)),Math.round(w(72,140,t)),Math.round(w(165,55,t))];}
+      if(h<.55){const g=(h-.40)/.15;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];}
+      if(h<.72){const g=(h-.55)/.17;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];}
+      if(h<.85){const g=(h-.72)/.13;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];}
+      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];
     }, 16, h=>h<.38?.04:h<.7?.82:.55
   ),
   // ── Barren: terracotta craters, pale dust ridges ──
   barren:mkPTex(
     (x,y)=>{const b=warp(Nn.b,x*2.8,y*2.8,8,0.5);const r=rfbm(Nn.b,x*4,y*4,5)*.35;return cl(b*.72+r*.28,0,1);},
     h=>{
-      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];} // crater shadow
-      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];} // warm terracotta
-      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];} // pale dust ridge
-      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)]; // mid-tone rust
+      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];}
+      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];}
+      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];}
+      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)];
     }, 15, h=>.75+h*.18
   ),
   // ── Industrial: dark metal with orange glow grid, bright windows ──
@@ -1392,10 +1489,11 @@ const TX={
       return cl(base*.55+crack*.45,0,1);
     },
     h=>{
-      if(h<.22){return [2,10,32];} // deep crevasse
-      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];} // blue shadow
-      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];} // mid ice
-      const g=(h-.65)/.35;return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)]; // bright surface
+      if(h<.22){return [2,10,32];}
+      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];}
+      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];}
+      const g=(h-.65)/.35;
+      return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)];
     }, 18, h=>h<.3?.03:.12
   ),
   // ── Rock: cratered rubble ──
@@ -1428,10 +1526,10 @@ const TX={
   green:mkPTex(
     (x,y)=>warp(Nn.gr,x*2.8,y*2.8,8,0.5,2),
     h=>{
-      if(h<.28){return [6,20,8];} // deep shadow
+      if(h<.28){return [6,20,8];}
       if(h<.55){const g=(h-.28)/.27;return [Math.round(14+g*40),Math.round(50+g*90),Math.round(10+g*22)];}
       if(h<.78){const g=(h-.55)/.23;return [Math.round(42+g*65),Math.round(100+g*65),Math.round(20+g*30)];}
-      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)]; // bright ridge
+      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)];
     }, 12, h=>.72+h*.2
   ),
   // ── Particle sprite ──
@@ -1467,6 +1565,45 @@ const sunCC=(()=>{
   }
   ctx.putImageData(ci,0,0);return cv2t(c);
 })();
+TX.sunTex=sunCC;
+
+// Procedural nebula panoramas (equirectangular) for sky dome + additive veil
+const Nneb=mkN(3.7);
+function mkNebulaCanvas(w,h,seedHue){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d'),img=x.createImageData(w,h);
+  const dh=seedHue||220;
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const u=i/w,v=j/h;
+    const n1=fbm(Nneb,u*2.1+0.4,v*2.1,6,2.05,.5);
+    const n2=fbm(Nneb,u*3.7+11,v*3.2+2.1,5,2.1,.48);
+    const wv=warp(Nneb,u*1.8,v*1.8,5,0.38,2);
+    const gas=cl(n1*.45+n2*.35+wv*.2,0,1);
+    const ridge=Math.pow(Math.max(0,gas-.35),1.4);
+    const r=Math.round(4+ridge*85+gas*22+(Math.sin(dh*.02+u)*8));
+    const g=Math.round(8+ridge*40+gas*55+(Math.cos(dh*.03+v)*10));
+    const b=Math.round(18+ridge*120+gas*90);
+    const a=Math.round(cl(ridge*220+gas*35,0,255));
+    const k=(j*w+i)*4;img.data[k]=r;img.data[k+1]=g;img.data[k+2]=b;img.data[k+3]=a;
+  }
+  x.putImageData(img,0,0);return c;
+}
+const nebBaseTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(1024,512,268));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  return t;
+})();
+const nebVeilTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(768,384,312));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
+const nebWarmTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(640,320,28));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
+
 // ─────────────────────────────────────────────────
 // PARTICLES
 // ─────────────────────────────────────────────────
@@ -1484,23 +1621,96 @@ function boom(pos,col,n,sp){n=n||60;sp=sp||1;for(let i=0;i<n;i++){const p=getP()
 // ─────────────────────────────────────────────────
 // ENVIRONMENT
 // ─────────────────────────────────────────────────
-// Stars
-const sGeo=new THREE.BufferGeometry(),sv=[];
-for(let i=0;i<7000;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>27000000)sv.push(x,y,z);}
-sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
-scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:2.8,transparent:true,opacity:.8})));
-// Faint second star layer with slight blue tint
-const sGeo2=new THREE.BufferGeometry(),sv2=[];
-for(let i=0;i<2500;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>70000000)sv2.push(x,y,z);}
-sGeo2.setAttribute('position',new THREE.Float32BufferAttribute(sv2,3));
-scene.add(new THREE.Points(sGeo2,new THREE.PointsMaterial({color:0xaabbff,size:1.8,transparent:true,opacity:.45})));
-// Nebula backdrop
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(144000,16,16),new THREE.MeshBasicMaterial({color:0x010210,side:THREE.BackSide})));
+// Stars — layered colors (distant world shell)
+function fillStarBuffer(geo,count,minR2,maxR2,warmChance){
+  const pos=[],col=[];
+  let tries=0;
+  while(pos.length/3<count&&tries<count*12){
+    tries++;
+    const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;
+    const d2=x*x+y*y+z*z;if(d2<minR2||d2>maxR2)continue;
+    pos.push(x,y,z);
+    const w=Math.random();
+    if(w<warmChance){col.push(1,.92,.78);}else if(w<warmChance+.35){col.push(.78,.88,1);}else{col.push(.95,.98,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const STAR_MATS=[];
+const sGeo=new THREE.BufferGeometry();
+fillStarBuffer(sGeo,12000,27000000,2.2e13,.12);
+const smA=new THREE.PointsMaterial({
+  size:3.5,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.94,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+scene.add(new THREE.Points(sGeo,smA));STAR_MATS.push(smA);
+const sGeo2=new THREE.BufferGeometry();
+fillStarBuffer(sGeo2,5500,5e7,2.2e13,.08);
+const smB=new THREE.PointsMaterial({
+  color:0xaaccff,size:2.4,sizeAttenuation:true,transparent:true,opacity:.58,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+scene.add(new THREE.Points(sGeo2,smB));STAR_MATS.push(smB);
+const sGeo3=new THREE.BufferGeometry(),sv3=[];
+for(let i=0;i<2200;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
+sGeo3.setAttribute('position',new THREE.Float32BufferAttribute(sv3,3));
+const smC=new THREE.PointsMaterial({color:0xffffff,size:5.6,transparent:true,opacity:.38,blending:THREE.AdditiveBlending,depthWrite:false});
+scene.add(new THREE.Points(sGeo3,smC));STAR_MATS.push(smC);
+
+// Sky rig — nebulae + dense starfield follow camera (infinite sky illusion)
+const skyRig=new THREE.Group();
+scene.add(skyRig);
+const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false});
+const skyDome=new THREE.Mesh(new THREE.SphereGeometry(92000,48,32),skyMat);skyRig.add(skyDome);
+const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(90500,24,20),new THREE.MeshBasicMaterial({color:0x020412,side:THREE.BackSide,depthWrite:false}));skyRig.add(skyDeep);
+const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(88000,32,24),new THREE.MeshBasicMaterial({
+  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.52,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff
+}));skyRig.add(nebVeil);
+const nebWarm=new THREE.Mesh(new THREE.SphereGeometry(85000,28,20),new THREE.MeshBasicMaterial({
+  map:nebWarmTex,side:THREE.BackSide,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,color:0xffaa66
+}));skyRig.add(nebWarm);
+
+function fillDiskStars(geo,n,radius,thick,biasZ,warmChance){
+  const pos=[],col=[];
+  for(let i=0;i<n;i++){
+    const u=Math.random()*2-1,v=Math.random()*2-1,w=Math.random()*2-1;
+    const len=Math.sqrt(u*u+v*v+w*w)||1;
+    let x=u/len*radius,y=v/len*radius,z=w/len*radius;
+    x+=(Math.random()-.5)*thick*2;y+=(Math.random()-.5)*thick*2;z+=(Math.random()-.5)*thick*2+biasZ;
+    pos.push(x,y,z);
+    const r=Math.random();
+    if(r<warmChance){col.push(1,.88,.62);}else if(r<warmChance+.28){col.push(.75,.88,1);}else{col.push(.92,.95,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const GAL_BAND=new THREE.BufferGeometry();
+fillDiskStars(GAL_BAND,14000,78000,4200,0,.09);
+const galMat=new THREE.PointsMaterial({
+  size:2.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.72,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(GAL_BAND,galMat));STAR_MATS.push(galMat);
+const NEAR1=new THREE.BufferGeometry();
+fillDiskStars(NEAR1,11000,76000,900,0,.11);
+const nm1=new THREE.PointsMaterial({
+  size:1.35,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.88,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(NEAR1,nm1));STAR_MATS.push(nm1);
+const NEAR2=new THREE.BufferGeometry();
+fillDiskStars(NEAR2,6500,74000,500,0,.07);
+const nm2=new THREE.PointsMaterial({
+  color:0xdde8ff,size:2.1,sizeAttenuation:true,transparent:true,opacity:.62,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+skyRig.add(new THREE.Points(NEAR2,nm2));STAR_MATS.push(nm2);
 
 // Sun
 const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(SUN_R,64,64),
-  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xdd3300,emissiveMap:TX.sunTex,emissiveIntensity:1.0,roughness:.8}));
+  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xff4400,emissiveMap:TX.sunTex,emissiveIntensity:1.35,roughness:.72}));
 scene.add(sunMesh);
+sunLt.position.copy(sunMesh.position);sunLt2.position.copy(sunMesh.position);
 [{r:SUN_R+210,op:.14,col:0xff8800},{r:SUN_R+540,op:.07,col:0xff5500},{r:SUN_R+1140,op:.03,col:0xff2200}].forEach(g=>{
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending})));
 });
@@ -1521,11 +1731,14 @@ for(let i=0;i<320;i++){
 const smeshes=[];
 const stations=[];
 
-// Orbit rings for non-satellites
+// Orbit rings for non-satellites (faction tint where applicable)
 SDATA.filter(sd=>!sd.sat).forEach(sd=>{
   const pts=[];for(let i=0;i<=144;i++){const a=i/144*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*sd.orbitR,0,Math.sin(a)*sd.orbitR));}
   const g=new THREE.BufferGeometry().setFromPoints(pts);
-  scene.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0x102035,transparent:true,opacity:.35})));
+  const f=sd.faction&&FACTIONS[sd.faction];
+  const col=new THREE.Color(f?f.hex:0x223355);
+  col.multiplyScalar(.42);
+  scene.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.4})));
 });
 
 // Satellite orbit rings (updated in loop around parent)
@@ -1553,11 +1766,12 @@ function buildStationMesh(sd){
     ...(sd.pType==='earth'?{emissive:0x000e1a,emissiveIntensity:.06}:{}),
   };
   const mat=new THREE.MeshStandardMaterial(matOpts);
+  mat.normalScale=new THREE.Vector2(1.08,1.08);
   const mesh=new THREE.Mesh(geo,mat);
   // Atmosphere glow
   const f=FACTIONS[sd.faction];const gc=f?f.hex:0x334455;
   if(['earth','fortress','ice','green'].includes(sd.pType)){
-    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
+    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
   }
   // Rings
   if(sd.pType==='fortress'){const ring=new THREE.Mesh(new THREE.TorusGeometry(sd.pR+sd.pR*.45,3.5,8,64),new THREE.MeshStandardMaterial({color:0x886633,roughness:.9}));ring.rotation.x=Math.PI/2.3;mesh.add(ring);}
@@ -1598,21 +1812,21 @@ class Ship{
 
     // ── Material palette ──────────────────────────
     const hullCol = new THREE.Color(bc);
-    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.28,metalness:.82,envMapIntensity:1.0});
+    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.22,metalness:.86,envMapIntensity:1.25});
     // Secondary hull panel (slightly lighter)
-    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.35),roughness:.22,metalness:.88});
+    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.42),roughness:.16,metalness:.9});
     // Dark underside
-    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.55),roughness:.5,metalness:.6});
+    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.58),roughness:.42,metalness:.68});
     // Cockpit glass
-    const ck = new THREE.MeshStandardMaterial({color:0x050c18,roughness:.04,metalness:.95,transparent:true,opacity:.88});
+    const ck = new THREE.MeshStandardMaterial({color:0x0a1830,roughness:.03,metalness:.96,transparent:true,opacity:.9,emissive:0x112244,emissiveIntensity:.35});
     // Engine nacelle
-    const em = new THREE.MeshStandardMaterial({color:0x080808,roughness:.75,metalness:.5});
+    const em = new THREE.MeshStandardMaterial({color:0x101418,roughness:.65,metalness:.62});
     // Glowing accent (faction color, additive)
-    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false});
+    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false});
     // Emissive trim (faction color, lights up dark side)
-    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.95,emissive:ah,emissiveIntensity:1.2});
+    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.96,emissive:ah,emissiveIntensity:1.85});
     // Thruster inner glow
-    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.9,blending:THREE.AdditiveBlending});
+    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:1,blending:THREE.AdditiveBlending});
 
     // ── HULL CONSTRUCTION ─────────────────────────
 
@@ -1785,13 +1999,13 @@ class Ship{
     this.energy-=13;this.fireCooldown=.22;
     const fwd=new THREE.Vector3(0,0,-1).applyEuler(this.mesh.rotation);
     const fire1=()=>{
-      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x00ffff:this.faction==='pirate'?0xff6600:0xff2200}));
+      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x66ffff:this.faction==='pirate'?0xff9933:0xff4422}));
       m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
       PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
       scene.add(m);
     };
     fire1();
-    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x00ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
+    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
     if(this.isPlayer&&PS.bigShot){const pm=PROJS[PROJS.length-1];if(pm)pm.mesh.scale.set(2,2,2);}
   }
   takeDamage(amt){
@@ -1834,6 +2048,7 @@ function updateProjs(dt){
               }
             });
             changeRep(ns.faction,-8);
+            ns.angry=true;
           }
           break;
         }
@@ -1879,7 +2094,7 @@ function spawnNpc(faction,stationId,type){
   const sm=getSM(stationId);
   if(sm){const a=Math.random()*Math.PI*2;const r=sm.sd.pR+1000+Math.random()*1500;ship.mesh.position.set(sm.mesh.position.x+Math.cos(a)*r,0,sm.mesh.position.z+Math.sin(a)*r);}
   ship.mesh.lookAt(playerShip.mesh.position);
-  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null});
+  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null,angry:false});
 }
 // ─────────────────────────────────────────────────
 // PLAYER SHIP  (must be before FLEET spawn)
@@ -1940,18 +2155,41 @@ function npcAI(ns,dt){
   }
   if(avoided)return;
 
-  const hostile=(rep[faction]||0)<-25;
   const dp=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
-  const dist=dp.length();dp.normalize();
-  const cY=new THREE.Vector3().crossVectors(fwd,dp).y;
-  const dot=fwd.dot(dp);
+  const dist=dp.length();
+  const dpN=dist>1e-5?dp.clone().multiplyScalar(1/dist):new THREE.Vector3(0,0,1);
+  const dot=fwd.dot(dpN);
+  const cY=new THREE.Vector3().crossVectors(fwd,dpN).y;
 
-  if((hostile||type==='pirate')&&playerShip.alive&&dist<7500){
-    if(cY>0.08)ship.mesh.rotation.y+=ship.turnSpeed*dt;
-    else if(cY<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt;
-    if(dist>1200&&dot>0.35)ship.applyThrust(dt);
-    if(dot>0.9&&dist<2700)ship.fire();
-  } else {
+  // Escort player if hired to do so (before combat / patrol)
+  if(ns.escorting&&ns.escortTimer>0){
+    ns.escortTimer-=dt;
+    if(ns.escortTimer<=0){ns.escorting=false;notify(ns.displayName||'Nave'+ ': scorta completata.');}
+    const eDir=new THREE.Vector3().subVectors(playerShip.mesh.position,pos).normalize();
+    const eCross=new THREE.Vector3().crossVectors(fwd,eDir).y;
+    if(eCross>0.1)ship.mesh.rotation.y+=ship.turnSpeed*dt*.8;
+    else if(eCross<-0.1)ship.mesh.rotation.y-=ship.turnSpeed*dt*.8;
+    if(dist>600)ship.applyThrust(dt);
+    return;
+  }
+
+  const repVal=rep[faction]!=null?rep[faction]:0;
+  const madAtPlayer=repVal<=-15||ns.angry;
+  const wantsFight=(type==='pirate'||madAtPlayer)&&playerShip.alive;
+
+  if(wantsFight){
+    const chaseR=10500;
+    if(dist<=chaseR){
+      const turn=ship.turnSpeed*dt*(type==='pirate'||ns.angry?1.12:1);
+      if(cY>0.06)ship.mesh.rotation.y+=turn;
+      else if(cY<-0.06)ship.mesh.rotation.y-=turn;
+      const thrustMult=type==='pirate'||ns.angry?1.18:1.05;
+      if(dist>950&&dot>-0.14)ship.applyThrust(dt*thrustMult);
+      const fireDot=(type==='pirate'||ns.angry)?0.74:0.8;
+      const fireDist=(type==='pirate'||ns.angry)?4000:3000;
+      if(dot>fireDot&&dist<fireDist)ship.fire();
+    }
+  }else{
     const hsm=getSM(ns.stationId);
     if(hsm){
       const pr=type==='merchant'?2700:type==='courier'?3600:1650;
@@ -1963,18 +2201,6 @@ function npcAI(ns,dt){
       else if(c2<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt*.5;
       if(pos.distanceTo(new THREE.Vector3(tx,0,tz))>360)ship.applyThrust(dt);
     }
-  }
-  // Escort player if hired to do so
-  if(ns.escorting&&ns.escortTimer>0){
-    ns.escortTimer-=dt;
-    if(ns.escortTimer<=0){ns.escorting=false;notify(ns.displayName||'Nave'+ ': scorta completata.');}
-    // follow player
-    const eDir=new THREE.Vector3().subVectors(playerShip.mesh.position,pos).normalize();
-    const eCross=new THREE.Vector3().crossVectors(fwd,eDir).y;
-    if(eCross>0.1)ship.mesh.rotation.y+=ship.turnSpeed*dt*.8;
-    else if(eCross<-0.1)ship.mesh.rotation.y-=ship.turnSpeed*dt*.8;
-    if(dist>600)ship.applyThrust(dt);
-    return;
   }
   ns.dtimer-=dt;
   if(ns.dtimer<0&&dist<1800&&playerShip.alive&&gstate==='flying'){
@@ -2367,7 +2593,7 @@ function getRepLabel(faction){
 
 function buildDlgChoices(ns){
   const {faction,type,ship}=ns;
-  const hostile=(rep[faction]||0)<-25||type==='pirate';
+  const hostile=(rep[faction]||0)<=-15||type==='pirate';
   const choices=[];
 
   // ── Greeting
@@ -2444,8 +2670,8 @@ function buildDlgChoices(ns){
       }});
     }
     choices.push({label:'[ATTACCA] Apri il fuoco!',cls:'hostile',fn:()=>{
+      const tgt=activeDlgNpc;if(tgt)tgt.angry=true;
       closeIdlg();
-      // force rep very hostile
       if(faction in rep)rep[faction]=Math.min(rep[faction]||0,-30);
       renderRep();
     }});
@@ -2932,14 +3158,20 @@ const MAP={
 };
 const BASE_SC=()=>Math.min(innerWidth,innerHeight)/78000;
 
-function worldToMap(wx,wz,cv){
+function mapClientToCanvas(cv,clientX,clientY){
+  const r=cv.getBoundingClientRect();
+  const sx=cv.width/Math.max(r.width,1),sy=cv.height/Math.max(r.height,1);
+  return {mx:(clientX-r.left)*sx,my:(clientY-r.top)*sy};
+}
+
+function worldToMap(wx,wz){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:cx+wx*sc, y:cy+wz*sc};
 }
-function mapToWorld(mx,my,cv){
+function mapToWorld(mx,my){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:(mx-cx)/sc, z:(my-cy)/sc};
 }
 
@@ -2951,24 +3183,37 @@ function resizeGM(){
 
 function drawMap(){
   const cv=document.getElementById('gmcv');const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  ctx.fillStyle='#000102';ctx.fillRect(0,0,W,H);
+  const W=innerWidth,H=innerHeight;
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#030818';ctx.fillRect(0,0,W,H);
 
-  // Cached star field
-  if(!MAP.starCache){
+  // Cached star field + nebula wash
+  if(!MAP.starCache||MAP.starCache.width!==W||MAP.starCache.height!==H){
     MAP.starCache=document.createElement('canvas');
     MAP.starCache.width=W;MAP.starCache.height=H;
     const sc2=MAP.starCache.getContext('2d');
-    for(let i=0;i<600;i++){
-      const a=0.08+Math.random()*.55;
+    const g0=sc2.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,Math.max(W,H)*.75);
+    g0.addColorStop(0,'rgba(40,20,90,.45)');g0.addColorStop(.35,'rgba(12,30,80,.22)');g0.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g0;sc2.fillRect(0,0,W,H);
+    const g1=sc2.createRadialGradient(W*.82,H*.12,0,W*.82,H*.12,Math.max(W,H)*.55);
+    g1.addColorStop(0,'rgba(90,30,60,.32)');g1.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g1;sc2.fillRect(0,0,W,H);
+    for(let i=0;i<900;i++){
+      const a=0.06+Math.random()*.62;
       sc2.fillStyle=`rgba(255,255,255,${a})`;
-      sc2.fillRect(Math.random()*W,Math.random()*H,Math.random()<.08?2:1,Math.random()<.08?2:1);
+      const s=Math.random()<.06?2:1;
+      sc2.fillRect(Math.random()*W,Math.random()*H,s,s);
+    }
+    for(let i=0;i<80;i++){
+      sc2.fillStyle=`rgba(180,210,255,${0.03+Math.random()*.08})`;
+      sc2.beginPath();sc2.arc(Math.random()*W,Math.random()*H,1.5+Math.random()*4,0,Math.PI*2);sc2.fill();
     }
   }
   ctx.drawImage(MAP.starCache,0,0);
 
   const sc=BASE_SC()*MAP.zoom;
-  const cx=W/2+MAP.panX, cy=H/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
 
   // Orbit rings (non-satellites)
   ctx.setLineDash([]);
@@ -3001,7 +3246,7 @@ function drawMap(){
   // Satellite orbit rings (drawn around parent position)
   smeshes.filter(s=>s.sd.sat).forEach(s=>{
     const par=getSM(s.sd.parentId);if(!par)return;
-    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z,cv);
+    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z);
     const f=FACTIONS[s.sd.faction];
     ctx.strokeStyle=(f?f.color+'33':'#223344');ctx.lineWidth=.8;ctx.setLineDash([2*MAP.zoom,4*MAP.zoom]);
     ctx.beginPath();ctx.arc(pp.x,pp.y,s.sd.satR*sc,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
@@ -3009,7 +3254,7 @@ function drawMap(){
 
   // Stations
   smeshes.forEach(sm=>{
-    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
     const f=FACTIONS[sm.sd.faction];const col=f?f.color:'#888';
     const r=Math.max(3,sm.sd.pR*sc*1.6);
     // Glow
@@ -3040,7 +3285,7 @@ function drawMap(){
   });
 
   // Player position
-  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z,cv);
+  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z);
   ctx.save();ctx.translate(ppx,ppy);
   // Rotate triangle to match ship heading
   ctx.rotate(-playerShip.mesh.rotation.y);
@@ -3055,7 +3300,7 @@ function drawMap(){
   if(navDestId){
     const sm=getSM(navDestId);
     if(sm){
-      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
       ctx.setLineDash([6,8]);ctx.strokeStyle='rgba(0,255,200,.35)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(dx,dy);ctx.stroke();
       ctx.setLineDash([]);
@@ -3066,9 +3311,8 @@ function drawMap(){
 
 function handleMapClick(e){
   const cv=document.getElementById('gmcv');
-  const rect=cv.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const {x:wx,z:wz}=mapToWorld(mx,my,cv);
+  const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+  const {x:wx,z:wz}=mapToWorld(mx,my);
   const sc=BASE_SC()*MAP.zoom;
   // Find closest station within click radius
   let best=null,bestD=Infinity;
@@ -3125,12 +3369,11 @@ function setupMapEvents(){
     const oldZoom=MAP.zoom;
     MAP.zoom=cl(MAP.zoom*Math.exp(-e.deltaY*.001),.12,8);
     // Zoom toward cursor
-    const rect=cv.getBoundingClientRect();
-    const mx=e.clientX-rect.left-cv.width/2;
-    const my=e.clientY-rect.top-cv.height/2;
+    const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+    const mx2=mx-cv.width/2,my2=my-cv.height/2;
     const zr=MAP.zoom/oldZoom;
-    MAP.panX=(MAP.panX+mx)*zr-mx;
-    MAP.panY=(MAP.panY+my)*zr-my;
+    MAP.panX=(MAP.panX+mx2)*zr-mx2;
+    MAP.panY=(MAP.panY+my2)*zr-my2;
     drawMap();
   },{passive:false});
 
@@ -3234,7 +3477,7 @@ function drawRadar(){
     const rx=(ns.ship.mesh.position.x-playerShip.mesh.position.x)*sc;
     const ry=(ns.ship.mesh.position.z-playerShip.mesh.position.z)*sc;
     if(Math.abs(rx)>46||Math.abs(ry)>46)return;
-    const hostile=(rep[ns.faction]||0)<-25||ns.faction==='pirate';
+    const hostile=(rep[ns.faction]||0)<=-15||ns.faction==='pirate'||ns.angry;
     ctx.fillStyle=hostile?'#ff4433':f?f.color:'#888';
     ctx.beginPath();ctx.arc(cl(cx+rx,2,W-2),cl(cy+ry,2,W-2),2.5,0,Math.PI*2);ctx.fill();
   });
@@ -3281,7 +3524,7 @@ function triggerVictory(){
   gstate='gameover';
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
-  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio sono di nuovo unite.<br>Il Consorzio Valsamoggio vive. Anche Crespellano ha (quasi) avuto il semaforo.<br>Taproblem — il sistema e\' in pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
+  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br>Crespellano ha (quasi) avuto il semaforo. Calcara ha (quasi) smesso di contare i timbri.<br>Taproblem: per ora, il vuoto sa di pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
 }
 
 // ─────────────────────────────────────────────────
@@ -3289,8 +3532,9 @@ function triggerVictory(){
 // ─────────────────────────────────────────────────
 const clock=new THREE.Clock();
 renderRep();
-// Start story after 5 seconds
-setTimeout(()=>advanceStory(1),5000);
+// Prologue then chapter 1 (staggered so text does not overlap)
+setTimeout(()=>showStoryBanner('PROLOGO','Sistema Valsamoggio — 2087',STORY.prologue,11000),4200);
+setTimeout(()=>advanceStory(1),15500);
 
 function animate(){
   requestAnimationFrame(animate);
@@ -3301,13 +3545,13 @@ function animate(){
 
   // Orbit updates — flat ecliptic plane
   smeshes.filter(s=>!s.sd.sat).forEach(sm=>{
-    sm.angle+=sm.sd.orbitSpeed*dt*.08;
+    sm.angle+=sm.sd.orbitSpeed*dt*.032;
     sm.mesh.position.set(Math.cos(sm.angle)*sm.sd.orbitR, 0, Math.sin(sm.angle)*sm.sd.orbitR);
     sm.mesh.rotation.y+=0.2*dt;
   });
   smeshes.filter(s=>s.sd.sat).forEach(sm=>{
     const par=getSM(sm.sd.parentId);if(!par)return;
-    sm.satAngle+=sm.sd.satSpeed*dt*.08;
+    sm.satAngle+=sm.sd.satSpeed*dt*.032;
     sm.mesh.position.set(
       par.mesh.position.x+Math.cos(sm.satAngle)*sm.sd.satR,
       0,
@@ -3402,6 +3646,16 @@ function animate(){
     const nc=document.getElementById('navcv');
     if(nc&&nc.width){nc.getContext('2d').clearRect(0,0,nc.width,nc.height);}
   }
+  const twT=performance.now()*.00115;
+  STAR_MATS[0].opacity=.88+Math.sin(twT)*.08;
+  STAR_MATS[1].opacity=.48+Math.sin(twT*1.3+1.2)*.12;
+  STAR_MATS[2].opacity=.28+Math.sin(twT*1.7+2.4)*.14;
+  if(STAR_MATS[3])STAR_MATS[3].opacity=.68+Math.sin(twT*.9+.5)*.1;
+  if(STAR_MATS[4])STAR_MATS[4].opacity=.82+Math.sin(twT*1.5+.8)*.1;
+  if(STAR_MATS[5])STAR_MATS[5].opacity=.55+Math.sin(twT*1.1+2.1)*.12;
+  skyRig.position.lerp(cam.position,1);
+  skyDome.rotation.y+=0.000014*dt*1000;nebVeil.rotation.y-=0.000009*dt*1000;
+  if(nebWarm)nebWarm.rotation.y+=0.000006*dt*1000;
   renderer.render(scene,cam);
 }
 animate();
