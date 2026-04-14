@@ -16,6 +16,13 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
+body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
+@keyframes lowHpPulse{0%,100%{filter:saturate(1)}50%{filter:saturate(1.15) contrast(1.05)}}
+
+/* Subtle film grain (no extra assets) */
+#film-grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size:180px 180px}
 
 /* ─ Canvas ─ */
 #cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 90px rgba(0,0,0,.28)}
@@ -265,10 +272,28 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
   #heat-lbl{bottom:max(134px,20vh);font-size:8px}
   #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
 }
+
+/* Flight HUD overlay (reticle + danger vignette) */
+#hud-overlay{position:fixed;inset:0;z-index:8;pointer-events:none}
+#reticle{position:absolute;left:50%;top:50%;width:min(100px,22vw);height:min(100px,22vw);margin:calc(min(-50px,-11vw)) 0 0 calc(min(-50px,-11vw));
+  border:1px solid rgba(120,190,255,.2);border-radius:2px;opacity:.35;box-shadow:0 0 0 1px rgba(0,0,0,.2) inset}
+#reticle::before,#reticle::after{content:'';position:absolute;background:rgba(140,200,255,.12)}
+#reticle::before{left:50%;top:-18%;width:1px;height:136%;transform:translateX(-50%)}
+#reticle::after{top:50%;left:-18%;height:1px;width:136%;transform:translateY(-50%)}
+#vignette-danger{position:absolute;inset:0;box-shadow:inset 0 0 0 0 rgba(200,20,40,0);transition:box-shadow .35s ease}
+#hud-overlay.danger #vignette-danger{box-shadow:inset 0 0 min(120px,28vw) min(40px,10vw) rgba(180,0,30,.42)}
+
+/* Control rows: two lines on narrow screens, one row on desktop */
+.ctrl-rows{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;gap:6px;align-items:center;width:100%}
+@media(max-width:700px){
+  .ctrl-rows{flex-direction:column;align-items:center;gap:5px}
+}
 </style>
 </head>
 <body>
+<div id="film-grain"></div>
 <div id="cv"></div>
+<div id="hud-overlay"><div id="reticle"></div><div id="vignette-danger"></div></div>
 <div id="dmgov"></div>
 <div id="fadeov"></div>
 <div id="land-title"><div class="lt-name" id="ltname"></div><div class="lt-sub" id="ltsub"></div></div>
@@ -304,12 +329,16 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
       </div>
     </div>
     <div class="hb-controls">
-      <div class="cg">
-        <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
-        <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
-        <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
-        <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
-        <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+      <div class="ctrl-rows">
+        <div class="cg">
+          <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
+          <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
+          <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
+        </div>
+        <div class="cg">
+          <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
+          <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1861,6 +1890,10 @@ function playTone(freq,dur,vol,type){
     o.start(t0);o.stop(t0+dd+.03);
   }catch(_){}
 }
+function playChime(kind){
+  if(kind==='notify'){playTone(520,.045,.034,'sine');setTimeout(()=>playTone(392,.055,.028,'sine'),75);}
+  else if(kind==='success'){playTone(523,.08,.042,'sine');setTimeout(()=>playTone(659,.09,.048,'sine'),95);setTimeout(()=>playTone(784,.14,.055,'sine'),195);}
+}
 
 // ─────────────────────────────────────────────────
 // SHIP CLASS
@@ -2415,8 +2448,8 @@ function renderRep(){
 }
 
 let nTmr=null;
-function notify(msg,dur){dur=dur||2400;const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
-function showStatus(html){const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
+function notify(msg,dur){dur=dur||2400;playChime('notify');const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
+function showStatus(html){playChime('success');const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
 
 // ─────────────────────────────────────────────────
 // PILOT PORTRAIT GENERATOR
@@ -3586,6 +3619,15 @@ function updateHUD(){
   if(PS.activeMissions.length>0){const m=PS.activeMissions[0];let p='';if(m.type==='combat')p=' ('+( m.killsDone||0)+'/'+m.killsNeeded+')';else if(m.targetSid){const ts=SDATA.find(s=>s.id===m.targetSid);if(ts)p=' → '+ts.name;}mt.textContent=m.title+p;mt.style.display='block';}
   else mt.style.display='none';
   smeshes.forEach(sm=>{if(sm.mesh._dr){const n=nearSt&&nearSt.sd.id===sm.sd.id;sm.mesh._dr.material.opacity=n?0.45+Math.sin(Date.now()*.01)*.18:0.13;}});
+  const ov=document.getElementById('hud-overlay'),ret=document.getElementById('reticle');
+  const fly=gstate==='flying'||gstate==='dialogue';
+  if(ov)ov.style.display=fly&&gstate!=='gameover'?'block':'none';
+  if(ov)ov.classList.toggle('danger',fly&&playerShip.alive&&playerShip.health<32);
+  document.body.classList.toggle('low-hp',fly&&playerShip.alive&&playerShip.health<22);
+  if(ret&&playerShip.maxSpeed>0){
+    const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
+    ret.style.opacity=String(.22+sp*.55);
+  }
   drawRadar();
 }
 
