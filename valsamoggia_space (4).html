@@ -271,6 +271,12 @@ body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
   #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
   #heat-lbl{bottom:max(134px,20vh);font-size:8px}
   #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
+#skim-lbl{position:fixed;top:118px;left:50%;transform:translateX(-50%);font-family:var(--FM);font-size:10px;color:#88eeff;letter-spacing:.15em;z-index:13;pointer-events:none;display:none;text-shadow:0 0 12px rgba(0,180,255,.5)}
+#skim-bar{position:fixed;top:136px;left:50%;transform:translateX(-50%);width:min(220px,55vw);height:5px;background:rgba(0,40,60,.5);border-radius:3px;overflow:hidden;z-index:13;pointer-events:none;display:none;border:1px solid rgba(0,200,255,.25)}
+#skim-fill{height:100%;width:0%;background:linear-gradient(90deg,#004466,#44ddff);transition:width .15s ease-out}
+@media(max-width:700px){
+  #skim-lbl{top:96px;font-size:9px}
+  #skim-bar{top:112px;width:min(200px,70vw)}
 }
 
 /* Flight HUD overlay (reticle + danger vignette) */
@@ -444,6 +450,8 @@ body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
 <div id="heat-lbl">SURRISCALDAMENTO</div>
 <div id="heat-bar"><div id="heat-fill" style="width:0%"></div></div>
 <div id="speed-bar"><div id="speed-fill"></div></div>
+<div id="skim-lbl">SORVOLO</div>
+<div id="skim-bar"><div id="skim-fill"></div></div>
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
@@ -612,6 +620,7 @@ const GOODS = {
   carburante:{name:'Carburante Castelletto',       unit:'tank'},
   armi_vere: {name:'Armi Vere (shhh)',             unit:'crate'},
   frammento: {name:'Frammento del Patto',          unit:'pz'},
+  cristalli: {name:'Cristalli atmosferici',        unit:'unit'},
 };
 const SG = {
   bazzano:    {vino:{s:90,b:115,sl:80},salumi:{s:55,b:180,sl:125},documenti:{s:100,b:11,sl:4}},
@@ -873,16 +882,22 @@ const MODULES=[
 // ─────────────────────────────────────────────────
 const PS={
   credits:1500, cargo:{}, cargoMax:14, crew:[], activeMissions:[],
-  maxSpeed:95, thrustPower:56, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
+  maxSpeed:138, thrustPower:72, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
   doubleShot:false, bigShot:false, maxHp:100, hpRegen:0, radarMult:1,
+  boostInstalled:false, turnMult:1, weaponVolley:1,
   modules:[],
 };
 const cargoCnt=()=>Object.values(PS.cargo).reduce((a,b)=>a+b,0);
 
+function applyBlueprintToPS(){
+  const st=bpStats();
+  PS.maxSpeed=st.speed;PS.thrustPower=st.thrust;PS.dmgBonus=st.dmg/100;PS.cargoMax=st.cargoMax;
+  PS.boostInstalled=st.hasBoost;PS.turnMult=st.turnMult;
+  PS.weaponVolley=1+Math.min(4,Math.floor(Math.max(0,st.weapons-1)/2));
+}
 function applyModules(){
-  PS.maxSpeed=95; PS.thrustPower=56; PS.dmgBonus=1.0; PS.tradeBonus=1.0;
-  PS.energyRegen=18; PS.doubleShot=false; PS.bigShot=false;
-  PS.maxHp=100; PS.hpRegen=0; PS.radarMult=1;
+  applyBlueprintToPS();
+  PS.tradeBonus=1.0;PS.doubleShot=false;PS.bigShot=false;PS.hpRegen=0;PS.radarMult=1;
   PS.crew.forEach(cid=>{const c=CREW_POOL.find(x=>x.id===cid);if(c&&c.fn)c.fn(PS);});
   PS.modules.forEach(mid=>{const m=MODULES.find(x=>x.id===mid);if(m)m.fn(PS);});
   if(typeof playerShip!=='undefined'&&playerShip){
@@ -891,6 +906,7 @@ function applyModules(){
     playerShip.dmgBonus=PS.dmgBonus;
     playerShip.thrustPower=PS.thrustPower;
     playerShip.maxHealth=PS.maxHp;
+    playerShip.turnSpeed=3.35*(PS.turnMult||1);
   }
 }
 
@@ -1031,16 +1047,19 @@ function bpCountModules(id){
   return n;
 }
 
+function finCountFromBp(){return bpCountModules('fin');}
 function bpStats(){
   const engines=bpCountModules('engine')+bpCountModules('engine2')*2+bpCountModules('boost_eng')*1.5;
   const weapons=bpCountModules('weapon')+bpCountModules('weapon2')*2;
   const shields=bpCountModules('shield');
   const cargo=bpCountModules('cargo')*8;
   const wings=bpCountModules('wing_l')+bpCountModules('wing_r');
+  const fins=finCountFromBp();
   const hasBoost=bpCountModules('boost_eng')>0;
-  return {engines,weapons,shields,cargo,wings,hasBoost,
-    speed:Math.round(85+engines*8), thrust:Math.round(50+engines*6),
-    dmg:Math.round(100+weapons*20), shieldHp:shields*20,
+  const turnMult=1+wings*.09+fins*.05;
+  return {engines,weapons,shields,cargo,wings,fins,hasBoost,turnMult,
+    speed:Math.round(138+engines*18), thrust:Math.round(72+engines*11),
+    dmg:Math.round(100+weapons*22), shieldHp:shields*20,
     maneuver:Math.round(100+wings*15), cargoMax:14+cargo};
 }
 
@@ -1115,6 +1134,8 @@ function drawBlueprint(){
     Manegg.: <span class="bp-stat-val">${stats.maneuver}%</span><br>
     Scudo HP: <span class="bp-stat-val">${stats.shieldHp}</span><br>
     Postbruciatore: <span class="bp-stat-val" style="color:${stats.hasBoost?'#ff8844':'#446688'}">${stats.hasBoost?'INSTALLATO':'—'}</span><br>
+    Salvo armi / colpo: <span class="bp-stat-val">${1+Math.min(4,Math.floor(Math.max(0,stats.weapons-1)/2))}</span><br>
+    Agilità rotazione: <span class="bp-stat-val">${(stats.turnMult*100).toFixed(0)}%</span><br>
     Costo blueprint: <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span>
   `;
 }
@@ -1135,12 +1156,7 @@ function openBlueprintModal(){
 function closeBlueprintModal(){
   if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');return;}
   document.getElementById('blueprint-modal').classList.remove('show');
-  // Apply blueprint stats to player
-  const stats=bpStats();
-  PS.maxSpeed=stats.speed; PS.thrustPower=stats.thrust;
-  PS.dmgBonus=stats.dmg/100; PS.cargoMax=stats.cargoMax;
-  PS.boostInstalled=stats.hasBoost;
-  applyModules(); // also re-apply upgrades on top
+  applyModules();
   rebuildPlayerMesh();
   notify('Nave ricostruita secondo blueprint!');
 }
@@ -1498,18 +1514,22 @@ function mkPTex(hFn,colFn,normStr,roughFn){
 const Nn={e:mkN(42),b:mkN(17),ind:mkN(99),f:mkN(55),ic:mkN(31),rk:mkN(77),st:mkN(88),dk:mkN(66),gr:mkN(23)};
 
 const TX={
-  // ── Earth: deep ocean, coast, vegetation, altitude, snow ──
+  // ── Earth: continents + ocean (domain noise + large-scale land mask) ──
   earth:mkPTex(
-    (x,y)=>warp(Nn.e,x*2.2,y*2.2,8,0.55,2),
+    (x,y)=>{
+      const cont=warp(Nn.e,x*.85,y*.85,5,0.42,2);
+      const detail=warp(Nn.e,x*2.2,y*2.2,8,0.5,2);
+      return cl(cont*.55+detail*.45,0,1);
+    },
     h=>{
       const w=(a,b,t)=>a+(b-a)*smooth01(t);
-      if(h<.35){const d=h/.35;return [Math.round(4+w(4,22,d)),Math.round(16+w(16,68,d)),Math.round(88+w(88,178,d))];}
-      if(h<.40){const t=(h-.35)/.05;return [Math.round(w(22,62,t)),Math.round(w(72,140,t)),Math.round(w(165,55,t))];}
-      if(h<.55){const g=(h-.40)/.15;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];}
-      if(h<.72){const g=(h-.55)/.17;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];}
-      if(h<.85){const g=(h-.72)/.13;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];}
-      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];
-    }, 16, h=>h<.38?.04:h<.7?.82:.55
+      if(h<.38){const d=h/.38;return [Math.round(3+w(3,20,d)),Math.round(14+w(14,65,d)),Math.round(92+w(92,175,d))];}
+      if(h<.48){const t=(h-.38)/.1;return [Math.round(w(22,55,t)),Math.round(w(72,125,t)),Math.round(w(165,48,t))];}
+      if(h<.62){const g=(h-.48)/.14;return [Math.round(10+g*75),Math.round(52+g*95),Math.round(6+g*22)];}
+      if(h<.78){const g=(h-.62)/.16;return [Math.round(28+g*88),Math.round(72+g*65),Math.round(10+g*25)];}
+      if(h<.88){const g=(h-.78)/.1;return [Math.round(75+g*110),Math.round(62+g*75),Math.round(35+g*55)];}
+      return [Math.round(188+h*65),Math.round(200+h*52),Math.round(218+h*35)];
+    }, 18, h=>h<.4?.035:h<.68?.78:.52
   ),
   // ── Barren: terracotta craters, pale dust ridges ──
   barren:mkPTex(
@@ -1843,6 +1863,19 @@ function buildStationMesh(sd){
   if(['earth','fortress','ice','green'].includes(sd.pType)){
     const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
   }
+  // City / arcology lights (procedural points on lit worlds)
+  if(['earth','industrial','station'].includes(sd.pType)){
+    const nLite=sd.pType==='earth'?42:sd.pType==='industrial'?28:18;
+    for(let k=0;k<nLite;k++){
+      const u=Math.random()*Math.PI*2,v=Math.acos(2*Math.random()-1);
+      const rr=sd.pR+1.5+Math.random()*5;
+      const lx=rr*Math.sin(v)*Math.cos(u),ly=rr*Math.cos(v),lz=rr*Math.sin(v)*Math.sin(u);
+      const warm=Math.random()>.35;
+      const lit=new THREE.Mesh(new THREE.SphereGeometry(2.2+Math.random()*7,5,5),
+        new THREE.MeshBasicMaterial({color:warm?0xffeedd:0x99ccff,transparent:true,opacity:.35+.25*Math.random(),blending:THREE.AdditiveBlending,depthWrite:false}));
+      lit.position.set(lx,ly,lz);mesh.add(lit);
+    }
+  }
   // Rings
   if(sd.pType==='fortress'){const ring=new THREE.Mesh(new THREE.TorusGeometry(sd.pR+sd.pR*.45,3.5,8,64),new THREE.MeshStandardMaterial({color:0x886633,roughness:.9}));ring.rotation.x=Math.PI/2.3;mesh.add(ring);}
   if(sd.pType==='industrial'){const ring2=new THREE.Mesh(new THREE.TorusGeometry(sd.pR+sd.pR*.35,2,8,64),new THREE.MeshBasicMaterial({color:0xffaa00,transparent:true,opacity:.55,blending:THREE.AdditiveBlending}));ring2.rotation.x=Math.PI/2;mesh.add(ring2);}
@@ -1903,7 +1936,7 @@ class Ship{
     this.isPlayer=!!o.isPlayer;this.faction=o.faction||null;
     this.health=100;this.energy=100;this.velocity=new THREE.Vector3();
     this.radius=7;this.alive=true;
-    this.turnSpeed=2.7;this.thrustPower=56;this.fireCooldown=0;
+    this.turnSpeed=2.7;this.thrustPower=56;this.fireCooldown=0;this._burstLeft=0;
     this.energyRegen=18;this.maxSpeed=100;this.dmgBonus=1.0;
     this.mesh=new THREE.Group();
     const bc=o.baseColor||'#112244',sc=o.stripeColor||'#ffffff',ah=o.accentHex||0x4488ff;
@@ -2068,6 +2101,10 @@ class Ship{
     this.energy=Math.min(100,this.energy+this.energyRegen*dt);
     if(this.isPlayer&&PS.hpRegen>0&&this.health<this.maxHealth)this.health=Math.min(this.maxHealth,this.health+PS.hpRegen*dt);
     if(this.fireCooldown>0)this.fireCooldown-=dt;
+    if(this._burstLeft>0&&this.fireCooldown<=0){
+      this._emitProjectile();this._burstLeft--;
+      this.fireCooldown=this._burstLeft>0?.045:(this.isPlayer?0.12:0.18);
+    }
     const toC=new THREE.Vector3().sub(this.mesh.position),dSq=toC.lengthSq();
     if(dSq>Math.pow(SUN_R+15,2)){this.velocity.addScaledVector(toC.normalize(),GRAV/dSq*dt);}
     else{this.takeDamage(100);}
@@ -2075,7 +2112,9 @@ class Ship{
     this.mesh.position.addScaledVector(this.velocity,dt);
     ['x','z'].forEach(ax=>{if(Math.abs(this.mesh.position[ax])>ARENA){this.mesh.position[ax]=Math.sign(this.mesh.position[ax])*ARENA;this.velocity[ax]*=-.8;}});
     this.mesh.position.y=0;
-    smeshes.forEach(sm=>{if(this.mesh.position.distanceToSquared(sm.mesh.position)<Math.pow(sm.sd.pR+this.radius,2))this.takeDamage(100);});
+    if(this.isPlayer&&typeof skimWorldActive==='function'&&skimWorldActive()){/* handled in planet skim */}else{
+      smeshes.forEach(sm=>{if(this.mesh.position.distanceToSquared(sm.mesh.position)<Math.pow(sm.sd.pR+this.radius,2))this.takeDamage(100);});
+    }
   }
   applyThrust(dt,thrustMult){
     thrustMult=thrustMult||1;
@@ -2093,19 +2132,23 @@ class Ship{
     this.velocity.addScaledVector(fwd,this.thrustPower*dt*thrustMult);
   }
   fire(){
-    if(this.energy<13||this.fireCooldown>0)return;
-    this.energy-=13;this.fireCooldown=.22;
+    const nBurst=this.isPlayer?(PS.weaponVolley||1):1;
+    const ec=Math.min(28,10+nBurst*4);
+    if(this.energy<ec||this.fireCooldown>0)return;
+    this.energy-=ec;
+    this._emitProjectile();
+    this._burstLeft=nBurst-1;
+      this.fireCooldown=this._burstLeft>0?0.048:0.18;
+  }
+  _emitProjectile(){
     const fwd=new THREE.Vector3(0,0,-1).applyEuler(this.mesh.rotation);
-    const fire1=()=>{
-      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x66ffff:this.faction==='pirate'?0xff9933:0xff4422}));
-      m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
-      PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
-      scene.add(m);
-    };
-    fire1();
-    if(this.isPlayer){playTone(720,.035,.05,'square');}
-    else{playTone(380,.06,.035,'triangle');}
-    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
+    const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x66ffff:this.faction==='pirate'?0xff9933:0xff4422}));
+    m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
+    PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
+    scene.add(m);
+    if(this.isPlayer){playTone(720,.028,.045,'square');}
+    else{playTone(380,.05,.032,'triangle');}
+    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,128),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
     if(this.isPlayer&&PS.bigShot){const pm=PROJS[PROJS.length-1];if(pm)pm.mesh.scale.set(2,2,2);}
   }
   takeDamage(amt){
@@ -2228,6 +2271,8 @@ const FLEET=[
   ['calcara','calcara','courier'],['monteveglio','monteveglio','courier'],
 ];
 FLEET.forEach(f=>spawnNpc(f[0],f[1],f[2]));
+applyModules();
+rebuildPlayerMesh();
 
 // ─────────────────────────────────────────────────
 // NPC AI
@@ -2246,9 +2291,9 @@ function npcAI(ns,dt){
     if(cx>0)ship.mesh.rotation.y-=ship.turnSpeed*dt*1.6;else ship.mesh.rotation.y+=ship.turnSpeed*dt*1.6;
     ship.applyThrust(dt);return;
   }
-  // Planet avoidance
+  // Planet avoidance (skim drones stay in atmosphere band)
   let avoided=false;
-  for(const sm of smeshes){
+  if(ns.skimDrone){/* skip */}else for(const sm of smeshes){
     const pd=pos.distanceTo(sm.mesh.position);
     if(pd<sm.sd.pR+480){
       const away=pos.clone().sub(sm.mesh.position).normalize();
@@ -2258,6 +2303,20 @@ function npcAI(ns,dt){
     }
   }
   if(avoided)return;
+
+  if(ns.skimDrone){
+    const par=getSM(ns.stationId);
+    if(par&&playerShip.alive){
+      const dp2=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
+      const d2=dp2.length()||1;dp2.multiplyScalar(1/d2);
+      const c2=new THREE.Vector3().crossVectors(fwd,dp2).y;
+      if(c2>0.06)ship.mesh.rotation.y+=ship.turnSpeed*dt*1.4;
+      else if(c2<-0.06)ship.mesh.rotation.y-=ship.turnSpeed*dt*1.4;
+      if(d2>220)ship.applyThrust(dt*1.2);
+      if(d2<2400&&fwd.dot(dp2)>.75)ship.fire();
+    }
+    return;
+  }
 
   const dp=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
   const dist=dp.length();
@@ -2942,6 +3001,86 @@ function showDlg(name,faction,line){
   document.getElementById('dlt').textContent=line;
   document.getElementById('dlg').style.display='block';
   dlgTmr=5.5;
+}
+
+// ─────────────────────────────────────────────────
+// PLANET ATMOSPHERE SKIM (low flight: resources + drones)
+// ─────────────────────────────────────────────────
+let skimSt=null,skimT=0,skimSpawn=0,skimPulse=0;
+const SKIM_TYPES=['earth','green','ice','barren','industrial','fortress'];
+const skimCreatures=[];
+function skimWorldActive(){return!!skimSt&&gstate==='flying';}
+function getSkimBand(sm){
+  const rad=typeof playerShip!=='undefined'&&playerShip?playerShip.radius:7;
+  const inner=sm.sd.pR+rad+22;
+  const outer=sm.sd.pR+Math.max(480,sm.sd.pR*.58);
+  return{inner,outer};
+}
+function findSkimPlanet(){
+  if(typeof playerShip==='undefined'||!playerShip||!playerShip.alive||gstate!=='flying')return null;
+  let best=null,bd=1e15;
+  for(const sm of smeshes){
+    if(!SKIM_TYPES.includes(sm.sd.pType))continue;
+    const{inner,outer}=getSkimBand(sm);
+    const d=playerShip.mesh.position.distanceTo(sm.mesh.position);
+    if(d>=inner&&d<=outer&&d<bd){bd=d;best=sm;}
+  }
+  return best;
+}
+function clearSkimEntities(){
+  skimCreatures.forEach(c=>{try{scene.remove(c.mesh);}catch(_){}});
+  skimCreatures.length=0;
+  for(let i=NPCS.length-1;i>=0;i--){
+    if(NPCS[i].skimDrone){if(NPCS[i].ship.alive)scene.remove(NPCS[i].ship.mesh);NPCS[i].ship.alive=false;NPCS.splice(i,1);}
+  }
+}
+function spawnSkimDrone(sm){
+  if(NPCS.filter(n=>n.skimDrone).length>=6)return;
+  const ang=Math.random()*Math.PI*2;
+  const r=sm.sd.pR+140+Math.random()*180;
+  const ship=new Ship({faction:'pirate',baseColor:'#1a2233',stripeColor:'#6688aa',accentHex:0x00ffaa,npcType:'courier'});
+  ship.mesh.scale.set(.45,.45,.45);ship.radius=3.2;ship.maxSpeed=125;ship.thrustPower=52;
+  ship.mesh.position.set(sm.mesh.position.x+Math.cos(ang)*r,0,sm.mesh.position.z+Math.sin(ang)*r);
+  ship.mesh.lookAt(playerShip.mesh.position);
+  NPCS.push({ship,faction:'pirate',stationId:sm.sd.id,type:'courier',dtimer:999,angry:true,pang:0,destId:null,skimDrone:true});
+}
+function spawnSkimCreature(sm){
+  const ang=Math.random()*Math.PI*2;
+  const mesh=new THREE.Mesh(new THREE.ConeGeometry(14,36,5),new THREE.MeshStandardMaterial({color:0x6a3a88,emissive:0x220044,emissiveIntensity:.4,roughness:.6}));
+  mesh.rotation.x=Math.PI/2;
+  mesh.position.set(sm.mesh.position.x+Math.cos(ang)*(sm.sd.pR+95),0,sm.mesh.position.z+Math.sin(ang)*(sm.sd.pR+95));
+  scene.add(mesh);
+  skimCreatures.push({mesh,sm,ang,speed:.35+Math.random()*.25,hp:28});
+}
+function updatePlanetSkim(dt){
+  const bar=document.getElementById('skim-bar'),fill=document.getElementById('skim-fill'),lbl=document.getElementById('skim-lbl');
+  const cand=findSkimPlanet();
+  if(!cand||gstate!=='flying'){
+    if(skimSt){skimSt=null;skimT=skimSpawn=skimPulse=0;clearSkimEntities();if(bar)bar.style.display='none';if(lbl)lbl.style.display='none';}
+    return;
+  }
+  const sm=cand;
+  if(skimSt!==sm){skimSt=sm;skimT=skimSpawn=skimPulse=0;clearSkimEntities();notify('Atmosfera: '+sm.sd.name+' — raccogli cristalli, elimina droni.');}
+  skimT+=dt;skimSpawn+=dt;skimPulse+=dt;
+  if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
+  if(lbl){lbl.style.display='block';lbl.textContent='SORVOLO · '+sm.sd.name.toUpperCase();}
+  if(skimPulse>.22){skimPulse=0;if(Math.random()<.55){const p=getP();if(p){
+    const dir=new THREE.Vector3().subVectors(playerShip.mesh.position,sm.mesh.position).normalize();
+    const pos=sm.mesh.position.clone().add(dir.clone().multiplyScalar(sm.sd.pR+40+Math.random()*60)).add(new THREE.Vector3((Math.random()-.5)*80,0,(Math.random()-.5)*80));
+    p.spawn(pos,new THREE.Vector3((Math.random()-.5)*20,8+Math.random()*25,(Math.random()-.5)*20),0xaaddff,.4+Math.random()*.5,2+Math.random()*3);}}}
+  if(skimSpawn>2.4){skimSpawn=0;if(Math.random()<.42)spawnSkimDrone(sm);if(Math.random()<.18)spawnSkimCreature(sm);}
+  if(Math.random()<.014*dt*60&&cargoCnt()<PS.cargoMax){PS.cargo.cristalli=(PS.cargo.cristalli||0)+1;if(Math.random()<.22)notify('+1 cristallo atmosferico');}
+  for(let i=skimCreatures.length-1;i>=0;i--){
+    const c=skimCreatures[i];c.ang+=c.speed*dt;
+    c.mesh.position.set(c.sm.mesh.position.x+Math.cos(c.ang)*(c.sm.sd.pR+95),0,c.sm.mesh.position.z+Math.sin(c.ang)*(c.sm.sd.pR+95));
+    c.mesh.lookAt(playerShip.mesh.position);
+    let hitC=false;
+    for(let j=0;j<PROJS.length;j++){
+      const pr=PROJS[j];if(pr.owner!=='player')continue;
+      if(pr.mesh.position.distanceToSquared(c.mesh.position)<900){c.hp-=18;hitC=true;break;}
+    }
+    if(hitC&&c.hp<=0){boom(c.mesh.position,0xaa66ff,22,.6);scene.remove(c.mesh);skimCreatures.splice(i,1);}
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -3728,8 +3867,9 @@ function animate(){
   // Flying (paused in dialogue or docked)
   if((gstate==='flying'||gstate==='dialogue')&&playerShip.alive){
     if(gstate==='flying'){
-      if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt;
-      if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt;
+      const turnBoost=INP.thrust?1.22:1;
+      if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt*turnBoost;
+      if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt*turnBoost;
       if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
       if(INP.fire)  playerShip.fire();
       // Afterburner
@@ -3750,8 +3890,9 @@ function animate(){
       }
       updateBoost(dt,playerShip);
       playerShip.update(dt);
-      NPCS.forEach((ns,i)=>{npcAI(ns,dt);if(!ns.ship.alive){const {faction,stationId}=ns;NPCS.splice(i,1);setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);}});
+      NPCS.forEach((ns,i)=>{npcAI(ns,dt);if(!ns.ship.alive){const {faction,stationId,skimDrone}=ns;NPCS.splice(i,1);if(!skimDrone)setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);}});
       updateProjs(dt);
+      updatePlanetSkim(dt);
       checkNear();
     }
     updateHUD();
