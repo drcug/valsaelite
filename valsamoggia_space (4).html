@@ -18,7 +18,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120%
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
 
 /* ─ Canvas ─ */
-#cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 120px rgba(0,0,0,.45)}
+#cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 90px rgba(0,0,0,.28)}
 #dmgov{position:fixed;inset:0;z-index:4;pointer-events:none}
 @keyframes dfl{0%{background:rgba(220,30,0,.45)}100%{background:transparent}}
 .dfl{animation:dfl .35s ease-out}
@@ -36,9 +36,11 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 #land-title .lt-sub{font-size:12px;color:#557799;font-family:var(--FM);margin-top:6px;letter-spacing:.2em}
 
 /* ─ HUD ─ */
-#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;gap:0}
-.ht{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
-.hb{display:flex;justify-content:space-between;align-items:flex-end;gap:6px}
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom));gap:0}
+.ht{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;flex-wrap:wrap}
+.hb{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.hb-left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 38%}
+.hb-controls{display:flex;flex-direction:column;align-items:stretch;gap:6px;flex:1 1 58%;min-width:0;max-width:100%}
 .hp{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:var(--FM);font-size:10px;backdrop-filter:blur(10px)}
 .hp .lb{color:#446688;font-size:9px;letter-spacing:.12em;margin-bottom:3px}
 .bw{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:3px}
@@ -101,7 +103,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 .dt{color:#aabbcc;border-left:2px solid var(--acc);padding-left:10px;font-style:italic}
 
 /* Mobile controls */
-.cg{display:flex;gap:8px}
+.cg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
 .cb{pointer-events:auto;touch-action:manipulation;width:62px;height:62px;border-radius:50%;
   background:rgba(3,10,28,.9);border:1.5px solid rgba(44,100,190,.32);color:var(--txt);
   font-family:var(--FD);font-weight:700;font-size:9px;letter-spacing:.05em;
@@ -233,9 +235,35 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 #bp-close{margin-top:14px;padding:10px 32px;background:var(--acc);color:#fff;border:none;
   border-radius:6px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.15em;cursor:pointer;}
 #bp-close:hover{background:#4499ff;}
+/* Speed bar + optional screen shake (set by JS) */
+#speed-bar{position:fixed;bottom:118px;left:50%;transform:translateX(-50%);width:min(200px,42vw);height:4px;background:rgba(0,0,0,.35);border-radius:3px;overflow:hidden;z-index:12;pointer-events:none;display:none;border:1px solid rgba(44,100,190,.25)}
+#speed-fill{height:100%;width:0%;background:linear-gradient(90deg,#2244aa,#55ccff);transition:width .12s ease-out}
+#cv.shake{animation:cvshake .28s ease-out}
+@keyframes cvshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}}
 @media(max-width:700px){
   #bp-wrap{flex-direction:column;align-items:center;}
   #bp-cv{width:min(340px,95vw) !important;height:auto !important;}
+  #hud{padding:6px 6px max(6px,env(safe-area-inset-bottom))}
+  .ht{gap:4px}
+  .ht .hp{flex:1 1 100%;min-width:0;max-width:100%}
+  .ht .hp:nth-child(2){order:3;flex:1 1 100%}
+  .ht .hp:nth-child(3){order:2;flex:1 1 100%;text-align:left !important}
+  .ht .hp:nth-child(3) .bw{margin-left:0 !important;margin-right:auto;width:100% !important;max-width:100%}
+  #radar{top:6px;width:72px;height:72px}
+  #rcv{width:72px !important;height:72px !important}
+  #mtick{top:84px;max-width:min(92vw,320px);font-size:9px;padding:3px 8px}
+  .hb{flex-direction:column;align-items:stretch;gap:8px}
+  .hb-left{flex:none;width:100%}
+  .hb-controls{flex:none;width:100%}
+  .cr-info{max-width:100%}
+  .cg{justify-content:center;gap:5px}
+  .cb{width:clamp(48px,13.5vw,56px);height:clamp(48px,13.5vw,56px);font-size:7px;gap:1px}
+  .cb svg{width:17px;height:17px}
+  #dprompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
+  #dlg{bottom:max(115px,17vh);max-width:94vw}
+  #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
+  #heat-lbl{bottom:max(134px,20vh);font-size:8px}
+  #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
 }
 </style>
 </head>
@@ -264,21 +292,25 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
     </div>
   </div>
   <div class="hb">
-    <div class="cr-info">
-      <div class="lb">CREDITI</div>
-      <div id="cval" class="cv2">1.200 Cr</div>
-      <div id="sval" class="sv">Stiva vuota</div>
+    <div class="hb-left">
+      <div class="cr-info">
+        <div class="lb">CREDITI</div>
+        <div id="cval" class="cv2">1.200 Cr</div>
+        <div id="sval" class="sv">Stiva vuota</div>
+      </div>
+      <div class="cg">
+        <button id="btnl" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
+        <button id="btnr" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></button>
+      </div>
     </div>
-    <div class="cg">
-      <button id="btnl" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
-      <button id="btnr" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></button>
-    </div>
-    <div class="cg">
-      <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
-      <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
-      <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
-      <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
-      <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+    <div class="hb-controls">
+      <div class="cg">
+        <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
+        <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
+        <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
+        <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
+        <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+      </div>
     </div>
   </div>
 </div>
@@ -382,6 +414,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 <div id="smsg"></div>
 <div id="heat-lbl">SURRISCALDAMENTO</div>
 <div id="heat-bar"><div id="heat-fill" style="width:0%"></div></div>
+<div id="speed-bar"><div id="speed-fill"></div></div>
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
@@ -837,6 +870,7 @@ function applyModules(){
 // ─────────────────────────────────────────────────
 const BOOST={
   active:false,
+  _rumble:0,
   heat:0,        // 0-100
   overheated:false,
   overheatTimer:0,
@@ -855,6 +889,8 @@ function updateBoost(dt,ship){
     updateHeatHUD();return;
   }
   if(BOOST.active&&!BOOST.overheated){
+    BOOST._rumble+=dt;
+    if(BOOST._rumble>.08){BOOST._rumble=0;playTone(70+Math.random()*50,.045,.038,'sawtooth');}
     BOOST.heat=Math.min(100,BOOST.heat+BOOST.HEAT_RATE*dt);
     if(BOOST.heat>=100){
       BOOST.overheated=true;BOOST.overheatTimer=BOOST.OVERHEAT_DUR;BOOST.active=false;
@@ -863,6 +899,7 @@ function updateBoost(dt,ship){
       notify('⚠ SURRISCALDAMENTO — motori offline per '+BOOST.OVERHEAT_DUR+'s!',3500);
     }
   } else {
+    BOOST._rumble=0;
     BOOST.heat=Math.max(0,BOOST.heat-BOOST.COOL_RATE*dt);
   }
   updateHeatHUD();
@@ -1294,11 +1331,13 @@ function rebuildPlayerMesh(){
 // THREE.JS SETUP
 // ─────────────────────────────────────────────────
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x030612,0.000064);
+// No exponential fog: it was washing out distant stars/nebulae (same black sky).
+scene.fog=null;
 const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,40000);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:false});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x030818,1);
 if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
 if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;}
 if(renderer.physicallyCorrectLights!==undefined)renderer.physicallyCorrectLights=true;
@@ -1640,34 +1679,36 @@ const STAR_MATS=[];
 const sGeo=new THREE.BufferGeometry();
 fillStarBuffer(sGeo,12000,27000000,2.2e13,.12);
 const smA=new THREE.PointsMaterial({
-  size:3.5,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.94,
+  size:5.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.98,
   blending:THREE.AdditiveBlending,depthWrite:false
-});
+});smA.fog=false;
 scene.add(new THREE.Points(sGeo,smA));STAR_MATS.push(smA);
 const sGeo2=new THREE.BufferGeometry();
 fillStarBuffer(sGeo2,5500,5e7,2.2e13,.08);
 const smB=new THREE.PointsMaterial({
-  color:0xaaccff,size:2.4,sizeAttenuation:true,transparent:true,opacity:.58,
+  color:0xaaccff,size:3.4,sizeAttenuation:true,transparent:true,opacity:.72,
   blending:THREE.AdditiveBlending,depthWrite:false
-});
+});smB.fog=false;
 scene.add(new THREE.Points(sGeo2,smB));STAR_MATS.push(smB);
 const sGeo3=new THREE.BufferGeometry(),sv3=[];
 for(let i=0;i<2200;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
 sGeo3.setAttribute('position',new THREE.Float32BufferAttribute(sv3,3));
-const smC=new THREE.PointsMaterial({color:0xffffff,size:5.6,transparent:true,opacity:.38,blending:THREE.AdditiveBlending,depthWrite:false});
+const smC=new THREE.PointsMaterial({color:0xffffff,size:7.2,transparent:true,opacity:.48,blending:THREE.AdditiveBlending,depthWrite:false});smC.fog=false;
 scene.add(new THREE.Points(sGeo3,smC));STAR_MATS.push(smC);
 
 // Sky rig — nebulae + dense starfield follow camera (infinite sky illusion)
 const skyRig=new THREE.Group();
 scene.add(skyRig);
-const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false});
+const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false,fog:false});
 const skyDome=new THREE.Mesh(new THREE.SphereGeometry(92000,48,32),skyMat);skyRig.add(skyDome);
-const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(90500,24,20),new THREE.MeshBasicMaterial({color:0x020412,side:THREE.BackSide,depthWrite:false}));skyRig.add(skyDeep);
+const skyDeepMat=new THREE.MeshBasicMaterial({color:0x050818,side:THREE.BackSide,depthWrite:false,fog:false});
+const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(90500,24,20),skyDeepMat);skyRig.add(skyDeep);
 const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(88000,32,24),new THREE.MeshBasicMaterial({
-  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.52,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff
-}));skyRig.add(nebVeil);
+  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.62,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff,fog:false
+}));
+skyRig.add(nebVeil);
 const nebWarm=new THREE.Mesh(new THREE.SphereGeometry(85000,28,20),new THREE.MeshBasicMaterial({
-  map:nebWarmTex,side:THREE.BackSide,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,color:0xffaa66
+  map:nebWarmTex,side:THREE.BackSide,transparent:true,opacity:.36,blending:THREE.AdditiveBlending,depthWrite:false,color:0xffaa66,fog:false
 }));skyRig.add(nebWarm);
 
 function fillDiskStars(geo,n,radius,thick,biasZ,warmChance){
@@ -1687,23 +1728,23 @@ function fillDiskStars(geo,n,radius,thick,biasZ,warmChance){
 const GAL_BAND=new THREE.BufferGeometry();
 fillDiskStars(GAL_BAND,14000,78000,4200,0,.09);
 const galMat=new THREE.PointsMaterial({
-  size:2.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.72,
+  size:3.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.85,
   blending:THREE.AdditiveBlending,depthWrite:false
-});
+});galMat.fog=false;
 skyRig.add(new THREE.Points(GAL_BAND,galMat));STAR_MATS.push(galMat);
 const NEAR1=new THREE.BufferGeometry();
 fillDiskStars(NEAR1,11000,76000,900,0,.11);
 const nm1=new THREE.PointsMaterial({
-  size:1.35,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.88,
+  size:2.1,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.92,
   blending:THREE.AdditiveBlending,depthWrite:false
-});
+});nm1.fog=false;
 skyRig.add(new THREE.Points(NEAR1,nm1));STAR_MATS.push(nm1);
 const NEAR2=new THREE.BufferGeometry();
 fillDiskStars(NEAR2,6500,74000,500,0,.07);
 const nm2=new THREE.PointsMaterial({
-  color:0xdde8ff,size:2.1,sizeAttenuation:true,transparent:true,opacity:.62,
+  color:0xdde8ff,size:2.8,sizeAttenuation:true,transparent:true,opacity:.75,
   blending:THREE.AdditiveBlending,depthWrite:false
-});
+});nm2.fog=false;
 skyRig.add(new THREE.Points(NEAR2,nm2));STAR_MATS.push(nm2);
 
 // Sun
@@ -1712,7 +1753,7 @@ const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(SUN_R,64,64),
 scene.add(sunMesh);
 sunLt.position.copy(sunMesh.position);sunLt2.position.copy(sunMesh.position);
 [{r:SUN_R+210,op:.14,col:0xff8800},{r:SUN_R+540,op:.07,col:0xff5500},{r:SUN_R+1140,op:.03,col:0xff2200}].forEach(g=>{
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending})));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending,fog:false})));
 });
 
 // Asteroid belt between Castelletto and Savigno
@@ -1796,6 +1837,30 @@ SDATA.forEach(sd=>{
 
 const getSM=id=>smeshes.find(s=>s.sd.id===id);
 const getST=id=>stations.find(s=>s.sd.id===id);
+
+// Lightweight procedural SFX (Web Audio — no asset files)
+let gameAudioCtx=null;
+function resumeGameAudio(){
+  try{
+    if(!gameAudioCtx)gameAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(gameAudioCtx.state==='suspended')gameAudioCtx.resume();
+  }catch(_){}
+}
+['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,resumeGameAudio,{once:true}));
+function playTone(freq,dur,vol,type){
+  try{
+    if(!gameAudioCtx||gameAudioCtx.state!=='running')return;
+    const o=gameAudioCtx.createOscillator();
+    const g=gameAudioCtx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    const t0=gameAudioCtx.currentTime,dd=dur||0.05;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(Math.min(vol||0.04,.12),t0+.004);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+dd);
+    o.connect(g).connect(gameAudioCtx.destination);
+    o.start(t0);o.stop(t0+dd+.03);
+  }catch(_){}
+}
 
 // ─────────────────────────────────────────────────
 // SHIP CLASS
@@ -2005,12 +2070,18 @@ class Ship{
       scene.add(m);
     };
     fire1();
+    if(this.isPlayer){playTone(720,.035,.05,'square');}
+    else{playTone(380,.06,.035,'triangle');}
     if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
     if(this.isPlayer&&PS.bigShot){const pm=PROJS[PROJS.length-1];if(pm)pm.mesh.scale.set(2,2,2);}
   }
   takeDamage(amt){
     if(!this.alive)return;this.health=Math.max(0,this.health-amt);
-    if(this.isPlayer){const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');}
+    if(this.isPlayer){
+      const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');
+      playTone(amt>14?140:200,.1,.055,'sawtooth');
+      const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
+    }
     if(this.health===0)this.die();
   }
   die(){
@@ -3493,6 +3564,13 @@ function updateHUD(){
   document.getElementById('bh').style.width=Math.max(0,playerShip.health)+'%';
   document.getElementById('bh').style.background=playerShip.health<30?'linear-gradient(90deg,#cc2200,#ff5522)':'linear-gradient(90deg,#1155ff,#33aaff)';
   document.getElementById('be').style.width=Math.max(0,playerShip.energy)+'%';
+  const spdBar=document.getElementById('speed-bar'),spdFill=document.getElementById('speed-fill');
+  if(spdBar&&spdFill&&playerShip.maxSpeed>0){
+    const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
+    spdBar.style.display='block';
+    spdFill.style.width=Math.round(sp*100)+'%';
+    spdFill.style.background=sp>.92?'linear-gradient(90deg,#ff6600,#ffcc33)':'linear-gradient(90deg,#2244aa,#55ccff)';
+  }
   document.getElementById('cval').textContent=fmt(PS.credits);
   const cc=cargoCnt();document.getElementById('sval').textContent=cc>0?'Stiva: '+cc+'/'+PS.cargoMax:'Stiva vuota';
   document.getElementById('crew-lb').textContent=PS.crew.length?'Eq: '+PS.crew.map(id=>CREW_POOL.find(c=>c.id===id)?.name.split(' ')[0]||id).join(' · '):'';
@@ -3610,7 +3688,7 @@ function animate(){
     if(gstate==='flying'){
       if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt;
       if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt;
-      if(INP.thrust)playerShip.applyThrust(dt);
+      if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
       if(INP.fire)  playerShip.fire();
       // Afterburner
       if(INP.boost&&PS.boostInstalled&&!BOOST.overheated){
