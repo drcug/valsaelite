@@ -14,11 +14,18 @@
   --FD:'Rajdhani',sans-serif;--FM:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
+body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
+@keyframes lowHpPulse{0%,100%{filter:saturate(1)}50%{filter:saturate(1.15) contrast(1.05)}}
+
+/* Subtle film grain (no extra assets) */
+#film-grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size:180px 180px}
 
 /* ─ Canvas ─ */
-#cv{position:fixed;inset:0;z-index:0}
+#cv{position:fixed;inset:0;z-index:0;box-shadow:inset 0 0 90px rgba(0,0,0,.28)}
 #dmgov{position:fixed;inset:0;z-index:4;pointer-events:none}
 @keyframes dfl{0%{background:rgba(220,30,0,.45)}100%{background:transparent}}
 .dfl{animation:dfl .35s ease-out}
@@ -36,9 +43,11 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 #land-title .lt-sub{font-size:12px;color:#557799;font-family:var(--FM);margin-top:6px;letter-spacing:.2em}
 
 /* ─ HUD ─ */
-#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;gap:0}
-.ht{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
-.hb{display:flex;justify-content:space-between;align-items:flex-end;gap:6px}
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom));gap:0}
+.ht{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;flex-wrap:wrap}
+.hb{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.hb-left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 38%}
+.hb-controls{display:flex;flex-direction:column;align-items:stretch;gap:6px;flex:1 1 58%;min-width:0;max-width:100%}
 .hp{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:var(--FM);font-size:10px;backdrop-filter:blur(10px)}
 .hp .lb{color:#446688;font-size:9px;letter-spacing:.12em;margin-bottom:3px}
 .bw{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:3px}
@@ -61,14 +70,19 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 /* Story chapter banner */
 #story-banner{
   display:none;position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);
-  z-index:45;text-align:center;pointer-events:none;
-  background:rgba(2,5,18,.9);border:1px solid rgba(130,60,200,.4);
-  border-radius:10px;padding:18px 28px;backdrop-filter:blur(14px);
-  font-family:var(--FD);max-width:420px;
+  z-index:45;text-align:center;pointer-events:auto;
+  background:linear-gradient(165deg,rgba(8,14,32,.94) 0%,rgba(3,6,18,.92) 55%,rgba(12,8,28,.93) 100%);
+  border:1px solid rgba(130,60,200,.45);box-shadow:0 0 0 1px rgba(34,119,238,.12),0 22px 60px rgba(0,0,0,.55),0 0 40px rgba(100,60,200,.15);
+  border-radius:12px;padding:18px 26px 14px;backdrop-filter:blur(16px);
+  font-family:var(--FD);max-width:min(520px,92vw);
 }
-#story-banner .sc{font-size:10px;color:#8844cc;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
-#story-banner .st{font-size:22px;font-weight:700;color:var(--bright);margin-bottom:6px}
-#story-banner .sd{font-size:12px;color:#7799bb;font-family:var(--FM);line-height:1.6}
+#story-banner .sc{font-size:10px;color:#aa77ee;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
+#story-banner .st{font-size:clamp(20px,3.2vw,26px);font-weight:700;color:var(--bright);margin-bottom:8px;text-shadow:0 0 24px rgba(100,160,255,.25)}
+#story-banner .sd{font-size:12px;color:#8aa8cc;font-family:var(--FM);line-height:1.68;max-height:min(40vh,260px);overflow-y:auto;padding:10px 8px 10px 2px;margin:0 -4px 10px 0;text-align:left;border-left:2px solid rgba(34,119,238,.35);padding-left:12px}
+#story-banner .sb-foot{font-size:9px;color:#445577;font-family:var(--FM);letter-spacing:.12em;margin-top:2px}
+#story-banner .sb-dismiss{margin-top:4px;padding:8px 22px;border-radius:6px;border:1px solid rgba(44,100,190,.45);
+  background:rgba(34,119,238,.18);color:var(--bright);font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.1em;cursor:pointer;transition:background .15s,border-color .15s}
+#story-banner .sb-dismiss:hover{background:rgba(34,119,238,.32);border-color:rgba(34,119,238,.65)}
 
 /* Dock prompt */
 #dprompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);
@@ -96,7 +110,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 .dt{color:#aabbcc;border-left:2px solid var(--acc);padding-left:10px;font-style:italic}
 
 /* Mobile controls */
-.cg{display:flex;gap:8px}
+.cg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
 .cb{pointer-events:auto;touch-action:manipulation;width:62px;height:62px;border-radius:50%;
   background:rgba(3,10,28,.9);border:1.5px solid rgba(44,100,190,.32);color:var(--txt);
   font-family:var(--FD);font-weight:700;font-size:9px;letter-spacing:.05em;
@@ -221,6 +235,8 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 .bp-mod-btn:hover{background:rgba(34,119,238,.12);border-color:var(--acc);color:var(--bright);}
 .bp-mod-btn.selected{background:rgba(34,119,238,.22);border-color:#77aaff;color:#fff;}
 .bp-mod-btn.installed{background:rgba(51,200,100,.08);border-color:rgba(51,200,100,.4);color:#55ee88;}
+.bp-mod-btn.locked{opacity:.38;cursor:not-allowed;filter:grayscale(.85);border-style:dashed;}
+.bp-mod-btn.locked:hover{background:rgba(255,255,255,.03);border-color:rgba(44,100,190,.25);color:var(--txt);}
 .bp-mod-icon{font-size:18px;line-height:1;}
 .bp-mod-name{font-size:9px;font-family:var(--FM);color:inherit;}
 .bp-stats{font-family:var(--FM);font-size:10px;color:#446688;line-height:1.9;}
@@ -228,14 +244,64 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 #bp-close{margin-top:14px;padding:10px 32px;background:var(--acc);color:#fff;border:none;
   border-radius:6px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.15em;cursor:pointer;}
 #bp-close:hover{background:#4499ff;}
+/* Speed bar + optional screen shake (set by JS) */
+#speed-bar{position:fixed;bottom:118px;left:50%;transform:translateX(-50%);width:min(200px,42vw);height:4px;background:rgba(0,0,0,.35);border-radius:3px;overflow:hidden;z-index:12;pointer-events:none;display:none;border:1px solid rgba(44,100,190,.25)}
+#speed-fill{height:100%;width:0%;background:linear-gradient(90deg,#2244aa,#55ccff);transition:width .12s ease-out}
+#cv.shake{animation:cvshake .28s ease-out}
+@keyframes cvshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}}
 @media(max-width:700px){
   #bp-wrap{flex-direction:column;align-items:center;}
   #bp-cv{width:min(340px,95vw) !important;height:auto !important;}
+  #hud{padding:6px 6px max(6px,env(safe-area-inset-bottom))}
+  .ht{gap:4px}
+  .ht .hp{flex:1 1 100%;min-width:0;max-width:100%}
+  .ht .hp:nth-child(2){order:3;flex:1 1 100%}
+  .ht .hp:nth-child(3){order:2;flex:1 1 100%;text-align:left !important}
+  .ht .hp:nth-child(3) .bw{margin-left:0 !important;margin-right:auto;width:100% !important;max-width:100%}
+  #radar{top:6px;width:72px;height:72px}
+  #rcv{width:72px !important;height:72px !important}
+  #mtick{top:84px;max-width:min(92vw,320px);font-size:9px;padding:3px 8px}
+  .hb{flex-direction:column;align-items:stretch;gap:8px}
+  .hb-left{flex:none;width:100%}
+  .hb-controls{flex:none;width:100%}
+  .cr-info{max-width:100%}
+  .cg{justify-content:center;gap:5px}
+  .cb{width:clamp(48px,13.5vw,56px);height:clamp(48px,13.5vw,56px);font-size:7px;gap:1px}
+  .cb svg{width:17px;height:17px}
+  #dprompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
+  #dlg{bottom:max(115px,17vh);max-width:94vw}
+  #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
+  #heat-lbl{bottom:max(134px,20vh);font-size:8px}
+  #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
+#skim-lbl{position:fixed;top:118px;left:50%;transform:translateX(-50%);font-family:var(--FM);font-size:10px;color:#88eeff;letter-spacing:.15em;z-index:13;pointer-events:none;display:none;text-shadow:0 0 12px rgba(0,180,255,.5)}
+#skim-bar{position:fixed;top:136px;left:50%;transform:translateX(-50%);width:min(220px,55vw);height:5px;background:rgba(0,40,60,.5);border-radius:3px;overflow:hidden;z-index:13;pointer-events:none;display:none;border:1px solid rgba(0,200,255,.25)}
+#skim-fill{height:100%;width:0%;background:linear-gradient(90deg,#004466,#44ddff);transition:width .15s ease-out}
+@media(max-width:700px){
+  #skim-lbl{top:96px;font-size:9px}
+  #skim-bar{top:112px;width:min(200px,70vw)}
+}
+
+/* Flight HUD overlay (reticle + danger vignette) */
+#hud-overlay{position:fixed;inset:0;z-index:8;pointer-events:none}
+#reticle{position:absolute;left:50%;top:50%;width:min(100px,22vw);height:min(100px,22vw);margin:calc(min(-50px,-11vw)) 0 0 calc(min(-50px,-11vw));
+  border:1px solid rgba(120,190,255,.2);border-radius:2px;opacity:.35;box-shadow:0 0 0 1px rgba(0,0,0,.2) inset}
+#reticle::before,#reticle::after{content:'';position:absolute;background:rgba(140,200,255,.12)}
+#reticle::before{left:50%;top:-18%;width:1px;height:136%;transform:translateX(-50%)}
+#reticle::after{top:50%;left:-18%;height:1px;width:136%;transform:translateY(-50%)}
+#vignette-danger{position:absolute;inset:0;box-shadow:inset 0 0 0 0 rgba(200,20,40,0);transition:box-shadow .35s ease}
+#hud-overlay.danger #vignette-danger{box-shadow:inset 0 0 min(120px,28vw) min(40px,10vw) rgba(180,0,30,.42)}
+
+/* Control rows: two lines on narrow screens, one row on desktop */
+.ctrl-rows{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;gap:6px;align-items:center;width:100%}
+@media(max-width:700px){
+  .ctrl-rows{flex-direction:column;align-items:center;gap:5px}
 }
 </style>
 </head>
 <body>
+<div id="film-grain"></div>
 <div id="cv"></div>
+<div id="hud-overlay"><div id="reticle"></div><div id="vignette-danger"></div></div>
 <div id="dmgov"></div>
 <div id="fadeov"></div>
 <div id="land-title"><div class="lt-name" id="ltname"></div><div class="lt-sub" id="ltsub"></div></div>
@@ -259,21 +325,29 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
     </div>
   </div>
   <div class="hb">
-    <div class="cr-info">
-      <div class="lb">CREDITI</div>
-      <div id="cval" class="cv2">1.200 Cr</div>
-      <div id="sval" class="sv">Stiva vuota</div>
+    <div class="hb-left">
+      <div class="cr-info">
+        <div class="lb">CREDITI</div>
+        <div id="cval" class="cv2">1.200 Cr</div>
+        <div id="sval" class="sv">Stiva vuota</div>
+      </div>
+      <div class="cg">
+        <button id="btnl" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
+        <button id="btnr" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></button>
+      </div>
     </div>
-    <div class="cg">
-      <button id="btnl" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
-      <button id="btnr" class="cb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></button>
-    </div>
-    <div class="cg">
-      <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
-      <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
-      <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
-      <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
-      <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+    <div class="hb-controls">
+      <div class="ctrl-rows">
+        <div class="cg">
+          <button id="btnmap" class="cb" style="font-size:9px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg>MAPPA</button>
+          <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>HAIL</button>
+          <button id="btnboost" class="cb boost"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>BOOST</button>
+        </div>
+        <div class="cg">
+          <button id="btnth" class="cb th"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg>MOTORI</button>
+          <button id="btnfi" class="cb fi"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>FUOCO</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -285,7 +359,7 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 <div id="navarrow" style="display:none;position:fixed;inset:0;z-index:9;pointer-events:none">
   <canvas id="navcv" style="width:100%;height:100%;display:block"></canvas>
 </div>
-<div id="story-banner"><div class="sc" id="sc"></div><div class="st" id="stit"></div><div class="sd" id="sdesc"></div></div>
+<div id="story-banner"><div class="sc" id="sc"></div><div class="st" id="stit"></div><div class="sd" id="sdesc"></div><div class="sb-foot" id="sbhint">[INVIO] o clic per continuare</div><button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button></div>
 
 <div id="dprompt">
   <div class="dn" id="dpnm"></div>
@@ -377,6 +451,9 @@ body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select
 <div id="smsg"></div>
 <div id="heat-lbl">SURRISCALDAMENTO</div>
 <div id="heat-bar"><div id="heat-fill" style="width:0%"></div></div>
+<div id="speed-bar"><div id="speed-fill"></div></div>
+<div id="skim-lbl">SORVOLO</div>
+<div id="skim-bar"><div id="skim-fill"></div></div>
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
@@ -545,6 +622,7 @@ const GOODS = {
   carburante:{name:'Carburante Castelletto',       unit:'tank'},
   armi_vere: {name:'Armi Vere (shhh)',             unit:'crate'},
   frammento: {name:'Frammento del Patto',          unit:'pz'},
+  cristalli: {name:'Cristalli atmosferici',        unit:'unit'},
 };
 const SG = {
   bazzano:    {vino:{s:90,b:115,sl:80},salumi:{s:55,b:180,sl:125},documenti:{s:100,b:11,sl:4}},
@@ -590,60 +668,94 @@ const CREW_POOL = [
 // 5 capitoli, ognuno sbloccato dopo il precedente
 const STORY = {
   chapter: 0,  // current chapter (0=not started)
+  prologue:'Nel 2087 il Sistema Valsamoggio brilla come un anello sul dito del Sole: cinque mondi, cinque orgogli, un solo cielo stellato che tutti pretendono di possedere. Un tempo le fazioni giurarono sul "Patto del Molino", un trattato scritto a Bazzano quando ancora si divideva solo il vino e non l\'orbita. Poi il documento scomparve — o fu nascosto — e ogni cometa divenne un pretesto per litigare. Tu sei il messaggero che il Consiglio ha scelto quando gli altri avevano smesso di fidarsi: non perché tu sia il migliore, ma perché sei l\'unico abbastanza testardo da attraversare tutto il sistema e tornare vivo.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'Un tempo le cinque fazioni erano unite dal "Patto del Molino", firmato a Bazzano. Il documento originale e\' scomparso. Senza il patto, le fazioni si stanno sgretolando. Il Consiglio di Bazzano ti ha incaricato di recuperare i frammenti.',
+      intro:'Il Consiglio di Bazzano Prime ti ha convocato in notturna: niente fanfare, solo un ologramma tremulo e l\'odore di carta bruciata. Il Patto originale non esiste più come volume unico: qualcuno lo ha smembrato in tre sigilli. Il primo frammento, dicono, dorme nell\'archivio di Crespellano — classificato come "niente", perché lì il catalogo è più importante della storia. Recuperalo prima che Calcara lo "autentichi" al posto loro.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Il Consiglio crede che un frammento del Patto sia conservato a Crespellano — archivio comunale. Probabilmente catalogato come "niente".',
+        desc:'Porta le credenziali diplomatiche (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
       num:2, title:'Niente e\' Qualcosa',
-      intro:'"A Crespellano hanno il frammento del Patto. Lo archiviano come \'niente\' perche\' non sanno cosa sia. Recuperalo e portalo a Calcara per autenticazione." — Ha senso quanto una scuola media costruita alla rovescia.',
+      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto, con la filigrana del mulino. Calcara pretende di certificarla: ufficialmente per sicurezza, in pratica per metterci il loro timbro — e il loro prezzo. Se accetti, entrerai nel gioco delle copie: chi controlla l\'archivio, controlla la memoria.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
-        desc:'Porta il Frammento del Patto a Calcara per l\'autenticazione. Attenzione: si dice che Calcara abbia una copia forgiata pronta.',
+        desc:'Porta il Frammento del Patto a Calcara Station. Osserva chi firma troppo in fretta: l\'Oligarchia non ama i testimoni che ricordano il testo originale.',
         reward:700, repGain:{crespellano:12,calcara:-5}, cargo:{type:'frammento',qty:1}, done:false, active:false},
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'"Calcara ha confermato l\'autenticita\' — troppo in fretta. Qualcosa non va. Il Castellano di Monteveglio vuole che tu recuperi il secondo frammento, custodito alla Rocca. Dovrai guadagnartelo in combattimento."',
+      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\' — e\' marketing." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto come in un torneo — solo che qui le "frecce di luce" lasciano il segno.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
-        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara per guadagnarti il rispetto del Castellano e il secondo frammento.',
+        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema. Il Castellano osserva: vuole sangue cosmico, non scuse da bollo.',
         reward:900, repGain:{monteveglio:20,calcara:-25}, killFaction:'calcara',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'"Hai il secondo frammento. Ma il terzo — il sigillo originale — e\' custodito a Savigno Deep. I savignesi non lo vendono. Ma potrebbero... barattarlo. Con tartufi. Ovviamente."',
+      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo, orgoglio e silenzio. Savigno Deep custodisce l\'anello finale del Patto, ma i savignesi non vendono la storia — la scambiano. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali, come tre giuramenti sul palato del cosmo.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Consegna 3 Kg di Tartufi Spaziali al Consiglio di Savigno in cambio del sigillo del Patto. (Compra tartufi prima a Savigno e poi consegna.)',
+        desc:'Consegna 3 kg di Tartufi Spaziali al Consiglio di Savigno Deep per ottenere il sigillo. Compra i tartufi a Savigno o nelle stazioni tartuifere prima di tornare.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, done:false, active:false},
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'"Hai tutti e tre i frammenti. Riportali a Bazzano Prime. Il Consiglio si riunisce. Le fazioni possono essere riunite — o Calcara tenterà di bloccare tutto. Preparati a combattere per il Patto."',
+      intro:'Hai ricomposto il trittico: carta, sangue, tartufo. Ora Bazzano deve decidere se riaccendere il mulino o lasciare che Calcara lo trasformi in concessionaria. Il cielo sopra Prime si riempie di scie ostili — non e\' piu\' una consegna, e\' una processione armata. Riporta i frammenti al Consiglio: se atterri, la storia respira di nuovo.',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
-        desc:'Porta i frammenti del Patto a Bazzano Prime. Attenzione alle navi di Calcara in viaggio — potrebbero tentare di fermarti.',
+        desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
   ],
 };
 
+const STORY_LINES={
+  story_1:'[COMUNICAZIONE] "Comandante, l\'archivio di Crespellano non apre porte: apre scatoloni etichettati male. Se trovi qualcosa che puzza di pergamena e burocrazia, e\' probabile che sia il Patto — o un\'altra cosa che aspetta da vent\'anni."',
+  story_2:'[CALCARA] "Autenticazione rapida: troppo rapida. Qualcuno ha gia\' preparato il timbro mentre tu ancora decollavi. Ricorda: qui l\'ufficialita\' e\' un prodotto, non un fatto."',
+  story_3:'[MONTEVEGLIO] "Il Castellano non vuole copie: vuole prove. Tre navi calcaresi nel vuoto non sono poesia — sono messaggio. Porta il messaggio, riporta il frammento."',
+  story_4:'[SAVIGNO] "Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo. Tre chili: non e\' ricatto, e\' tradizione. E tradizione, qui, batte la legge."',
+  story_5:'[BAZZANO PRIME] "I tre pezzi tornano a casa. Se Calcara intercetta, non e\' pirateria — e\' revisione di testo. Non lasciare che riscrivano il Patto mentre tu ancora cerchi un parcheggio in orbita."',
+};
+
+function pushStoryLine(missionId){
+  const line=STORY_LINES[missionId];if(!line)return;
+  setTimeout(()=>showDlg('Consiglio del Sistema','bazzano',line),2200);
+}
+
+let storyBannerTimer=null;
+function hideStoryBanner(){
+  if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
+  document.getElementById('story-banner').style.display='none';
+}
+function showStoryBanner(label,title,body,holdMs){
+  document.getElementById('sc').textContent=label;
+  document.getElementById('stit').textContent=title;
+  document.getElementById('sdesc').textContent=body;
+  const b=document.getElementById('story-banner');
+  b.style.display='block';
+  if(storyBannerTimer)clearTimeout(storyBannerTimer);
+  storyBannerTimer=setTimeout(hideStoryBanner,holdMs||9000);
+}
+(function setupStoryBannerUi(){
+  const b=document.getElementById('story-banner');
+  document.getElementById('sbdismiss').addEventListener('click',hideStoryBanner);
+  b.addEventListener('click',e=>{if(e.target===b)hideStoryBanner();});
+  window.addEventListener('keydown',e=>{
+    if(b.style.display!=='block')return;
+    if(e.code==='Enter'||e.code==='Escape'||e.code==='Space'){e.preventDefault();hideStoryBanner();}
+  });
+})();
+
 function advanceStory(ch){
   STORY.chapter = ch;
   const chapter = STORY.chapters[ch-1];
   if(!chapter)return;
-  document.getElementById('sc').textContent = 'CAPITOLO '+ch;
-  document.getElementById('stit').textContent = chapter.title;
-  document.getElementById('sdesc').textContent = chapter.intro;
-  const b = document.getElementById('story-banner');
-  b.style.display = 'block';
-  setTimeout(()=>{b.style.display='none';},7000);
+  showStoryBanner('CAPITOLO '+ch,chapter.title,chapter.intro,9000);
+  pushStoryLine(chapter.mission.id);
   // auto-add story mission to relevant station
   const st = stations.find(s=>s.sd.id===chapter.mission.sid);
   if(st){
@@ -657,32 +769,32 @@ function advanceStory(ch){
 // ─────────────────────────────────────────────────
 const DIALOGUES = {
   bazzano:[
-    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.']},
-    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.']},
-    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.']},
+    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.','Le stelle non mentono: se il Patto torna, qualcuno a Prime smettera\' di dormire col comunicatore acceso.']},
+    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.','Ho visto navi partire per Crespellano con la speranza e tornare con la modulistica: stessa rotta, altra anima.']},
+    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.','Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante in orbita.']},
   ],
   crespellano:[
-    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.']},
-    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.']},
-    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.']},
+    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.','L\'archivio dice "niente" ma puzza di storia: chi entra senza permesso trova solo polvere... e ambizione.']},
+    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.','Se cerchi il Patto, non cercarlo nei discorsi: cercalo nei cassetti etichettati male.']},
+    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.','Tra una piadina e un frammento antico, a volte e\' la piadina a salvarti la pelle.']},
   ],
   calcara:[
-    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.']},
-    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.']},
-    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.']},
+    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.','La verita\' qui ha timbro e IVA: se non e\' fatturata, non esiste.']},
+    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.','Autenticazione rapida, file sigillato, cliente soddisfatto — cosi\' funziona l\'universo, comandante.']},
+    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.','Se porti roba "sensibile", abbassa i fari: non tutti vogliono vedere cosa timbriamo.']},
   ],
   monteveglio:[
-    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.']},
-    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.']},
-    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.']},
+    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.','Il Patto non si riconquista con inchini: si riconquista con prove nel vuoto.']},
+    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.','Quando Calcara dice "certificato", noi sentiamo "copia": la Rocca non ascolta i fogli, ascolta il sangue.']},
+    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.','Compro storie solo se hanno un manico: il resto e\' politica orbitale.']},
   ],
   savigno:[
-    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.']},
-    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.']},
-    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.']},
+    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.','Il sigillo del Patto non si paga in slogan: si paga in aroma.']},
+    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.','Le stelle qui sono fredde apposta: cosi\' capisci cosa e\' davvero caldo.']},
+    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.','Se torni da Bazzano con carta vecchia, portaci anche fame: la fame si traduce in accordi.']},
   ],
   pirate:[
-    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.']},
+    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.','Il Patto? Io lo vendo al peso — come tutto il resto.']},
   ],
 };
 
@@ -692,25 +804,30 @@ const TAVERN = {
     {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta. Taebol chi si stupisce."'},
     {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — teba i cavalieri col fiasco pieno."'},
     {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
+    {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
     {s:'Pirati in pausa caffe\'',  t:'"Siamo diventati pirati nel 2038. L\'alternativa era fare i burocrati a Calcara. Abbiamo scelto il male minore."'},
     {s:'Prof della scuola rovescia',t:'"Insegno da dieci anni nell\'istituto costruito alla rovescia. I ragazzi entrano dal tetto. Lo trovano normale. Siamo noi che ci siamo adattati."'},
+    {s:'Custode dell\'archivio',   t:'"Qui dentro c\'e\' roba classificata male. A volte \'male\' e\' un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
   monteveglio:[
     {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser."'},
     {s:'Castellano (il vero)',     t:'"La nuova torre e\' quasi pronta. 200 metri. L\'ho promesso in campagna elettorale. Al contrario di Calcara che promette hangar e li costruisce davvero, troppo e troppi."'},
     {s:'Bardo Spaziale',           t:'"Ho cantato la ballata di Crespellano — quella del popolo che aspetta il semaforo. Mi hanno pagato in piadine. Tagiov la canz? Forse. Le piadine erano ottime."'},
+    {s:'Scriba dell\'Ordine',      t:'"Le stelle sopra la Rocca sembrano punte di lancia. Se il Patto torna, qualcuno dovra\' smetterla di usarle solo per il turismo."'},
   ],
   savigno:[
     {s:'Commerciante di tartufi',  t:'"Il prezzo e\' 420. Non tratto. Non abbasso. Non saldo. Il tartufo spaziale non conosce crisi economica."'},
     {s:'Vecchio isolazionista',    t:'"Vivo qui da 40 anni. L\'isolamento e\' una scelta. Quando voglio compagnia insulto qualcuno di Crespellano sul comunicatore."'},
     {s:'Sommelier di funghi',      t:'"Il porcino stellare si abbina al silenzio cosmico. Savigno capisce queste cose. Gli altri no, toronto."'},
+    {s:'Astrologa da taverna',     t:'"Ho letto il futuro nel fondo di una tazza: vedo tartufi, vedo sangue, vedo un timbro calcarese che brucia da solo."'},
   ],
   castelletto:[
     {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffe\'. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
     {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
+    {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
   ],
 };
 
@@ -781,16 +898,23 @@ const MODULES=[
 // ─────────────────────────────────────────────────
 const PS={
   credits:1500, cargo:{}, cargoMax:14, crew:[], activeMissions:[],
-  maxSpeed:95, thrustPower:56, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
+  maxSpeed:138, thrustPower:72, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
   doubleShot:false, bigShot:false, maxHp:100, hpRegen:0, radarMult:1,
-  modules:[],
+  boostInstalled:false, turnMult:1, weaponVolley:1,
+  modules:['eng1','wep1','nav1'],
 };
 const cargoCnt=()=>Object.values(PS.cargo).reduce((a,b)=>a+b,0);
 
+function applyBlueprintToPS(){
+  const st=bpStats();
+  PS.maxSpeed=st.speed;PS.thrustPower=st.thrust;PS.dmgBonus=st.dmg/100;PS.cargoMax=st.cargoMax;
+  PS.boostInstalled=st.hasBoost;PS.turnMult=st.turnMult;
+  PS.weaponVolley=1+Math.min(4,Math.floor(Math.max(0,st.weapons-1)/2));
+}
 function applyModules(){
-  PS.maxSpeed=95; PS.thrustPower=56; PS.dmgBonus=1.0; PS.tradeBonus=1.0;
-  PS.energyRegen=18; PS.doubleShot=false; PS.bigShot=false;
-  PS.maxHp=100; PS.hpRegen=0; PS.radarMult=1;
+  applyBlueprintToPS();
+  PS.tradeBonus=1.0;PS.doubleShot=false;PS.bigShot=false;PS.hpRegen=0;PS.radarMult=1;
+  PS.energyRegen=18;PS.maxHp=100;
   PS.crew.forEach(cid=>{const c=CREW_POOL.find(x=>x.id===cid);if(c&&c.fn)c.fn(PS);});
   PS.modules.forEach(mid=>{const m=MODULES.find(x=>x.id===mid);if(m)m.fn(PS);});
   if(typeof playerShip!=='undefined'&&playerShip){
@@ -799,6 +923,7 @@ function applyModules(){
     playerShip.dmgBonus=PS.dmgBonus;
     playerShip.thrustPower=PS.thrustPower;
     playerShip.maxHealth=PS.maxHp;
+    playerShip.turnSpeed=3.35*(PS.turnMult||1);
   }
 }
 
@@ -807,6 +932,7 @@ function applyModules(){
 // ─────────────────────────────────────────────────
 const BOOST={
   active:false,
+  _rumble:0,
   heat:0,        // 0-100
   overheated:false,
   overheatTimer:0,
@@ -825,6 +951,8 @@ function updateBoost(dt,ship){
     updateHeatHUD();return;
   }
   if(BOOST.active&&!BOOST.overheated){
+    BOOST._rumble+=dt;
+    if(BOOST._rumble>.08){BOOST._rumble=0;playTone(70+Math.random()*50,.045,.038,'sawtooth');}
     BOOST.heat=Math.min(100,BOOST.heat+BOOST.HEAT_RATE*dt);
     if(BOOST.heat>=100){
       BOOST.overheated=true;BOOST.overheatTimer=BOOST.OVERHEAT_DUR;BOOST.active=false;
@@ -833,6 +961,7 @@ function updateBoost(dt,ship){
       notify('⚠ SURRISCALDAMENTO — motori offline per '+BOOST.OVERHEAT_DUR+'s!',3500);
     }
   } else {
+    BOOST._rumble=0;
     BOOST.heat=Math.max(0,BOOST.heat-BOOST.COOL_RATE*dt);
   }
   updateHeatHUD();
@@ -861,20 +990,33 @@ function updateHeatHUD(){
 const BP_COLS=12, BP_ROWS=8, BP_CELL=44;
 
 // Blueprint module definitions (distinct from upgrade MODULES — these are structural)
+// unlockShop: station MODULES id required before this piece appears in the editor palette
 const BP_MODULES=[
-  {id:'hull',     label:'Scafo',        icon:'▪',  color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1},
-  {id:'cockpit',  label:'Cabina',       icon:'👁', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1},
-  {id:'engine',   label:'Motore',       icon:'🔥', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1},
-  {id:'engine2',  label:'Motore II',    icon:'⚡', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1},
-  {id:'boost_eng',label:'Postbruciatore',icon:'💥',color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1},
-  {id:'weapon',   label:'Cannone',      icon:'🔫', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1},
-  {id:'weapon2',  label:'Cannone II',   icon:'⭐', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1},
-  {id:'shield',   label:'Scudo',        icon:'🛡', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1},
-  {id:'cargo',    label:'Stiva',        icon:'📦', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1},
-  {id:'wing_l',   label:'Ala Sinistra', icon:'◀',  color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2},
-  {id:'wing_r',   label:'Ala Destra',   icon:'▶',  color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2},
-  {id:'fin',      label:'Timone',       icon:'↑',  color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1},
+  {id:'hull',     label:'Scafo',        icon:'▪',  color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'cockpit',  label:'Cabina',       icon:'👁', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null},
+  {id:'engine',   label:'Motore',       icon:'🔥', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:'eng1'},
+  {id:'engine2',  label:'Motore II',    icon:'⚡', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2'},
+  {id:'boost_eng',label:'Postbruciatore',icon:'💥',color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3'},
+  {id:'weapon',   label:'Cannone',      icon:'🔫', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:'wep1'},
+  {id:'weapon2',  label:'Cannone II',   icon:'⭐', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2'},
+  {id:'shield',   label:'Scudo',        icon:'🛡', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:'shd1'},
+  {id:'cargo',    label:'Stiva',        icon:'📦', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:'crg1'},
+  {id:'wing_l',   label:'Ala Sinistra', icon:'◀',  color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:'nav1'},
+  {id:'wing_r',   label:'Ala Destra',   icon:'▶',  color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:'nav1'},
+  {id:'fin',      label:'Timone',       icon:'↑',  color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:'nav1'},
 ];
+
+function bpShopUnlocked(shopId){return!shopId||PS.modules.includes(shopId);}
+function bpBlueprintUnlocked(bpId){
+  const m=BP_MODULES.find(x=>x.id===bpId);if(!m)return true;return bpShopUnlocked(m.unlockShop);
+}
+function stripBlueprintToUnlocked(){
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    const id=bpGrid[r][c];if(!id||id==='hull'||id==='cockpit')continue;
+    if(bpBlueprintUnlocked(id))continue;
+    bpGrid[r][c]='hull';
+  }
+}
 
 // Default blueprint layout (row, col, moduleId)
 const defaultBlueprint=[
@@ -913,21 +1055,41 @@ function bpCost(){
   return total;
 }
 
-function bpCountOf(id){
-  let n=0;for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpGrid[r][c]===id)n++;
+// Count placed modules once each (1×1 = per cell; larger = top-left anchor of w×h block)
+function bpCountModules(id){
+  const m=BP_MODULES.find(x=>x.id===id);if(!m)return 0;
+  if(m.w===1&&m.h===1){
+    let n=0;for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpGrid[r][c]===id)n++;
+    return n;
+  }
+  let n=0;
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    if(bpGrid[r][c]!==id)continue;
+    const left=c===0||bpGrid[r][c-1]!==id;
+    const top=r===0||bpGrid[r-1][c]!==id;
+    if(!left||!top)continue;
+    let ok=true;
+    for(let dr=0;dr<m.h&&ok;dr++)for(let dc=0;dc<m.w;dc++){
+      if(r+dr>=BP_ROWS||c+dc>=BP_COLS||bpGrid[r+dr][c+dc]!==id)ok=false;
+    }
+    if(ok)n++;
+  }
   return n;
 }
 
+function finCountFromBp(){return bpCountModules('fin');}
 function bpStats(){
-  const engines=bpCountOf('engine')+bpCountOf('engine2')*2+bpCountOf('boost_eng')*1.5;
-  const weapons=bpCountOf('weapon')+bpCountOf('weapon2')*2;
-  const shields=bpCountOf('shield');
-  const cargo=bpCountOf('cargo')*8;
-  const wings=bpCountOf('wing_l')+bpCountOf('wing_r');
-  const hasBoost=bpCountOf('boost_eng')>0;
-  return {engines,weapons,shields,cargo,wings,hasBoost,
-    speed:Math.round(85+engines*8), thrust:Math.round(50+engines*6),
-    dmg:Math.round(100+weapons*20), shieldHp:shields*20,
+  const engines=bpCountModules('engine')+bpCountModules('engine2')*2+bpCountModules('boost_eng')*1.5;
+  const weapons=bpCountModules('weapon')+bpCountModules('weapon2')*2;
+  const shields=bpCountModules('shield');
+  const cargo=bpCountModules('cargo')*8;
+  const wings=bpCountModules('wing_l')+bpCountModules('wing_r');
+  const fins=finCountFromBp();
+  const hasBoost=bpCountModules('boost_eng')>0;
+  const turnMult=1+wings*.09+fins*.05;
+  return {engines,weapons,shields,cargo,wings,fins,hasBoost,turnMult,
+    speed:Math.round(138+engines*18), thrust:Math.round(72+engines*11),
+    dmg:Math.round(100+weapons*22), shieldHp:shields*20,
     maneuver:Math.round(100+wings*15), cargoMax:14+cargo};
 }
 
@@ -1002,6 +1164,8 @@ function drawBlueprint(){
     Manegg.: <span class="bp-stat-val">${stats.maneuver}%</span><br>
     Scudo HP: <span class="bp-stat-val">${stats.shieldHp}</span><br>
     Postbruciatore: <span class="bp-stat-val" style="color:${stats.hasBoost?'#ff8844':'#446688'}">${stats.hasBoost?'INSTALLATO':'—'}</span><br>
+    Salvo armi / colpo: <span class="bp-stat-val">${1+Math.min(4,Math.floor(Math.max(0,stats.weapons-1)/2))}</span><br>
+    Agilità rotazione: <span class="bp-stat-val">${(stats.turnMult*100).toFixed(0)}%</span><br>
     Costo blueprint: <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span>
   `;
 }
@@ -1013,6 +1177,7 @@ function roundRect(ctx,x,y,w,h,r){
 }
 
 function openBlueprintModal(){
+  stripBlueprintToUnlocked();
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
   drawBlueprint();
@@ -1020,13 +1185,9 @@ function openBlueprintModal(){
 }
 
 function closeBlueprintModal(){
+  if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');return;}
   document.getElementById('blueprint-modal').classList.remove('show');
-  // Apply blueprint stats to player
-  const stats=bpStats();
-  PS.maxSpeed=stats.speed; PS.thrustPower=stats.thrust;
-  PS.dmgBonus=stats.dmg/100; PS.cargoMax=stats.cargoMax;
-  PS.boostInstalled=stats.hasBoost;
-  applyModules(); // also re-apply upgrades on top
+  applyModules();
   rebuildPlayerMesh();
   notify('Nave ricostruita secondo blueprint!');
 }
@@ -1035,11 +1196,14 @@ function buildBpPalette(){
   const el=document.getElementById('bp-module-list');if(!el)return;
   el.innerHTML='';
   BP_MODULES.forEach(m=>{
-    const btn=document.createElement('div');btn.className='bp-mod-btn';
+    const ok=bpShopUnlocked(m.unlockShop);
+    const btn=document.createElement('div');btn.className='bp-mod-btn'+(ok?'':' locked');
     if(bpSelected===m.id)btn.classList.add('selected');
     btn.innerHTML=`<span class="bp-mod-icon">${m.icon}</span><span class="bp-mod-name">${m.label}</span>`;
-    btn.title=m.desc+(m.cost?' · '+fmt(m.cost):'');
+    const reqName=m.unlockShop?(MODULES.find(x=>x.id===m.unlockShop)?.name||m.unlockShop):'';
+    btn.title=(ok?m.desc:'Sblocco: installa in officina «'+reqName+'».')+(m.cost?' · '+fmt(m.cost):'');
     btn.addEventListener('click',()=>{
+      if(!ok){notify('Sblocco blueprint: installa «'+(reqName||m.unlockShop)+'» in officina.');return;}
       bpSelected=bpSelected===m.id?null:m.id;
       buildBpPalette();drawBlueprint();
     });
@@ -1058,29 +1222,58 @@ function setupBpEvents(){
   const cv=document.getElementById('bp-cv');if(!cv)return;
   function getCellAt(e){
     const rect=cv.getBoundingClientRect();
-    const x=e.clientX-rect.left, y=e.clientY-rect.top;
+    const sx=cv.width/Math.max(rect.width,1),sy=cv.height/Math.max(rect.height,1);
+    const x=(e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
     return {r:Math.floor(y/BP_CELL),c:Math.floor(x/BP_CELL)};
+  }
+  function bpClearRect(r0,c0,w,h){
+    for(let dr=0;dr<h;dr++)for(let dc=0;dc<w;dc++){
+      const rr=r0+dr,cc=c0+dc;if(rr>=0&&rr<BP_ROWS&&cc>=0&&cc<BP_COLS)bpGrid[rr][cc]=null;
+    }
   }
   function placeAt(r,c){
     if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return;
-    if(bpSelected==='__erase'){bpGrid[r][c]=null;}
-    else if(bpSelected){
+    if(bpSelected==='__erase'){
+      const id=bpGrid[r][c];if(!id)return;
+      const m=BP_MODULES.find(x=>x.id===id);
+      if(m){let r0=r,c0=c;
+        while(c0>0&&bpGrid[r][c0-1]===id)c0--;
+        while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
+        bpClearRect(r0,c0,m.w,m.h);
+      }else bpGrid[r][c]=null;
+      drawBlueprint();return;
+    }
+    if(bpSelected){
+      if(!bpBlueprintUnlocked(bpSelected)){notify('Pezzo bloccato: installa il modulo richiesto in officina.');return;}
       const m=BP_MODULES.find(x=>x.id===bpSelected);
       if(!m)return;
-      // Check width fits
       if(c+m.w>BP_COLS||r+m.h>BP_ROWS)return;
+      for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
+        const c0=bpGrid[r+dr][c+dc];
+        if(c0&&c0!==bpSelected){
+          const om=BP_MODULES.find(x=>x.id===c0);if(om){let rr=r+dr,cc=c+dc;
+            while(cc>0&&bpGrid[rr][cc-1]===c0)cc--;
+            while(rr>0&&bpGrid[rr-1][cc]===c0)rr--;
+            bpClearRect(rr,cc,om.w,om.h);
+          }else bpGrid[r+dr][c+dc]=null;
+        }
+      }
       for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++)bpGrid[r+dr][c+dc]=bpSelected;
     }
     drawBlueprint();
   }
-  cv.addEventListener('mousedown',e=>{const {r,c}=getCellAt(e);placeAt(r,c);bpDragFrom={r,c};});
-  cv.addEventListener('mousemove',e=>{if(!bpDragFrom)return;const {r,c}=getCellAt(e);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}});
+  cv.addEventListener('mousedown',e=>{if(e.button!==0)return;const {r,c}=getCellAt(e);placeAt(r,c);bpDragFrom={r,c};});
+  cv.addEventListener('mousemove',e=>{if(!bpDragFrom||e.buttons!==1)return;const {r,c}=getCellAt(e);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}});
   cv.addEventListener('mouseup',()=>{bpDragFrom=null;});
+  cv.addEventListener('mouseleave',()=>{bpDragFrom=null;});
   cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const {r,c}=getCellAt(t);placeAt(r,c);bpDragFrom={r,c};},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();if(!bpDragFrom)return;const t=e.touches[0];const {r,c}=getCellAt(t);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}},{passive:false});
   cv.addEventListener('touchend',()=>{bpDragFrom=null;});
-  // Right-click to erase
-  cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);bpGrid[r][c]=null;drawBlueprint();});
+  cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);const id=bpGrid[r][c];if(!id)return;
+    const m=BP_MODULES.find(x=>x.id===id);
+    if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;bpClearRect(r0,c0,m.w,m.h);}
+    else bpGrid[r][c]=null;
+    drawBlueprint();});
 }
 
 // ── Rebuild player 3D mesh from blueprint ─────────
@@ -1100,29 +1293,37 @@ function rebuildPlayerMesh(){
   const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.95,emissive:ah,emissiveIntensity:1.2});
   const boostMat=new THREE.MeshStandardMaterial({color:0xff4400,roughness:.2,metalness:.5,emissive:0xff2200,emissiveIntensity:.8});
 
-  // Count module types from blueprint
-  const engCount=bpCountOf('engine')+bpCountOf('engine2')+bpCountOf('boost_eng');
-  const weapCount=bpCountOf('weapon')+bpCountOf('weapon2');
-  const wingL=bpCountOf('wing_l'), wingR=bpCountOf('wing_r');
-  const cargoCount2=bpCountOf('cargo');
-  const hasBoostEng=bpCountOf('boost_eng')>0;
-  const shieldCount=bpCountOf('shield');
-  const finCount=bpCountOf('fin');
+  // Count module types from blueprint (per placed module, not per cell)
+  const engCount=bpCountModules('engine')+bpCountModules('engine2')+bpCountModules('boost_eng');
+  const weapCount=bpCountModules('weapon')+bpCountModules('weapon2');
+  const wingL=bpCountModules('wing_l'), wingR=bpCountModules('wing_r');
+  const cargoCount2=bpCountModules('cargo');
+  const hasBoostEng=bpCountModules('boost_eng')>0;
+  const shieldCount=bpCountModules('shield');
+  const finCount=bpCountModules('fin');
+  const hullBlocks=bpCountModules('hull');
+  const cockpitPlaced=bpCountModules('cockpit')>0;
 
   // Wing span derived from blueprint
   const wingSpan=7+wingL*2+wingR*2;
+  const fuselageLen=10+Math.min(hullBlocks,8)*0.55;
+  const fuselageW=2.6+Math.min(hullBlocks,6)*0.08;
+  const fuselageH=1.45+Math.min(hullBlocks,6)*0.05;
 
-  // ── Core fuselage (always present) ────────────
-  playerShip.mesh.add(new THREE.Mesh(new THREE.BoxGeometry(3.2,1.8,12),hm));
-  const nb=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.3,6),hm2);nb.position.set(0,0,-9);playerShip.mesh.add(nb);
-  const ntGeo=new THREE.ConeGeometry(1.1,4.5,4);ntGeo.rotateX(Math.PI/2);ntGeo.rotateY(Math.PI/4);
-  const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.1,-13.5);playerShip.mesh.add(nt);
-  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.35,1.8,4),tm);ntCap.rotation.x=Math.PI/2;ntCap.rotation.y=Math.PI/4;ntCap.position.set(0,.1,-16.2);playerShip.mesh.add(ntCap);
+  // ── Core fuselage (length from hull blocks) ────────────
+  playerShip.mesh.add(new THREE.Mesh(new THREE.BoxGeometry(fuselageW,fuselageH,fuselageLen),hm));
+  const noseZ=-fuselageLen/2-3;
+  const nb=new THREE.Mesh(new THREE.BoxGeometry(fuselageW*.85,fuselageH*.78,5),hm2);nb.position.set(0,0,noseZ+2.2);playerShip.mesh.add(nb);
+  const ntGeo=new THREE.ConeGeometry(1.05,4.2,4);ntGeo.rotateX(Math.PI/2);ntGeo.rotateY(Math.PI/4);
+  const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.08,noseZ-.8);playerShip.mesh.add(nt);
+  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.32,1.6,4),tm);ntCap.rotation.x=Math.PI/2;ntCap.rotation.y=Math.PI/4;ntCap.position.set(0,.08,noseZ-3.4);playerShip.mesh.add(ntCap);
 
-  // ── Cockpit ──────────────────────────────────
-  const ckFrame=new THREE.Mesh(new THREE.BoxGeometry(2.4,.4,3.5),tm);ckFrame.position.set(0,1.1,-5);playerShip.mesh.add(ckFrame);
-  const cgGeo=new THREE.SphereGeometry(1,14,10);cgGeo.scale(.7,.45,1.2);cgGeo.translate(0,1.2,-5);playerShip.mesh.add(new THREE.Mesh(cgGeo,ck));
-  const scanLine=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,3.3),gm);scanLine.position.set(0,1.42,-5);playerShip.mesh.add(scanLine);
+  // ── Cockpit (only if placed on blueprint) ──────────────────────────────────
+  if(cockpitPlaced){
+    const ckFrame=new THREE.Mesh(new THREE.BoxGeometry(2.4,.4,3.5),tm);ckFrame.position.set(0,1.1,-5);playerShip.mesh.add(ckFrame);
+    const cgGeo=new THREE.SphereGeometry(1,14,10);cgGeo.scale(.7,.45,1.2);cgGeo.translate(0,1.2,-5);playerShip.mesh.add(new THREE.Mesh(cgGeo,ck));
+    const scanLine=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,3.3),gm);scanLine.position.set(0,1.42,-5);playerShip.mesh.add(scanLine);
+  }
 
   // ── Spine / keel ─────────────────────────────
   const spine=new THREE.Mesh(new THREE.BoxGeometry(.7,1,10),hm2);spine.position.set(0,1.4,0);playerShip.mesh.add(spine);
@@ -1133,27 +1334,27 @@ function rebuildPlayerMesh(){
     const panel=new THREE.Mesh(new THREE.BoxGeometry(.08,1.1,5.5),tm);panel.position.set(s*1.62,0,-1.5);playerShip.mesh.add(panel);
   });
 
-  // ── Wings (width from blueprint) ─────────────
+  // ── Wings (width from blueprint; skip side if no wing module) ─────────────
   [-1,1].forEach(side=>{
     const span=(side<0?wingL:wingR);
-    const ww=6+span*2.5;
+    if(span<=0)return;
+    const ww=Math.max(3.2,wingSpan+span*2.2);
     const wGeo=new THREE.BoxGeometry(ww,.28,7);
     const w=new THREE.Mesh(wGeo,hm);w.position.set(side*(ww/2+1.6),.15,.8);w.rotation.y=side*-.18;playerShip.mesh.add(w);
-    // Wingtip
     const finGeo=new THREE.BoxGeometry(.25,2.8+span*.5,2.4);
     const fin=new THREE.Mesh(finGeo,hm);fin.position.set(side*(ww+2),1.2,-.4);playerShip.mesh.add(fin);
     const finTip=new THREE.Mesh(new THREE.BoxGeometry(.22,.25,2.2),tm);finTip.position.set(side*(ww+2),2.65,-.3);playerShip.mesh.add(finTip);
-    // Wing emissive channel
     const wChan=new THREE.Mesh(new THREE.BoxGeometry(ww*.8,.06,1.2),gm);wChan.position.set(side*(ww/2+1.6),-.02,0);wChan.rotation.y=side*-.18;playerShip.mesh.add(wChan);
-    // Wing trim stripe
     const wt=new THREE.Mesh(new THREE.BoxGeometry(ww,.26,1.2),tm);wt.position.set(side*(ww/2+1.6),.12,-1.2);wt.rotation.y=side*-.18;playerShip.mesh.add(wt);
   });
 
-  // ── Engines (number from blueprint) ──────────
+  // ── Engines (one mesh per engine / engine2 / boost module) ──────────
   const engPositions=[];
-  if(engCount<=2){engPositions.push([-2.5,-.6],[2.5,-.6]);}
-  else if(engCount<=4){engPositions.push([-4,-.6],[-1.5,-.8],[1.5,-.8],[4,-.6]);}
-  else{engPositions.push([-5,-.5],[-2.5,-.8],[0,-.9],[2.5,-.8],[5,-.5]);}
+  const spread=2.4+Math.min(engCount,6)*0.55;
+  for(let i=0;i<engCount;i++){
+    const t=engCount<=1?0:(i/(engCount-1))*2-1;
+    engPositions.push([t*spread,-.65-Math.abs(t)*.12]);
+  }
 
   engPositions.forEach(([ex,ey],i)=>{
     const isBoostPos=hasBoostEng&&i===Math.floor(engPositions.length/2);
@@ -1168,10 +1369,12 @@ function rebuildPlayerMesh(){
   });
 
   // ── Weapon mounts ─────────────────────────────
-  for(let i=0;i<Math.min(weapCount,4);i++){
-    const wx=(i%2===0?-1:1)*(1.5+Math.floor(i/2)*2.5);
-    const wp=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,2.2),hmd);wp.position.set(wx,-.9,-3.5);playerShip.mesh.add(wp);
-    const wTip=new THREE.Mesh(new THREE.ConeGeometry(i>1?.25:.18,.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,-.9,-5);playerShip.mesh.add(wTip);
+  const weapon2n=bpCountModules('weapon2');
+  for(let i=0;i<Math.min(weapCount,6);i++){
+    const wx=(i%2===0?-1:1)*(1.4+Math.floor(i/2)*2.2);
+    const big=i>=bpCountModules('weapon')&&weapon2n>0;
+    const wp=new THREE.Mesh(new THREE.BoxGeometry(big?.42:.35,big?.42:.35,big?2.8:2.2),hmd);wp.position.set(wx,-.9,-3.5);playerShip.mesh.add(wp);
+    const wTip=new THREE.Mesh(new THREE.ConeGeometry(big?.3:.18,big?1.1:.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,-.9,big?-5.6:-5);playerShip.mesh.add(wTip);
   }
 
   // ── Cargo pods ────────────────────────────────
@@ -1208,19 +1411,24 @@ function rebuildPlayerMesh(){
 // THREE.JS SETUP
 // ─────────────────────────────────────────────────
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x000102,0.000085);
+// No exponential fog: it was washing out distant stars/nebulae (same black sky).
+scene.fog=null;
 const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,40000);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:false});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x030818,1);
+if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
+if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;}
+if(renderer.physicallyCorrectLights!==undefined)renderer.physicallyCorrectLights=true;
 document.getElementById('cv').appendChild(renderer.domElement);
 // Rich multi-source lighting so ships are lit from all angles
-scene.add(new THREE.AmbientLight(0xaabbdd,0.55));
-const hemiLight=new THREE.HemisphereLight(0x223366,0x110a00,0.7);scene.add(hemiLight);
-const backFill=new THREE.DirectionalLight(0x334466,0.45);backFill.position.set(-300,200,400);scene.add(backFill);
-const rimLight=new THREE.DirectionalLight(0x6688aa,0.3);rimLight.position.set(0,300,-200);scene.add(rimLight);
-const sunLt=new THREE.PointLight(0xffeecc,9,66000);scene.add(sunLt);
-const sunLt2=new THREE.PointLight(0xff7700,4,12000);scene.add(sunLt2);
+scene.add(new THREE.AmbientLight(0xb8c8ee,0.62));
+const hemiLight=new THREE.HemisphereLight(0x3355aa,0x1a1208,0.82);scene.add(hemiLight);
+const backFill=new THREE.DirectionalLight(0x446699,0.58);backFill.position.set(-300,200,400);scene.add(backFill);
+const rimLight=new THREE.DirectionalLight(0x88aadd,0.42);rimLight.position.set(0,300,-200);scene.add(rimLight);
+const sunLt=new THREE.PointLight(0xffeecc,12,66000);scene.add(sunLt);
+const sunLt2=new THREE.PointLight(0xff8833,5.5,12000);scene.add(sunLt2);
 window.addEventListener('resize',()=>{
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);resizeGM();
@@ -1308,12 +1516,19 @@ function hToNorm(h,sz,str){
 function cv2t(c){const t=new THREE.CanvasTexture(c);t.anisotropy=renderer.capabilities.getMaxAnisotropy();t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;}
 
 // Make {map, normalMap, roughnessMap} triple from a height function + color mapper
+function smooth01(t){t=cl(t,0,1);return t*t*(3-2*t);}
 function mkPTex(hFn,colFn,normStr,roughFn){
   const h=genH(hFn,TS);
   // diffuse
   const cc=document.createElement('canvas');cc.width=cc.height=TS;
   const cx=cc.getContext('2d'),ci=cx.createImageData(TS,TS);
-  for(let i=0;i<TS*TS;i++){const [r,g,b]=colFn(h[i]);ci.data.set([r,g,b,255],i*4);}
+  for(let i=0;i<TS*TS;i++){
+    const xi=i%TS, yi=(i/TS)|0;
+    const u=xi/TS,v=yi/TS;
+    const micro=0.04*Math.sin(u*93.7+yi*2.1)+0.035*Math.sin(v*111.3+xi*1.7);
+    const [r,g,b]=colFn(h[i]+micro);
+    ci.data.set([r,g,b,255],i*4);
+  }
   cx.putImageData(ci,0,0);
   // normal
   const nc=document.createElement('canvas');nc.width=nc.height=TS;
@@ -1334,26 +1549,31 @@ function mkPTex(hFn,colFn,normStr,roughFn){
 const Nn={e:mkN(42),b:mkN(17),ind:mkN(99),f:mkN(55),ic:mkN(31),rk:mkN(77),st:mkN(88),dk:mkN(66),gr:mkN(23)};
 
 const TX={
-  // ── Earth: deep ocean, coast, vegetation, altitude, snow ──
+  // ── Earth: continents + ocean (domain noise + large-scale land mask) ──
   earth:mkPTex(
-    (x,y)=>warp(Nn.e,x*2.2,y*2.2,8,0.55,2),
+    (x,y)=>{
+      const cont=warp(Nn.e,x*.85,y*.85,5,0.42,2);
+      const detail=warp(Nn.e,x*2.2,y*2.2,8,0.5,2);
+      return cl(cont*.55+detail*.45,0,1);
+    },
     h=>{
-      if(h<.35){const d=h/.35;return [Math.round(4+d*18),Math.round(16+d*52),Math.round(88+d*90)];}  // deep→shallow ocean
-      if(h<.40){return [Math.round(50+h*120),Math.round(100+h*80),Math.round(50)];}  // coast/beach
-      if(h<.55){const g=h-.40;return [Math.round(12+g*80),Math.round(60+g*100),Math.round(8+g*20)];} // lowland vegetation
-      if(h<.72){const g=h-.55;return [Math.round(30+g*90),Math.round(80+g*60),Math.round(10+g*20)];} // upland
-      if(h<.85){const g=h-.72;return [Math.round(80+g*120),Math.round(65+g*80),Math.round(40+g*60)];} // rock
-      return [Math.round(195+h*60),Math.round(208+h*47),Math.round(225+h*30)];  // snow/ice cap
-    }, 16, h=>h<.38?.04:h<.7?.82:.55
+      const w=(a,b,t)=>a+(b-a)*smooth01(t);
+      if(h<.38){const d=h/.38;return [Math.round(3+w(3,20,d)),Math.round(14+w(14,65,d)),Math.round(92+w(92,175,d))];}
+      if(h<.48){const t=(h-.38)/.1;return [Math.round(w(22,55,t)),Math.round(w(72,125,t)),Math.round(w(165,48,t))];}
+      if(h<.62){const g=(h-.48)/.14;return [Math.round(10+g*75),Math.round(52+g*95),Math.round(6+g*22)];}
+      if(h<.78){const g=(h-.62)/.16;return [Math.round(28+g*88),Math.round(72+g*65),Math.round(10+g*25)];}
+      if(h<.88){const g=(h-.78)/.1;return [Math.round(75+g*110),Math.round(62+g*75),Math.round(35+g*55)];}
+      return [Math.round(188+h*65),Math.round(200+h*52),Math.round(218+h*35)];
+    }, 18, h=>h<.4?.035:h<.68?.78:.52
   ),
   // ── Barren: terracotta craters, pale dust ridges ──
   barren:mkPTex(
     (x,y)=>{const b=warp(Nn.b,x*2.8,y*2.8,8,0.5);const r=rfbm(Nn.b,x*4,y*4,5)*.35;return cl(b*.72+r*.28,0,1);},
     h=>{
-      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];} // crater shadow
-      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];} // warm terracotta
-      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];} // pale dust ridge
-      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)]; // mid-tone rust
+      if(h<.22){return [Math.round(28+h*60),Math.round(10+h*28),Math.round(4+h*10)];}
+      if(h<.55){const g=(h-.22)/.33;return [Math.round(80+g*110),Math.round(28+g*55),Math.round(8+g*22)];}
+      if(h>.88){return [Math.round(195+h*60),Math.round(178+h*50),Math.round(140+h*45)];}
+      return [Math.round(140+h*60),Math.round(60+h*45),Math.round(18+h*24)];
     }, 15, h=>.75+h*.18
   ),
   // ── Industrial: dark metal with orange glow grid, bright windows ──
@@ -1392,10 +1612,11 @@ const TX={
       return cl(base*.55+crack*.45,0,1);
     },
     h=>{
-      if(h<.22){return [2,10,32];} // deep crevasse
-      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];} // blue shadow
-      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];} // mid ice
-      const g=(h-.65)/.35;return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)]; // bright surface
+      if(h<.22){return [2,10,32];}
+      if(h<.40){const g=h/.40;return [Math.round(g*30),Math.round(g*75),Math.round(105+g*60)];}
+      if(h<.65){const g=(h-.40)/.25;return [Math.round(85+g*90),Math.round(130+g*85),Math.round(175+g*65)];}
+      const g=(h-.65)/.35;
+      return [Math.round(175+g*80),Math.round(200+g*55),Math.round(230+g*25)];
     }, 18, h=>h<.3?.03:.12
   ),
   // ── Rock: cratered rubble ──
@@ -1428,10 +1649,10 @@ const TX={
   green:mkPTex(
     (x,y)=>warp(Nn.gr,x*2.8,y*2.8,8,0.5,2),
     h=>{
-      if(h<.28){return [6,20,8];} // deep shadow
+      if(h<.28){return [6,20,8];}
       if(h<.55){const g=(h-.28)/.27;return [Math.round(14+g*40),Math.round(50+g*90),Math.round(10+g*22)];}
       if(h<.78){const g=(h-.55)/.23;return [Math.round(42+g*65),Math.round(100+g*65),Math.round(20+g*30)];}
-      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)]; // bright ridge
+      return [Math.round(90+h*55),Math.round(120+h*45),Math.round(50+h*30)];
     }, 12, h=>.72+h*.2
   ),
   // ── Particle sprite ──
@@ -1467,6 +1688,45 @@ const sunCC=(()=>{
   }
   ctx.putImageData(ci,0,0);return cv2t(c);
 })();
+TX.sunTex=sunCC;
+
+// Procedural nebula panoramas (equirectangular) for sky dome + additive veil
+const Nneb=mkN(3.7);
+function mkNebulaCanvas(w,h,seedHue){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d'),img=x.createImageData(w,h);
+  const dh=seedHue||220;
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const u=i/w,v=j/h;
+    const n1=fbm(Nneb,u*2.1+0.4,v*2.1,6,2.05,.5);
+    const n2=fbm(Nneb,u*3.7+11,v*3.2+2.1,5,2.1,.48);
+    const wv=warp(Nneb,u*1.8,v*1.8,5,0.38,2);
+    const gas=cl(n1*.45+n2*.35+wv*.2,0,1);
+    const ridge=Math.pow(Math.max(0,gas-.35),1.4);
+    const r=Math.round(4+ridge*85+gas*22+(Math.sin(dh*.02+u)*8));
+    const g=Math.round(8+ridge*40+gas*55+(Math.cos(dh*.03+v)*10));
+    const b=Math.round(18+ridge*120+gas*90);
+    const a=Math.round(cl(ridge*220+gas*35,0,255));
+    const k=(j*w+i)*4;img.data[k]=r;img.data[k+1]=g;img.data[k+2]=b;img.data[k+3]=a;
+  }
+  x.putImageData(img,0,0);return c;
+}
+const nebBaseTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(1024,512,268));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  return t;
+})();
+const nebVeilTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(768,384,312));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
+const nebWarmTex=(()=>{
+  const t=new THREE.CanvasTexture(mkNebulaCanvas(640,320,28));
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+})();
+
 // ─────────────────────────────────────────────────
 // PARTICLES
 // ─────────────────────────────────────────────────
@@ -1484,25 +1744,100 @@ function boom(pos,col,n,sp){n=n||60;sp=sp||1;for(let i=0;i<n;i++){const p=getP()
 // ─────────────────────────────────────────────────
 // ENVIRONMENT
 // ─────────────────────────────────────────────────
-// Stars
-const sGeo=new THREE.BufferGeometry(),sv=[];
-for(let i=0;i<7000;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>27000000)sv.push(x,y,z);}
-sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
-scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:2.8,transparent:true,opacity:.8})));
-// Faint second star layer with slight blue tint
-const sGeo2=new THREE.BufferGeometry(),sv2=[];
-for(let i=0;i<2500;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>70000000)sv2.push(x,y,z);}
-sGeo2.setAttribute('position',new THREE.Float32BufferAttribute(sv2,3));
-scene.add(new THREE.Points(sGeo2,new THREE.PointsMaterial({color:0xaabbff,size:1.8,transparent:true,opacity:.45})));
-// Nebula backdrop
-scene.add(new THREE.Mesh(new THREE.SphereGeometry(144000,16,16),new THREE.MeshBasicMaterial({color:0x010210,side:THREE.BackSide})));
+// Stars — layered colors (distant world shell)
+function fillStarBuffer(geo,count,minR2,maxR2,warmChance){
+  const pos=[],col=[];
+  let tries=0;
+  while(pos.length/3<count&&tries<count*12){
+    tries++;
+    const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;
+    const d2=x*x+y*y+z*z;if(d2<minR2||d2>maxR2)continue;
+    pos.push(x,y,z);
+    const w=Math.random();
+    if(w<warmChance){col.push(1,.92,.78);}else if(w<warmChance+.35){col.push(.78,.88,1);}else{col.push(.95,.98,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const STAR_MATS=[];
+const sGeo=new THREE.BufferGeometry();
+fillStarBuffer(sGeo,12000,27000000,2.2e13,.12);
+const smA=new THREE.PointsMaterial({
+  size:5.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.98,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});smA.fog=false;
+scene.add(new THREE.Points(sGeo,smA));STAR_MATS.push(smA);
+const sGeo2=new THREE.BufferGeometry();
+fillStarBuffer(sGeo2,5500,5e7,2.2e13,.08);
+const smB=new THREE.PointsMaterial({
+  color:0xaaccff,size:3.4,sizeAttenuation:true,transparent:true,opacity:.72,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});smB.fog=false;
+scene.add(new THREE.Points(sGeo2,smB));STAR_MATS.push(smB);
+const sGeo3=new THREE.BufferGeometry(),sv3=[];
+for(let i=0;i<2200;i++){const x=(Math.random()-.5)*165000,y=(Math.random()-.5)*165000,z=(Math.random()-.5)*165000;if(x*x+y*y+z*z>8e7)sv3.push(x,y,z);}
+sGeo3.setAttribute('position',new THREE.Float32BufferAttribute(sv3,3));
+const smC=new THREE.PointsMaterial({color:0xffffff,size:7.2,transparent:true,opacity:.48,blending:THREE.AdditiveBlending,depthWrite:false});smC.fog=false;
+scene.add(new THREE.Points(sGeo3,smC));STAR_MATS.push(smC);
+
+// Sky rig — nebulae + dense starfield follow camera (infinite sky illusion)
+const skyRig=new THREE.Group();
+scene.add(skyRig);
+const skyMat=new THREE.MeshBasicMaterial({map:nebBaseTex,side:THREE.BackSide,depthWrite:false,fog:false});
+const skyDome=new THREE.Mesh(new THREE.SphereGeometry(92000,48,32),skyMat);skyRig.add(skyDome);
+const skyDeepMat=new THREE.MeshBasicMaterial({color:0x050818,side:THREE.BackSide,depthWrite:false,fog:false});
+const skyDeep=new THREE.Mesh(new THREE.SphereGeometry(90500,24,20),skyDeepMat);skyRig.add(skyDeep);
+const nebVeil=new THREE.Mesh(new THREE.SphereGeometry(88000,32,24),new THREE.MeshBasicMaterial({
+  map:nebVeilTex,side:THREE.BackSide,transparent:true,opacity:.62,blending:THREE.AdditiveBlending,depthWrite:false,color:0x6688ff,fog:false
+}));
+skyRig.add(nebVeil);
+const nebWarm=new THREE.Mesh(new THREE.SphereGeometry(85000,28,20),new THREE.MeshBasicMaterial({
+  map:nebWarmTex,side:THREE.BackSide,transparent:true,opacity:.36,blending:THREE.AdditiveBlending,depthWrite:false,color:0xffaa66,fog:false
+}));skyRig.add(nebWarm);
+
+function fillDiskStars(geo,n,radius,thick,biasZ,warmChance){
+  const pos=[],col=[];
+  for(let i=0;i<n;i++){
+    const u=Math.random()*2-1,v=Math.random()*2-1,w=Math.random()*2-1;
+    const len=Math.sqrt(u*u+v*v+w*w)||1;
+    let x=u/len*radius,y=v/len*radius,z=w/len*radius;
+    x+=(Math.random()-.5)*thick*2;y+=(Math.random()-.5)*thick*2;z+=(Math.random()-.5)*thick*2+biasZ;
+    pos.push(x,y,z);
+    const r=Math.random();
+    if(r<warmChance){col.push(1,.88,.62);}else if(r<warmChance+.28){col.push(.75,.88,1);}else{col.push(.92,.95,1);}
+  }
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+}
+const GAL_BAND=new THREE.BufferGeometry();
+fillDiskStars(GAL_BAND,14000,78000,4200,0,.09);
+const galMat=new THREE.PointsMaterial({
+  size:3.2,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.85,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});galMat.fog=false;
+skyRig.add(new THREE.Points(GAL_BAND,galMat));STAR_MATS.push(galMat);
+const NEAR1=new THREE.BufferGeometry();
+fillDiskStars(NEAR1,11000,76000,900,0,.11);
+const nm1=new THREE.PointsMaterial({
+  size:2.1,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.92,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});nm1.fog=false;
+skyRig.add(new THREE.Points(NEAR1,nm1));STAR_MATS.push(nm1);
+const NEAR2=new THREE.BufferGeometry();
+fillDiskStars(NEAR2,6500,74000,500,0,.07);
+const nm2=new THREE.PointsMaterial({
+  color:0xdde8ff,size:2.8,sizeAttenuation:true,transparent:true,opacity:.75,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});nm2.fog=false;
+skyRig.add(new THREE.Points(NEAR2,nm2));STAR_MATS.push(nm2);
 
 // Sun
 const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(SUN_R,64,64),
-  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xdd3300,emissiveMap:TX.sunTex,emissiveIntensity:1.0,roughness:.8}));
+  new THREE.MeshStandardMaterial({map:TX.sunTex,emissive:0xff4400,emissiveMap:TX.sunTex,emissiveIntensity:1.35,roughness:.72}));
 scene.add(sunMesh);
+sunLt.position.copy(sunMesh.position);sunLt2.position.copy(sunMesh.position);
 [{r:SUN_R+210,op:.14,col:0xff8800},{r:SUN_R+540,op:.07,col:0xff5500},{r:SUN_R+1140,op:.03,col:0xff2200}].forEach(g=>{
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending})));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(g.r,32,32),new THREE.MeshBasicMaterial({color:g.col,transparent:true,opacity:g.op,blending:THREE.AdditiveBlending,fog:false})));
 });
 
 // Asteroid belt between Castelletto and Savigno
@@ -1521,11 +1856,14 @@ for(let i=0;i<320;i++){
 const smeshes=[];
 const stations=[];
 
-// Orbit rings for non-satellites
+// Orbit rings for non-satellites (faction tint where applicable)
 SDATA.filter(sd=>!sd.sat).forEach(sd=>{
   const pts=[];for(let i=0;i<=144;i++){const a=i/144*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*sd.orbitR,0,Math.sin(a)*sd.orbitR));}
   const g=new THREE.BufferGeometry().setFromPoints(pts);
-  scene.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0x102035,transparent:true,opacity:.35})));
+  const f=sd.faction&&FACTIONS[sd.faction];
+  const col=new THREE.Color(f?f.hex:0x223355);
+  col.multiplyScalar(.42);
+  scene.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.4})));
 });
 
 // Satellite orbit rings (updated in loop around parent)
@@ -1553,11 +1891,25 @@ function buildStationMesh(sd){
     ...(sd.pType==='earth'?{emissive:0x000e1a,emissiveIntensity:.06}:{}),
   };
   const mat=new THREE.MeshStandardMaterial(matOpts);
+  mat.normalScale=new THREE.Vector2(1.08,1.08);
   const mesh=new THREE.Mesh(geo,mat);
   // Atmosphere glow
   const f=FACTIONS[sd.faction];const gc=f?f.hex:0x334455;
   if(['earth','fortress','ice','green'].includes(sd.pType)){
-    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
+    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
+  }
+  // City / arcology lights (procedural points on lit worlds)
+  if(['earth','industrial','station'].includes(sd.pType)){
+    const nLite=sd.pType==='earth'?42:sd.pType==='industrial'?28:18;
+    for(let k=0;k<nLite;k++){
+      const u=Math.random()*Math.PI*2,v=Math.acos(2*Math.random()-1);
+      const rr=sd.pR+1.5+Math.random()*5;
+      const lx=rr*Math.sin(v)*Math.cos(u),ly=rr*Math.cos(v),lz=rr*Math.sin(v)*Math.sin(u);
+      const warm=Math.random()>.35;
+      const lit=new THREE.Mesh(new THREE.SphereGeometry(2.2+Math.random()*7,5,5),
+        new THREE.MeshBasicMaterial({color:warm?0xffeedd:0x99ccff,transparent:true,opacity:.35+.25*Math.random(),blending:THREE.AdditiveBlending,depthWrite:false}));
+      lit.position.set(lx,ly,lz);mesh.add(lit);
+    }
   }
   // Rings
   if(sd.pType==='fortress'){const ring=new THREE.Mesh(new THREE.TorusGeometry(sd.pR+sd.pR*.45,3.5,8,64),new THREE.MeshStandardMaterial({color:0x886633,roughness:.9}));ring.rotation.x=Math.PI/2.3;mesh.add(ring);}
@@ -1583,6 +1935,34 @@ SDATA.forEach(sd=>{
 const getSM=id=>smeshes.find(s=>s.sd.id===id);
 const getST=id=>stations.find(s=>s.sd.id===id);
 
+// Lightweight procedural SFX (Web Audio — no asset files)
+let gameAudioCtx=null;
+function resumeGameAudio(){
+  try{
+    if(!gameAudioCtx)gameAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(gameAudioCtx.state==='suspended')gameAudioCtx.resume();
+  }catch(_){}
+}
+['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,resumeGameAudio,{once:true}));
+function playTone(freq,dur,vol,type){
+  try{
+    if(!gameAudioCtx||gameAudioCtx.state!=='running')return;
+    const o=gameAudioCtx.createOscillator();
+    const g=gameAudioCtx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    const t0=gameAudioCtx.currentTime,dd=dur||0.05;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(Math.min(vol||0.04,.12),t0+.004);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+dd);
+    o.connect(g).connect(gameAudioCtx.destination);
+    o.start(t0);o.stop(t0+dd+.03);
+  }catch(_){}
+}
+function playChime(kind){
+  if(kind==='notify'){playTone(520,.045,.034,'sine');setTimeout(()=>playTone(392,.055,.028,'sine'),75);}
+  else if(kind==='success'){playTone(523,.08,.042,'sine');setTimeout(()=>playTone(659,.09,.048,'sine'),95);setTimeout(()=>playTone(784,.14,.055,'sine'),195);}
+}
+
 // ─────────────────────────────────────────────────
 // SHIP CLASS
 // ─────────────────────────────────────────────────
@@ -1591,28 +1971,28 @@ class Ship{
     this.isPlayer=!!o.isPlayer;this.faction=o.faction||null;
     this.health=100;this.energy=100;this.velocity=new THREE.Vector3();
     this.radius=7;this.alive=true;
-    this.turnSpeed=2.7;this.thrustPower=56;this.fireCooldown=0;
+    this.turnSpeed=2.7;this.thrustPower=56;this.fireCooldown=0;this._burstLeft=0;
     this.energyRegen=18;this.maxSpeed=100;this.dmgBonus=1.0;
     this.mesh=new THREE.Group();
     const bc=o.baseColor||'#112244',sc=o.stripeColor||'#ffffff',ah=o.accentHex||0x4488ff;
 
     // ── Material palette ──────────────────────────
     const hullCol = new THREE.Color(bc);
-    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.28,metalness:.82,envMapIntensity:1.0});
+    const hm = new THREE.MeshStandardMaterial({color:hullCol,roughness:.22,metalness:.86,envMapIntensity:1.25});
     // Secondary hull panel (slightly lighter)
-    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.35),roughness:.22,metalness:.88});
+    const hm2 = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(1.42),roughness:.16,metalness:.9});
     // Dark underside
-    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.55),roughness:.5,metalness:.6});
+    const hmd = new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.58),roughness:.42,metalness:.68});
     // Cockpit glass
-    const ck = new THREE.MeshStandardMaterial({color:0x050c18,roughness:.04,metalness:.95,transparent:true,opacity:.88});
+    const ck = new THREE.MeshStandardMaterial({color:0x0a1830,roughness:.03,metalness:.96,transparent:true,opacity:.9,emissive:0x112244,emissiveIntensity:.35});
     // Engine nacelle
-    const em = new THREE.MeshStandardMaterial({color:0x080808,roughness:.75,metalness:.5});
+    const em = new THREE.MeshStandardMaterial({color:0x101418,roughness:.65,metalness:.62});
     // Glowing accent (faction color, additive)
-    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false});
+    const gm = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false});
     // Emissive trim (faction color, lights up dark side)
-    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.95,emissive:ah,emissiveIntensity:1.2});
+    const tm = new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.96,emissive:ah,emissiveIntensity:1.85});
     // Thruster inner glow
-    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.9,blending:THREE.AdditiveBlending});
+    const thrusterGlow = new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:1,blending:THREE.AdditiveBlending});
 
     // ── HULL CONSTRUCTION ─────────────────────────
 
@@ -1756,6 +2136,10 @@ class Ship{
     this.energy=Math.min(100,this.energy+this.energyRegen*dt);
     if(this.isPlayer&&PS.hpRegen>0&&this.health<this.maxHealth)this.health=Math.min(this.maxHealth,this.health+PS.hpRegen*dt);
     if(this.fireCooldown>0)this.fireCooldown-=dt;
+    if(this._burstLeft>0&&this.fireCooldown<=0){
+      this._emitProjectile();this._burstLeft--;
+      this.fireCooldown=this._burstLeft>0?.045:(this.isPlayer?0.12:0.18);
+    }
     const toC=new THREE.Vector3().sub(this.mesh.position),dSq=toC.lengthSq();
     if(dSq>Math.pow(SUN_R+15,2)){this.velocity.addScaledVector(toC.normalize(),GRAV/dSq*dt);}
     else{this.takeDamage(100);}
@@ -1763,7 +2147,18 @@ class Ship{
     this.mesh.position.addScaledVector(this.velocity,dt);
     ['x','z'].forEach(ax=>{if(Math.abs(this.mesh.position[ax])>ARENA){this.mesh.position[ax]=Math.sign(this.mesh.position[ax])*ARENA;this.velocity[ax]*=-.8;}});
     this.mesh.position.y=0;
-    smeshes.forEach(sm=>{if(this.mesh.position.distanceToSquared(sm.mesh.position)<Math.pow(sm.sd.pR+this.radius,2))this.takeDamage(100);});
+    if(this.isPlayer&&typeof skimWorldActive==='function'&&skimWorldActive()){/* planet skim loop handles hazards */}
+    else smeshes.forEach(sm=>{
+      const dSq=this.mesh.position.distanceToSquared(sm.mesh.position);
+      const d=Math.sqrt(dSq);
+      const hitR=sm.sd.pR+this.radius;
+      if(this.isPlayer&&typeof SKIM_TYPES!=='undefined'&&SKIM_TYPES.includes(sm.sd.pType)&&typeof getSkimBand==='function'){
+        const{inner,outer}=getSkimBand(sm);
+        if(d>=inner&&d<=outer)return;
+        if(d<inner&&d>=sm.sd.pR+this.radius*.92)return;
+      }
+      if(dSq<hitR*hitR)this.takeDamage(100);
+    });
   }
   applyThrust(dt,thrustMult){
     thrustMult=thrustMult||1;
@@ -1781,22 +2176,32 @@ class Ship{
     this.velocity.addScaledVector(fwd,this.thrustPower*dt*thrustMult);
   }
   fire(){
-    if(this.energy<13||this.fireCooldown>0)return;
-    this.energy-=13;this.fireCooldown=.22;
+    const nBurst=this.isPlayer?(PS.weaponVolley||1):1;
+    const ec=Math.min(28,10+nBurst*4);
+    if(this.energy<ec||this.fireCooldown>0)return;
+    this.energy-=ec;
+    this._emitProjectile();
+    this._burstLeft=nBurst-1;
+      this.fireCooldown=this._burstLeft>0?0.048:0.18;
+  }
+  _emitProjectile(){
     const fwd=new THREE.Vector3(0,0,-1).applyEuler(this.mesh.rotation);
-    const fire1=()=>{
-      const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x00ffff:this.faction==='pirate'?0xff6600:0xff2200}));
-      m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
-      PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
-      scene.add(m);
-    };
-    fire1();
-    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x00ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,130),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
+    const m=new THREE.Mesh(new THREE.SphereGeometry(.9,8,8),new THREE.MeshBasicMaterial({color:this.isPlayer?0x66ffff:this.faction==='pirate'?0xff9933:0xff4422}));
+    m.position.copy(this.mesh.position).addScaledVector(fwd,8.5);
+    PROJS.push({mesh:m,velocity:this.velocity.clone().addScaledVector(fwd,135),life:3.5,owner:this.isPlayer?'player':'enemy',ofaction:this.faction});
+    scene.add(m);
+    if(this.isPlayer){playTone(720,.028,.045,'square');}
+    else{playTone(380,.05,.032,'triangle');}
+    if(this.isPlayer&&PS.doubleShot){const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);const sz=PS.bigShot?1.8:.9;const m2=new THREE.Mesh(new THREE.SphereGeometry(sz,8,8),new THREE.MeshBasicMaterial({color:0x66ffff}));m2.position.copy(this.mesh.position).addScaledVector(fwd,7).addScaledVector(right,4);PROJS.push({mesh:m2,velocity:this.velocity.clone().addScaledVector(fwd,128),life:3.5,owner:'player',ofaction:null});scene.add(m2);}
     if(this.isPlayer&&PS.bigShot){const pm=PROJS[PROJS.length-1];if(pm)pm.mesh.scale.set(2,2,2);}
   }
   takeDamage(amt){
     if(!this.alive)return;this.health=Math.max(0,this.health-amt);
-    if(this.isPlayer){const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');}
+    if(this.isPlayer){
+      const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');
+      playTone(amt>14?140:200,.1,.055,'sawtooth');
+      const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
+    }
     if(this.health===0)this.die();
   }
   die(){
@@ -1834,6 +2239,7 @@ function updateProjs(dt){
               }
             });
             changeRep(ns.faction,-8);
+            ns.angry=true;
           }
           break;
         }
@@ -1879,7 +2285,7 @@ function spawnNpc(faction,stationId,type){
   const sm=getSM(stationId);
   if(sm){const a=Math.random()*Math.PI*2;const r=sm.sd.pR+1000+Math.random()*1500;ship.mesh.position.set(sm.mesh.position.x+Math.cos(a)*r,0,sm.mesh.position.z+Math.sin(a)*r);}
   ship.mesh.lookAt(playerShip.mesh.position);
-  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null});
+  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null,angry:false});
 }
 // ─────────────────────────────────────────────────
 // PLAYER SHIP  (must be before FLEET spawn)
@@ -1887,6 +2293,8 @@ function spawnNpc(faction,stationId,type){
 const playerShip=new Ship({isPlayer:true,faction:'bazzano',baseColor:'#0a1e55',stripeColor:'#99ccff',accentHex:0x44aaff});
 playerShip.mesh.position.set(0,0,8700);
 playerShip.mesh.visible=true;
+applyModules();
+rebuildPlayerMesh();
 
 // Spawn fleet — large diverse crew
 const FLEET=[
@@ -1909,6 +2317,8 @@ const FLEET=[
   ['calcara','calcara','courier'],['monteveglio','monteveglio','courier'],
 ];
 FLEET.forEach(f=>spawnNpc(f[0],f[1],f[2]));
+applyModules();
+rebuildPlayerMesh();
 
 // ─────────────────────────────────────────────────
 // NPC AI
@@ -1927,9 +2337,9 @@ function npcAI(ns,dt){
     if(cx>0)ship.mesh.rotation.y-=ship.turnSpeed*dt*1.6;else ship.mesh.rotation.y+=ship.turnSpeed*dt*1.6;
     ship.applyThrust(dt);return;
   }
-  // Planet avoidance
+  // Planet avoidance (skim drones stay in atmosphere band)
   let avoided=false;
-  for(const sm of smeshes){
+  if(ns.skimDrone){/* skip */}else for(const sm of smeshes){
     const pd=pos.distanceTo(sm.mesh.position);
     if(pd<sm.sd.pR+480){
       const away=pos.clone().sub(sm.mesh.position).normalize();
@@ -1940,18 +2350,55 @@ function npcAI(ns,dt){
   }
   if(avoided)return;
 
-  const hostile=(rep[faction]||0)<-25;
-  const dp=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
-  const dist=dp.length();dp.normalize();
-  const cY=new THREE.Vector3().crossVectors(fwd,dp).y;
-  const dot=fwd.dot(dp);
+  if(ns.skimDrone){
+    const par=getSM(ns.stationId);
+    if(par&&playerShip.alive){
+      const dp2=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
+      const d2=dp2.length()||1;dp2.multiplyScalar(1/d2);
+      const c2=new THREE.Vector3().crossVectors(fwd,dp2).y;
+      if(c2>0.06)ship.mesh.rotation.y+=ship.turnSpeed*dt*1.4;
+      else if(c2<-0.06)ship.mesh.rotation.y-=ship.turnSpeed*dt*1.4;
+      if(d2>220)ship.applyThrust(dt*1.2);
+      if(d2<2400&&fwd.dot(dp2)>.75)ship.fire();
+    }
+    return;
+  }
 
-  if((hostile||type==='pirate')&&playerShip.alive&&dist<7500){
-    if(cY>0.08)ship.mesh.rotation.y+=ship.turnSpeed*dt;
-    else if(cY<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt;
-    if(dist>1200&&dot>0.35)ship.applyThrust(dt);
-    if(dot>0.9&&dist<2700)ship.fire();
-  } else {
+  const dp=new THREE.Vector3().subVectors(playerShip.mesh.position,pos);
+  const dist=dp.length();
+  const dpN=dist>1e-5?dp.clone().multiplyScalar(1/dist):new THREE.Vector3(0,0,1);
+  const dot=fwd.dot(dpN);
+  const cY=new THREE.Vector3().crossVectors(fwd,dpN).y;
+
+  // Escort player if hired to do so (before combat / patrol)
+  if(ns.escorting&&ns.escortTimer>0){
+    ns.escortTimer-=dt;
+    if(ns.escortTimer<=0){ns.escorting=false;notify(ns.displayName||'Nave'+ ': scorta completata.');}
+    const eDir=new THREE.Vector3().subVectors(playerShip.mesh.position,pos).normalize();
+    const eCross=new THREE.Vector3().crossVectors(fwd,eDir).y;
+    if(eCross>0.1)ship.mesh.rotation.y+=ship.turnSpeed*dt*.8;
+    else if(eCross<-0.1)ship.mesh.rotation.y-=ship.turnSpeed*dt*.8;
+    if(dist>600)ship.applyThrust(dt);
+    return;
+  }
+
+  const repVal=rep[faction]!=null?rep[faction]:0;
+  const madAtPlayer=repVal<=-15||ns.angry;
+  const wantsFight=(type==='pirate'||madAtPlayer)&&playerShip.alive;
+
+  if(wantsFight){
+    const chaseR=10500;
+    if(dist<=chaseR){
+      const turn=ship.turnSpeed*dt*(type==='pirate'||ns.angry?1.12:1);
+      if(cY>0.06)ship.mesh.rotation.y+=turn;
+      else if(cY<-0.06)ship.mesh.rotation.y-=turn;
+      const thrustMult=type==='pirate'||ns.angry?1.18:1.05;
+      if(dist>950&&dot>-0.14)ship.applyThrust(dt*thrustMult);
+      const fireDot=(type==='pirate'||ns.angry)?0.74:0.8;
+      const fireDist=(type==='pirate'||ns.angry)?4000:3000;
+      if(dot>fireDot&&dist<fireDist)ship.fire();
+    }
+  }else{
     const hsm=getSM(ns.stationId);
     if(hsm){
       const pr=type==='merchant'?2700:type==='courier'?3600:1650;
@@ -1963,18 +2410,6 @@ function npcAI(ns,dt){
       else if(c2<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt*.5;
       if(pos.distanceTo(new THREE.Vector3(tx,0,tz))>360)ship.applyThrust(dt);
     }
-  }
-  // Escort player if hired to do so
-  if(ns.escorting&&ns.escortTimer>0){
-    ns.escortTimer-=dt;
-    if(ns.escortTimer<=0){ns.escorting=false;notify(ns.displayName||'Nave'+ ': scorta completata.');}
-    // follow player
-    const eDir=new THREE.Vector3().subVectors(playerShip.mesh.position,pos).normalize();
-    const eCross=new THREE.Vector3().crossVectors(fwd,eDir).y;
-    if(eCross>0.1)ship.mesh.rotation.y+=ship.turnSpeed*dt*.8;
-    else if(eCross<-0.1)ship.mesh.rotation.y-=ship.turnSpeed*dt*.8;
-    if(dist>600)ship.applyThrust(dt);
-    return;
   }
   ns.dtimer-=dt;
   if(ns.dtimer<0&&dist<1800&&playerShip.alive&&gstate==='flying'){
@@ -2118,8 +2553,8 @@ function renderRep(){
 }
 
 let nTmr=null;
-function notify(msg,dur){dur=dur||2400;const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
-function showStatus(html){const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
+function notify(msg,dur){dur=dur||2400;playChime('notify');const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
+function showStatus(html){playChime('success');const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
 
 // ─────────────────────────────────────────────────
 // PILOT PORTRAIT GENERATOR
@@ -2141,6 +2576,11 @@ function drawPilotPortrait(canvas, seed, factionId){
   const vig=ctx.createRadialGradient(W/2,H*.45,W*.1,W/2,H*.5,W*.75);
   vig.addColorStop(0,'transparent'); vig.addColorStop(1,'rgba(0,0,0,.6)');
   ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<90;i++){
+    const sx=rng(0,W),sy=rng(0,H*.55),br=rng(.35,1.35);
+    ctx.fillStyle=`rgba(200,220,255,${rng(.12,.42)})`;
+    ctx.beginPath();ctx.arc(sx,sy,br,0,Math.PI*2);ctx.fill();
+  }
 
   // Skin palettes
   const skins=[
@@ -2179,6 +2619,12 @@ function drawPilotPortrait(canvas, seed, factionId){
     cg.addColorStop(0,sk.b+'66'); cg.addColorStop(1,'transparent');
     ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(cx+s*hw*.44,headY+hh*.12,hw*.32,0,Math.PI*2); ctx.fill();
   });
+  const rim=ctx.createLinearGradient(cx-hw*1.4,headY,cx+hw*.2,headY+hh);
+  rim.addColorStop(0,'rgba(255,255,255,.14)');rim.addColorStop(.45,'transparent');rim.addColorStop(1,'transparent');
+  ctx.fillStyle=rim;ctx.beginPath();
+  ctx.ellipse(cx,headY+hh*.08,hw*1.05,hh*1.02,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.22)';
+  ctx.beginPath();ctx.ellipse(cx,headY+hh*.78,hw*.55,hh*.14,0,0,Math.PI*2);ctx.fill();
 
   // Hair
   const hCols=['#100808','#281408','#7a4018','#b07020','#d4b050','#e8d8a0','#eeeeee','#540010','#001035','#224418'];
@@ -2253,6 +2699,15 @@ function drawPilotPortrait(canvas, seed, factionId){
     ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=.7;
     ctx.beginPath(); ctx.ellipse(ex,ey+eh*.65,ew*.78,eh*.28,0,0,Math.PI); ctx.stroke();
   });
+  ctx.strokeStyle='rgba(180,210,255,.55)';ctx.lineWidth=2.2;ctx.lineCap='round';
+  ctx.beginPath();ctx.arc(cx,headY-hh*.52,hw*1.05,Math.PI*.12,Math.PI-Math.PI*.12);ctx.stroke();
+  ctx.fillStyle='rgba(40,55,80,.92)';
+  ctx.beginPath();ctx.ellipse(cx-hw*1.02,headY-hh*.02,hw*.14,hh*.1,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx+hw*1.02,headY-hh*.02,hw*.14,hh*.1,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(120,160,220,.5)';ctx.lineWidth=1.1;
+  ctx.beginPath();ctx.moveTo(cx+hw*.95,headY+hh*.02);ctx.quadraticCurveTo(cx+hw*1.15,headY+hh*.42,cx+hw*.55,headY+hh*.52);ctx.stroke();
+  ctx.fillStyle='rgba(90,200,255,.35)';
+  ctx.beginPath();ctx.arc(cx+hw*.52,headY+hh*.54,hw*.07,0,Math.PI*2);ctx.fill();
 
   // Eyebrows
   const bCol=(hCol==='#eeeeee'||hCol==='#e8d8a0')?'#888':hCol;
@@ -2367,7 +2822,7 @@ function getRepLabel(faction){
 
 function buildDlgChoices(ns){
   const {faction,type,ship}=ns;
-  const hostile=(rep[faction]||0)<-25||type==='pirate';
+  const hostile=(rep[faction]||0)<=-15||type==='pirate';
   const choices=[];
 
   // ── Greeting
@@ -2444,8 +2899,8 @@ function buildDlgChoices(ns){
       }});
     }
     choices.push({label:'[ATTACCA] Apri il fuoco!',cls:'hostile',fn:()=>{
+      const tgt=activeDlgNpc;if(tgt)tgt.angry=true;
       closeIdlg();
-      // force rep very hostile
       if(faction in rep)rep[faction]=Math.min(rep[faction]||0,-30);
       renderRep();
     }});
@@ -2615,6 +3070,86 @@ function showDlg(name,faction,line){
 }
 
 // ─────────────────────────────────────────────────
+// PLANET ATMOSPHERE SKIM (low flight: resources + drones)
+// ─────────────────────────────────────────────────
+let skimSt=null,skimT=0,skimSpawn=0,skimPulse=0;
+const SKIM_TYPES=['earth','green','ice','barren','industrial','fortress'];
+const skimCreatures=[];
+function skimWorldActive(){return!!skimSt&&gstate==='flying';}
+function getSkimBand(sm){
+  const rad=typeof playerShip!=='undefined'&&playerShip?playerShip.radius:7;
+  const inner=sm.sd.pR+rad+22;
+  const outer=sm.sd.pR+Math.max(480,sm.sd.pR*.58);
+  return{inner,outer};
+}
+function findSkimPlanet(){
+  if(typeof playerShip==='undefined'||!playerShip||!playerShip.alive||gstate!=='flying')return null;
+  let best=null,bd=1e15;
+  for(const sm of smeshes){
+    if(!SKIM_TYPES.includes(sm.sd.pType))continue;
+    const{inner,outer}=getSkimBand(sm);
+    const d=playerShip.mesh.position.distanceTo(sm.mesh.position);
+    if(d>=inner&&d<=outer&&d<bd){bd=d;best=sm;}
+  }
+  return best;
+}
+function clearSkimEntities(){
+  skimCreatures.forEach(c=>{try{scene.remove(c.mesh);}catch(_){}});
+  skimCreatures.length=0;
+  for(let i=NPCS.length-1;i>=0;i--){
+    if(NPCS[i].skimDrone){if(NPCS[i].ship.alive)scene.remove(NPCS[i].ship.mesh);NPCS[i].ship.alive=false;NPCS.splice(i,1);}
+  }
+}
+function spawnSkimDrone(sm){
+  if(NPCS.filter(n=>n.skimDrone).length>=6)return;
+  const ang=Math.random()*Math.PI*2;
+  const r=sm.sd.pR+140+Math.random()*180;
+  const ship=new Ship({faction:'pirate',baseColor:'#1a2233',stripeColor:'#6688aa',accentHex:0x00ffaa,npcType:'courier'});
+  ship.mesh.scale.set(.45,.45,.45);ship.radius=3.2;ship.maxSpeed=125;ship.thrustPower=52;
+  ship.mesh.position.set(sm.mesh.position.x+Math.cos(ang)*r,0,sm.mesh.position.z+Math.sin(ang)*r);
+  ship.mesh.lookAt(playerShip.mesh.position);
+  NPCS.push({ship,faction:'pirate',stationId:sm.sd.id,type:'courier',dtimer:999,angry:true,pang:0,destId:null,skimDrone:true});
+}
+function spawnSkimCreature(sm){
+  const ang=Math.random()*Math.PI*2;
+  const mesh=new THREE.Mesh(new THREE.ConeGeometry(14,36,5),new THREE.MeshStandardMaterial({color:0x6a3a88,emissive:0x220044,emissiveIntensity:.4,roughness:.6}));
+  mesh.rotation.x=Math.PI/2;
+  mesh.position.set(sm.mesh.position.x+Math.cos(ang)*(sm.sd.pR+95),0,sm.mesh.position.z+Math.sin(ang)*(sm.sd.pR+95));
+  scene.add(mesh);
+  skimCreatures.push({mesh,sm,ang,speed:.35+Math.random()*.25,hp:28});
+}
+function updatePlanetSkim(dt){
+  const bar=document.getElementById('skim-bar'),fill=document.getElementById('skim-fill'),lbl=document.getElementById('skim-lbl');
+  const cand=findSkimPlanet();
+  if(!cand||gstate!=='flying'){
+    if(skimSt){skimSt=null;skimT=skimSpawn=skimPulse=0;clearSkimEntities();if(bar)bar.style.display='none';if(lbl)lbl.style.display='none';}
+    return;
+  }
+  const sm=cand;
+  if(skimSt!==sm){skimSt=sm;skimT=skimSpawn=skimPulse=0;clearSkimEntities();notify('Atmosfera: '+sm.sd.name+' — raccogli cristalli, elimina droni.');}
+  skimT+=dt;skimSpawn+=dt;skimPulse+=dt;
+  if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
+  if(lbl){lbl.style.display='block';lbl.textContent='SORVOLO · '+sm.sd.name.toUpperCase();}
+  if(skimPulse>.22){skimPulse=0;if(Math.random()<.55){const p=getP();if(p){
+    const dir=new THREE.Vector3().subVectors(playerShip.mesh.position,sm.mesh.position).normalize();
+    const pos=sm.mesh.position.clone().add(dir.clone().multiplyScalar(sm.sd.pR+40+Math.random()*60)).add(new THREE.Vector3((Math.random()-.5)*80,0,(Math.random()-.5)*80));
+    p.spawn(pos,new THREE.Vector3((Math.random()-.5)*20,8+Math.random()*25,(Math.random()-.5)*20),0xaaddff,.4+Math.random()*.5,2+Math.random()*3);}}}
+  if(skimSpawn>2.4){skimSpawn=0;if(Math.random()<.42)spawnSkimDrone(sm);if(Math.random()<.18)spawnSkimCreature(sm);}
+  if(Math.random()<.014*dt*60&&cargoCnt()<PS.cargoMax){PS.cargo.cristalli=(PS.cargo.cristalli||0)+1;if(Math.random()<.22)notify('+1 cristallo atmosferico');}
+  for(let i=skimCreatures.length-1;i>=0;i--){
+    const c=skimCreatures[i];c.ang+=c.speed*dt;
+    c.mesh.position.set(c.sm.mesh.position.x+Math.cos(c.ang)*(c.sm.sd.pR+95),0,c.sm.mesh.position.z+Math.sin(c.ang)*(c.sm.sd.pR+95));
+    c.mesh.lookAt(playerShip.mesh.position);
+    let hitC=false;
+    for(let j=0;j<PROJS.length;j++){
+      const pr=PROJS[j];if(pr.owner!=='player')continue;
+      if(pr.mesh.position.distanceToSquared(c.mesh.position)<900){c.hp-=18;hitC=true;break;}
+    }
+    if(hitC&&c.hp<=0){boom(c.mesh.position,0xaa66ff,22,.6);scene.remove(c.mesh);skimCreatures.splice(i,1);}
+  }
+}
+
+// ─────────────────────────────────────────────────
 // NEAR STATION CHECK
 // ─────────────────────────────────────────────────
 function checkNear(){
@@ -2687,7 +3222,8 @@ function switchTab(id,st){
 const MODULE_CATS={engine:'⚡ MOTORI',weapon:'🔫 ARMI',shield:'🛡 SCAFO / DIFESE',cargo:'📦 STIVA',special:'⭐ SPECIALI'};
 function tModules(pnl,st){
   pnl.innerHTML='<div class="stt">OFFICINA MODULARE — '+st.sd.name.toUpperCase()+'</div>';
-  pnl.innerHTML+='<div style="font-size:10px;color:#446688;font-family:var(--FM);margin-bottom:12px">Moduli installati: '+PS.modules.length+' | Crediti: '+fmt(PS.credits)+'</div>';
+  pnl.innerHTML+='<div style="font-size:10px;color:#446688;font-family:var(--FM);margin-bottom:12px">Moduli installati: '+PS.modules.length+' | Crediti: '+fmt(PS.credits)+'</div>'
+  +'<div style="font-size:9px;color:#5577aa;font-family:var(--FM);margin:-6px 0 12px;line-height:1.45">I moduli qui installati sbloccano pezzi strutturali nel <b style="color:#88aacc">Blueprint</b> (motori, armi, scudi, stiva, ali).</div>';
   // Installed modules
   if(PS.modules.length>0){
     pnl.innerHTML+='<div class="stt" style="color:#33cc66">INSTALLATI</div>';
@@ -2726,6 +3262,7 @@ function installModule(mid){
   if(m.req&&!PS.modules.includes(m.req)){notify('Richiede: '+(MODULES.find(x=>x.id===m.req)?.name||m.req));return;}
   PS.credits-=m.cost;
   PS.modules.push(mid);
+  stripBlueprintToUnlocked();
   applyModules();
   notify('Modulo installato: '+m.name);
   buildDock(dockedSt);
@@ -2738,7 +3275,9 @@ function removeModule(mid){
   PS.modules.splice(idx,1);
   const m=MODULES.find(x=>x.id===mid);
   PS.credits+=Math.floor((m?.cost||0)*0.6); // 60% refund
+  stripBlueprintToUnlocked();
   applyModules();
+  rebuildPlayerMesh();
   notify('Modulo rimosso (rimborso 60%): '+(m?.name||mid));
   buildDock(dockedSt);
 }
@@ -2932,14 +3471,20 @@ const MAP={
 };
 const BASE_SC=()=>Math.min(innerWidth,innerHeight)/78000;
 
-function worldToMap(wx,wz,cv){
+function mapClientToCanvas(cv,clientX,clientY){
+  const r=cv.getBoundingClientRect();
+  const sx=cv.width/Math.max(r.width,1),sy=cv.height/Math.max(r.height,1);
+  return {mx:(clientX-r.left)*sx,my:(clientY-r.top)*sy};
+}
+
+function worldToMap(wx,wz){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:cx+wx*sc, y:cy+wz*sc};
 }
-function mapToWorld(mx,my,cv){
+function mapToWorld(mx,my){
   const sc=BASE_SC()*MAP.zoom;
-  const cx=cv.width/2+MAP.panX, cy=cv.height/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
   return {x:(mx-cx)/sc, z:(my-cy)/sc};
 }
 
@@ -2951,24 +3496,37 @@ function resizeGM(){
 
 function drawMap(){
   const cv=document.getElementById('gmcv');const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  ctx.fillStyle='#000102';ctx.fillRect(0,0,W,H);
+  const W=innerWidth,H=innerHeight;
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#030818';ctx.fillRect(0,0,W,H);
 
-  // Cached star field
-  if(!MAP.starCache){
+  // Cached star field + nebula wash
+  if(!MAP.starCache||MAP.starCache.width!==W||MAP.starCache.height!==H){
     MAP.starCache=document.createElement('canvas');
     MAP.starCache.width=W;MAP.starCache.height=H;
     const sc2=MAP.starCache.getContext('2d');
-    for(let i=0;i<600;i++){
-      const a=0.08+Math.random()*.55;
+    const g0=sc2.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,Math.max(W,H)*.75);
+    g0.addColorStop(0,'rgba(40,20,90,.45)');g0.addColorStop(.35,'rgba(12,30,80,.22)');g0.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g0;sc2.fillRect(0,0,W,H);
+    const g1=sc2.createRadialGradient(W*.82,H*.12,0,W*.82,H*.12,Math.max(W,H)*.55);
+    g1.addColorStop(0,'rgba(90,30,60,.32)');g1.addColorStop(1,'rgba(0,0,0,0)');
+    sc2.fillStyle=g1;sc2.fillRect(0,0,W,H);
+    for(let i=0;i<900;i++){
+      const a=0.06+Math.random()*.62;
       sc2.fillStyle=`rgba(255,255,255,${a})`;
-      sc2.fillRect(Math.random()*W,Math.random()*H,Math.random()<.08?2:1,Math.random()<.08?2:1);
+      const s=Math.random()<.06?2:1;
+      sc2.fillRect(Math.random()*W,Math.random()*H,s,s);
+    }
+    for(let i=0;i<80;i++){
+      sc2.fillStyle=`rgba(180,210,255,${0.03+Math.random()*.08})`;
+      sc2.beginPath();sc2.arc(Math.random()*W,Math.random()*H,1.5+Math.random()*4,0,Math.PI*2);sc2.fill();
     }
   }
   ctx.drawImage(MAP.starCache,0,0);
 
   const sc=BASE_SC()*MAP.zoom;
-  const cx=W/2+MAP.panX, cy=H/2+MAP.panY;
+  const cx=innerWidth/2+MAP.panX, cy=innerHeight/2+MAP.panY;
 
   // Orbit rings (non-satellites)
   ctx.setLineDash([]);
@@ -3001,7 +3559,7 @@ function drawMap(){
   // Satellite orbit rings (drawn around parent position)
   smeshes.filter(s=>s.sd.sat).forEach(s=>{
     const par=getSM(s.sd.parentId);if(!par)return;
-    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z,cv);
+    const pp=worldToMap(par.mesh.position.x,par.mesh.position.z);
     const f=FACTIONS[s.sd.faction];
     ctx.strokeStyle=(f?f.color+'33':'#223344');ctx.lineWidth=.8;ctx.setLineDash([2*MAP.zoom,4*MAP.zoom]);
     ctx.beginPath();ctx.arc(pp.x,pp.y,s.sd.satR*sc,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
@@ -3009,7 +3567,7 @@ function drawMap(){
 
   // Stations
   smeshes.forEach(sm=>{
-    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+    const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
     const f=FACTIONS[sm.sd.faction];const col=f?f.color:'#888';
     const r=Math.max(3,sm.sd.pR*sc*1.6);
     // Glow
@@ -3040,7 +3598,7 @@ function drawMap(){
   });
 
   // Player position
-  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z,cv);
+  const {x:ppx,y:ppy}=worldToMap(playerShip.mesh.position.x,playerShip.mesh.position.z);
   ctx.save();ctx.translate(ppx,ppy);
   // Rotate triangle to match ship heading
   ctx.rotate(-playerShip.mesh.rotation.y);
@@ -3055,7 +3613,7 @@ function drawMap(){
   if(navDestId){
     const sm=getSM(navDestId);
     if(sm){
-      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z,cv);
+      const {x:dx,y:dy}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
       ctx.setLineDash([6,8]);ctx.strokeStyle='rgba(0,255,200,.35)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(dx,dy);ctx.stroke();
       ctx.setLineDash([]);
@@ -3066,9 +3624,8 @@ function drawMap(){
 
 function handleMapClick(e){
   const cv=document.getElementById('gmcv');
-  const rect=cv.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-  const {x:wx,z:wz}=mapToWorld(mx,my,cv);
+  const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+  const {x:wx,z:wz}=mapToWorld(mx,my);
   const sc=BASE_SC()*MAP.zoom;
   // Find closest station within click radius
   let best=null,bestD=Infinity;
@@ -3125,12 +3682,11 @@ function setupMapEvents(){
     const oldZoom=MAP.zoom;
     MAP.zoom=cl(MAP.zoom*Math.exp(-e.deltaY*.001),.12,8);
     // Zoom toward cursor
-    const rect=cv.getBoundingClientRect();
-    const mx=e.clientX-rect.left-cv.width/2;
-    const my=e.clientY-rect.top-cv.height/2;
+    const {mx,my}=mapClientToCanvas(cv,e.clientX,e.clientY);
+    const mx2=mx-cv.width/2,my2=my-cv.height/2;
     const zr=MAP.zoom/oldZoom;
-    MAP.panX=(MAP.panX+mx)*zr-mx;
-    MAP.panY=(MAP.panY+my)*zr-my;
+    MAP.panX=(MAP.panX+mx2)*zr-mx2;
+    MAP.panY=(MAP.panY+my2)*zr-my2;
     drawMap();
   },{passive:false});
 
@@ -3234,7 +3790,7 @@ function drawRadar(){
     const rx=(ns.ship.mesh.position.x-playerShip.mesh.position.x)*sc;
     const ry=(ns.ship.mesh.position.z-playerShip.mesh.position.z)*sc;
     if(Math.abs(rx)>46||Math.abs(ry)>46)return;
-    const hostile=(rep[ns.faction]||0)<-25||ns.faction==='pirate';
+    const hostile=(rep[ns.faction]||0)<=-15||ns.faction==='pirate'||ns.angry;
     ctx.fillStyle=hostile?'#ff4433':f?f.color:'#888';
     ctx.beginPath();ctx.arc(cl(cx+rx,2,W-2),cl(cy+ry,2,W-2),2.5,0,Math.PI*2);ctx.fill();
   });
@@ -3250,6 +3806,13 @@ function updateHUD(){
   document.getElementById('bh').style.width=Math.max(0,playerShip.health)+'%';
   document.getElementById('bh').style.background=playerShip.health<30?'linear-gradient(90deg,#cc2200,#ff5522)':'linear-gradient(90deg,#1155ff,#33aaff)';
   document.getElementById('be').style.width=Math.max(0,playerShip.energy)+'%';
+  const spdBar=document.getElementById('speed-bar'),spdFill=document.getElementById('speed-fill');
+  if(spdBar&&spdFill&&playerShip.maxSpeed>0){
+    const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
+    spdBar.style.display='block';
+    spdFill.style.width=Math.round(sp*100)+'%';
+    spdFill.style.background=sp>.92?'linear-gradient(90deg,#ff6600,#ffcc33)':'linear-gradient(90deg,#2244aa,#55ccff)';
+  }
   document.getElementById('cval').textContent=fmt(PS.credits);
   const cc=cargoCnt();document.getElementById('sval').textContent=cc>0?'Stiva: '+cc+'/'+PS.cargoMax:'Stiva vuota';
   document.getElementById('crew-lb').textContent=PS.crew.length?'Eq: '+PS.crew.map(id=>CREW_POOL.find(c=>c.id===id)?.name.split(' ')[0]||id).join(' · '):'';
@@ -3265,6 +3828,15 @@ function updateHUD(){
   if(PS.activeMissions.length>0){const m=PS.activeMissions[0];let p='';if(m.type==='combat')p=' ('+( m.killsDone||0)+'/'+m.killsNeeded+')';else if(m.targetSid){const ts=SDATA.find(s=>s.id===m.targetSid);if(ts)p=' → '+ts.name;}mt.textContent=m.title+p;mt.style.display='block';}
   else mt.style.display='none';
   smeshes.forEach(sm=>{if(sm.mesh._dr){const n=nearSt&&nearSt.sd.id===sm.sd.id;sm.mesh._dr.material.opacity=n?0.45+Math.sin(Date.now()*.01)*.18:0.13;}});
+  const ov=document.getElementById('hud-overlay'),ret=document.getElementById('reticle');
+  const fly=gstate==='flying'||gstate==='dialogue';
+  if(ov)ov.style.display=fly&&gstate!=='gameover'?'block':'none';
+  if(ov)ov.classList.toggle('danger',fly&&playerShip.alive&&playerShip.health<32);
+  document.body.classList.toggle('low-hp',fly&&playerShip.alive&&playerShip.health<22);
+  if(ret&&playerShip.maxSpeed>0){
+    const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
+    ret.style.opacity=String(.22+sp*.55);
+  }
   drawRadar();
 }
 
@@ -3281,7 +3853,7 @@ function triggerVictory(){
   gstate='gameover';
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
-  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio sono di nuovo unite.<br>Il Consorzio Valsamoggio vive. Anche Crespellano ha (quasi) avuto il semaforo.<br>Taproblem — il sistema e\' in pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
+  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br>Crespellano ha (quasi) avuto il semaforo. Calcara ha (quasi) smesso di contare i timbri.<br>Taproblem: per ora, il vuoto sa di pace.<br><br>Fine del Capitolo I: "Il Patto del Molino"';
 }
 
 // ─────────────────────────────────────────────────
@@ -3289,8 +3861,9 @@ function triggerVictory(){
 // ─────────────────────────────────────────────────
 const clock=new THREE.Clock();
 renderRep();
-// Start story after 5 seconds
-setTimeout(()=>advanceStory(1),5000);
+// Prologue then chapter 1 (staggered so text does not overlap)
+setTimeout(()=>showStoryBanner('PROLOGO','Sistema Valsamoggio — 2087',STORY.prologue,11000),4200);
+setTimeout(()=>advanceStory(1),15500);
 
 function animate(){
   requestAnimationFrame(animate);
@@ -3301,13 +3874,13 @@ function animate(){
 
   // Orbit updates — flat ecliptic plane
   smeshes.filter(s=>!s.sd.sat).forEach(sm=>{
-    sm.angle+=sm.sd.orbitSpeed*dt*.08;
+    sm.angle+=sm.sd.orbitSpeed*dt*.032;
     sm.mesh.position.set(Math.cos(sm.angle)*sm.sd.orbitR, 0, Math.sin(sm.angle)*sm.sd.orbitR);
     sm.mesh.rotation.y+=0.2*dt;
   });
   smeshes.filter(s=>s.sd.sat).forEach(sm=>{
     const par=getSM(sm.sd.parentId);if(!par)return;
-    sm.satAngle+=sm.sd.satSpeed*dt*.08;
+    sm.satAngle+=sm.sd.satSpeed*dt*.032;
     sm.mesh.position.set(
       par.mesh.position.x+Math.cos(sm.satAngle)*sm.sd.satR,
       0,
@@ -3364,9 +3937,10 @@ function animate(){
   // Flying (paused in dialogue or docked)
   if((gstate==='flying'||gstate==='dialogue')&&playerShip.alive){
     if(gstate==='flying'){
-      if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt;
-      if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt;
-      if(INP.thrust)playerShip.applyThrust(dt);
+      const turnBoost=INP.thrust?1.22:1;
+      if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt*turnBoost;
+      if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt*turnBoost;
+      if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
       if(INP.fire)  playerShip.fire();
       // Afterburner
       if(INP.boost&&PS.boostInstalled&&!BOOST.overheated){
@@ -3386,8 +3960,9 @@ function animate(){
       }
       updateBoost(dt,playerShip);
       playerShip.update(dt);
-      NPCS.forEach((ns,i)=>{npcAI(ns,dt);if(!ns.ship.alive){const {faction,stationId}=ns;NPCS.splice(i,1);setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);}});
+      NPCS.forEach((ns,i)=>{npcAI(ns,dt);if(!ns.ship.alive){const {faction,stationId,skimDrone}=ns;NPCS.splice(i,1);if(!skimDrone)setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);}});
       updateProjs(dt);
+      updatePlanetSkim(dt);
       checkNear();
     }
     updateHUD();
@@ -3402,6 +3977,16 @@ function animate(){
     const nc=document.getElementById('navcv');
     if(nc&&nc.width){nc.getContext('2d').clearRect(0,0,nc.width,nc.height);}
   }
+  const twT=performance.now()*.00115;
+  STAR_MATS[0].opacity=.88+Math.sin(twT)*.08;
+  STAR_MATS[1].opacity=.48+Math.sin(twT*1.3+1.2)*.12;
+  STAR_MATS[2].opacity=.28+Math.sin(twT*1.7+2.4)*.14;
+  if(STAR_MATS[3])STAR_MATS[3].opacity=.68+Math.sin(twT*.9+.5)*.1;
+  if(STAR_MATS[4])STAR_MATS[4].opacity=.82+Math.sin(twT*1.5+.8)*.1;
+  if(STAR_MATS[5])STAR_MATS[5].opacity=.55+Math.sin(twT*1.1+2.1)*.12;
+  skyRig.position.lerp(cam.position,1);
+  skyDome.rotation.y+=0.000014*dt*1000;nebVeil.rotation.y-=0.000009*dt*1000;
+  if(nebWarm)nebWarm.rotation.y+=0.000006*dt*1000;
   renderer.render(scene,cam);
 }
 animate();
