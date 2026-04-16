@@ -276,22 +276,6 @@ body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
 #skim-lbl{position:fixed;top:118px;left:50%;transform:translateX(-50%);font-family:var(--FM);font-size:10px;color:#88eeff;letter-spacing:.15em;z-index:13;pointer-events:none;display:none;text-shadow:0 0 12px rgba(0,180,255,.5)}
 #skim-bar{position:fixed;top:136px;left:50%;transform:translateX(-50%);width:min(220px,55vw);height:5px;background:rgba(0,40,60,.5);border-radius:3px;overflow:hidden;z-index:13;pointer-events:none;display:none;border:1px solid rgba(0,200,255,.25)}
 #skim-fill{height:100%;width:0%;background:linear-gradient(90deg,#004466,#44ddff);transition:width .15s ease-out}
-#suborbit{
-  display:none;position:fixed;inset:0;z-index:74;pointer-events:none;
-}
-#suborbit-cv{width:100%;height:100%;display:block}
-#suborbit-hud{
-  position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:75;
-  background:rgba(2,10,24,.78);border:1px solid rgba(70,150,230,.35);border-radius:8px;
-  padding:6px 12px;color:#a9dbff;font:10px var(--FM);letter-spacing:.08em;display:none;pointer-events:none;
-}
-#suborbit-ui{display:none;position:fixed;left:0;right:0;bottom:18px;z-index:5002;pointer-events:none}
-#suborbit-ui .srow{display:flex;justify-content:center;gap:10px;margin-top:8px}
-#suborbit-ui .sbtn{pointer-events:auto;width:64px;height:64px;border-radius:50%;border:1px solid rgba(90,170,240,.5);background:rgba(6,24,56,.8);color:#d8eeff;font:700 10px var(--FD);letter-spacing:.08em}
-#suborbit-ui .sbtn.fire{border-color:rgba(255,120,80,.55);background:rgba(62,14,18,.8)}
-body.suborbit-active #suborbit{display:block !important;opacity:1 !important;z-index:5000 !important}
-body.suborbit-active #suborbit-hud{display:block !important;z-index:5001 !important}
-body.suborbit-active #suborbit-ui{display:block !important}
 @media(max-width:700px){
   #skim-lbl{top:96px;font-size:9px}
   #skim-bar{top:112px;width:min(200px,70vw)}
@@ -490,10 +474,7 @@ body.suborbit-active #suborbit-ui{display:block !important}
     <div id="dktbs" class="dktabs"></div>
     <div id="dkpns"></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:center;padding:0 0 10px">
-    <button id="ldck" onclick="startLaunch()">DECOLLA</button>
-    <button id="ldck-suborbit" onclick="startSuborbit()" style="display:none">VOLO SUBORBITALE</button>
-  </div>
+  <button id="ldck" onclick="startLaunch()">DECOLLA</button>
 </div>
 
 <div id="notif"></div>
@@ -503,21 +484,6 @@ body.suborbit-active #suborbit-ui{display:block !important}
 <div id="speed-bar"><div id="speed-fill"></div></div>
 <div id="skim-lbl">SORVOLO</div>
 <div id="skim-bar"><div id="skim-fill"></div></div>
-<div id="suborbit"><canvas id="suborbit-cv"></canvas></div>
-<div id="suborbit-hud"></div>
-<div id="suborbit-ui">
-  <div class="srow">
-    <button id="sob-up" class="sbtn">SU</button>
-  </div>
-  <div class="srow">
-    <button id="sob-left" class="sbtn">SX</button>
-    <button id="sob-fire" class="sbtn fire">FUOCO<br/>TRAZ.</button>
-    <button id="sob-right" class="sbtn">DX</button>
-  </div>
-  <div class="srow">
-    <button id="sob-down" class="sbtn">GIU</button>
-  </div>
-</div>
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
@@ -2563,18 +2529,8 @@ const fadeEl=document.getElementById('fadeov');
 const ltEl=document.getElementById('land-title');
 
 window.addEventListener('keydown',e=>{
-  if(SUBORBIT.active&&e.code==='Escape'){
-    e.preventDefault();
-    skimSt=null;skimT=0;
-    leaveSuborbit({toDock:true});
-    const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
-    if(bar)bar.style.display='none';
-    if(lbl)lbl.style.display='none';
-    return;
-  }
-  if(gameplayPaused()&&e.code!=='KeyM'&&e.code!=='Escape')return;
-  if(GAME.state==='docked')return;
-  if(GAME.state==='dialogue'){if(e.code==='Escape')closeIdlg();return;}
+  if(gstate==='docked')return;
+  if(gstate==='dialogue'){if(e.code==='Escape')closeIdlg();return;}
   if(e.code==='ArrowLeft'||e.code==='KeyA')INP.left=true;
   if(e.code==='ArrowRight'||e.code==='KeyD')INP.right=true;
   if(e.code==='ArrowUp'||e.code==='KeyW')INP.thrust=true;
@@ -3250,232 +3206,8 @@ function showDlg(name,faction,line){
 // ─────────────────────────────────────────────────
 let skimSt=null,skimT=0;
 const SKIM_TYPES=['earth','green','ice','barren','industrial','fortress'];
-const SUBORBIT={
-  active:false,planet:null,seed:0,time:0,intro:0,offset:0,speed:260,
-  x:0,y:190,vx:0,vy:0,roll:0,pitch:0,corridorHalf:760,
-  speedBase:260,minAlt:34,maxAlt:430,
-  terrain:{chunks:[],count:8,chunkLen:980,chunkW:6200,segX:44,segZ:18,lastBase:1e9},
-  props:[],propCount:64,propSpan:7600,
-  enemies:[],pickups:[],hazards:[],
-  spawnEnemyT:1.4,spawnPickupT:1.1,spawnHazardT:1.8,
-  enemyCap:10,pickupCap:8,hazardCap:8,fireCd:0,tractoring:false,
-  collected:0,kills:0,fromDockId:null,
-  smoothX:0,smoothY:0,smoothGy:0,
-  anchor:new THREE.Vector3(),
-  prevFog:null,prevClear:SPACE_CLEAR_COLOR
-};
-function hashRand(seed,i){const n=Math.sin(seed*97.1+i*12.9898)*43758.5453;return n-Math.floor(n);}
-function suborbitHeight(seed,x,z){
-  const ridge=Math.sin(z*.0042+seed*.31)*64+Math.sin(z*.0105-seed*.12)*28;
-  const dunes=Math.sin((x*.012)+(z*.008))*14+Math.cos((x*.007)-(z*.005))*11;
-  const sideWall=Math.max(0,Math.abs(x)-540)*.12;
-  const noise=(hashRand(seed,x*.0027+z*.0011)-.5)*10;
-  return 26+ridge+dunes+noise+sideWall;
-}
-function mkSuborbitChunk(){
-  const t=SUBORBIT.terrain;
-  const g=new THREE.PlaneGeometry(t.chunkW,t.chunkLen,t.segX,t.segZ);
-  g.rotateX(-Math.PI/2);
-  const m=new THREE.Mesh(
-    g,
-    new THREE.MeshStandardMaterial({color:0x4f7148,roughness:.95,metalness:.02,flatShading:true})
-  );
-  m.visible=false;
-  scene.add(m);
-  return{mesh:m,pos:g.attributes.position,idx:1e9};
-}
-function ensureSuborbitTerrain(){
-  if(SUBORBIT.terrain.chunks.length)return;
-  for(let i=0;i<SUBORBIT.terrain.count;i++)SUBORBIT.terrain.chunks.push(mkSuborbitChunk());
-  for(let i=0;i<SUBORBIT.propCount;i++){
-    const tower=Math.random()<.58;
-    const h=tower?(22+Math.random()*120):(10+Math.random()*30);
-    const g=tower?new THREE.BoxGeometry(12+Math.random()*26,h,12+Math.random()*26):new THREE.ConeGeometry(12+Math.random()*18,h,6);
-    const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:tower?0x666e78:0x355f2c,roughness:.9,emissive:0x2c2212,emissiveIntensity:.05}));
-    m.userData.h=h;
-    m.userData.phase=Math.random()*Math.PI*2;
-    m.userData.wx=(Math.random()<.5?-1:1)*(220+Math.random()*840);
-    m.userData.wz=600+Math.random()*SUBORBIT.propSpan;
-    m.visible=false;
-    scene.add(m);
-    SUBORBIT.props.push(m);
-  }
-  for(let i=0;i<SUBORBIT.enemyCap;i++){
-    const m=new THREE.Mesh(new THREE.OctahedronGeometry(14,0),new THREE.MeshStandardMaterial({color:0xcc5533,emissive:0x441100,emissiveIntensity:.5}));
-    m.visible=false;scene.add(m);SUBORBIT.enemies.push({mesh:m,active:false,wx:0,wz:0,hp:2});
-  }
-  for(let i=0;i<SUBORBIT.pickupCap;i++){
-    const m=new THREE.Mesh(new THREE.SphereGeometry(8,10,10),new THREE.MeshStandardMaterial({color:0x44ddee,emissive:0x113344,emissiveIntensity:.7}));
-    m.visible=false;scene.add(m);SUBORBIT.pickups.push({mesh:m,active:false,wx:0,wz:0});
-  }
-  for(let i=0;i<SUBORBIT.hazardCap;i++){
-    const m=new THREE.Mesh(new THREE.TorusKnotGeometry(9,2.8,36,6),new THREE.MeshStandardMaterial({color:0xaa33ff,emissive:0x2a0044,emissiveIntensity:.45}));
-    m.visible=false;scene.add(m);SUBORBIT.hazards.push({mesh:m,active:false,wx:0,wz:0});
-  }
-}
-function resetSuborbitActors(){
-  SUBORBIT.spawnEnemyT=1.2;SUBORBIT.spawnPickupT=.8;SUBORBIT.spawnHazardT=1.6;
-  SUBORBIT.fireCd=0;SUBORBIT.tractoring=false;SUBORBIT.collected=0;SUBORBIT.kills=0;
-  for(const e of SUBORBIT.enemies){e.active=false;e.hp=2;e.mesh.visible=false;}
-  for(const p of SUBORBIT.pickups){p.active=false;p.mesh.visible=false;}
-  for(const h of SUBORBIT.hazards){h.active=false;h.mesh.visible=false;}
-}
-function spawnSuborbitActor(pool,kind){
-  const a=pool.find(x=>!x.active);if(!a)return;
-  a.active=true;
-  a.wx=(Math.random()<.5?-1:1)*(120+Math.random()*SUBORBIT.corridorHalf*.9);
-  a.wz=SUBORBIT.offset+900+Math.random()*3000;
-  if(kind==='enemy')a.hp=2;
-  a.mesh.visible=true;
-}
-function updateSuborbitActors(dt){
-  SUBORBIT.fireCd=Math.max(0,SUBORBIT.fireCd-dt);
-  SUBORBIT.tractoring=!!INP.fire;
-  SUBORBIT.spawnEnemyT-=dt;SUBORBIT.spawnPickupT-=dt;SUBORBIT.spawnHazardT-=dt;
-  if(SUBORBIT.spawnEnemyT<=0){SUBORBIT.spawnEnemyT=.9+Math.random()*1.1;spawnSuborbitActor(SUBORBIT.enemies,'enemy');}
-  if(SUBORBIT.spawnPickupT<=0){SUBORBIT.spawnPickupT=.7+Math.random()*1.1;spawnSuborbitActor(SUBORBIT.pickups,'pickup');}
-  if(SUBORBIT.spawnHazardT<=0){SUBORBIT.spawnHazardT=1.2+Math.random()*1.8;spawnSuborbitActor(SUBORBIT.hazards,'hazard');}
-  const shipWz=SUBORBIT.offset+40;
-  if(INP.fire&&SUBORBIT.fireCd<=0){
-    SUBORBIT.fireCd=.15;
-    let hit=null,hd=1e9;
-    for(const e of SUBORBIT.enemies){
-      if(!e.active)continue;
-      const dz=e.wz-shipWz,dx=Math.abs(e.wx-SUBORBIT.x);
-      if(dz>80&&dz<980&&dx<140&&dz<hd){hd=dz;hit=e;}
-    }
-    if(hit){
-      hit.hp--;
-      if(hit.hp<=0){hit.active=false;hit.mesh.visible=false;SUBORBIT.kills++;PS.credits+=8;notify('Bersaglio abbattuto +8');}
-    }
-  }
-  for(const e of SUBORBIT.enemies){
-    if(!e.active)continue;
-    const dz=e.wz-SUBORBIT.offset;
-    e.wx+=Math.sin(SUBORBIT.time*2+e.wz*.004)*34*dt;
-    e.mesh.rotation.y+=2.4*dt;
-    const g=suborbitHeight(SUBORBIT.seed,e.wx,e.wz);
-    e.mesh.position.set(SUBORBIT.anchor.x+e.wx,SUBORBIT.anchor.y+g+70,SUBORBIT.anchor.z+dz);
-    if(dz<-120){e.active=false;e.mesh.visible=false;continue;}
-    if(Math.abs(e.wx-SUBORBIT.x)<36&&Math.abs(dz-40)<46){playerShip.takeDamage(10);e.active=false;e.mesh.visible=false;}
-  }
-  for(const p of SUBORBIT.pickups){
-    if(!p.active)continue;
-    const dz=p.wz-SUBORBIT.offset;
-    if(SUBORBIT.tractoring){
-      const tx=SUBORBIT.x, tz=shipWz+40;
-      p.wx=lerp(p.wx,tx,.045);
-      p.wz=lerp(p.wz,tz,.06);
-    }
-    const g=suborbitHeight(SUBORBIT.seed,p.wx,p.wz);
-    p.mesh.position.set(SUBORBIT.anchor.x+p.wx,SUBORBIT.anchor.y+g+26+Math.sin(SUBORBIT.time*3+p.wz*.01)*6,SUBORBIT.anchor.z+dz);
-    if(dz<-120){p.active=false;p.mesh.visible=false;continue;}
-    if(Math.abs(p.wx-SUBORBIT.x)<30&&Math.abs(dz-40)<40){p.active=false;p.mesh.visible=false;SUBORBIT.collected++;PS.cargo.cristalli=(PS.cargo.cristalli||0)+1;}
-  }
-  for(const h of SUBORBIT.hazards){
-    if(!h.active)continue;
-    const dz=h.wz-SUBORBIT.offset;
-    h.mesh.rotation.x+=1.6*dt;h.mesh.rotation.y-=1.2*dt;
-    const g=suborbitHeight(SUBORBIT.seed,h.wx,h.wz);
-    h.mesh.position.set(SUBORBIT.anchor.x+h.wx,SUBORBIT.anchor.y+g+34,SUBORBIT.anchor.z+dz);
-    if(dz<-120){h.active=false;h.mesh.visible=false;continue;}
-    if(Math.abs(h.wx-SUBORBIT.x)<34&&Math.abs(dz-40)<44){playerShip.takeDamage(14);h.active=false;h.mesh.visible=false;}
-  }
-}
-function shapeSuborbitChunk(ch,chunkIndex){
-  const p=ch.pos;
-  for(let i=0;i<p.count;i++){
-    const x=p.getX(i);
-    const z=p.getZ(i);
-    const h=suborbitHeight(SUBORBIT.seed,x,chunkIndex*SUBORBIT.terrain.chunkLen+z);
-    p.setY(i,h);
-  }
-  p.needsUpdate=true;
-  ch.mesh.geometry.computeVertexNormals();
-  ch.idx=chunkIndex;
-}
-function updateSuborbitTerrainVisual(){
-  const t=SUBORBIT.terrain;
-  const base=Math.floor(SUBORBIT.offset/t.chunkLen)-1;
-  if(base!==t.lastBase){
-    t.lastBase=base;
-    for(let i=0;i<t.chunks.length;i++){
-      const idx=base+i;
-      if(t.chunks[i].idx!==idx)shapeSuborbitChunk(t.chunks[i],idx);
-    }
-  }
-  for(const ch of t.chunks){
-    ch.mesh.position.set(SUBORBIT.anchor.x,SUBORBIT.anchor.y,SUBORBIT.anchor.z+ch.idx*t.chunkLen-SUBORBIT.offset);
-    ch.mesh.visible=true;
-  }
-  SUBORBIT.props.forEach((m,i)=>{
-    const wx=cl(m.userData.wx,-SUBORBIT.corridorHalf*1.45,SUBORBIT.corridorHalf*1.45);
-    let wz=m.userData.wz;
-    while(wz<SUBORBIT.offset-700)wz+=SUBORBIT.propSpan;
-    m.userData.wz=wz;
-    const ground=suborbitHeight(SUBORBIT.seed,wx,wz);
-    m.position.set(SUBORBIT.anchor.x+wx,SUBORBIT.anchor.y+ground+(m.userData.h||20)*.5,SUBORBIT.anchor.z+(wz-SUBORBIT.offset));
-    const e=.06+Math.max(0,Math.sin(SUBORBIT.time*2.2+(m.userData.phase||0)))*.34;
-    m.material.emissiveIntensity=e;
-    m.visible=true;
-  });
-}
-function enterSuborbit(sm){
-  ensureSuborbitTerrain();
-  SUBORBIT.active=true;SUBORBIT.planet=sm;SUBORBIT.seed=((sm.sd.orbitR+sm.sd.pR*13)|0);
-  SUBORBIT.time=0;SUBORBIT.intro=0;SUBORBIT.offset=0;SUBORBIT.speed=SUBORBIT.speedBase;
-  SUBORBIT.x=0;SUBORBIT.y=190;SUBORBIT.vx=0;SUBORBIT.vy=0;SUBORBIT.roll=0;SUBORBIT.pitch=0;
-  SUBORBIT.smoothX=0;SUBORBIT.smoothY=190;SUBORBIT.smoothGy=0;
-  SUBORBIT.fromDockId=sm.sd.id;
-  resetSuborbitActors();
-  SUBORBIT.terrain.lastBase=1e9;
-  const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
-  SUBORBIT.anchor.copy(playerShip.mesh.position).addScaledVector(fwd,260);
-  SUBORBIT.anchor.y=0;
-  SUBORBIT.prevFog=scene.fog;
-  SUBORBIT.prevClear=SPACE_CLEAR_COLOR;
-  scene.fog=new THREE.Fog(0xa8c6df,220,5900);
-  renderer.setClearColor(SUBORBIT_CLEAR_COLOR,1);
-  updateSuborbitTerrainVisual();
-  GAME.state='suborbit';
-  document.body.classList.add('suborbit-active');
-  notify('Volo suborbitale attivo: '+sm.sd.name);
-}
-function leaveSuborbit(opts){
-  opts=opts||{};
-  SUBORBIT.active=false;SUBORBIT.planet=null;
-  SUBORBIT.terrain.chunks.forEach(ch=>ch.mesh.visible=false);
-  SUBORBIT.props.forEach(m=>m.visible=false);
-  SUBORBIT.enemies.forEach(e=>e.mesh.visible=false);
-  SUBORBIT.pickups.forEach(p=>p.mesh.visible=false);
-  SUBORBIT.hazards.forEach(h=>h.mesh.visible=false);
-  scene.fog=SUBORBIT.prevFog;
-  renderer.setClearColor(SUBORBIT.prevClear,1);
-  document.body.classList.remove('suborbit-active');
-  if(opts.toDock&&SUBORBIT.fromDockId){
-    const st=stations.find(s=>s.sd.id===SUBORBIT.fromDockId);
-    if(st){
-      GAME.dockedSt=st;
-      GAME.state='docked';
-      setPausedReason('docked',true);
-      playerShip.mesh.visible=false;
-      document.getElementById('dkscr').style.display='block';
-      document.getElementById('hud').style.display='none';
-      document.getElementById('radar').style.display='none';
-      document.getElementById('mtick').style.display='none';
-      buildDock(st);
-      return;
-    }
-  }
-  const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
-  playerShip.velocity.copy(fwd).multiplyScalar(140);
-  playerShip.mesh.rotation.x=0;playerShip.mesh.rotation.z=0;
-  fadeEl.style.transition='opacity .5s ease';
-  fadeEl.style.opacity='.2';
-  setTimeout(()=>{fadeEl.style.opacity='0';},240);
-  GAME.state='flying';
-}
-function skimWorldActive(){return SUBORBIT.active;}
+const skimCreatures=[];
+function skimWorldActive(){return!!skimSt&&gstate==='flying';}
 function getSkimBand(sm){
   const rad=typeof playerShip!=='undefined'&&playerShip?playerShip.radius:7;
   const inner=sm.sd.pR+rad+22;
@@ -3493,47 +3225,36 @@ function findSkimPlanet(){
   }
   return best;
 }
-function checkPlanetCrash(){
-  if(!playerShip.alive||GAME.state!=='flying')return;
-  // If we are in docking range, let the approach menu handle interaction.
-  if(GAME.nearSt)return;
-  for(const sm of smeshes){
-    if(!SKIM_TYPES.includes(sm.sd.pType))continue;
-    const d=playerShip.mesh.position.distanceTo(sm.mesh.position);
-    const crashR=sm.sd.pR+playerShip.radius+6;
-    if(d<crashR){
-      playerShip.takeDamage(999);
-      triggerGameOver();
-      return;
-    }
+function clearSkimEntities(){
+  skimCreatures.forEach(c=>{try{scene.remove(c.mesh);}catch(_){}});
+  skimCreatures.length=0;
+  for(let i=NPCS.length-1;i>=0;i--){
+    if(NPCS[i].skimDrone){if(NPCS[i].ship.alive)scene.remove(NPCS[i].ship.mesh);NPCS[i].ship.alive=false;NPCS.splice(i,1);}
   }
+}
+function spawnSkimDrone(sm){
+  if(NPCS.filter(n=>n.skimDrone).length>=6)return;
+  const ang=Math.random()*Math.PI*2;
+  const r=sm.sd.pR+140+Math.random()*180;
+  const ship=new Ship({faction:'pirate',baseColor:'#1a2233',stripeColor:'#6688aa',accentHex:0x00ffaa,npcType:'courier'});
+  ship.mesh.scale.set(.45,.45,.45);ship.radius=3.2;ship.maxSpeed=125;ship.thrustPower=52;
+  ship.mesh.position.set(sm.mesh.position.x+Math.cos(ang)*r,0,sm.mesh.position.z+Math.sin(ang)*r);
+  ship.mesh.lookAt(playerShip.mesh.position);
+  NPCS.push({ship,faction:'pirate',stationId:sm.sd.id,type:'courier',dtimer:999,angry:true,pang:0,destId:null,skimDrone:true});
+}
+function spawnSkimCreature(sm){
+  const ang=Math.random()*Math.PI*2;
+  const mesh=new THREE.Mesh(new THREE.ConeGeometry(14,36,5),new THREE.MeshStandardMaterial({color:0x6a3a88,emissive:0x220044,emissiveIntensity:.4,roughness:.6}));
+  mesh.rotation.x=Math.PI/2;
+  mesh.position.set(sm.mesh.position.x+Math.cos(ang)*(sm.sd.pR+95),0,sm.mesh.position.z+Math.sin(ang)*(sm.sd.pR+95));
+  scene.add(mesh);
+  skimCreatures.push({mesh,sm,ang,speed:.35+Math.random()*.25,hp:28});
 }
 function updatePlanetSkim(dt){
   const bar=document.getElementById('skim-bar'),fill=document.getElementById('skim-fill'),lbl=document.getElementById('skim-lbl');
-  if(GAME.state==='suborbit'&&SUBORBIT.active){
-    const sm=SUBORBIT.planet;if(!sm){leaveSuborbit();return;}
-    skimSt=sm;skimT+=dt;
-    SUBORBIT.intro=cl(SUBORBIT.intro+dt*1.2,0,1);
-    const ax=(INP.left?-1:0)+(INP.right?1:0);
-    const ay=(INP.thrust?1:0)-(INP.boost?1:0);
-    SUBORBIT.vx=cl(SUBORBIT.vx+ax*dt*280,-300,300);
-    SUBORBIT.vy=cl(SUBORBIT.vy+ay*dt*210,-220,220);
-    SUBORBIT.vx*=0.92;SUBORBIT.vy*=0.93;
-    SUBORBIT.x=cl(SUBORBIT.x+SUBORBIT.vx*dt,-SUBORBIT.corridorHalf,SUBORBIT.corridorHalf);
-    SUBORBIT.y=cl(SUBORBIT.y+SUBORBIT.vy*dt,SUBORBIT.minAlt,SUBORBIT.maxAlt);
-    const targetSpd=SUBORBIT.speedBase+(INP.thrust?90:0)+(INP.boost?130:0);
-    SUBORBIT.speed=lerp(SUBORBIT.speed,targetSpd,.08);
-    SUBORBIT.roll=lerp(SUBORBIT.roll,-SUBORBIT.vx/280,.14);
-    SUBORBIT.pitch=lerp(SUBORBIT.pitch,SUBORBIT.vy/220,.12);
-    SUBORBIT.offset+=SUBORBIT.speed*dt;
-    updateSuborbitTerrainVisual();
-    updateSuborbitActors(dt);
-    const g=suborbitHeight(SUBORBIT.seed,SUBORBIT.x,SUBORBIT.offset+120);
-    SUBORBIT.smoothGy=lerp(SUBORBIT.smoothGy,g,.16);
-    if(SUBORBIT.y<g+18){playerShip.takeDamage(20);leaveSuborbit();triggerGameOver();return;}
-    if(Math.abs(SUBORBIT.x)>SUBORBIT.corridorHalf-6){playerShip.takeDamage(20);leaveSuborbit();triggerGameOver();return;}
-    if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
-    if(lbl){lbl.style.display='block';lbl.textContent=`SUBORBITALE · SPD ${Math.round(SUBORBIT.speed)} · ALT ${Math.round(SUBORBIT.y)} · KILL ${SUBORBIT.kills} · RACCOLTE ${SUBORBIT.collected} · ESC=RITORNA`;}
+  const cand=findSkimPlanet();
+  if(!cand||gstate!=='flying'){
+    if(skimSt){skimSt=null;skimT=skimSpawn=skimPulse=0;clearSkimEntities();if(bar)bar.style.display='none';if(lbl)lbl.style.display='none';}
     return;
   }
   if(skimSt){skimSt=null;skimT=0;}
@@ -4599,38 +4320,7 @@ function animate(){
     const ic=FRAME_TMP.camTarget.copy(playerShip.mesh.position).addScaledVector(fwd,-(240+p*90)).add(FRAME_TMP.upLaunch);
     cam.position.lerp(ic,.12);cam.lookAt(playerShip.mesh.position);
     if(p>=1)completeLaunch();
-    const tRender=performance.now();
-    renderer.render(scene,cam);
-    profileFrame('render',performance.now()-tRender);
-    profileFrame('frame',performance.now()-frameStart);
-    PROF.samples++;flushProfiler(performance.now());
-    return;
-  }
-
-  if(GAME.state==='suborbit'&&SUBORBIT.active&&playerShip.alive){
-    SUBORBIT.time+=dt;
-    SUBORBIT.smoothX=lerp(SUBORBIT.smoothX,SUBORBIT.x,.18);
-    SUBORBIT.smoothY=lerp(SUBORBIT.smoothY,SUBORBIT.y,.16);
-    const shipY=SUBORBIT.anchor.y+SUBORBIT.smoothGy+SUBORBIT.smoothY;
-    playerShip.mesh.position.set(SUBORBIT.anchor.x+SUBORBIT.smoothX,shipY,SUBORBIT.anchor.z+40);
-    playerShip.mesh.rotation.set(SUBORBIT.pitch*.24,-Math.PI,cl(SUBORBIT.roll,-0.6,0.6));
-    const intro=SUBORBIT.intro;
-    const introEase=intro*intro*(3-2*intro);
-    const camBehind=FRAME_TMP.camTarget.copy(playerShip.mesh.position);
-    camBehind.z-=lerp(420,235,introEase);camBehind.y+=lerp(170,82,introEase);
-    const lookAt=FRAME_TMP.lookAhead.copy(playerShip.mesh.position);
-    lookAt.z+=lerp(210,320,introEase);lookAt.y-=lerp(24,8,introEase);
-    cam.position.lerp(camBehind,lerp(.038,.085,introEase));
-    cam.lookAt(lookAt);
-    const tHud=performance.now();
-    updateHUD();
-    profileFrame('hud',performance.now()-tHud);
-    const tRender=performance.now();
-    renderer.render(scene,cam);
-    profileFrame('render',performance.now()-tRender);
-    profileFrame('frame',performance.now()-frameStart);
-    PROF.samples++;flushProfiler(performance.now());
-    return;
+    renderer.render(scene,cam);return;
   }
 
   // Flying (paused in dialogue or docked)
@@ -4659,30 +4349,11 @@ function animate(){
       }
       updateBoost(dt,playerShip);
       playerShip.update(dt);
-      checkNear();
-      checkPlanetCrash();
-      DYNAMIC_NPC_SPAWN.timer-=dt;
-      if(DYNAMIC_NPC_SPAWN.timer<=0){
-        DYNAMIC_NPC_SPAWN.timer=DYNAMIC_NPC_SPAWN.interval;
-        spawnDynamicNpc();
-      }
-      let tNpc=performance.now();
-      for(let i=NPCS.length-1;i>=0;i--){
-        const ns=NPCS[i];
-        npcAI(ns,dt);
-        if(!ns.ship.alive){
-          const {faction,stationId,skimDrone}=ns;
-          NPCS.splice(i,1);
-          if(!skimDrone)setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);
-        }
-      }
-      profileFrame('npc',performance.now()-tNpc);
-      const tProjs=performance.now();
+      NPCS.forEach((ns,i)=>{npcAI(ns,dt);if(!ns.ship.alive){const {faction,stationId,skimDrone}=ns;NPCS.splice(i,1);if(!skimDrone)setTimeout(()=>spawnNpc(faction,stationId,'patrol'),12000);}});
       updateProjs(dt);
-      profileFrame('projs',performance.now()-tProjs);
-      updateTargeting(dt);
+      updatePlanetSkim(dt);
+      checkNear();
     }
-    const tHud=performance.now();
     updateHUD();
     profileFrame('hud',performance.now()-tHud);
     if(navDestId)drawNavArrow();
