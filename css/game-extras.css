@@ -21,22 +21,27 @@ html,body{
 
 #film-grain{opacity:.055;}
 
-/* Desktop: hide touch pads; show only utility row */
+/* Flight controls: ALWAYS visible (MOT/ACCEL was hidden on desktop before) */
 @media (hover:hover) and (pointer:fine){
-  .hb-left .cg,
-  .cb-row-extra{display:none !important;}
-  .ctrl-rows{justify-content:flex-end;}
-  .ctrl-rows .cg:first-child{display:flex;}
-  .cb{width:48px;height:48px;border-radius:8px;font-size:8px;}
-  .cb svg{width:16px;height:16px;}
+  /* Hide only turn pad under credits; keep flight row */
+  .hb-left > .cg{display:none !important;}
+  .ctrl-rows{justify-content:flex-end;flex-wrap:wrap;}
+  .cb{width:52px;height:52px;border-radius:8px;font-size:8px;}
+  .cb svg{width:17px;height:17px;}
+  #btnth{
+    width:64px;height:64px;font-size:9px;
+    border-color:rgba(60,220,180,.85)!important;
+    background:rgba(8,48,42,.95)!important;
+    box-shadow:0 0 16px rgba(46,200,160,.35);
+  }
   #speed-bar{bottom:72px;}
   #dprompt{bottom:88px;}
   #dlg{bottom:86px;}
 }
 
-/* Touch / coarse: full mobile controls */
+/* Touch / coarse / narrow: full mobile controls including SX/DX */
 @media (pointer:coarse),(max-width:700px){
-  .hb-left .cg,
+  .hb-left > .cg{display:flex !important;}
   .cb-row-extra{display:flex !important;}
 }
 
@@ -137,6 +142,7 @@ html,body{
   filter:saturate(1.05) contrast(1.04);
 }
 #land-pano.show{display:block;opacity:1;}
+body:not(.landing-pano) #land-pano{display:none!important;opacity:0!important;}
 #land-pano::after{
   content:'';position:absolute;inset:0;
   background:

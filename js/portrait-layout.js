@@ -1,5 +1,5 @@
 'use strict';
-/** Layout ritratti — atlas bust + pezzi faccia AI (Forbidden Planet) */
+/** Layout ritratti — atlas di busti COMPLETI (8 facce AI allineate) */
 window.PORTRAIT_LAYOUT = {
   cols: 4,
   rows: 2,
@@ -7,9 +7,9 @@ window.PORTRAIT_LAYOUT = {
   cellH: 160,
   atlasPath: 'sprites/portraits.png',
   view: {
-    pad: 0.04,
+    pad: 0.02,
     centerYFrac: 0.52,
-    scaleMul: 1.05
+    scaleMul: 1.08
   },
   face: {
     cxFrac: 0.5,
@@ -17,51 +17,17 @@ window.PORTRAIT_LAYOUT = {
     hwFrac: 0.38,
     hhFrac: 0.40
   },
-  /** Pezzi modulari generati via AI */
+  /** Teste complete opzionali (stesso set dell'atlas) */
   parts: {
     heads: [
       'sprites/faces/heads/head_00.png',
       'sprites/faces/heads/head_01.png',
       'sprites/faces/heads/head_02.png',
-      'sprites/faces/heads/head_03.png'
-    ],
-    eyes: {
-      normal: 'sprites/faces/eyes/eyes_normal.png',
-      blue: 'sprites/faces/eyes/eyes_normal.png',
-      alien: 'sprites/faces/eyes/eyes_normal.png',
-      stern: 'sprites/faces/eyes/eyes_normal.png',
-      cyborgR: 'sprites/faces/eyes/eyes_cyborg.png',
-      cyborgG: 'sprites/faces/eyes/eyes_cyborg.png',
-      goggles: 'sprites/faces/eyes/eyes_goggles.png',
-      patch: 'sprites/faces/eyes/eyes_normal.png'
-    },
-    hair: {
-      short: 'sprites/faces/hair/hair_short.png',
-      medium: 'sprites/faces/hair/hair_short.png',
-      wavy: 'sprites/faces/hair/hair_long.png',
-      long: 'sprites/faces/hair/hair_long.png',
-      mohawk: 'sprites/faces/hair/hair_mohawk.png',
-      bun: 'sprites/faces/hair/hair_bun.png',
-      shaved: null,
-      bald: null
-    },
-    mouths: {
-      smile: 'sprites/faces/mouths/mouth_smile.png',
-      confident: 'sprites/faces/mouths/mouth_smile.png',
-      open: 'sprites/faces/mouths/mouth_smile.png',
-      smirk: 'sprites/faces/mouths/mouth_smirk.png',
-      stern: 'sprites/faces/mouths/mouth_stern.png',
-      neutral: 'sprites/faces/mouths/mouth_stern.png',
-      flat: 'sprites/faces/mouths/mouth_stern.png',
-      grit: 'sprites/faces/mouths/mouth_stern.png'
-    },
-    accessories: [
-      null,
-      null,
-      'sprites/faces/accessories/acc_scar.png',
-      'sprites/faces/accessories/acc_mask.png',
-      null,
-      'sprites/faces/accessories/acc_scar.png'
+      'sprites/faces/heads/head_03.png',
+      'sprites/faces/heads/head_04.png',
+      'sprites/faces/heads/head_05.png',
+      'sprites/faces/heads/head_06.png',
+      'sprites/faces/heads/head_07.png'
     ]
   }
 };
