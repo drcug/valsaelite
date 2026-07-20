@@ -1,14 +1,14 @@
 'use strict';
 /**
- * Portrait — busti AI completi (atlas 4×2) + fallback procedurale.
- * Niente pezzi sovrapposti mal allineati: ogni cella è un volto finito.
+ * Portrait — busti AI completi (atlas 4×4 = 16) + tintura capelli da seed + fallback procedurale.
  */
 (function (global) {
   const L = global.PORTRAIT_LAYOUT || {
-    cols: 4, rows: 2, cellW: 128, cellH: 160,
+    cols: 4, rows: 4, cellW: 128, cellH: 160,
     atlasPath: 'sprites/portraits.png',
     view: { pad: 0.02, centerYFrac: 0.52, scaleMul: 1.08 },
     face: { cxFrac: 0.5, headYFrac: 0.36, hwFrac: 0.38, hhFrac: 0.40 },
+    hairTints: ['#100808', '#7a4018', '#d4b050', '#eeeeee', '#540010', '#224418', '#c04018', '#6a28a0'],
     parts: { heads: [] }
   };
 
@@ -23,17 +23,26 @@
     { b: '#b0b8c8', m: '#8890a0', d: '#606878', l: '#9098a8' }
   ];
 
-  const HAIR_COLS = ['#100808', '#281408', '#7a4018', '#b07020', '#d4b050', '#e8d8a0', '#eeeeee', '#540010', '#001035', '#224418'];
+  const HAIR_COLS = (L.hairTints && L.hairTints.length)
+    ? L.hairTints
+    : ['#100808', '#281408', '#7a4018', '#b07020', '#d4b050', '#e8d8a0', '#eeeeee', '#540010', '#001035', '#224418', '#c04018', '#2a6a58', '#6a28a0', '#4a2030', '#88aacc', '#d4a050'];
   const EYE_COLS = ['#3a5f8a', '#2d6e3a', '#7a4a1a', '#1a4a6b', '#4a3a7b', '#1f4a2a', '#5a3a20', '#2a5a6a'];
-  const HAIR_STYLES = ['short', 'medium', 'long', 'mohawk', 'bun', 'shaved', 'wavy', 'bald'];
+  const HAIR_STYLES = ['short', 'medium', 'long', 'mohawk', 'bun', 'shaved', 'wavy', 'bald', 'buzz', 'bob', 'ponytail', 'crop'];
   const EYE_TYPES = ['normal', 'blue', 'cyborgR', 'cyborgG', 'alien', 'stern', 'goggles', 'patch'];
   const MOUTH_TYPES = ['smile', 'neutral', 'smirk', 'confident', 'stern', 'open', 'flat', 'grit'];
+  const N_BUSTS = Math.max(1, (L.cols || 4) * (L.rows || 4));
 
   function portraitFaceFromSeed(seed) {
     let h = (seed >>> 0) || 1;
     h = (Math.imul(h, 1664525) + 1013904223) | 0;
     const x = Math.abs(h);
-    return { fHead: x % 8, fEye: (x >> 3) % 8, fMouth: (x >> 6) % 8, fHair: (x >> 9) % 8 };
+    return {
+      fHead: x % N_BUSTS,
+      fEye: (x >> 3) % 8,
+      fMouth: (x >> 6) % 8,
+      fHair: (x >> 9) % HAIR_COLS.length,
+      fHairStyle: (x >> 12) % HAIR_STYLES.length
+    };
   }
 
   function portraitHueFromSeed(seed) {
@@ -41,7 +50,12 @@
   }
 
   function portraitAtlasIndex(seed) {
-    return portraitFaceFromSeed(seed).fHead % (L.cols * L.rows);
+    return portraitFaceFromSeed(seed).fHead % N_BUSTS;
+  }
+
+  function portraitHairTint(seed) {
+    const fac = portraitFaceFromSeed(seed);
+    return HAIR_COLS[fac.fHair % HAIR_COLS.length];
   }
 
   function makeRng(seed) {
@@ -302,7 +316,7 @@
     const sk = SKINS[fac.fHead % SKINS.length];
     const hCol = HAIR_COLS[(fac.fHair + fac.fHead) % HAIR_COLS.length];
     const eCol = EYE_COLS[fac.fEye % EYE_COLS.length];
-    const hStyle = HAIR_STYLES[fac.fHair % HAIR_STYLES.length];
+    const hStyle = HAIR_STYLES[fac.fHairStyle % HAIR_STYLES.length];
     const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
     const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
     drawHair(ctx, g, hStyle, hCol, sk, rng);
@@ -337,21 +351,25 @@
     ctx.strokeRect(3, 3, W - 6, H - 6);
   }
 
-  /** Disegna un busto completo (nessun pezzo staccato) */
+  /** Disegna un busto completo + tinta capelli da seed */
   function drawCompleteBust(ctx, W, H, seed, factionId, hue) {
     const fCol = drawPortraitBg(ctx, W, H, factionId);
+    const fac = portraitFaceFromSeed(seed);
+    const hairTint = portraitHairTint(seed);
+    const meta = (L.hairMeta && L.hairMeta[fac.fHead % L.hairMeta.length]) || null;
+    const isBald = meta && meta.style === 'bald';
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
+    let rect = null;
     let drawn = false;
     if (atlas.ready && atlas.img) {
-      const rect = computeAtlasRect(W, H, atlas.img, seed);
+      rect = computeAtlasRect(W, H, atlas.img, seed);
       if (rect) {
         ctx.save();
-        if (hue != null && !isNaN(hue)) {
-          const mild = ((hue % 28) - 14);
-          ctx.filter = `hue-rotate(${mild}deg) saturate(1.05) contrast(1.04)`;
-        }
+        // Tinta generale leggera + shift per varietà pelle/uniforme
+        const mild = hue != null && !isNaN(hue) ? ((hue % 24) - 12) : 0;
+        ctx.filter = `hue-rotate(${mild}deg) saturate(1.06) contrast(1.04)`;
         ctx.drawImage(
           atlas.img,
           rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch,
@@ -375,11 +393,10 @@
         const dh = im.naturalHeight * sc;
         const dx = (W - dw) * 0.5;
         const dy = H * 0.52 - dh * 0.5;
+        rect = { dx, dy, dw, dh };
         ctx.save();
-        if (hue != null && !isNaN(hue)) {
-          const mild = ((hue % 28) - 14);
-          ctx.filter = `hue-rotate(${mild}deg) saturate(1.05)`;
-        }
+        const mild = hue != null && !isNaN(hue) ? ((hue % 24) - 12) : 0;
+        ctx.filter = `hue-rotate(${mild}deg) saturate(1.06)`;
         ctx.drawImage(im, dx, dy, dw, dh);
         ctx.restore();
         drawn = true;
@@ -388,7 +405,29 @@
 
     if (!drawn) return false;
 
-    // Leggero alone fazione in basso (non copre il volto)
+    // Ritinta regione capelli (parte alta del busto) — mantiene stile, cambia colore
+    if (!isBald && hairTint && rect) {
+      ctx.save();
+      const hx = rect.dx + rect.dw * 0.5;
+      const hy = rect.dy + rect.dh * 0.22;
+      const hrX = rect.dw * 0.42;
+      const hrY = rect.dh * 0.28;
+      ctx.beginPath();
+      ctx.ellipse(hx, hy, hrX, hrY, 0, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.globalCompositeOperation = 'color';
+      ctx.globalAlpha = 0.72;
+      ctx.fillStyle = hairTint;
+      ctx.fillRect(rect.dx, rect.dy, rect.dw, rect.dh * 0.55);
+      // Soft edge second pass
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = hairTint;
+      ctx.fillRect(rect.dx, rect.dy, rect.dw, rect.dh * 0.45);
+      ctx.restore();
+    }
+
+    // Alone fazione in basso
     const suitG = ctx.createLinearGradient(0, H * 0.82, 0, H);
     suitG.addColorStop(0, fCol + '00');
     suitG.addColorStop(1, fCol + '77');
@@ -489,6 +528,7 @@
   global.portraitFaceFromSeed = portraitFaceFromSeed;
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
+  global.portraitHairTint = portraitHairTint;
   global.PortraitAtlas = PortraitAtlas;
   global.PortraitHeads = PortraitHeads;
   global.PortraitParts = PortraitHeads; // compat

@@ -21,7 +21,19 @@ html,body{
 
 #film-grain{opacity:.055;}
 
-/* Flight controls: ALWAYS visible (MOT/ACCEL was hidden on desktop before) */
+/* Story banner above HUD; mobile controls above a11y leftovers */
+#story-banner{z-index:120!important;}
+body.story-open #a11y-strip,
+body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
+
+/* Mobile: keep flight buttons clear of chrome */
+@media(max-width:700px),(pointer:coarse){
+  #a11y-strip,#fx-toggle{z-index:14;}
+  #hud{z-index:20;}
+  .hb,.flight-primary,.cb-row-extra,.cb{z-index:22;}
+  /* Extra bottom inset so controls sit above home indicator, not under chrome */
+  #hud{padding-bottom:max(14px,env(safe-area-inset-bottom))!important;}
+}
 @media (hover:hover) and (pointer:fine){
   /* Hide only turn pad under credits; keep flight row */
   .hb-left > .cg{display:none !important;}

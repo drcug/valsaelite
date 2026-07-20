@@ -42,21 +42,40 @@ body.reduced-motion #hud-overlay.danger #vignette-danger{box-shadow:inset 0 0 40
   #cv.shake{animation:none !important}
 }
 /* Toggle UI per riduzione effetti */
-#fx-toggle{position:fixed;right:10px;bottom:10px;z-index:95;font:10px var(--FM);color:#88aacc;
+#fx-toggle{position:fixed;right:10px;top:10px;z-index:12;font:10px var(--FM);color:#88aacc;
   background:rgba(2,10,24,.72);border:1px solid rgba(70,150,230,.35);border-radius:6px;
-  padding:4px 8px;cursor:pointer;letter-spacing:.08em;user-select:none}
+  padding:4px 8px;cursor:pointer;letter-spacing:.08em;user-select:none;pointer-events:auto}
 #fx-toggle:hover{color:#cce4ff;border-color:rgba(120,200,255,.55)}
 body.reduced-motion #fx-toggle{color:#ffcc66;border-color:rgba(255,200,100,.4)}
-@media(max-width:700px){#fx-toggle{right:6px;bottom:6px;font-size:9px;padding:3px 6px}}
+@media(max-width:700px){
+  #fx-toggle{right:6px;top:max(6px,env(safe-area-inset-top));font-size:9px;padding:3px 6px;z-index:14}
+}
 #a11y-strip{
-  position:fixed;left:10px;bottom:10px;z-index:95;display:flex;flex-direction:column;gap:4px;
-  font:9px var(--FM);color:#88aacc;pointer-events:auto;
+  position:fixed;left:10px;top:10px;z-index:12;display:flex;flex-direction:column;gap:4px;
+  font:9px var(--FM);color:#88aacc;pointer-events:auto;max-width:min(200px,46vw);
 }
 #a11y-strip button{
   padding:4px 8px;border-radius:6px;border:1px solid rgba(70,150,230,.38);
   background:rgba(2,10,24,.78);color:#c8ddff;cursor:pointer;letter-spacing:.06em;text-align:left;
 }
 #a11y-strip button:hover{border-color:rgba(120,200,255,.55);color:#fff}
+#a11y-strip .a11y-panel{display:flex;flex-direction:column;gap:4px}
+#a11y-strip.collapsed .a11y-panel{display:none}
+#a11y-toggle{
+  padding:6px 10px!important;font-weight:700;letter-spacing:.1em;
+  border-color:rgba(62,207,187,.5)!important;color:#e8fff6!important;
+}
+@media(max-width:700px){
+  #a11y-strip{
+    left:6px;top:max(6px,env(safe-area-inset-top));bottom:auto;z-index:14;
+    /* Non coprire i controlli di volo in basso */
+  }
+  #a11y-strip.collapsed{max-width:none}
+  /* Spazio HUD in basso per i controlli touch, sopra safe-area */
+  #hud{padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+  .hb{padding-bottom:2px;position:relative;z-index:16}
+  .cb,.flight-primary,.cb-row-extra{position:relative;z-index:16}
+}
 body.a11y-high-contrast{
   --txt:#d0e4ff;--bright:#ffffff;--border:rgba(120,200,255,.45);
   --panel:rgba(0,6,18,.96);
@@ -568,7 +587,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <div class="sc" id="sc"></div>
     <div class="st" id="stit"></div>
     <div class="sd" id="sdesc"></div>
-    <div class="sb-foot" id="sbhint">[INVIO] o clic per continuare</div>
+    <div class="sb-foot" id="sbhint">Premi CONTINUA per chiudere</div>
     <button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button>
   </div>
 </div>
@@ -677,11 +696,14 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="suborbit-float-layer" aria-hidden="true"></div>
 <div id="suborbit-debrief" role="dialog" aria-modal="true" aria-labelledby="suborbit-debrief-title"><div class="sdbox"><div class="sdt" id="suborbit-debrief-title">Fine corsa</div><div class="sdg" id="suborbit-debrief-grade">—</div><div class="sdr" id="suborbit-debrief-body"></div><button type="button" id="suborbit-debrief-ok">CONTINUA</button></div></div>
 <div id="suborbit-hud"></div>
-<div id="a11y-strip" title="Accessibilità">
-  <button type="button" id="a11y-hc" title="Alto contrasto HUD">Contrasto: normale</button>
-  <button type="button" id="a11y-scale" title="Scala interfaccia">UI: 100%</button>
-  <button type="button" id="a11y-sfx" title="Audio SFX/ambiente">Audio: ON</button>
-  <button type="button" id="a11y-help" title="Aiuto controlli [?]">Aiuto [?]</button>
+<div id="a11y-strip" class="collapsed" title="Accessibilità">
+  <button type="button" id="a11y-toggle" aria-expanded="false" aria-controls="a11y-panel">UI ▾</button>
+  <div class="a11y-panel" id="a11y-panel">
+    <button type="button" id="a11y-hc" title="Alto contrasto HUD">Contrasto: normale</button>
+    <button type="button" id="a11y-scale" title="Scala interfaccia">UI: 100%</button>
+    <button type="button" id="a11y-sfx" title="Audio SFX/ambiente">Audio: ON</button>
+    <button type="button" id="a11y-help" title="Aiuto controlli [?]">Aiuto [?]</button>
+  </div>
 </div>
 <div id="fx-toggle" title="Riduzione effetti (shake/flash)">FX: PIENO</div>
 <div id="tutorial-modal" aria-modal="true" role="dialog" aria-labelledby="tutorial-modal-title">
@@ -1148,9 +1170,12 @@ function pushStoryLine(missionId){
 let storyBannerTimer=null;
 function hideStoryBanner(){
   if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
-  document.getElementById('story-banner').style.display='none';
+  const b=document.getElementById('story-banner');
+  if(b)b.style.display='none';
+  document.body.classList.remove('story-open');
+  if(typeof setPausedReason==='function')setPausedReason('story',false);
 }
-function showStoryBanner(label,title,body,holdMs){
+function showStoryBanner(label,title,body,_holdMsIgnored){
   document.getElementById('sc').textContent=label;
   document.getElementById('stit').textContent=title;
   document.getElementById('sdesc').textContent=body;
@@ -1160,19 +1185,22 @@ function showStoryBanner(label,title,body,holdMs){
     if(src){art.src=src;art.style.display='block';}
     else{art.removeAttribute('src');art.style.display='none';}
   }
+  const hint=document.getElementById('sbhint');
+  if(hint)hint.textContent='Premi CONTINUA per chiudere';
   const b=document.getElementById('story-banner');
   b.style.display='block';
-  if(storyBannerTimer)clearTimeout(storyBannerTimer);
-  storyBannerTimer=setTimeout(hideStoryBanner,holdMs||9000);
+  document.body.classList.add('story-open');
+  if(typeof setPausedReason==='function')setPausedReason('story',true);
+  // Nessun auto-dismiss: resta aperto finché non si preme CONTINUA
+  if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
 }
 (function setupStoryBannerUi(){
   const b=document.getElementById('story-banner');
-  document.getElementById('sbdismiss').addEventListener('click',hideStoryBanner);
-  b.addEventListener('click',e=>{if(e.target===b)hideStoryBanner();});
-  window.addEventListener('keydown',e=>{
-    if(b.style.display!=='block')return;
-    if(e.code==='Enter'||e.code==='Escape'||e.code==='Space'){e.preventDefault();hideStoryBanner();}
+  document.getElementById('sbdismiss').addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    hideStoryBanner();
   });
+  // Non chiudere cliccando fuori o con tastiera — solo il pulsante CONTINUA
 })();
 
 function advanceStory(ch){
@@ -2222,10 +2250,12 @@ function rebuildPlayerMesh(){
   const bc=normalizeHullHex(PS.hullPaintHex), ah=0x55ddff;
   const hullCol=new THREE.Color(bc);
   // Boost luminance so dark paints stay readable in space
-  hullCol.offsetHSL(0,0.04,0.12);
-  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.34,metalness:.62,emissive:hullCol.clone().multiplyScalar(0.18),emissiveIntensity:.35});
-  const hm2=new THREE.MeshStandardMaterial({color:hullCol.clone().offsetHSL(0,0,.18),roughness:.26,metalness:.7,emissive:ah,emissiveIntensity:.12});
-  const hmd=new THREE.MeshStandardMaterial({color:hullCol.clone().multiplyScalar(0.62),roughness:.55,metalness:.48,emissive:0x061018,emissiveIntensity:.08});
+  hullCol.offsetHSL(0,0.04,0.14);
+  const hullHi=hullCol.clone();hullHi.offsetHSL(0,0.02,0.16);
+  const hullLo=hullCol.clone().multiplyScalar(0.62);
+  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.34,metalness:.55,emissive:hullCol.clone().multiplyScalar(0.22),emissiveIntensity:.4});
+  const hm2=new THREE.MeshStandardMaterial({color:hullHi,roughness:.26,metalness:.65,emissive:ah,emissiveIntensity:.18});
+  const hmd=new THREE.MeshStandardMaterial({color:hullLo,roughness:.55,metalness:.42,emissive:0x061018,emissiveIntensity:.1});
   const ck=new THREE.MeshStandardMaterial({color:0x0a2840,roughness:.04,metalness:.92,transparent:true,opacity:.9,emissive:0x226688,emissiveIntensity:.55});
   const em=new THREE.MeshStandardMaterial({color:0x101820,roughness:.7,metalness:.55});
   const gm=new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false});
@@ -4205,14 +4235,23 @@ const GAME={
   state:'flying', // flying|landing|docked|launching|gameover
   dockedSt:null,nearSt:null,
   landTimer:0,landDur:2.8,launchTimer:0,launchDur:2.2,
-  pausedReasons:{map:false,blueprint:false,dialogue:false,docked:false,suborbit:false,diary:false}
+  pausedReasons:{map:false,blueprint:false,dialogue:false,docked:false,suborbit:false,diary:false,story:false}
 };
 function setPausedReason(reason,on){if(GAME.pausedReasons[reason]!==undefined)GAME.pausedReasons[reason]=!!on;}
 function gameplayPaused(){return Object.values(GAME.pausedReasons).some(Boolean);}
+function storyBannerOpen(){
+  const b=document.getElementById('story-banner');
+  return !!(b&&b.style.display==='block');
+}
 const fadeEl=document.getElementById('fadeov');
 const ltEl=document.getElementById('land-title');
 
 window.addEventListener('keydown',e=>{
+  if(typeof storyBannerOpen==='function'&&storyBannerOpen()){
+    // Solo CONTINUA chiude il modal storia — blocca input di gioco
+    e.preventDefault();
+    return;
+  }
   if(BOARDING.active&&GAME.state==='boarding'){
     // Il boarding riusa left/right/thrust/boost/fire per muoversi + sparare.
     if(e.code==='Escape'){e.preventDefault();leaveBoarding({});return;}
@@ -9889,12 +9928,35 @@ renderRep();
   });
 })();
 (function initA11yUi(){
+  const strip=document.getElementById('a11y-strip');
+  const tog=document.getElementById('a11y-toggle');
   const hc=document.getElementById('a11y-hc');
   const sc=document.getElementById('a11y-scale');
   const sfx=document.getElementById('a11y-sfx');
   const help=document.getElementById('a11y-help');
   const helpClose=document.getElementById('help-close');
   if(!hc||!sc)return;
+  // Pannello UI collassabile: non copre i controlli di volo in basso
+  if(tog&&strip){
+    const syncTog=()=>{
+      const open=!strip.classList.contains('collapsed');
+      tog.setAttribute('aria-expanded',open?'true':'false');
+      tog.textContent=open?'UI ▴':'UI ▾';
+    };
+    tog.addEventListener('click',e=>{
+      e.preventDefault();e.stopPropagation();
+      strip.classList.toggle('collapsed');
+      syncTog();
+    });
+    // Su mobile parte collassato; tap fuori chiude
+    document.addEventListener('click',e=>{
+      if(!strip||strip.classList.contains('collapsed'))return;
+      if(strip.contains(e.target))return;
+      strip.classList.add('collapsed');
+      syncTog();
+    });
+    syncTog();
+  }
   const steps=['90','100','110','120'];
   let high=false,uiStep=1;
   try{high=localStorage.getItem('valsaelite_hc')==='1';}catch(_){high=false;}
