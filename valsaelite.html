@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Valsamoggia Spaziale</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link href="css/game-extras.css" rel="stylesheet">
 <style>
 :root{
-  --bg:#010408;--panel:rgba(2,7,18,0.96);--border:rgba(44,100,190,0.2);
-  --txt:#88aacc;--bright:#cce4ff;--acc:#2277ee;
+  --bg:#030a10;--panel:rgba(4,16,24,0.94);--border:rgba(70,180,160,0.28);
+  --txt:#9ec8c0;--bright:#e8fff6;--acc:#2a9f8c;--copper:#c4893a;--teal:#3ecfbb;
   --ui-scale:1;
   --baz:#1d5cbf;--cre:#b82d0e;--cal:#c49200;--mon:#8822bb;--sav:#1a8840;
-  --FD:'Rajdhani',sans-serif;--FM:'Share Tech Mono',monospace;
+  --FD:'Orbitron',sans-serif;--FM:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
@@ -127,8 +127,8 @@ body.boarding-active #boarding-touch{display:flex}
   z-index:89;text-align:center;pointer-events:none;
   font-family:var(--FD);letter-spacing:.25em;
 }
-#land-title .lt-name{font-size:clamp(22px,4vw,42px);font-weight:700;color:var(--bright);text-shadow:0 0 30px rgba(51,136,255,.8)}
-#land-title .lt-sub{font-size:12px;color:#557799;font-family:var(--FM);margin-top:6px;letter-spacing:.2em}
+#land-title .lt-name{font-size:clamp(22px,4vw,42px);font-weight:700;color:var(--bright);text-shadow:0 0 30px rgba(62,207,187,.55),0 2px 0 rgba(0,0,0,.5);letter-spacing:.14em}
+#land-title .lt-sub{font-size:12px;color:#8ab8b0;font-family:var(--FM);margin-top:6px;letter-spacing:.2em}
 
 /* ─ HUD ─ */
 #hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom));gap:0}
@@ -155,22 +155,8 @@ body.boarding-active #boarding-touch{display:flex}
   padding:4px 14px;font-family:var(--FM);font-size:10px;color:#bb77ff;
   z-index:11;pointer-events:none;display:none;text-align:center;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Story chapter banner */
-#story-banner{
-  display:none;position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);
-  z-index:45;text-align:center;pointer-events:auto;
-  background:linear-gradient(165deg,rgba(8,14,32,.94) 0%,rgba(3,6,18,.92) 55%,rgba(12,8,28,.93) 100%);
-  border:1px solid rgba(130,60,200,.45);box-shadow:0 0 0 1px rgba(34,119,238,.12),0 22px 60px rgba(0,0,0,.55),0 0 40px rgba(100,60,200,.15);
-  border-radius:12px;padding:18px 26px 14px;backdrop-filter:blur(16px);
-  font-family:var(--FD);max-width:min(520px,92vw);
-}
-#story-banner .sc{font-size:10px;color:#aa77ee;letter-spacing:.25em;margin-bottom:6px;font-family:var(--FM)}
-#story-banner .st{font-size:clamp(20px,3.2vw,26px);font-weight:700;color:var(--bright);margin-bottom:8px;text-shadow:0 0 24px rgba(100,160,255,.25)}
-#story-banner .sd{font-size:12px;color:#8aa8cc;font-family:var(--FM);line-height:1.68;max-height:min(40vh,260px);overflow-y:auto;padding:10px 8px 10px 2px;margin:0 -4px 10px 0;text-align:left;border-left:2px solid rgba(34,119,238,.35);padding-left:12px}
-#story-banner .sb-foot{font-size:9px;color:#445577;font-family:var(--FM);letter-spacing:.12em;margin-top:2px}
-#story-banner .sb-dismiss{margin-top:4px;padding:8px 22px;border-radius:6px;border:1px solid rgba(44,100,190,.45);
-  background:rgba(34,119,238,.18);color:var(--bright);font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.1em;cursor:pointer;transition:background .15s,border-color .15s}
-#story-banner .sb-dismiss:hover{background:rgba(34,119,238,.32);border-color:rgba(34,119,238,.65)}
+/* Story chapter banner — layout base; stile completo in game-extras.css */
+#story-banner{display:none}
 
 /* Dock prompt */
 #dprompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);
@@ -516,6 +502,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="hud-overlay"><div id="vignette-danger"></div></div>
 <div id="dmgov"></div>
 <div id="fadeov"></div>
+<div id="land-pano" aria-hidden="true"></div>
 <div id="land-title"><div class="lt-name" id="ltname"></div><div class="lt-sub" id="ltsub"></div></div>
 
 <div id="hud">
@@ -575,7 +562,16 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="navarrow" style="display:block;position:fixed;inset:0;z-index:9;pointer-events:none">
   <canvas id="navcv" style="width:100%;height:100%;display:block"></canvas>
 </div>
-<div id="story-banner"><div class="sc" id="sc"></div><div class="st" id="stit"></div><div class="sd" id="sdesc"></div><div class="sb-foot" id="sbhint">[INVIO] o clic per continuare</div><button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button></div>
+<div id="story-banner">
+  <div class="sb-art-wrap"><img id="sbart" alt="" decoding="async"/></div>
+  <div class="sb-body">
+    <div class="sc" id="sc"></div>
+    <div class="st" id="stit"></div>
+    <div class="sd" id="sdesc"></div>
+    <div class="sb-foot" id="sbhint">[INVIO] o clic per continuare</div>
+    <button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button>
+  </div>
+</div>
 
 <div id="dprompt">
   <div class="dn" id="dpnm"></div>
@@ -650,12 +646,13 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 </div>
 
 <div id="dkscr">
+  <div id="dk-pano" aria-hidden="true"></div>
   <div class="dki">
     <div class="dkh">
       <div><div id="dkt" class="dkt"></div><div id="dkbg" class="dkbg"></div></div>
-      <div style="text-align:right;font-family:var(--FM);font-size:10px;color:#446688">
-        <div>Crediti: <span id="dkcr" style="color:#ffcc33;font-weight:700"></span></div>
-        <div style="margin-top:2px">HP: <span id="dkhp" style="color:#33aaff"></span></div>
+      <div style="text-align:right;font-family:var(--FM);font-size:10px;color:#6a9a90">
+        <div>Crediti: <span id="dkcr" style="color:#e0a84a;font-weight:700"></span></div>
+        <div style="margin-top:2px">HP: <span id="dkhp" style="color:#3ecfbb"></span></div>
       </div>
     </div>
     <div id="dkdc" class="dkdc"></div>
@@ -779,12 +776,13 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
-    <div class="help-grid"><span>Volo</span><span><kbd>WASD</kbd> / frecce · motori · <kbd>Spazio</kbd> fuoco · <kbd>Shift/B</kbd> boost</span></div>
+    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> motori · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> boost · <kbd>Spazio</kbd> fuoco</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> target · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> hail</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
-    <div class="help-grid"><span>Suborbita</span><span><kbd>F</kbd> trazione container · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
+    <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
     <div class="help-grid"><span>Salvataggio</span><span>Auto-save all'attracco · Salva/Carica nel tab Riparazione</span></div>
+    <div class="help-grid"><span>Desktop</span><span>Tastiera completa · su touch compaiono SX/DX/MOT/FUE</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
   </div>
 </div>
@@ -799,6 +797,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/assets.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/suborbit-daily.js"></script>
@@ -1155,6 +1154,12 @@ function showStoryBanner(label,title,body,holdMs){
   document.getElementById('sc').textContent=label;
   document.getElementById('stit').textContent=title;
   document.getElementById('sdesc').textContent=body;
+  const art=document.getElementById('sbart');
+  if(art){
+    const src=(typeof storyArtFor==='function')?storyArtFor(label,title):null;
+    if(src){art.src=src;art.style.display='block';}
+    else{art.removeAttribute('src');art.style.display='none';}
+  }
   const b=document.getElementById('story-banner');
   b.style.display='block';
   if(storyBannerTimer)clearTimeout(storyBannerTimer);
@@ -2559,19 +2564,19 @@ const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,40000);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:false});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,BOOT_CFG.initPixelRatio));
-renderer.setClearColor(0x030818,1);
-const SPACE_CLEAR_COLOR=0x030818;
-const SUBORBIT_CLEAR_COLOR=0x6ea0d8;
+renderer.setClearColor(0x041218,1);
+const SPACE_CLEAR_COLOR=0x041218;
+const SUBORBIT_CLEAR_COLOR=0x5a9a8a;
 if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;
-if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;}
+if(THREE.ACESFilmicToneMapping!==undefined){renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;}
 if(renderer.physicallyCorrectLights!==undefined)renderer.physicallyCorrectLights=true;
 document.getElementById('cv').appendChild(renderer.domElement);
 setTimeout(()=>renderer.setPixelRatio(Math.min(devicePixelRatio,BOOT_CFG.finalPixelRatio)),BOOT_CFG.upscaleDelayMs);
-// Rich multi-source lighting so ships are lit from all angles
-scene.add(new THREE.AmbientLight(0xb8c8ee,0.62));
-const hemiLight=new THREE.HemisphereLight(0x3355aa,0x1a1208,0.82);scene.add(hemiLight);
-const backFill=new THREE.DirectionalLight(0x446699,0.58);backFill.position.set(-300,200,400);scene.add(backFill);
-const rimLight=new THREE.DirectionalLight(0x88aadd,0.42);rimLight.position.set(0,300,-200);scene.add(rimLight);
+// Rich multi-source lighting — teal/copper Forbidden Planet palette
+scene.add(new THREE.AmbientLight(0xa8c8c0,0.58));
+const hemiLight=new THREE.HemisphereLight(0x2a6a70,0x1a1208,0.78);scene.add(hemiLight);
+const backFill=new THREE.DirectionalLight(0x3a7a70,0.55);backFill.position.set(-300,200,400);scene.add(backFill);
+const rimLight=new THREE.DirectionalLight(0xc4893a,0.38);rimLight.position.set(0,300,-200);scene.add(rimLight);
 const sunLt=new THREE.PointLight(0xffeecc,12,66000);scene.add(sunLt);
 const sunLt2=new THREE.PointLight(0xff8833,5.5,12000);scene.add(sunLt2);
 window.addEventListener('resize',()=>{
@@ -2700,6 +2705,34 @@ const TX={
     x.fillStyle=g;x.fillRect(0,0,48,48);return new THREE.CanvasTexture(c);
   })(),
 };
+/** Sovrascrive mappe pianeta con albedo AI (Forbidden Planet) se disponibili */
+(function upgradePlanetMapsFromArt(){
+  const keys=['earth','barren','industrial','fortress','ice','rock','asteroid','station','dock','green'];
+  const loader=new THREE.TextureLoader();
+  keys.forEach(k=>{
+    loader.load('sprites/planets/maps/'+k+'.jpg',(tex)=>{
+      tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+      tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+      if(THREE.SRGBColorSpace!==undefined)tex.colorSpace=THREE.SRGBColorSpace;
+      else if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;
+      const old=TX[k]&&TX[k].map;
+      if(TX[k])TX[k].map=tex;
+      else TX[k]={map:tex,normalMap:FLAT_NORMAL,roughnessMap:mkRoughTex(0.7)};
+      if(old&&old.dispose)try{old.dispose();}catch(_){}
+      // refresh station meshes already built
+      if(typeof smeshes!=='undefined'){
+        smeshes.forEach(sm=>{
+          if(!sm||!sm.sd||sm.sd.pType!==k||!sm.mesh)return;
+          sm.mesh.traverse(ch=>{
+            if(ch.isMesh&&ch.material&&ch.material.map&&ch.userData&&ch.userData.planetBody){
+              ch.material.map=tex;ch.material.needsUpdate=true;
+            }
+          });
+        });
+      }
+    },undefined,()=>{});
+  });
+})();
 function shipTex(b,s){return mkPlanetTex({seed:141,c1:b,c2:b,c3:s,accent:s,blobs:18,lines:6,rough:.38});}
 
 // Sun texture (lightweight)
@@ -2998,6 +3031,7 @@ function buildStationMesh(sd){
   const mat=new THREE.MeshStandardMaterial(matOpts);
   mat.normalScale=new THREE.Vector2(1.08,1.08);
   const mesh=new THREE.Mesh(geo,mat);
+  mesh.userData.planetBody=true;
   // Atmosphere glow
   const f=FACTIONS[sd.faction];const gc=f?f.hex:0x334455;
   if(['earth','fortress','ice','green'].includes(sd.pType)){
@@ -3365,7 +3399,7 @@ function tryShowTutorialBlueprint(){
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
-    '<p><strong>WASD</strong> o frecce: virata e motori. <strong>Spazio</strong> spara. <strong>Shift/B</strong> afterburner (se installato).</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Su touch: pulsanti SX/DX, MOT, FUE, MSL, TGT.</p>');
+    '<p><strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>S</strong> o <strong>Shift/B</strong> boost (afterburner). <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Su touch: pulsanti SX/DX, MOT, FUE, MSL, TGT. Su PC i pad touch restano nascosti.</p>');
 }
 function tryShowTutorialDock(){
   return showTutorialOnce('valsaelite_tut_dock','Attracco e missioni',
@@ -4309,6 +4343,20 @@ function startLanding(){
   document.getElementById('ltsub').textContent=f?f.name:'PORTO NEUTRALE';
   document.getElementById('ltsub').style.color=f?f.color:'#7799bb';
   ltEl.style.display='block';ltEl.style.opacity='0';
+  // Panorama pianeta (Forbidden Planet matte)
+  const panoEl=document.getElementById('land-pano');
+  if(panoEl){
+    const url=(typeof planetPano==='function')?planetPano(GAME.dockedSt.sd.id):null;
+    if(url){
+      panoEl.style.backgroundImage='url("'+url+'")';
+      panoEl.classList.add('show');
+      panoEl.style.opacity='0';
+      requestAnimationFrame(()=>{panoEl.style.opacity='1';});
+    }else{
+      panoEl.classList.remove('show');
+      panoEl.style.backgroundImage='';
+    }
+  }
   // Fade in title and overlay
   let t0=null;
   function animFade(ts){
@@ -4347,6 +4395,8 @@ function completeLanding(){
   GAME.state='docked';
   setPausedReason('docked',true);
   ltEl.style.display='none';
+  const panoEl=document.getElementById('land-pano');
+  if(panoEl){panoEl.classList.remove('show');panoEl.style.opacity='0';}
   fadeEl.style.opacity='0';fadeEl.style.transition='opacity 0s';
   playerShip.mesh.visible=false;
   checkDeliveryOnDock(GAME.dockedSt.sd.id);
@@ -4372,6 +4422,8 @@ function startLaunch(){
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
   document.getElementById('radar').style.display='block';
+  const panoEl=document.getElementById('land-pano');
+  if(panoEl){panoEl.classList.remove('show');panoEl.style.opacity='0';panoEl.style.backgroundImage='';}
   // Start with black overlay, fade it out quickly so player sees the launch
   fadeEl.style.transition='opacity 0s';fadeEl.style.opacity='1';
   setTimeout(()=>{fadeEl.style.transition='opacity 1.2s ease';fadeEl.style.opacity='0';},80);
@@ -4744,6 +4796,7 @@ const SUBORBIT={
   smoothX:0,smoothY:0,smoothGy:0,
   anchor:new THREE.Vector3(),
   prevFog:null,prevClear:SPACE_CLEAR_COLOR,
+  skyMesh:null,skyTex:null,
   runGoal:32000,corridorComplete:false,corridorBonusTaken:false,_lastProgBracket:0,
   autoExitRemaining:null,
   // Qualità “commercial”: stress, set piece, FX, statistiche run, debrief.
@@ -4899,6 +4952,7 @@ function applySuborbitBiome(sm){
   const b=SUBORBIT.profile||getSuborbitProfile(sm);
   scene.fog=new THREE.Fog(b.fog,240,5600);
   renderer.setClearColor(b.clear,1);
+  setSuborbitSkyPano(sm);
   for(const ch of SUBORBIT.terrain.chunks){
     if(ch.mesh&&ch.mesh.material){
       const tm=ch.mesh.material;
@@ -4946,6 +5000,39 @@ function applySuborbitBiome(sm){
   }
   for(const h of SUBORBIT.hazards){if(h.mesh&&h.mesh.material){h.mesh.material.color.setHex(b.hazard);h.mesh.material.emissive.setHex(b.hazard);h.mesh.material.emissiveIntensity=.55;}}
   for(const p of SUBORBIT.pickups){if(p.mesh&&p.mesh.material){p.mesh.material.color.setHex(b.pickup);p.mesh.material.emissive.setHex(b.pickup);p.mesh.material.emissiveIntensity=.78;}}
+}
+function setSuborbitSkyPano(sm){
+  const url=(typeof planetPano==='function'&&sm&&sm.sd)?planetPano(sm.sd.id):null;
+  if(!url){clearSuborbitSkyPano();return;}
+  const loader=new THREE.TextureLoader();
+  loader.load(url,(tex)=>{
+    tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;
+    if(THREE.SRGBColorSpace!==undefined)tex.colorSpace=THREE.SRGBColorSpace;
+    else if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;
+    if(!SUBORBIT.skyMesh){
+      const geo=new THREE.SphereGeometry(4200,32,20);
+      const mat=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,fog:false,depthWrite:false});
+      const mesh=new THREE.Mesh(geo,mat);
+      mesh.renderOrder=-20;
+      mesh.frustumCulled=false;
+      scene.add(mesh);
+      SUBORBIT.skyMesh=mesh;
+    }else{
+      if(SUBORBIT.skyTex)SUBORBIT.skyTex.dispose();
+      SUBORBIT.skyMesh.material.map=tex;
+      SUBORBIT.skyMesh.material.needsUpdate=true;
+      SUBORBIT.skyMesh.visible=true;
+    }
+    SUBORBIT.skyTex=tex;
+  },undefined,()=>{/* silent */});
+}
+function clearSuborbitSkyPano(){
+  if(SUBORBIT.skyMesh)SUBORBIT.skyMesh.visible=false;
+}
+function updateSuborbitSkyFollow(){
+  if(!SUBORBIT.skyMesh||!SUBORBIT.active)return;
+  SUBORBIT.skyMesh.position.copy(SUBORBIT.anchor);
+  SUBORBIT.skyMesh.position.y+=180;
 }
 /** Palette per tipo nemico (mesh composte: hull + sensori). */
 function setSuborbitEnemyKindVisual(e){
@@ -5801,6 +5888,7 @@ function leaveSuborbit(opts){
   setSpaceFlightObjectsVisible(true);
   scene.fog=SUBORBIT.prevFog;
   renderer.setClearColor(SUBORBIT.prevClear,1);
+  clearSuborbitSkyPano();
   document.body.classList.remove('suborbit-active');
   const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
   playerShip.velocity.copy(fwd).multiplyScalar(140);
@@ -5962,6 +6050,7 @@ function updatePlanetSkim(dt){
       SUBORBIT.loreEventT=9+Math.random()*9;
     }
     updateSuborbitTerrainVisual();
+    updateSuborbitSkyFollow();
     updateSuborbitActors(sdt);
     if((SUBORBIT.setPieceT||0)>0){SUBORBIT.setPieceT=Math.max(0,SUBORBIT.setPieceT-sdt);if(SUBORBIT.setPieceT<=0){SUBORBIT.setPieceT=0;SUBORBIT.setPieceKind=null;SUBORBIT.setPieceEdgeMul=1;}}
     const g=suborbitHeight(SUBORBIT.seed,SUBORBIT.x,SUBORBIT.offset+40);
@@ -8205,6 +8294,17 @@ function buildDock(st){
   document.getElementById('dkdc').textContent=sd.desc;
   document.getElementById('dkcr').textContent=fmt(PS.credits);
   document.getElementById('dkhp').textContent=Math.round(playerShip.health)+'/100';
+  const panoStrip=document.getElementById('dk-pano');
+  if(panoStrip){
+    const url=(typeof planetPano==='function')?planetPano(sd.id):null;
+    if(url){
+      panoStrip.style.backgroundImage='url("'+url+'")';
+      panoStrip.classList.add('has-pano');
+    }else{
+      panoStrip.style.backgroundImage='';
+      panoStrip.classList.remove('has-pano');
+    }
+  }
   const tabs=document.getElementById('dktbs'),panels=document.getElementById('dkpns');
   const subBtn=document.getElementById('ldck-suborbit');
   if(subBtn)subBtn.style.display=SKIM_TYPES.includes(sd.pType)?'inline-block':'none';

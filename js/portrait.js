@@ -1,14 +1,15 @@
 'use strict';
 /**
- * Portrait — atlas bust + overlay procedurale (occhi, naso/bocca, capelli, accessori)
- * Fallback: volto interamente procedurale se atlas assente.
+ * Portrait — compositing pezzi faccia AI + atlas bust + fallback procedurale
+ * Stile: retro-sci-fi Forbidden Planet (teal / rame / film grain)
  */
 (function (global) {
   const L = global.PORTRAIT_LAYOUT || {
     cols: 4, rows: 2, cellW: 128, cellH: 160,
     atlasPath: 'sprites/portraits.png',
     view: { pad: 0.06, centerYFrac: 0.52, scaleMul: 1.0 },
-    face: { cxFrac: 0.5, headYFrac: 0.36, hwFrac: 0.38, hhFrac: 0.40 }
+    face: { cxFrac: 0.5, headYFrac: 0.36, hwFrac: 0.38, hhFrac: 0.40 },
+    parts: { heads: [], eyes: {}, hair: {}, mouths: {}, accessories: [] }
   };
 
   const SKINS = [
@@ -67,6 +68,8 @@
   }
 
   const atlas = { ready: false, loading: false, promise: null, img: null };
+  const partCache = Object.create(null);
+  const partsState = { ready: false, loading: false, promise: null, ok: 0, fail: 0 };
 
   function absUrl(rel) {
     try { return new URL(rel, global.location.href).href; } catch (_) { return rel; }
@@ -81,6 +84,46 @@
       im.src = url;
     });
   }
+
+  function collectPartUrls() {
+    const P = L.parts || {};
+    const urls = [];
+    (P.heads || []).forEach((u) => { if (u) urls.push(u); });
+    Object.values(P.eyes || {}).forEach((u) => { if (u) urls.push(u); });
+    Object.values(P.hair || {}).forEach((u) => { if (u) urls.push(u); });
+    Object.values(P.mouths || {}).forEach((u) => { if (u) urls.push(u); });
+    (P.accessories || []).forEach((u) => { if (u) urls.push(u); });
+    return [...new Set(urls)];
+  }
+
+  const PortraitParts = {
+    load() {
+      if (partsState.ready) return Promise.resolve(partsState.ok > 0);
+      if (partsState.promise) return partsState.promise;
+      partsState.loading = true;
+      const urls = collectPartUrls();
+      partsState.promise = Promise.all(urls.map((u) =>
+        loadImage(absUrl(u)).then((im) => {
+          partCache[u] = im;
+          partsState.ok++;
+          return true;
+        }).catch(() => {
+          partsState.fail++;
+          return false;
+        })
+      )).then(() => {
+        partsState.ready = true;
+        partsState.loading = false;
+        if (typeof global.console !== 'undefined') {
+          global.console.info('[portrait] Face parts OK:', partsState.ok, 'fail:', partsState.fail);
+        }
+        return partsState.ok > 0;
+      });
+      return partsState.promise;
+    },
+    get(path) { return path ? partCache[path] || null : null; },
+    get ready() { return partsState.ready && partsState.ok > 0; }
+  };
 
   const PortraitAtlas = {
     load() {
@@ -97,7 +140,7 @@
           }
           return atlas.ready;
         })
-        .catch((e) => {
+        .catch(() => {
           atlas.ready = false;
           atlas.loading = false;
           atlas.promise = null;
@@ -151,6 +194,18 @@
     return { dx: (W - dw) * 0.5, dy: H * v.centerYFrac - dh * 0.5, dw, dh, cw, ch, col, row, sc };
   }
 
+  function drawPartFit(ctx, im, dx, dy, dw, dh, opt) {
+    if (!im) return;
+    opt = opt || {};
+    ctx.save();
+    if (opt.filter) ctx.filter = opt.filter;
+    if (opt.alpha != null) ctx.globalAlpha = opt.alpha;
+    if (opt.composite) ctx.globalCompositeOperation = opt.composite;
+    ctx.drawImage(im, dx, dy, dw, dh);
+    ctx.restore();
+  }
+
+  /* ── Procedural overlays (fallback / spice) ── */
   function drawHair(ctx, g, style, hCol, sk, rng) {
     const { cx, headY, hw, hh } = g;
     if (style === 'bald') return;
@@ -163,7 +218,7 @@
       ctx.quadraticCurveTo(cx, headY - hh * 1.18, cx, headY - hh);
       ctx.closePath();
       ctx.fill();
-    } else if (style === 'medium') {
+    } else if (style === 'medium' || style === 'wavy') {
       ctx.beginPath();
       ctx.moveTo(cx - hw * 0.68, headY + hh * 0.18);
       ctx.bezierCurveTo(cx - hw * 1.22, headY - hh * 0.32, cx - hw * 0.98, headY - hh * 1.12, cx, headY - hh * 1.1);
@@ -190,26 +245,6 @@
       ctx.beginPath();
       ctx.arc(cx, headY - hh * 1.18, hw * 0.32, 0, Math.PI * 2);
       ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(cx - hw, headY - 0.06 * hh);
-      ctx.bezierCurveTo(cx - hw, headY - hh * 0.62, cx - hw * 0.5, headY - hh, cx, headY - hh);
-      ctx.bezierCurveTo(cx + hw * 0.5, headY - hh, cx + hw, headY - hh * 0.62, cx + hw, headY - 0.06 * hh);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'wavy') {
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.7, headY + hh * 0.22);
-      for (let i = 0; i <= 8; i++) {
-        const t = i / 8;
-        ctx.lineTo(cx - hw * (1.1 - t * 0.4) + Math.sin(t * Math.PI * 3) * hw * 0.08, headY - hh * (t * 0.95 - 0.12));
-      }
-      ctx.quadraticCurveTo(cx, headY - hh * 1.12, cx + hw * 0.6, headY - hh * 0.9);
-      for (let i = 8; i >= 0; i--) {
-        const t = i / 8;
-        ctx.lineTo(cx + hw * (1.1 - t * 0.4) + Math.sin(t * Math.PI * 3) * hw * 0.08, headY - hh * (t * 0.95 - 0.12));
-      }
-      ctx.closePath();
-      ctx.fill();
     } else if (style === 'shaved') {
       ctx.globalAlpha = 0.35;
       ctx.fillStyle = sk.d;
@@ -226,18 +261,10 @@
       ctx.beginPath();
       ctx.ellipse(ex, ey, ew * 1.1, eh * 1.05, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = Math.max(0.8, ew * 0.12);
-      ctx.stroke();
-      ctx.strokeStyle = '#444';
-      ctx.beginPath();
-      ctx.moveTo(ex - ew * 1.3, ey - eh * 0.5);
-      ctx.lineTo(ex + ew * 1.3, ey + eh * 0.5);
-      ctx.stroke();
       return;
     }
     if (kind === 'cyborgR' || kind === 'cyborgG') {
-      const glow = kind === 'cyborgR' ? '#ff2244' : '#44ff88';
+      const glow = kind === 'cyborgR' ? '#ff6644' : '#44ffaa';
       ctx.fillStyle = '#1a2030';
       ctx.beginPath();
       ctx.ellipse(ex, ey, ew, eh, 0, 0, Math.PI * 2);
@@ -245,10 +272,6 @@
       ctx.fillStyle = glow;
       ctx.beginPath();
       ctx.ellipse(ex, ey, ew * 0.55, eh * 0.65, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.7)';
-      ctx.beginPath();
-      ctx.arc(ex + ew * 0.2, ey - eh * 0.2, ew * 0.15, 0, Math.PI * 2);
       ctx.fill();
       return;
     }
@@ -261,19 +284,9 @@
     ctx.beginPath();
     ctx.ellipse(ex, ey, ew * 0.62, eh * 0.84, 0, 0, Math.PI * 2);
     ctx.fill();
-    if (kind === 'alien') {
-      ctx.fillStyle = 'rgba(255,220,80,.55)';
-      ctx.beginPath();
-      ctx.ellipse(ex, ey, ew * 0.5, eh * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
     ctx.fillStyle = '#050508';
     ctx.beginPath();
     ctx.ellipse(ex, ey + eh * 0.04, ew * 0.32, eh * 0.48, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.beginPath();
-    ctx.arc(ex + ew * 0.22, ey - eh * 0.24, ew * 0.1, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -282,41 +295,20 @@
     const eyeY = headY - hh * 0.06;
     const eSpread = hw * 0.38;
     const ew = hw * 0.15, eh = hh * 0.075;
-    const bCol = (hCol === '#eeeeee' || hCol === '#e8d8a0') ? '#888888' : hCol;
-
     if (eyeType === 'goggles') {
-      ctx.fillStyle = 'rgba(20,30,40,.75)';
-      ctx.strokeStyle = '#556677';
+      ctx.fillStyle = 'rgba(20,40,50,.75)';
+      ctx.strokeStyle = '#7a9aaa';
       ctx.lineWidth = Math.max(1, hw * 0.04);
       const gx = cx - eSpread - ew * 1.1, gy = eyeY - eh * 1.2, gw = (eSpread + ew * 1.1) * 2, gh = eh * 2.4;
       roundRectCtx(ctx, gx, gy, gw, gh, eh * 0.5);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = 'rgba(80,200,120,.35)';
-      ctx.beginPath();
-      ctx.ellipse(cx - eSpread, eyeY, ew * 0.9, eh * 0.85, 0, 0, Math.PI * 2);
-      ctx.ellipse(cx + eSpread, eyeY, ew * 0.9, eh * 0.85, 0, 0, Math.PI * 2);
-      ctx.fill();
       return;
     }
-
     const leftKind = eyeType === 'patch' ? 'patch' : eyeType === 'cyborgR' ? 'cyborgR' : eyeType === 'cyborgG' ? 'normal' : eyeType;
     const rightKind = eyeType === 'patch' ? 'normal' : eyeType === 'cyborgR' ? 'normal' : eyeType === 'cyborgG' ? 'cyborgG' : eyeType;
-
     drawOneEye(ctx, cx - eSpread, eyeY, ew, eh, eCol, leftKind);
     drawOneEye(ctx, cx + eSpread, eyeY, ew, eh, eCol, rightKind);
-
-    ctx.strokeStyle = bCol;
-    ctx.lineWidth = eyeType === 'stern' ? Math.max(1.8, hw * 0.035) : Math.max(1.2, hw * 0.028);
-    ctx.lineCap = 'round';
-    [-1, 1].forEach((s) => {
-      const bx = cx + s * eSpread, by = eyeY - hh * 0.15;
-      const lift = eyeType === 'stern' ? -0.04 : rng(-0.03, 0.03);
-      ctx.beginPath();
-      ctx.moveTo(bx - hw * 0.13, by + s * lift * hh);
-      ctx.quadraticCurveTo(bx, by - hh * 0.04, bx + hw * 0.13, by - s * lift * hh);
-      ctx.stroke();
-    });
   }
 
   function drawNoseMouth(ctx, g, mouthType, sk) {
@@ -330,16 +322,9 @@
     ctx.moveTo(cx + hw * 0.04, eyeY + hh * 0.1);
     ctx.quadraticCurveTo(cx + hw * 0.12, noseY, cx, noseY + hh * 0.05);
     ctx.stroke();
-    [-1, 1].forEach((s) => {
-      ctx.fillStyle = sk.d + '44';
-      ctx.beginPath();
-      ctx.ellipse(cx + s * hw * 0.075, noseY + hh * 0.046, hw * 0.042, hh * 0.028, 0, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
     const mY = headY + hh * 0.44, mW = hw * 0.22;
     ctx.fillStyle = sk.l;
-    if (mouthType === 'smile') {
+    if (mouthType === 'smile' || mouthType === 'confident' || mouthType === 'open') {
       ctx.beginPath();
       ctx.moveTo(cx - mW, mY);
       ctx.quadraticCurveTo(cx, mY - hh * 0.065, cx + mW, mY);
@@ -348,82 +333,37 @@
       ctx.fill();
     } else if (mouthType === 'smirk') {
       ctx.beginPath();
-      ctx.moveTo(cx - mW * 0.92, mY + hh * 0.012);
-      ctx.quadraticCurveTo(cx + mW * 0.28, mY - hh * 0.065, cx + mW * 0.96, mY - hh * 0.02);
-      ctx.quadraticCurveTo(cx, mY + hh * 0.065, cx - mW * 0.92, mY + hh * 0.012);
-      ctx.closePath();
-      ctx.fill();
-    } else if (mouthType === 'open') {
-      ctx.fillStyle = '#401820';
-      ctx.beginPath();
-      ctx.ellipse(cx, mY, mW * 0.7, hh * 0.06, 0, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (mouthType === 'grit') {
-      ctx.fillStyle = sk.d;
-      for (let i = -3; i <= 3; i++) {
-        ctx.fillRect(cx + i * mW * 0.22 - mW * 0.08, mY - hh * 0.02, mW * 0.14, hh * 0.035);
-      }
+      ctx.moveTo(cx - mW * 0.85, mY + hh * 0.02);
+      ctx.quadraticCurveTo(cx + mW * 0.2, mY - hh * 0.08, cx + mW, mY - hh * 0.02);
+      ctx.strokeStyle = sk.d;
+      ctx.lineWidth = Math.max(1.2, hw * 0.04);
+      ctx.stroke();
     } else {
-      ctx.fillRect(cx - mW, mY - hh * 0.016, mW * 2, hh * 0.032);
+      ctx.beginPath();
+      ctx.moveTo(cx - mW * 0.9, mY);
+      ctx.lineTo(cx + mW * 0.9, mY);
+      ctx.strokeStyle = sk.d;
+      ctx.lineWidth = Math.max(1.4, hw * 0.045);
+      ctx.stroke();
     }
-    ctx.strokeStyle = sk.d + '88';
-    ctx.lineWidth = Math.max(0.6, hw * 0.04);
-    ctx.beginPath();
-    ctx.moveTo(cx - mW, mY);
-    ctx.lineTo(cx + mW, mY);
-    ctx.stroke();
   }
 
   function drawAccessories(ctx, g, seed, factionId, fCol, W, rng) {
     const { cx, headY, hw, hh } = g;
-    const acc = (seed >>> 12) % 5;
-    const eyeY = headY - hh * 0.06;
-
-    if (acc === 1 || rng() > 0.82) {
-      ctx.strokeStyle = 'rgba(180,100,78,.75)';
-      ctx.lineWidth = Math.max(1.2, hw * 0.06);
-      ctx.lineCap = 'round';
-      const sxc = cx + rng(-hw * 0.35, hw * 0.35);
-      const syc = headY + rng(-hh * 0.15, hh * 0.3);
+    if ((seed % 5) === 0) {
+      ctx.strokeStyle = fCol;
+      ctx.lineWidth = Math.max(1, hw * 0.035);
       ctx.beginPath();
-      ctx.moveTo(sxc, syc - hh * 0.12);
-      ctx.lineTo(sxc + rng(-4, 4), syc + hh * 0.14);
+      ctx.arc(cx + hw * 0.72, headY + hh * 0.1, hw * 0.12, 0, Math.PI * 2);
       ctx.stroke();
     }
-
-    if (acc === 2) {
-      ctx.fillStyle = 'rgba(40,50,60,.85)';
-      ctx.strokeStyle = '#667788';
-      ctx.lineWidth = Math.max(0.8, hw * 0.04);
+    if ((seed % 7) === 2) {
+      ctx.strokeStyle = 'rgba(180,120,80,.55)';
+      ctx.lineWidth = Math.max(0.8, hw * 0.025);
       ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.55, headY + hh * 0.35);
-      ctx.lineTo(cx + hw * 0.55, headY + hh * 0.35);
-      ctx.quadraticCurveTo(cx + hw * 0.5, headY + hh * 0.55, cx, headY + hh * 0.52);
-      ctx.quadraticCurveTo(cx - hw * 0.5, headY + hh * 0.55, cx - hw * 0.55, headY + hh * 0.35);
-      ctx.fill();
+      ctx.moveTo(cx - hw * 0.55, headY + hh * 0.05);
+      ctx.lineTo(cx - hw * 0.15, headY + hh * 0.35);
       ctx.stroke();
-      ctx.fillStyle = '#334455';
-      ctx.fillRect(cx - hw * 0.12, headY + hh * 0.38, hw * 0.24, hh * 0.06);
-    }
-
-    if (acc === 3) {
-      ctx.strokeStyle = '#8899aa';
-      ctx.lineWidth = Math.max(1, hw * 0.05);
-      ctx.beginPath();
-      ctx.arc(cx + hw * 0.95, headY + hh * 0.05, hw * 0.12, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = fCol + 'cc';
-      ctx.beginPath();
-      ctx.arc(cx + hw * 0.95, headY + hh * 0.05, hw * 0.06, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    if (acc === 4 && factionId) {
-      ctx.fillStyle = fCol + '99';
-      ctx.font = `bold ${Math.max(8, Math.round(W * 0.09))}px sans-serif`;
-      ctx.textAlign = 'center';
-      const sym = { bazzano: '⬡', crespellano: '×', calcara: '⚙', monteveglio: '⚔', savigno: '◈', pirate: '☠' }[factionId] || '★';
-      ctx.fillText(sym, cx + hw * 0.55, eyeY - hh * 0.2);
     }
   }
 
@@ -432,12 +372,11 @@
     const rng = makeRng(seed ^ 0x9e3779b9);
     const sk = SKINS[fac.fHead % SKINS.length];
     const hCol = HAIR_COLS[(fac.fHair + fac.fHead) % HAIR_COLS.length];
-    const eCol = EYE_COLS[fac.fEye % EYE_COLS.length];
+    const eCol = EYE_COLS[fac.fEye % EYE_TYPES.length];
     const hStyle = HAIR_STYLES[fac.fHair % HAIR_STYLES.length];
     const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
     const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
     const fCol = factionColor(factionId);
-
     drawHair(ctx, g, hStyle, hCol, sk, rng);
     drawEyes(ctx, g, eyeType, eCol, hCol, rng);
     drawNoseMouth(ctx, g, mouthType, sk);
@@ -447,22 +386,131 @@
   function drawPortraitBg(ctx, W, H, factionId) {
     const fCol = factionColor(factionId);
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#02060e');
-    bg.addColorStop(1, fCol + '22');
+    bg.addColorStop(0, '#041018');
+    bg.addColorStop(0.45, '#0a1c28');
+    bg.addColorStop(1, fCol + '33');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
+    // subtle teal scanlines
+    ctx.fillStyle = 'rgba(80,200,180,.04)';
+    for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
     return fCol;
   }
 
   function drawPortraitFrame(ctx, W, H) {
     const vig = ctx.createRadialGradient(W * 0.5, H * 0.48, W * 0.08, W * 0.5, H * 0.5, W * 0.82);
     vig.addColorStop(0, 'transparent');
-    vig.addColorStop(1, 'rgba(0,0,0,.45)');
+    vig.addColorStop(1, 'rgba(0,8,12,.55)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(120,200,255,.35)';
+    ctx.strokeStyle = 'rgba(120,210,190,.4)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+    ctx.strokeStyle = 'rgba(180,120,60,.25)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
+    ctx.strokeRect(3, 3, W - 6, H - 6);
+  }
+
+  /** Compositing pezzi AI randomizzati da seed */
+  function drawModularComposite(ctx, W, H, seed, factionId, hue) {
+    const P = L.parts;
+    if (!P || !P.heads || !P.heads.length) return false;
+    const fac = portraitFaceFromSeed(seed);
+    const rng = makeRng(seed ^ 0xa5a5a5);
+    const headPath = P.heads[fac.fHead % P.heads.length];
+    const headIm = PortraitParts.get(headPath);
+    if (!headIm) return false;
+
+    const hStyle = HAIR_STYLES[fac.fHair % HAIR_STYLES.length];
+    const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
+    const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
+    const hairPath = P.hair && P.hair[hStyle];
+    const eyePath = P.eyes && P.eyes[eyeType];
+    const mouthPath = P.mouths && P.mouths[mouthType];
+    const accPath = (P.accessories || [])[Math.floor(rng(0, P.accessories.length))];
+
+    const fCol = drawPortraitBg(ctx, W, H, factionId);
+    const pad = 0.04;
+    const maxW = W * (1 - 2 * pad);
+    const maxH = H * (1 - 2 * pad);
+    const sc = Math.min(maxW / headIm.naturalWidth, maxH / headIm.naturalHeight);
+    const dw = headIm.naturalWidth * sc;
+    const dh = headIm.naturalHeight * sc;
+    const dx = (W - dw) * 0.5;
+    const dy = H * 0.52 - dh * 0.5;
+
+    ctx.save();
+    if (hue != null && !isNaN(hue)) {
+      // mild hue only — keep teal/copper feel
+      const mild = ((hue % 40) - 20);
+      ctx.filter = `hue-rotate(${mild}deg) saturate(1.08) contrast(1.05)`;
+    }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(headIm, dx, dy, dw, dh);
+    ctx.restore();
+
+    // Mouth overlay (lower third of face)
+    const mouthIm = PortraitParts.get(mouthPath);
+    if (mouthIm) {
+      const mw = dw * 0.72, mh = dh * 0.42;
+      drawPartFit(ctx, mouthIm, dx + (dw - mw) * 0.5, dy + dh * 0.48, mw, mh, { alpha: 0.92 });
+    }
+
+    // Eyes overlay
+    const eyeIm = PortraitParts.get(eyePath);
+    if (eyeIm) {
+      const ew = dw * 0.78, eh = dh * 0.38;
+      const filter = eyeType === 'alien' ? 'hue-rotate(40deg) saturate(1.4)'
+        : eyeType === 'blue' ? 'hue-rotate(-20deg) saturate(1.2)'
+        : eyeType === 'cyborgG' ? 'hue-rotate(80deg)'
+        : null;
+      drawPartFit(ctx, eyeIm, dx + (dw - ew) * 0.5, dy + dh * 0.22, ew, eh, { alpha: 0.95, filter });
+      if (eyeType === 'patch') {
+        ctx.fillStyle = 'rgba(8,6,10,.85)';
+        ctx.beginPath();
+        ctx.ellipse(dx + dw * 0.32, dy + dh * 0.38, dw * 0.1, dh * 0.07, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Hair on top
+    const hairIm = PortraitParts.get(hairPath);
+    if (hairIm) {
+      const hw = dw * 1.08, hh = dh * 0.72;
+      drawPartFit(ctx, hairIm, dx + (dw - hw) * 0.5, dy - dh * 0.06, hw, hh, { alpha: 0.98 });
+    }
+
+    // Accessory
+    const accIm = PortraitParts.get(accPath);
+    if (accIm) {
+      const aw = dw * 0.85, ah = dh * 0.55;
+      drawPartFit(ctx, accIm, dx + (dw - aw) * 0.5, dy + dh * 0.28, aw, ah, { alpha: 0.9 });
+    }
+
+    // Faction collar strip
+    const suitG = ctx.createLinearGradient(0, H * 0.78, 0, H);
+    suitG.addColorStop(0, fCol + '00');
+    suitG.addColorStop(0.35, fCol + '66');
+    suitG.addColorStop(1, fCol + 'bb');
+    ctx.fillStyle = suitG;
+    ctx.fillRect(0, H * 0.78, W, H * 0.22);
+
+    // Copper corner marks (Forbidden Planet UI)
+    ctx.strokeStyle = 'rgba(200,140,60,.45)';
+    ctx.lineWidth = 1.5;
+    const c = 10;
+    [[0, 0], [W, 0], [0, H], [W, H]].forEach(([ox, oy], i) => {
+      const sx = ox === 0 ? 1 : -1, sy = oy === 0 ? 1 : -1;
+      ctx.beginPath();
+      ctx.moveTo(ox + sx * c, oy);
+      ctx.lineTo(ox, oy);
+      ctx.lineTo(ox, oy + sy * c);
+      ctx.stroke();
+    });
+
+    drawPortraitFrame(ctx, W, H);
+    return true;
   }
 
   function drawAtlasComposite(ctx, W, H, seed, factionId, hue) {
@@ -471,20 +519,35 @@
     const rect = computeAtlasRect(W, H, im, seed);
     if (!rect) return false;
 
-    const fCol = factionColor(factionId);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.clearRect(0, 0, W, H);
     drawPortraitBg(ctx, W, H, factionId);
 
     ctx.save();
-    if (hue != null && !isNaN(hue)) ctx.filter = `hue-rotate(${hue}deg) saturate(1.06)`;
+    if (hue != null && !isNaN(hue)) ctx.filter = `hue-rotate(${((hue % 36) - 18)}deg) saturate(1.06)`;
     ctx.drawImage(im, rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch, rect.dx, rect.dy, rect.dw, rect.dh);
     ctx.restore();
 
-    const g = faceGeomFromRect(rect);
-    drawFaceOverlay(ctx, g, seed, factionId, W);
+    // Layer AI parts over atlas bust when available
+    if (PortraitParts.ready) {
+      const fac = portraitFaceFromSeed(seed);
+      const P = L.parts;
+      const hStyle = HAIR_STYLES[fac.fHair % HAIR_STYLES.length];
+      const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
+      const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
+      const eyeIm = PortraitParts.get(P.eyes && P.eyes[eyeType]);
+      const hairIm = PortraitParts.get(P.hair && P.hair[hStyle]);
+      const mouthIm = PortraitParts.get(P.mouths && P.mouths[mouthType]);
+      if (mouthIm) drawPartFit(ctx, mouthIm, rect.dx + rect.dw * 0.12, rect.dy + rect.dh * 0.48, rect.dw * 0.76, rect.dh * 0.4, { alpha: 0.88 });
+      if (eyeIm) drawPartFit(ctx, eyeIm, rect.dx + rect.dw * 0.1, rect.dy + rect.dh * 0.22, rect.dw * 0.8, rect.dh * 0.36, { alpha: 0.9 });
+      if (hairIm) drawPartFit(ctx, hairIm, rect.dx - rect.dw * 0.04, rect.dy - rect.dh * 0.05, rect.dw * 1.08, rect.dh * 0.7, { alpha: 0.95 });
+    } else {
+      const g = faceGeomFromRect(rect);
+      drawFaceOverlay(ctx, g, seed, factionId, W);
+    }
 
+    const fCol = factionColor(factionId);
     const suitG = ctx.createLinearGradient(0, H * 0.72, 0, H);
     suitG.addColorStop(0, fCol + '55');
     suitG.addColorStop(1, fCol + '88');
@@ -537,24 +600,6 @@
     suitG.addColorStop(1, fCol + 'dd');
     ctx.fillStyle = suitG;
     ctx.fillRect(0, H * 0.7, W, H * 0.3);
-    ctx.fillStyle = fCol + 'cc';
-    ctx.beginPath();
-    ctx.moveTo(g.cx - W * 0.28, H * 0.7);
-    ctx.lineTo(g.cx - W * 0.065, H * 0.64);
-    ctx.lineTo(g.cx + W * 0.065, H * 0.64);
-    ctx.lineTo(g.cx + W * 0.28, H * 0.7);
-    ctx.fill();
-    roundRectCtx(ctx, g.cx + W * 0.17, H * 0.74, W * 0.1, W * 0.1, 3);
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    ctx.fill();
-    ctx.fillStyle = fCol + 'ee';
-    ctx.font = `bold ${Math.round(W * 0.12)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const sym2 = { bazzano: '⬡', crespellano: '⚑', calcara: '⚙', monteveglio: '⚔', savigno: '◈', pirate: '☠' }[factionId] || '★';
-    ctx.fillText(sym2, g.cx + W * 0.22, H * 0.79);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
 
     drawPortraitFrame(ctx, W, H);
   }
@@ -581,12 +626,18 @@
       const hue = opt.hue != null ? opt.hue : portraitHueFromSeed(seed);
       const forceProcedural = !!opt.procedural;
 
+      if (!forceProcedural && PortraitParts.ready && drawModularComposite(ctx, W, H, seed, factionId, hue)) {
+        return 'modular';
+      }
       if (!forceProcedural && atlas.ready && drawAtlasComposite(ctx, W, H, seed, factionId, hue)) {
         return 'atlas+overlay';
       }
 
       drawProcedural(ctx, W, H, seed, factionId);
 
+      if (!partsState.ready && !partsState.loading) {
+        PortraitParts.load().then((ok) => { if (ok) redrawActiveDialog(); });
+      }
       if (!atlas.ready && !atlas.loading) {
         PortraitAtlas.load().then((ok) => { if (ok) redrawActiveDialog(); });
       }
@@ -602,7 +653,8 @@
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
   global.PortraitAtlas = PortraitAtlas;
+  global.PortraitParts = PortraitParts;
   global.PortraitRenderer = PortraitRenderer;
 
-  PortraitAtlas.load().then((ok) => { if (ok) redrawActiveDialog(); });
+  Promise.all([PortraitParts.load(), PortraitAtlas.load()]).then(() => redrawActiveDialog());
 })(typeof window !== 'undefined' ? window : globalThis);
