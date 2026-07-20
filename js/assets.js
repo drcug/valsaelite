@@ -49,8 +49,12 @@
     if (s.indexOf('PROLOGO') >= 0) return STORY_ART.prologue;
     const m = s.match(/CAPITOLO\s*(\d)/);
     if (m) return STORY_ART[parseInt(m[1], 10)] || STORY_ART.prologue;
-    if (title && /timbro/i.test(title)) return STORY_ART.stamp;
-    if (title && /vittoria|patto restaurato|molino/i.test(title)) return STORY_ART.finale;
+    const t = String(title || '');
+    if (/timbro|copia|calcara/i.test(t)) return STORY_ART.stamp;
+    if (/rocca|torneo|monteveglio|frecce/i.test(t)) return STORY_ART[3];
+    if (/palato|tartuf|savigno/i.test(t)) return STORY_ART[4];
+    if (/consigliere|bazzano|patto|vittoria|molino/i.test(t)) return STORY_ART.finale;
+    if (/pressione|pirata/i.test(t)) return STORY_ART.stamp;
     return STORY_ART.prologue;
   }
 
