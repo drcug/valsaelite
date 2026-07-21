@@ -45,6 +45,14 @@
     const v=AUDIO.sfxVol;
     if(kind==='fire')global.playTone(880,.04,.032*v,'square');
     else if(kind==='hit'){global.playTone(220,.06,.04*v,'sawtooth');setTimeout(()=>global.playTone(140,.08,.03*v,'triangle'),30);}
+    else if(kind==='hitconfirm'){global.playTone(720,.03,.03*v,'square');setTimeout(()=>global.playTone(980,.04,.025*v,'sine'),25);}
+    else if(kind==='crit'){global.playTone(1100,.05,.04*v,'square');setTimeout(()=>global.playTone(660,.08,.035*v,'sawtooth'),40);}
+    else if(kind==='hit_bazz'){global.playTone(500,.03,.028*v,'sine');setTimeout(()=>global.playTone(750,.04,.03*v,'square'),20);}
+    else if(kind==='hit_cres'){global.playTone(280,.05,.035*v,'sawtooth');}
+    else if(kind==='hit_calc'){global.playTone(440,.03,.03*v,'triangle');setTimeout(()=>global.playTone(880,.03,.028*v,'square'),35);}
+    else if(kind==='hit_mont'){global.playTone(360,.05,.032*v,'triangle');setTimeout(()=>global.playTone(540,.06,.03*v,'sine'),40);}
+    else if(kind==='hit_sav'){global.playTone(620,.04,.03*v,'sine');}
+    else if(kind==='hit_pir'){global.playTone(180,.06,.04*v,'sawtooth');setTimeout(()=>global.playTone(90,.08,.035*v,'triangle'),40);}
     else if(kind==='explode'){global.playTone(90,.12,.05*v,'sawtooth');setTimeout(()=>global.playTone(55,.18,.04*v,'triangle'),60);}
     else if(kind==='dock'){global.playTone(330,.1,.035*v,'sine');setTimeout(()=>global.playTone(440,.12,.04*v,'sine'),90);}
   };
