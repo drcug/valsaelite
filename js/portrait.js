@@ -1,15 +1,15 @@
 'use strict';
 /**
- * Portrait — busti AI completi (atlas 4×4 = 16) + tintura capelli da seed + fallback procedurale.
+ * Portrait — busti pelati + overlay capelli (tint sullo sprite) + accessori.
  */
 (function (global) {
   const L = global.PORTRAIT_LAYOUT || {
     cols: 4, rows: 4, cellW: 128, cellH: 160,
     atlasPath: 'sprites/portraits.png',
     view: { pad: 0.02, centerYFrac: 0.52, scaleMul: 1.08 },
-    face: { cxFrac: 0.5, headYFrac: 0.36, hwFrac: 0.38, hhFrac: 0.40 },
+    overlay: { hairScale: 1.22, hairY: -0.06, accScale: 1.05, accY: 0.04 },
     hairTints: ['#100808', '#7a4018', '#d4b050', '#eeeeee', '#540010', '#224418', '#c04018', '#6a28a0'],
-    parts: { heads: [] }
+    parts: { heads: [], hair: [null], accessories: [null] }
   };
 
   const SKINS = [
@@ -27,21 +27,28 @@
     ? L.hairTints
     : ['#100808', '#281408', '#7a4018', '#b07020', '#d4b050', '#e8d8a0', '#eeeeee', '#540010', '#001035', '#224418', '#c04018', '#2a6a58', '#6a28a0', '#4a2030', '#88aacc', '#d4a050'];
   const EYE_COLS = ['#3a5f8a', '#2d6e3a', '#7a4a1a', '#1a4a6b', '#4a3a7b', '#1f4a2a', '#5a3a20', '#2a5a6a'];
-  const HAIR_STYLES = ['short', 'medium', 'long', 'mohawk', 'bun', 'shaved', 'wavy', 'bald', 'buzz', 'bob', 'ponytail', 'crop'];
+  const HAIR_STYLES = ['short', 'medium', 'long', 'mohawk', 'bun', 'wavy', 'bald', 'bob'];
   const EYE_TYPES = ['normal', 'blue', 'cyborgR', 'cyborgG', 'alien', 'stern', 'goggles', 'patch'];
   const MOUTH_TYPES = ['smile', 'neutral', 'smirk', 'confident', 'stern', 'open', 'flat', 'grit'];
   const N_BUSTS = Math.max(1, (L.cols || 4) * (L.rows || 4));
+  const HAIR_PATHS = (L.parts && L.parts.hair) || [null];
+  const ACC_PATHS = (L.parts && L.parts.accessories) || [null];
 
   function portraitFaceFromSeed(seed) {
     let h = (seed >>> 0) || 1;
     h = (Math.imul(h, 1664525) + 1013904223) | 0;
     const x = Math.abs(h);
+    const hairIdx = (x >> 12) % HAIR_PATHS.length;
+    const accIdx = (x >> 15) % ACC_PATHS.length;
     return {
       fHead: x % N_BUSTS,
       fEye: (x >> 3) % 8,
       fMouth: (x >> 6) % 8,
       fHair: (x >> 9) % HAIR_COLS.length,
-      fHairStyle: (x >> 12) % HAIR_STYLES.length
+      fHairStyle: hairIdx,
+      fAcc: accIdx,
+      hairPath: HAIR_PATHS[hairIdx] || null,
+      accPath: ACC_PATHS[accIdx] || null
     };
   }
 
@@ -82,8 +89,8 @@
   }
 
   const atlas = { ready: false, loading: false, promise: null, img: null };
-  const headCache = Object.create(null);
-  const headsState = { ready: false, loading: false, promise: null, ok: 0 };
+  const partCache = Object.create(null);
+  const partsState = { ready: false, loading: false, promise: null, ok: 0 };
 
   function absUrl(rel) {
     try { return new URL(rel, global.location.href).href; } catch (_) { return rel; }
@@ -99,6 +106,15 @@
     });
   }
 
+  function collectPartUrls() {
+    const urls = [];
+    const push = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
+    ((L.parts && L.parts.heads) || []).forEach(push);
+    HAIR_PATHS.forEach(push);
+    ACC_PATHS.forEach(push);
+    return urls;
+  }
+
   const PortraitAtlas = {
     load() {
       if (atlas.ready) return Promise.resolve(true);
@@ -109,9 +125,6 @@
           atlas.img = im;
           atlas.ready = im.naturalWidth > 0 && im.naturalHeight > 0;
           atlas.loading = false;
-          if (atlas.ready && typeof global.console !== 'undefined') {
-            global.console.info('[portrait] Atlas bust OK:', L.atlasPath);
-          }
           return atlas.ready;
         })
         .catch(() => {
@@ -126,24 +139,31 @@
     get img() { return atlas.img; }
   };
 
-  const PortraitHeads = {
+  const PortraitParts = {
     load() {
-      if (headsState.ready) return Promise.resolve(headsState.ok > 0);
-      if (headsState.promise) return headsState.promise;
-      const urls = (L.parts && L.parts.heads) || [];
-      headsState.loading = true;
-      headsState.promise = Promise.all(urls.map((u) =>
-        loadImage(absUrl(u)).then((im) => { headCache[u] = im; headsState.ok++; return true; })
+      if (partsState.ready) return Promise.resolve(partsState.ok > 0);
+      if (partsState.promise) return partsState.promise;
+      const urls = collectPartUrls();
+      partsState.loading = true;
+      partsState.promise = Promise.all(urls.map((u) =>
+        loadImage(absUrl(u)).then((im) => { partCache[u] = im; partsState.ok++; return true; })
           .catch(() => false)
       )).then(() => {
-        headsState.ready = true;
-        headsState.loading = false;
-        return headsState.ok > 0;
+        partsState.ready = true;
+        partsState.loading = false;
+        return partsState.ok > 0;
       });
-      return headsState.promise;
+      return partsState.promise;
     },
-    get(path) { return path ? headCache[path] || null : null; },
-    get ready() { return headsState.ready && headsState.ok > 0; }
+    get(path) { return path ? partCache[path] || null : null; },
+    get ready() { return partsState.ready && partsState.ok > 0; }
+  };
+
+  // Compat alias
+  const PortraitHeads = {
+    load: () => PortraitParts.load(),
+    get: (path) => PortraitParts.get(path),
+    get ready() { return PortraitParts.ready; }
   };
 
   function factionColor(factionId) {
@@ -177,11 +197,45 @@
     return { dx: (W - dw) * 0.5, dy: H * v.centerYFrac - dh * 0.5, dw, dh, cw, ch, col, row, sc };
   }
 
+  /** Tinta colore applicata solo allo sprite capelli (offscreen). */
+  function tintHairSprite(img, tintHex) {
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) return null;
+    const c = (typeof document !== 'undefined') ? document.createElement('canvas') : null;
+    if (!c) return img;
+    c.width = w; c.height = h;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, w, h);
+    x.drawImage(img, 0, 0);
+    // Mantieni luminosità dello sprite, cambia solo hue/saturazione
+    x.globalCompositeOperation = 'color';
+    x.fillStyle = tintHex;
+    x.fillRect(0, 0, w, h);
+    // Rinforzo leggero della saturazione sul pigmento
+    x.globalCompositeOperation = 'source-atop';
+    x.globalAlpha = 0.22;
+    x.fillStyle = tintHex;
+    x.fillRect(0, 0, w, h);
+    x.globalAlpha = 1;
+    return c;
+  }
+
+  function overlayRect(base, scale, yOff) {
+    const dw = base.dw * scale;
+    const dh = base.dh * scale;
+    return {
+      dx: base.dx + (base.dw - dw) * 0.5,
+      dy: base.dy + base.dh * yOff + (base.dh - dh) * 0.5,
+      dw, dh
+    };
+  }
+
   function drawHair(ctx, g, style, hCol, sk, rng) {
     const { cx, headY, hw, hh } = g;
     if (style === 'bald') return;
     ctx.fillStyle = hCol;
-    if (style === 'short' || style === 'medium' || style === 'wavy') {
+    if (style === 'short' || style === 'medium' || style === 'wavy' || style === 'bob') {
       ctx.beginPath();
       ctx.moveTo(cx - hw, headY - 0.05 * hh);
       ctx.bezierCurveTo(cx - hw * 1.05, headY - hh * 0.68, cx - hw * 0.58, headY - hh, cx, headY - hh);
@@ -207,13 +261,6 @@
       ctx.beginPath();
       ctx.arc(cx, headY - hh * 1.18, hw * 0.32, 0, Math.PI * 2);
       ctx.fill();
-    } else if (style === 'shaved') {
-      ctx.globalAlpha = 0.35;
-      ctx.fillStyle = sk.d;
-      for (let k = 0; k < 40; k++) {
-        ctx.fillRect(cx + (rng() - 0.5) * hw * 2, headY - hh * 0.5 + rng() * hh * 0.5, rng(0.4, 1.2), rng(0.8, 2));
-      }
-      ctx.globalAlpha = 1;
     }
   }
 
@@ -310,13 +357,13 @@
     }
   }
 
-  function drawFaceOverlay(ctx, g, seed, factionId) {
+  function drawFaceOverlay(ctx, g, seed) {
     const fac = portraitFaceFromSeed(seed);
     const rng = makeRng(seed ^ 0x9e3779b9);
     const sk = SKINS[fac.fHead % SKINS.length];
-    const hCol = HAIR_COLS[(fac.fHair + fac.fHead) % HAIR_COLS.length];
+    const hCol = HAIR_COLS[fac.fHair % HAIR_COLS.length];
     const eCol = EYE_COLS[fac.fEye % EYE_COLS.length];
-    const hStyle = HAIR_STYLES[fac.fHairStyle % HAIR_STYLES.length];
+    const hStyle = fac.hairPath ? HAIR_STYLES[fac.fHairStyle % HAIR_STYLES.length] : 'bald';
     const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
     const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
     drawHair(ctx, g, hStyle, hCol, sk, rng);
@@ -351,83 +398,69 @@
     ctx.strokeRect(3, 3, W - 6, H - 6);
   }
 
-  /** Disegna un busto completo + tinta capelli da seed */
-  function drawCompleteBust(ctx, W, H, seed, factionId, hue) {
+  function drawLayeredBust(ctx, W, H, seed, factionId) {
     const fCol = drawPortraitBg(ctx, W, H, factionId);
     const fac = portraitFaceFromSeed(seed);
     const hairTint = portraitHairTint(seed);
-    const meta = (L.hairMeta && L.hairMeta[fac.fHead % L.hairMeta.length]) || null;
-    const isBald = meta && meta.style === 'bald';
+    const ov = L.overlay || {};
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
     let rect = null;
     let drawn = false;
+
     if (atlas.ready && atlas.img) {
       rect = computeAtlasRect(W, H, atlas.img, seed);
       if (rect) {
-        ctx.save();
-        // Tinta generale leggera + shift per varietà pelle/uniforme
-        const mild = hue != null && !isNaN(hue) ? ((hue % 24) - 12) : 0;
-        ctx.filter = `hue-rotate(${mild}deg) saturate(1.06) contrast(1.04)`;
         ctx.drawImage(
           atlas.img,
           rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch,
           rect.dx, rect.dy, rect.dw, rect.dh
         );
-        ctx.restore();
         drawn = true;
       }
     }
 
-    if (!drawn && PortraitHeads.ready) {
+    if (!drawn) {
       const heads = (L.parts && L.parts.heads) || [];
-      const path = heads[portraitAtlasIndex(seed) % heads.length];
-      const im = PortraitHeads.get(path);
+      const path = heads[portraitAtlasIndex(seed) % Math.max(1, heads.length)];
+      const im = PortraitParts.get(path);
       if (im) {
         const pad = 0.03;
         const maxW = W * (1 - 2 * pad);
         const maxH = H * (1 - 2 * pad);
-        const sc = Math.min(maxW / im.naturalWidth, maxH / im.naturalHeight);
+        const sc = Math.min(maxW / im.naturalWidth, maxH / im.naturalHeight) * (L.view.scaleMul || 1);
         const dw = im.naturalWidth * sc;
         const dh = im.naturalHeight * sc;
         const dx = (W - dw) * 0.5;
-        const dy = H * 0.52 - dh * 0.5;
+        const dy = H * (L.view.centerYFrac || 0.52) - dh * 0.5;
         rect = { dx, dy, dw, dh };
-        ctx.save();
-        const mild = hue != null && !isNaN(hue) ? ((hue % 24) - 12) : 0;
-        ctx.filter = `hue-rotate(${mild}deg) saturate(1.06)`;
         ctx.drawImage(im, dx, dy, dw, dh);
-        ctx.restore();
         drawn = true;
       }
     }
 
-    if (!drawn) return false;
+    if (!drawn || !rect) return false;
 
-    // Ritinta regione capelli (parte alta del busto) — mantiene stile, cambia colore
-    if (!isBald && hairTint && rect) {
-      ctx.save();
-      const hx = rect.dx + rect.dw * 0.5;
-      const hy = rect.dy + rect.dh * 0.22;
-      const hrX = rect.dw * 0.42;
-      const hrY = rect.dh * 0.28;
-      ctx.beginPath();
-      ctx.ellipse(hx, hy, hrX, hrY, 0, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.globalCompositeOperation = 'color';
-      ctx.globalAlpha = 0.72;
-      ctx.fillStyle = hairTint;
-      ctx.fillRect(rect.dx, rect.dy, rect.dw, rect.dh * 0.55);
-      // Soft edge second pass
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = hairTint;
-      ctx.fillRect(rect.dx, rect.dy, rect.dw, rect.dh * 0.45);
-      ctx.restore();
+    // Capelli: tint SOLO sullo sprite overlay
+    if (fac.hairPath) {
+      const hairImg = PortraitParts.get(fac.hairPath);
+      if (hairImg) {
+        const tinted = tintHairSprite(hairImg, hairTint) || hairImg;
+        const hr = overlayRect(rect, ov.hairScale || 1.22, ov.hairY != null ? ov.hairY : -0.06);
+        ctx.drawImage(tinted, hr.dx, hr.dy, hr.dw, hr.dh);
+      }
     }
 
-    // Alone fazione in basso
+    // Accessori (occhiali / visori / maschere) — nessun tint capelli
+    if (fac.accPath) {
+      const accImg = PortraitParts.get(fac.accPath);
+      if (accImg) {
+        const ar = overlayRect(rect, ov.accScale || 1.05, ov.accY != null ? ov.accY : 0.04);
+        ctx.drawImage(accImg, ar.dx, ar.dy, ar.dw, ar.dh);
+      }
+    }
+
     const suitG = ctx.createLinearGradient(0, H * 0.82, 0, H);
     suitG.addColorStop(0, fCol + '00');
     suitG.addColorStop(1, fCol + '77');
@@ -472,7 +505,7 @@
     ctx.closePath();
     ctx.fill();
 
-    drawFaceOverlay(ctx, g, seed, factionId);
+    drawFaceOverlay(ctx, g, seed);
 
     const suitG = ctx.createLinearGradient(0, H * 0.7, 0, H);
     suitG.addColorStop(0, fCol + 'aa');
@@ -502,10 +535,9 @@
       opt = opt || {};
       const seed = opt.seed != null ? opt.seed : 1;
       const factionId = opt.factionId || 'bazzano';
-      const hue = opt.hue != null ? opt.hue : portraitHueFromSeed(seed);
       const forceProcedural = !!opt.procedural;
 
-      if (!forceProcedural && drawCompleteBust(ctx, W, H, seed, factionId, hue)) {
+      if (!forceProcedural && drawLayeredBust(ctx, W, H, seed, factionId)) {
         return 'bust';
       }
 
@@ -514,8 +546,8 @@
       if (!atlas.ready && !atlas.loading) {
         PortraitAtlas.load().then((ok) => { if (ok) redrawActiveDialog(); });
       }
-      if (!headsState.ready && !headsState.loading) {
-        PortraitHeads.load().then((ok) => { if (ok) redrawActiveDialog(); });
+      if (!partsState.ready && !partsState.loading) {
+        PortraitParts.load().then((ok) => { if (ok) redrawActiveDialog(); });
       }
       return 'procedural';
     },
@@ -531,8 +563,8 @@
   global.portraitHairTint = portraitHairTint;
   global.PortraitAtlas = PortraitAtlas;
   global.PortraitHeads = PortraitHeads;
-  global.PortraitParts = PortraitHeads; // compat
+  global.PortraitParts = PortraitParts;
   global.PortraitRenderer = PortraitRenderer;
 
-  Promise.all([PortraitAtlas.load(), PortraitHeads.load()]).then(() => redrawActiveDialog());
+  Promise.all([PortraitAtlas.load(), PortraitParts.load()]).then(() => redrawActiveDialog());
 })(typeof window !== 'undefined' ? window : globalThis);

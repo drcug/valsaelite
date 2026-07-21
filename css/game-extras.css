@@ -48,8 +48,15 @@ body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
   }
   #speed-bar{bottom:72px;}
   #dprompt{bottom:88px;}
+  #boarding-prompt{bottom:88px;}
   #dlg{bottom:86px;}
 }
+.rp.collapsed{
+  background:linear-gradient(165deg,rgba(6,22,30,.88),rgba(3,12,18,.9));
+}
+.rp .rp-toggle{color:#6a9a90!important;}
+.rp .rp-toggle:hover{color:var(--bright)!important;}
+
 
 /* Touch / coarse / narrow: full mobile controls including SX/DX */
 @media (pointer:coarse),(max-width:700px){
