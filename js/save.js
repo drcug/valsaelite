@@ -34,7 +34,8 @@
         crew:[...ps.crew],modules:[...ps.modules],bpInv:{...ps.bpInv},
         hullPaintHex:ps.hullPaintHex,missiles:ps.missiles,
         activeMissionIds:ps.activeMissions.map(m=>m.id),
-        sandboxMode:!!ps.sandboxMode
+        sandboxMode:!!ps.sandboxMode,
+        rootSeen:{...(ps.rootSeen||{})}
       },
       STORY:{chapter:global.STORY.chapter,won:!!global.STORY.won},
       storyMissions:storyMissionSnap(global.STORY),
@@ -100,7 +101,8 @@
       credits:d.credits,cargo:{...d.cargo},cargoMax:d.cargoMax,
       crew:[...d.crew],modules:[...d.modules],bpInv:{...d.bpInv},
       hullPaintHex:d.hullPaintHex,missiles:d.missiles,
-      sandboxMode:!!d.sandboxMode,activeMissions:[]
+      sandboxMode:!!d.sandboxMode,activeMissions:[],
+      rootSeen:{...(d.rootSeen||{})}
     });
     global.STORY.chapter=data.STORY.chapter|0;
     global.STORY.won=!!data.STORY.won;
