@@ -36,17 +36,58 @@
     });
   }
 
-  function portraitAtlasIndex(seed) {
+  function allBustIndices() {
+    return Array.from({ length: N_BUSTS }, (_, i) => i);
+  }
+
+  function poolIndices(name) {
+    const pools = L.pools || {};
+    const list = pools[name];
+    if (list && list.length) return list.filter((i) => i >= 0 && i < N_BUSTS);
+    return allBustIndices();
+  }
+
+  function looksFeminineName(name) {
+    if (!name || typeof name !== 'string') return false;
+    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b/i;
+    const s = String(name).trim();
+    if (re.test(s)) return true;
+    // Controlla primo token ("Marina del Porto", "Dottoressa Baldi")
+    const first = s.split(/[\s"']+/).filter(Boolean)[0] || '';
+    return !!(first && re.test(first));
+  }
+
+  /**
+   * Sceglie il pool busto: pirate → pirati; nome femminile → donne;
+   * altrimenti uomini/donne in base al seed (civili misti).
+   */
+  function resolvePortraitPool(seed, opt) {
+    opt = opt || {};
+    if (opt.pool && L.pools && L.pools[opt.pool]) return poolIndices(opt.pool);
+    const fac = String(opt.factionId || opt.faction || '');
+    const kind = String(opt.kind || opt.gender || '').toLowerCase();
+    if (fac === 'pirate' || kind === 'pirate' || kind === 'pirates') return poolIndices('pirate');
+    if (kind === 'f' || kind === 'female' || kind === 'women' || kind === 'woman') return poolIndices('women');
+    if (kind === 'm' || kind === 'male' || kind === 'men' || kind === 'man') return poolIndices('men');
+    if (looksFeminineName(opt.name || opt.displayName)) return poolIndices('women');
+    // Civili: ~38% donne (pool più piccolo), resto uomini
     const x = ((seed * 1103515245 + 12345) >>> 0);
-    return x % N_BUSTS;
+    if ((x % 100) < 38) return poolIndices('women');
+    return poolIndices('men');
+  }
+
+  function portraitAtlasIndex(seed, opt) {
+    const pool = resolvePortraitPool(seed, opt);
+    const x = ((seed * 1103515245 + 12345) >>> 0);
+    return pool[x % Math.max(1, pool.length)];
   }
 
   function portraitHueFromSeed(seed) {
     return ((seed * 37) % 360);
   }
 
-  function portraitFaceFromSeed(seed) {
-    const idx = portraitAtlasIndex(seed);
+  function portraitFaceFromSeed(seed, opt) {
+    const idx = portraitAtlasIndex(seed, opt);
     const heads = (L.parts && L.parts.heads) || [];
     return {
       fHead: idx,
@@ -161,13 +202,15 @@
     ctx.strokeRect(4, 4, W - 8, H - 8);
   }
 
-  function atlasTile(seed) {
+  function atlasTile(seed, opt) {
     if (!atlas.ready || !atlas.img) return null;
     const cols = L.cols || 4, rows = L.rows || 4;
     const cw = Math.floor(atlas.img.naturalWidth / cols);
     const ch = Math.floor(atlas.img.naturalHeight / rows);
-    const idx = portraitAtlasIndex(seed) % Math.min(N_BUSTS, cols * rows);
+    const maxTile = Math.min(N_BUSTS, cols * rows);
+    const idx = portraitAtlasIndex(seed, opt) % maxTile;
     const col = idx % cols, row = (idx / cols) | 0;
+    if (row >= rows) return null;
     const tile = document.createElement('canvas');
     tile.width = cw; tile.height = ch;
     tile.getContext('2d').drawImage(atlas.img, col * cw, row * ch, cw, ch, 0, 0, cw, ch);
@@ -176,6 +219,7 @@
 
   function drawBust(ctx, W, H, seed, factionId, opt) {
     opt = opt || {};
+    const drawOpt = Object.assign({}, opt, { factionId: factionId || opt.factionId });
     drawPortraitBg(ctx, W, H, factionId);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -185,10 +229,11 @@
     if (isPlayer && playerL.head) path = playerL.head;
     else {
       const heads = (L.parts && L.parts.heads) || [];
-      path = heads[portraitAtlasIndex(seed) % Math.max(1, heads.length)];
+      const idx = portraitAtlasIndex(seed, drawOpt);
+      path = heads[idx % Math.max(1, heads.length)];
     }
     let im = PortraitParts.get(path);
-    if (!im && !isPlayer) im = atlasTile(seed);
+    if (!im && !isPlayer) im = atlasTile(seed, drawOpt);
     if (!im) return false;
 
     const iw = im.naturalWidth || im.width || 128;
@@ -258,7 +303,8 @@
     doc.querySelectorAll('canvas.crew-port').forEach((cv) => {
       const seed = +cv.dataset.seed | 0;
       const fac = cv.dataset.fac || 'bazzano';
-      PortraitRenderer.drawCanvas(cv, seed, fac);
+      const name = cv.dataset.name || '';
+      PortraitRenderer.drawCanvas(cv, seed, fac, { name: name });
     });
   }
 
@@ -270,7 +316,9 @@
     if (!pc) return;
     PortraitRenderer.draw(pc.getContext('2d'), pc.width, pc.height, {
       seed: npc.seed,
-      factionId: npc.faction
+      factionId: npc.faction,
+      name: npc.displayName || npc.name,
+      kind: npc.type === 'pirate' ? 'pirate' : undefined
     });
   }
 
@@ -296,12 +344,15 @@
     },
     drawPlayer(canvas) {
       return PortraitRenderer.drawCanvas(canvas, 1, 'bazzano', { player: true });
-    }
+    },
+    resolvePool: resolvePortraitPool,
+    poolIndices: poolIndices
   };
 
   global.portraitFaceFromSeed = portraitFaceFromSeed;
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
+  global.resolvePortraitPool = resolvePortraitPool;
   global.portraitHairTint = function () { return '#222'; };
   global.PortraitAtlas = PortraitAtlas;
   global.PortraitHeads = PortraitParts;
