@@ -7,14 +7,19 @@
     prologue: 'sprites/story/prologue.jpg',
     1: 'sprites/story/ch01.jpg',
     2: 'sprites/story/ch02.jpg',
-    3: 'sprites/story/ch04.jpg',      // torneo Monteveglio
-    4: 'sprites/story/ch05.jpg',      // tartufi Savigno
-    5: 'sprites/story/ch03.jpg',      // ritorno Bazzano / Patto
-    6: 'sprites/story/ch06.jpg',      // Ombra di Imperium
-    7: 'sprites/story/ch07.jpg',      // Fuoco sulla Rocca
-    8: 'sprites/story/ch08.jpg',      // Mulino Acceso
+    3: 'sprites/story/ch04.jpg',
+    4: 'sprites/story/ch05.jpg',
+    5: 'sprites/story/ch03.jpg',
+    6: 'sprites/story/ch06.jpg',
+    7: 'sprites/story/ch07.jpg',
+    8: 'sprites/story/ch08.jpg',
     stamp: 'sprites/story/ch03.jpg',
-    finale: 'sprites/story/finale.jpg'
+    finale: 'sprites/story/finale.jpg',
+    intro1: 'sprites/story/intro/intro_01.jpg',
+    intro2: 'sprites/story/intro/intro_02.jpg',
+    intro3: 'sprites/story/intro/intro_03.jpg',
+    intro4: 'sprites/story/intro/intro_04.jpg',
+    intro5: 'sprites/story/intro/intro_05.jpg'
   };
 
   /** Panorami per corpo principale; satelliti ereditano dal parent */

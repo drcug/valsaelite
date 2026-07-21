@@ -31,7 +31,7 @@ window.PORTRAIT_LAYOUT = {
   player: {
     head: 'sprites/faces/player/zvan_complete.png',
     hair: null,
-    hairTint: '#f2f2f5',
+    hairTint: '#c8c8c8',
     name: 'Zvan Marìa',
     complete: true
   },

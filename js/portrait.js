@@ -381,20 +381,27 @@
   function drawPortraitBg(ctx, W, H, factionId) {
     const fCol = factionColor(factionId);
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#041018');
-    bg.addColorStop(0.45, '#0a1c28');
-    bg.addColorStop(1, fCol + '33');
+    bg.addColorStop(0, '#1a3848');
+    bg.addColorStop(0.4, '#143040');
+    bg.addColorStop(1, fCol + '55');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(80,200,180,.04)';
+    // Soft key light behind the bust so dark faces stay readable
+    const glow = ctx.createRadialGradient(W * 0.5, H * 0.42, 4, W * 0.5, H * 0.45, W * 0.55);
+    glow.addColorStop(0, 'rgba(255,230,200,.28)');
+    glow.addColorStop(0.55, 'rgba(120,200,180,.08)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(80,200,180,.05)';
     for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
     return fCol;
   }
 
   function drawPortraitFrame(ctx, W, H) {
-    const vig = ctx.createRadialGradient(W * 0.5, H * 0.48, W * 0.08, W * 0.5, H * 0.5, W * 0.82);
+    const vig = ctx.createRadialGradient(W * 0.5, H * 0.48, W * 0.12, W * 0.5, H * 0.5, W * 0.88);
     vig.addColorStop(0, 'transparent');
-    vig.addColorStop(1, 'rgba(0,8,12,.55)');
+    vig.addColorStop(1, 'rgba(0,8,12,.38)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(120,210,190,.4)';
@@ -421,7 +428,7 @@
 
   /** Disegna busto/testa con lift luminosità (i midtoni scuri sparivano sul fondo dark UI). */
   function drawBrightSprite(ctx, img, dx, dy, dw, dh, lift) {
-    lift = (lift == null) ? 1.35 : lift;
+    lift = (lift == null) ? 1.55 : lift;
     const iw = img.naturalWidth || img.width || 128;
     const ih = img.naturalHeight || img.height || 160;
     const c = document.createElement('canvas');
@@ -429,16 +436,15 @@
     const x = c.getContext('2d');
     x.clearRect(0, 0, iw, ih);
     x.drawImage(img, 0, 0);
-    x.globalCompositeOperation = 'source-atop';
-    x.globalAlpha = Math.min(0.55, Math.max(0, (lift - 1) * 0.85));
-    x.fillStyle = '#fff4e8';
+    // Screen-blend lift: preserves dark edges, raises midtones hard
+    x.globalCompositeOperation = 'screen';
+    x.globalAlpha = Math.min(0.72, Math.max(0.2, (lift - 1) * 0.95));
+    x.fillStyle = '#ffe8c8';
     x.fillRect(0, 0, iw, ih);
     x.globalAlpha = 1;
-    x.globalCompositeOperation = 'source-over';
-    // Leggero contrasto via overlay caldo
-    x.globalCompositeOperation = 'soft-light';
-    x.globalAlpha = 0.35;
-    x.fillStyle = '#ffe8c8';
+    x.globalCompositeOperation = 'source-atop';
+    x.globalAlpha = 0.28;
+    x.fillStyle = '#fff6e8';
     x.fillRect(0, 0, iw, ih);
     x.globalAlpha = 1;
     x.globalCompositeOperation = 'source-over';
@@ -465,7 +471,7 @@
       const im = PortraitParts.get(playerL.head);
       if (im) {
         rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
-        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.15);
+        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.25);
         drawn = true;
       }
     }
@@ -479,7 +485,7 @@
       const im = PortraitParts.get(path);
       if (im) {
         rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
-        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.4);
+        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.7);
         drawn = true;
       }
     }
@@ -496,7 +502,7 @@
           rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch,
           0, 0, rect.cw, rect.ch
         );
-        drawBrightSprite(ctx, tile, rect.dx, rect.dy, rect.dw, rect.dh, 1.4);
+        drawBrightSprite(ctx, tile, rect.dx, rect.dy, rect.dw, rect.dh, 1.7);
         drawn = true;
       }
     }
@@ -511,6 +517,18 @@
         const hr = overlayRect(rect, ov.hairScale != null ? ov.hairScale : 1, ov.hairY || 0);
         ctx.drawImage(tinted, hr.dx, hr.dy, hr.dw, hr.dh);
       }
+    }
+
+    // Ridisegna occhi/bocca SOPRA i capelli così la faccia resta leggibile
+    if (!isPlayer) {
+      const rng = makeRng(seed);
+      const g = {
+        cx: rect.dx + rect.dw * 0.5,
+        headY: rect.dy + rect.dh * 0.42,
+        hw: rect.dw * 0.22,
+        hh: rect.dh * 0.28
+      };
+      drawFaceOverlay(ctx, g, seed);
     }
 
     // Accessori — stesso rect, nessun tint capelli

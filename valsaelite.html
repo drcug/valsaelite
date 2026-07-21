@@ -17,7 +17,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#0a1630 0%,#040814 42%,#010205 100%)}
 body{color:var(--txt);font-family:var(--FD);user-select:none;-webkit-user-select:none;touch-action:none}
-body.booting>*:not(#micro-preloader):not(#preloader){visibility:hidden !important}
+body.booting>*:not(#micro-preloader):not(#preloader):not(#main-menu):not(#intro-slideshow){visibility:hidden !important}
 body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
 @keyframes lowHpPulse{0%,100%{filter:saturate(1)}50%{filter:saturate(1.15) contrast(1.05)}}
 
@@ -96,8 +96,8 @@ body.suborbit-active #a11y-strip{display:none !important;}
 }
 #tutorial-modal.show{display:flex !important;}
 #bp-preview-wrap{margin:0 0 6px;border-radius:8px;overflow:hidden;border:1px solid rgba(60,140,220,.38);
-  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:168px;position:relative;}
-#bp-preview-wrap canvas{display:block;width:100%;height:168px}
+  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:200px;position:relative;}
+#bp-preview-wrap canvas{display:block;width:100%;height:200px}
 
 /* ─ Abbordaggio / Space hulk ─ */
 #boarding{display:none;position:fixed;inset:0;z-index:90;background:
@@ -122,10 +122,11 @@ body.boarding-active #boarding-touch{display:flex}
 .btouch-pad button:active,.btouch-fire:active{background:rgba(34,90,160,.55);transform:scale(.97)}
 .btouch-fire{min-width:120px;padding:12px 18px;border-color:rgba(255,140,90,.55);background:rgba(48,12,8,.78);color:#ffd0c0}
 .btouch-hint{font:9px var(--FM);color:#6688aa;letter-spacing:.06em;text-align:center;max-width:min(92vw,420px);margin-bottom:2px}
-#boarding-hud{position:fixed;left:10px;top:10px;z-index:92;font-family:var(--FM);font-size:11px;color:#d7ebff;
+#boarding-hud{display:none;position:fixed;left:10px;top:10px;z-index:92;font-family:var(--FM);font-size:11px;color:#d7ebff;
   background:linear-gradient(180deg,rgba(5,16,34,.88),rgba(4,10,20,.74));
   border:1px solid rgba(110,190,255,.45);border-radius:11px;padding:9px 13px;letter-spacing:.11em;
   max-width:400px;width:66vw;box-shadow:0 0 28px rgba(70,170,255,.2),inset 0 0 20px rgba(140,220,255,.08)}
+body.boarding-active #boarding-hud{display:block}
 #boarding-hud .bh-title{font-family:var(--FD);font-size:13px;font-weight:700;color:#f8fdff;letter-spacing:.17em;margin-bottom:4px}
 #boarding-hud .bh-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:4px}
 #boarding-hud .bh-bar>div{height:100%;background:linear-gradient(90deg,#ff4430,#ffb838 46%,#fff3a0);transition:width .15s}
@@ -504,6 +505,63 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 #preloader>div{margin:0 auto}
 @keyframes mpulse{0%{transform:translateX(-95%)}50%{transform:translateX(80%)}100%{transform:translateX(220%)}}
 
+/* ─ Main menu + intro slideshow ─ */
+#main-menu{display:none;position:fixed;inset:0;z-index:130;align-items:center;justify-content:center;
+  font-family:var(--FD);pointer-events:auto}
+#main-menu.show{display:flex}
+#main-menu .mm-bg{position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(2,10,14,.35) 0%,rgba(2,8,12,.82) 55%,rgba(1,4,8,.95) 100%),
+    url('sprites/story/intro/intro_01.jpg') center/cover no-repeat;
+  filter:saturate(1.05) contrast(1.05);animation:mm-ken 22s ease-in-out infinite alternate}
+@keyframes mm-ken{from{transform:scale(1.05)}to{transform:scale(1.12)}}
+#main-menu .mm-panel{position:relative;z-index:1;width:min(420px,92vw);text-align:center;padding:28px 22px 20px;
+  background:linear-gradient(165deg,rgba(6,22,30,.94),rgba(3,12,18,.97));
+  border:1px solid rgba(70,180,160,.4);box-shadow:0 0 0 1px rgba(196,137,58,.18),0 28px 70px rgba(0,0,0,.55);
+  border-radius:6px;backdrop-filter:blur(12px)}
+#main-menu .mm-brand{font-size:clamp(28px,6vw,40px);font-weight:700;letter-spacing:.18em;color:var(--bright);
+  text-shadow:0 0 28px rgba(62,207,187,.35)}
+#main-menu .mm-sub{font:10px/1.4 var(--FM);letter-spacing:.2em;color:var(--copper);margin:8px 0 4px}
+#main-menu .mm-tag{font:11px/1.4 var(--FM);color:#7aab9e;margin-bottom:22px}
+#main-menu .mm-actions{display:flex;flex-direction:column;gap:8px}
+#main-menu .mm-btn{font-family:var(--FD);font-weight:700;font-size:13px;letter-spacing:.16em;padding:12px 16px;
+  border-radius:4px;border:1px solid rgba(70,180,160,.4);background:rgba(8,40,44,.55);color:var(--bright);
+  cursor:pointer;transition:background .15s,border-color .15s,transform .08s}
+#main-menu .mm-btn:hover{background:rgba(42,159,140,.35);border-color:rgba(62,207,187,.7)}
+#main-menu .mm-btn:active{transform:scale(.98)}
+#main-menu .mm-btn.primary{background:linear-gradient(180deg,rgba(42,159,140,.55),rgba(20,90,80,.7));border-color:rgba(62,207,187,.75)}
+#main-menu .mm-btn.ghost{background:transparent;font-size:11px;padding:8px}
+#main-menu .mm-btn:disabled{opacity:.35;cursor:not-allowed}
+#main-menu .mm-opts{margin-top:14px;text-align:left;padding:12px;border:1px solid rgba(70,180,160,.22);border-radius:4px;
+  background:rgba(0,8,12,.35)}
+#main-menu .mm-opt{display:flex;align-items:center;gap:8px;font:11px var(--FM);color:#9ec4bc;margin-bottom:8px;cursor:pointer}
+#main-menu .mm-foot{margin-top:18px;font:9px var(--FM);letter-spacing:.14em;color:#4a7068}
+
+#intro-slideshow{display:none;position:fixed;inset:0;z-index:140;flex-direction:column;background:#02080c;
+  font-family:var(--FD);pointer-events:auto}
+#intro-slideshow.show{display:flex}
+#intro-slideshow .is-art-wrap{flex:1;min-height:0;position:relative;overflow:hidden;background:#041018}
+#intro-slideshow .is-art-wrap img{width:100%;height:100%;object-fit:cover;display:block;
+  animation:is-in .55s ease;filter:saturate(1.06) contrast(1.05)}
+@keyframes is-in{from{opacity:.2;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+#intro-slideshow .is-art-wrap::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 35%,rgba(2,8,12,.92) 100%);pointer-events:none}
+#intro-slideshow .is-body{padding:16px 22px max(18px,env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(4,16,22,.98),rgba(2,8,12,.99));border-top:1px solid rgba(70,180,160,.3)}
+#intro-slideshow .is-chap{font:10px var(--FM);letter-spacing:.28em;color:var(--copper);margin-bottom:6px}
+#intro-slideshow .is-title{font-size:clamp(18px,3.5vw,26px);font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.06em}
+#intro-slideshow .is-text{font:12px/1.7 var(--FM);color:#9ec4bc;max-height:min(28vh,200px);overflow-y:auto;margin-bottom:12px}
+#intro-slideshow .is-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#intro-slideshow .is-foot #is-progress{flex:1;font:10px var(--FM);color:#4a7068;letter-spacing:.12em}
+#intro-slideshow .is-btn{font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.14em;padding:10px 18px;
+  border-radius:4px;border:1px solid rgba(70,180,160,.5);background:rgba(42,159,140,.28);color:var(--bright);cursor:pointer}
+#intro-slideshow .is-btn.ghost{background:transparent;border-color:rgba(70,180,160,.25);color:#7aab9e}
+
+/* Blueprint polish */
+#bp-preview-wrap{border:1px solid rgba(70,180,160,.35)!important;box-shadow:inset 0 0 40px rgba(20,80,70,.15),0 8px 24px rgba(0,0,0,.35);
+  background:radial-gradient(80% 70% at 50% 40%,#0a1a24 0%,#040a12 100%)!important;border-radius:6px!important}
+#bp-cv{box-shadow:0 0 0 1px rgba(196,137,58,.12)}
+
 /* Control rows: two lines on narrow screens, one row on desktop */
 .ctrl-rows{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;gap:6px;align-items:center;width:100%}
 @media(max-width:700px){
@@ -814,6 +872,40 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     </div>
   </div>
 </div>
+<div id="main-menu" aria-modal="true" role="dialog" aria-label="Menu principale">
+  <div class="mm-bg" aria-hidden="true"></div>
+  <div class="mm-panel">
+    <div class="mm-brand">VALSAMOGGIA</div>
+    <div class="mm-sub">SPAZIALE · SISTEMA IMPERIUM → VALSAMOGGIO</div>
+    <div class="mm-tag">Funzionario VII · Zvan Marìa</div>
+    <div class="mm-actions">
+      <button type="button" id="mm-start" class="mm-btn primary">PARTI</button>
+      <button type="button" id="mm-load" class="mm-btn">CARICA</button>
+      <button type="button" id="mm-intro" class="mm-btn">INTRO</button>
+      <button type="button" id="mm-options" class="mm-btn">OPZIONI</button>
+    </div>
+    <div id="mm-options-panel" class="mm-opts" hidden>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-fx" checked> Effetti visivi</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-motion"> Riduci movimento</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-skipintro"> Salta intro alla partenza</label>
+      <button type="button" id="mm-help" class="mm-btn ghost">Controlli</button>
+    </div>
+    <div class="mm-foot">1956 · Forbidden Planet · Valsamoggia Spaziale</div>
+  </div>
+</div>
+<div id="intro-slideshow" aria-modal="true" role="dialog" aria-label="Intro">
+  <div class="is-art-wrap"><img id="is-art" alt=""></div>
+  <div class="is-body">
+    <div class="is-chap" id="is-chap"></div>
+    <div class="is-title" id="is-title"></div>
+    <div class="is-text" id="is-text"></div>
+    <div class="is-foot">
+      <span id="is-progress"></span>
+      <button type="button" id="is-next" class="is-btn">AVANTI</button>
+      <button type="button" id="is-skip" class="is-btn ghost">SALTA</button>
+    </div>
+  </div>
+</div>
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
@@ -887,9 +979,134 @@ let _bootStoryTimers=[];
 function cancelBootStory(){_bootStoryTimers.forEach(clearTimeout);_bootStoryTimers=[];}
 function scheduleBootStory(){
   cancelBootStory();
-  _bootStoryTimers.push(setTimeout(()=>showStoryBanner('PROLOGO','Zvan Marìa — Ritorno a Valsamoggio',STORY.prologue,11000),4200));
-  _bootStoryTimers.push(setTimeout(()=>advanceStory(1),15500));
+  // Solo prologo: il cap. 1 parte quando il giocatore preme CONTINUA.
+  _bootStoryTimers.push(setTimeout(()=>showStoryBanner('PROLOGO','Zvan Marìa — Ritorno a Valsamoggio',STORY.prologue,11000),400));
 }
+
+const INTRO_SLIDES=[
+  {chap:'IMPERIUM · I',title:'La Capitale di Marmo',
+    text:'Sistema Imperium. Corridoi di pietra e rame, bolle di sicurezza, rapporti che nessuno legge. Qui hai passato vent\'anni — funzionario di settimo livello Zvan Marìa — lontano dal cielo di Valsamoggio.',
+    art:'sprites/story/intro/intro_01.jpg'},
+  {chap:'IMPERIUM · II',title:'La Convocazione',
+    text:'Il tuo capo ti fa chiamare. Nessuna cerimonia: solo una busta nera e uno sguardo che dice "questa volta non puoi rifiutare". Le cinque fazioni stanno per far collassare l\'anello orbitale.',
+    art:'sprites/story/intro/intro_02.jpg'},
+  {chap:'IMPERIUM · III',title:'La Missione',
+    text:'"Torna a casa, Marìa. Non per pietà — perché conosci il dialetto, il vino e i rancori. Il Patto del Molino e\' sparito. Il guaio e\' tuo." Sul tavolo: coordinate Valsamoggio e un saluto di pietra.',
+    art:'sprites/story/intro/intro_03.jpg'},
+  {chap:'IMPERIUM · IV',title:'La Mappa',
+    text:'Cinque fazioni. Un mulino spento. Un figlio del sistema che deve dimostrare di non essere diventato un estraneo. La mappa holografica pulsa di teal e rame.',
+    art:'sprites/story/intro/intro_04.jpg'},
+  {chap:'IMPERIUM · V',title:'Partenza',
+    text:'La navetta lascia i moli di Imperium. Dietro: marmo e burocrazia. Davanti: Valsamoggio. Vent\'anni dopo, il ritorno comincia.',
+    art:'sprites/story/intro/intro_05.jpg'}
+];
+let INTRO_STATE={i:0,open:false,onDone:null};
+
+function showMainMenu(){
+  cancelBootStory();
+  hideIntroSlideshow(true);
+  const el=document.getElementById('main-menu');
+  if(!el){scheduleBootStory();return;}
+  el.classList.add('show');
+  document.body.classList.add('menu-open');
+  setPausedReason('story',true);
+  const loadBtn=document.getElementById('mm-load');
+  const has=(typeof hasSaveGame==='function'&&hasSaveGame());
+  if(loadBtn){loadBtn.disabled=!has;loadBtn.title=has?'Carica salvataggio':'Nessun salvataggio';}
+  const fx=document.getElementById('mm-opt-fx');
+  const motion=document.getElementById('mm-opt-motion');
+  if(fx)fx.checked=!document.body.classList.contains('fx-off');
+  if(motion)motion.checked=document.body.classList.contains('reduced-motion');
+}
+function hideMainMenu(){
+  const el=document.getElementById('main-menu');
+  if(el)el.classList.remove('show');
+  document.body.classList.remove('menu-open');
+  const opts=document.getElementById('mm-options-panel');
+  if(opts)opts.hidden=true;
+}
+function startNewGameFromMenu(){
+  hideMainMenu();
+  if(typeof clearSaveGame==='function')clearSaveGame();
+  const skip=document.getElementById('mm-opt-skipintro');
+  if(skip&&skip.checked){
+    setPausedReason('story',false);
+    scheduleBootStory();
+    return;
+  }
+  playIntroSlideshow(()=>{
+    setPausedReason('story',false);
+    scheduleBootStory();
+  });
+}
+function loadGameFromMenu(){
+  if(typeof hasSaveGame!=='function'||!hasSaveGame()){notify('Nessun salvataggio.',1600);return;}
+  hideMainMenu();
+  setPausedReason('story',false);
+  if(typeof loadGame==='function')loadGame(true);
+}
+function playIntroSlideshow(onDone){
+  INTRO_STATE.i=0;
+  INTRO_STATE.open=true;
+  INTRO_STATE.onDone=typeof onDone==='function'?onDone:null;
+  hideMainMenu();
+  const el=document.getElementById('intro-slideshow');
+  if(!el){if(INTRO_STATE.onDone)INTRO_STATE.onDone();return;}
+  el.classList.add('show');
+  document.body.classList.add('intro-open');
+  setPausedReason('story',true);
+  renderIntroSlide();
+}
+function hideIntroSlideshow(silent){
+  const el=document.getElementById('intro-slideshow');
+  if(el)el.classList.remove('show');
+  document.body.classList.remove('intro-open');
+  INTRO_STATE.open=false;
+  if(!silent&&INTRO_STATE.onDone){
+    const cb=INTRO_STATE.onDone;INTRO_STATE.onDone=null;cb();
+  }else INTRO_STATE.onDone=null;
+}
+function renderIntroSlide(){
+  const s=INTRO_SLIDES[INTRO_STATE.i];if(!s)return;
+  const art=document.getElementById('is-art');
+  if(art){art.removeAttribute('style');art.src=s.art;}
+  const chap=document.getElementById('is-chap');if(chap)chap.textContent=s.chap;
+  const tit=document.getElementById('is-title');if(tit)tit.textContent=s.title;
+  const txt=document.getElementById('is-text');if(txt)txt.textContent=s.text;
+  const prog=document.getElementById('is-progress');
+  if(prog)prog.textContent=(INTRO_STATE.i+1)+' / '+INTRO_SLIDES.length;
+  const next=document.getElementById('is-next');
+  if(next)next.textContent=INTRO_STATE.i>=INTRO_SLIDES.length-1?'INIZIA':'AVANTI';
+}
+function introNext(){
+  if(INTRO_STATE.i>=INTRO_SLIDES.length-1){hideIntroSlideshow(false);return;}
+  INTRO_STATE.i++;
+  renderIntroSlide();
+}
+function introSkip(){hideIntroSlideshow(false);}
+
+(function setupMainMenuUi(){
+  const bind=(id,fn)=>{const b=document.getElementById(id);if(b)b.addEventListener('click',e=>{e.preventDefault();fn();});};
+  bind('mm-start',startNewGameFromMenu);
+  bind('mm-load',loadGameFromMenu);
+  bind('mm-intro',()=>playIntroSlideshow(()=>showMainMenu()));
+  bind('mm-options',()=>{
+    const p=document.getElementById('mm-options-panel');
+    if(p)p.hidden=!p.hidden;
+  });
+  bind('mm-help',()=>{window._helpFromMenu=true;hideMainMenu();openHelpModal();});
+  bind('is-next',introNext);
+  bind('is-skip',introSkip);
+  const fx=document.getElementById('mm-opt-fx');
+  if(fx)fx.addEventListener('change',()=>{
+    document.body.classList.toggle('fx-off',!fx.checked);
+  });
+  const motion=document.getElementById('mm-opt-motion');
+  if(motion)motion.addEventListener('change',()=>{
+    document.body.classList.toggle('reduced-motion',!!motion.checked);
+  });
+})();
+
 let _hullRepSnapHex='#0a1e55';
 function normalizeHullHex(h){
   if(!h||typeof h!=='string')return '#0a1e55';
@@ -1219,9 +1436,14 @@ let storyBannerTimer=null;
 function hideStoryBanner(){
   if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
   const b=document.getElementById('story-banner');
+  const wasPrologue=document.getElementById('sc')&&/PROLOGO/i.test(document.getElementById('sc').textContent||'');
   if(b)b.style.display='none';
   document.body.classList.remove('story-open');
   if(typeof setPausedReason==='function')setPausedReason('story',false);
+  // Dopo il prologo, sblocca automaticamente il capitolo 1
+  if(wasPrologue&&STORY.chapter<1&&!STORY.won){
+    setTimeout(()=>advanceStory(1),280);
+  }
 }
 function showStoryBanner(label,title,body,_holdMsIgnored){
   document.getElementById('sc').textContent=label;
@@ -1543,7 +1765,7 @@ const MODULES=[
 // ─────────────────────────────────────────────────
 const PS={
   credits:1500, cargo:{}, cargoMax:14, crew:[], activeMissions:[],
-  maxSpeed:138, thrustPower:72, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
+  maxSpeed:148, thrustPower:82, dmgBonus:1.0, tradeBonus:1.0, energyRegen:18,
   doubleShot:false, bigShot:false, maxHp:100, hpRegen:0, radarMult:1,
   driftDamp:1.0, tacticalRadar:false, jammer:false, interdictBonus:1.0,
   boostInstalled:false, missileInstalled:false, missiles:0, missileMax:0, turnMult:1, weaponVolley:1,
@@ -1579,7 +1801,7 @@ function applyModules(){
     playerShip.dmgBonus=PS.dmgBonus;
     playerShip.thrustPower=PS.thrustPower;
     playerShip.maxHealth=PS.maxHp;
-    playerShip.turnSpeed=3.35*(PS.turnMult||1);
+    playerShip.turnSpeed=3.85*(PS.turnMult||1);
   }
 }
 const ECON={
@@ -1608,9 +1830,9 @@ const SUBORBIT_TUNING={
 function suborbitTuning(){return SUBORBIT_TUNING[SUBORBIT_BALANCE_PRESET]||SUBORBIT_TUNING.narrative;}
 let SUBORBIT_CONTROL_PRESET='assisted'; // assisted | arcade | sim
 const SUBORBIT_CONTROL={
-  assisted:{targetVx:360,targetVy:290,sx:8.4,sy:7.6,dx:.93,dy:.94,edgeAssistStart:.78,edgeAssistMin:110,edgeAssistMax:300,speedThrust:170,speedBrake:96,edgeSpeedTax:85},
-  arcade:{targetVx:420,targetVy:340,sx:10.2,sy:9.3,dx:.9,dy:.91,edgeAssistStart:.84,edgeAssistMin:80,edgeAssistMax:220,speedThrust:188,speedBrake:104,edgeSpeedTax:70},
-  sim:{targetVx:320,targetVy:250,sx:6.6,sy:6.2,dx:.95,dy:.96,edgeAssistStart:.72,edgeAssistMin:130,edgeAssistMax:360,speedThrust:150,speedBrake:86,edgeSpeedTax:110}
+  assisted:{targetVx:410,targetVy:330,sx:10.8,sy:9.6,dx:.91,dy:.92,edgeAssistStart:.76,edgeAssistMin:130,edgeAssistMax:340,speedThrust:195,speedBrake:110,edgeSpeedTax:78},
+  arcade:{targetVx:470,targetVy:380,sx:12.4,sy:11.2,dx:.88,dy:.89,edgeAssistStart:.82,edgeAssistMin:90,edgeAssistMax:250,speedThrust:215,speedBrake:118,edgeSpeedTax:62},
+  sim:{targetVx:350,targetVy:280,sx:7.8,sy:7.2,dx:.94,dy:.95,edgeAssistStart:.7,edgeAssistMin:140,edgeAssistMax:380,speedThrust:168,speedBrake:96,edgeSpeedTax:105}
 };
 const SUBORBIT_CONTROL_LABEL={assisted:'ASSISTITO',arcade:'ARCADE',sim:'SIM'};
 function suborbitControl(){return SUBORBIT_CONTROL[SUBORBIT_CONTROL_PRESET]||SUBORBIT_CONTROL.assisted;}
@@ -2387,15 +2609,22 @@ function rebuildPlayerMesh(){
   const st=spec.struct;
   const he=bpShipHullCellHalfExtents(spec);
 
-  // ── Scafo: voxel per cella hull (forma = layout griglia) ───────────────────
+  // ── Scafo: voxel arrotondati (box sovrapposti + capsule) per silhouette meno "minecraft" ─
   let bx0=1e9,bx1=-1e9,by0=1e9,by1=-1e9,bz0=1e9,bz1=-1e9;
   let hullVox=0;
+  const hullGeo=new THREE.BoxGeometry(he.hx*2.18,he.hy*2.12,he.hz*2.22);
+  const hullRound=new THREE.SphereGeometry(Math.min(he.hx,he.hy,he.hz)*1.05,10,8);
   for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
     if(bpGrid[r][c]!=='hull')continue;
     const p=bpShipLocalFromAnchor(r,c,spec);
-    const cell=new THREE.Mesh(new THREE.BoxGeometry(he.hx*2,he.hy*2,he.hz*2),hm);
+    const cell=new THREE.Mesh(hullGeo,hm);
     cell.position.set(p.x,p.y,p.z);
     playerShip.mesh.add(cell);
+    // Soften corners
+    const bead=new THREE.Mesh(hullRound,hm2);
+    bead.position.set(p.x,p.y,p.z);
+    bead.scale.set(1.15,0.95,1.2);
+    playerShip.mesh.add(bead);
     hullVox++;
     bx0=Math.min(bx0,p.x-he.hx);bx1=Math.max(bx1,p.x+he.hx);
     by0=Math.min(by0,p.y-he.hy);by1=Math.max(by1,p.y+he.hy);
@@ -2444,9 +2673,12 @@ function rebuildPlayerMesh(){
   const noseH=Math.max(fuselageH*0.72,he.hy*2.6);
   const nb=new THREE.Mesh(new THREE.BoxGeometry(noseBridge*0.92,noseH*0.82,4.2),hm2);
   nb.position.set(0,0,-2.15);noseG.add(nb);
-  const ntGeo=new THREE.ConeGeometry(Math.max(0.85,noseBridge*0.22),3.8,4);ntGeo.rotateX(Math.PI/2);ntGeo.rotateY(Math.PI/4);
+  const ntGeo=new THREE.ConeGeometry(Math.max(0.85,noseBridge*0.22),3.8,10);ntGeo.rotateX(Math.PI/2);
   const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.06,-4.5);noseG.add(nt);
-  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.28,1.45,4),tm);ntCap.rotation.x=Math.PI/2;ntCap.rotation.y=Math.PI/4;ntCap.position.set(0,.06,-6.5);noseG.add(ntCap);
+  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.28,1.45,8),tm);ntCap.rotation.x=Math.PI/2;ntCap.position.set(0,.06,-6.5);noseG.add(ntCap);
+  // Anello sensoriale sulla prua
+  const noseRing=new THREE.Mesh(new THREE.TorusGeometry(Math.max(0.55,noseBridge*0.16),0.06,8,20),tm);
+  noseRing.rotation.y=Math.PI/2;noseRing.position.set(0,.08,-5.2);noseG.add(noseRing);
   playerShip.mesh.add(noseG);
 
   // ── Cabina: un blocco orientato per ogni modulo cockpit sul blueprint ─────
@@ -3578,6 +3810,10 @@ function openHelpModal(){
 function closeHelpModal(){
   const m=document.getElementById('help-modal');if(m)m.classList.remove('show');
   if(GAME.state!=='dialogue')setPausedReason('dialogue',false);
+  if(window._helpFromMenu){
+    window._helpFromMenu=false;
+    showMainMenu();
+  }
 }
 function tryShowTutorialChain(){
   setTimeout(()=>{
@@ -3587,20 +3823,8 @@ function tryShowTutorialChain(){
   },800);
 }
 function showResumePromptIfNeeded(){
-  if(typeof hasSaveGame!=='function'||!hasSaveGame()){scheduleBootStory();return;}
-  const el=document.getElementById('resume-prompt');
-  if(!el){scheduleBootStory();return;}
-  cancelBootStory();
-  el.classList.add('show');
-  document.getElementById('resume-continue').onclick=()=>{
-    el.classList.remove('show');
-    if(typeof loadGame==='function')loadGame(true);
-  };
-  document.getElementById('resume-new').onclick=()=>{
-    el.classList.remove('show');
-    if(typeof clearSaveGame==='function')clearSaveGame();
-    scheduleBootStory();
-  };
+  // Dopo il preloader: menu principale (PARTI / CARICA / INTRO / OPZIONI).
+  showMainMenu();
 }
 function formatRunStats(){
   const mins=Math.floor((Date.now()-RUN_STATS.startTime)/60000);
@@ -3700,8 +3924,8 @@ function ensureBpPreview3d(){
     r.setClearColor(0x040a14,1);
     r.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
     const w=Math.max(200,wrap.clientWidth||400);
-    r.setSize(w,168);
-    BP_PV.cam.aspect=w/168;BP_PV.cam.updateProjectionMatrix();
+    r.setSize(w,200);
+    BP_PV.cam.aspect=w/200;BP_PV.cam.updateProjectionMatrix();
     wrap.innerHTML='';
     wrap.appendChild(r.domElement);
   }
@@ -3731,9 +3955,9 @@ function syncBpPreview3d(){
   const target=34;
   m.scale.setScalar(target/maxD);
   const w=Math.max(200,wrap.clientWidth||400);
-  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==168){
-    BP_PV.renderer.setSize(w,168);
-    BP_PV.cam.aspect=w/168;BP_PV.cam.updateProjectionMatrix();
+  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==200){
+    BP_PV.renderer.setSize(w,200);
+    BP_PV.cam.aspect=w/200;BP_PV.cam.updateProjectionMatrix();
   }
   BP_PV.mesh.rotation.y=0;
   BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
@@ -3951,8 +4175,16 @@ class Ship{
   }
   applyThrust(dt,thrustMult){
     thrustMult=thrustMult||1;
-    const fwd=new THREE.Vector3(0,0,-1).applyEuler(this.mesh.rotation);
-    const right=new THREE.Vector3(1,0,0).applyEuler(this.mesh.rotation);
+    // Usa solo yaw: il bank visivo (rotation.z) non deve inclinare la spinta fuori dal piano.
+    const yaw=this.mesh.rotation.y;
+    const fwd=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+    const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+    // Ramp di accelerazione più reattivo (meno "lento all'inizio")
+    const speed=this.velocity.length();
+    const headroom=Math.max(0.22,1-speed/(this.maxSpeed*Math.max(1,thrustMult*0.92)+1e-3));
+    const accel=this.thrustPower*thrustMult*(0.72+headroom*0.55);
+    this.velocity.addScaledVector(fwd,accel*dt);
+    this.velocity.y=0;
     const col=this.isPlayer?(thrustMult>1?0xff6600:0x00aaff):this.faction==='crespellano'?0xff5500:this.faction==='calcara'?0xffaa00:this.faction==='monteveglio'?0xaa44ff:this.faction==='savigno'?0x44ff88:0xff3300;
     const colCore=thrustMult>1?0xffeeaa:col;
     const lifeMul=thrustMult>1?1.45:1;
@@ -3967,6 +4199,13 @@ class Ship{
       p.spawn(ep,v,colCore,(.16+Math.random()*.28)*lifeMul,(1.8+Math.random()*2.2)*scMul*(thrustMult>.5?thrustMult:1));
     });
     // Fascio centrale (scia più densa verso poppa).
+    {
+      const ep=this.mesh.position.clone().addScaledVector(fwd,-8.2);
+      const p=getP();if(p){
+        const v=fwd.clone().multiplyScalar(-(48+Math.random()*30)*thrustMult).add(this.velocity);
+        p.spawn(ep,v,col,(.2+Math.random()*.25)*lifeMul,(2.4+Math.random()*2)*scMul);
+      }
+    }
     if(thrustMult>1||this.isPlayer){
       const ep=this.mesh.position.clone().addScaledVector(fwd,-9.2);
       const p=getP();if(p){
@@ -3976,7 +4215,6 @@ class Ship{
         p.spawn(ep,v,thrustMult>1?0xffaa55:col,(.12+Math.random()*.2)*lifeMul,(2.4+Math.random()*2.8)*scMul);
       }
     }
-    this.velocity.addScaledVector(fwd,this.thrustPower*dt*thrustMult);
   }
   fire(){
     const nBurst=this.isPlayer?(PS.weaponVolley||1):1;
@@ -6765,8 +7003,23 @@ function buildBoardingMap(kind){
       fHead:Math.floor(rnd()*8),fEye:Math.floor(rnd()*8),fMouth:Math.floor(rnd()*8),fHair:Math.floor(rnd()*8)
     });
   }
+  // Obiettivo PRIMA del loot (altrimenti BOARDING.objective è null → crash abbordaggio).
+  BOARDING.objective={type:'loot',collected:0,needed:1,label:'Recupera l\'obiettivo (cassa dorata).'};
+  BOARDING._o2Mul=1;
+  BOARDING.reward=big?ECON.hulkBase:ECON.boardingBase;
+  if(big){
+    const or=rnd();
+    if(or>.62){
+      BOARDING.objective={type:'generator',collected:0,needed:2,label:'Disattiva 2 generatori (casse rosse).'};
+      BOARDING.reward=Math.round(ECON.hulkBase*1.15);
+    }else if(or>.38){
+      BOARDING.objective={type:'rescue',collected:0,needed:1,label:'Recupera il superstite — O2 critico!'};
+      BOARDING._o2Mul=1.55;
+      BOARDING.reward=Math.round(ECON.hulkBase*1.08);
+    }
+  }
   // Loot: obiettivo principale + minor.
-  const mainN=BOARDING.objective.needed||1;
+  const mainN=(BOARDING.objective&&BOARDING.objective.needed)||1;
   for(let mi=0;mi<mainN;mi++){
     let tries=30,mx=C-3,my=R-3;
     while(tries-- >0){
@@ -6826,25 +7079,12 @@ function buildBoardingMap(kind){
       BOARDING.hazards.push({x:hx,y:hy,ph:rnd()*Math.PI*2});
     }
   }
-  BOARDING.objective={type:'loot',collected:0,needed:1,label:'Recupera l\'obiettivo (cassa dorata).'};
-  if(big){
-    const or=rnd();
-    if(or>.62){
-      BOARDING.objective={type:'generator',collected:0,needed:2,label:'Disattiva 2 generatori (casse rosse).'};
-      BOARDING.reward=Math.round(ECON.hulkBase*1.15);
-    }else if(or>.38){
-      BOARDING.objective={type:'rescue',collected:0,needed:1,label:'Recupera il superstite — O2 critico!'};
-      BOARDING._o2Mul=1.55;
-      BOARDING.reward=Math.round(ECON.hulkBase*1.08);
-    }else BOARDING._o2Mul=1;
-  }else BOARDING._o2Mul=1;
   BOARDING.player.hp=100;
   BOARDING.player.o2=big?100:100;
   BOARDING.player.fireCd=0;
   BOARDING.selectTarget=null;
   BOARDING.timer=0;BOARDING.introT=.42;BOARDING.outcome=null;
   BOARDING.lootTable=big?BOARDING_LOOT_HULK:BOARDING_LOOT_SHIP;
-  BOARDING.reward=big?ECON.hulkBase:ECON.boardingBase;
 }
 function enterBoarding(opts){
   if(BOARDING.active)return;
@@ -6854,17 +7094,26 @@ function enterBoarding(opts){
   fadeEl.style.transition='opacity .24s ease';
   fadeEl.style.opacity='.82';
   setTimeout(()=>{fadeEl.style.opacity='0';},90);
-  BOARDING.active=true;
   BOARDING.kind=opts.kind||'ship';
   BOARDING.sourceNpc=opts.npc||null;
   BOARDING.sourceHulk=opts.hulk||null;
   BOARDING.seed=opts.seed||((Math.random()*1e9)|0);
-  buildBoardingMap(BOARDING.kind);
+  try{
+    buildBoardingMap(BOARDING.kind);
+  }catch(err){
+    console.error('boarding map failed',err);
+    BOARDING.active=false;BOARDING.map=null;BOARDING.objective=null;
+    notify('Abbordaggio fallito: segnale interferito.',2000);
+    fadeEl.style.opacity='0';
+    return;
+  }
+  BOARDING.active=true;
   BOARDING.introT=.52;
   BOARDING.outroT=0;
   BOARDING.flashT=.22;
   GAME.state='boarding';
   document.body.classList.add('boarding-active');
+  const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='block';
   notify(BOARDING.kind==='hulk'?'Abbordaggio HULK: attento ai fuochi.':'Abbordaggio nave nemica.',1800);
   initBoardingPointer();
   if(typeof PortraitAtlas!=='undefined')PortraitAtlas.load();
@@ -10572,15 +10821,20 @@ function animate(){
   // Flying (paused in dialogue or docked)
   if((GAME.state==='flying'||GAME.state==='dialogue')&&playerShip.alive){
     if(GAME.state==='flying'){
-      const turnBoost=INP.thrust?1.22:1;
+      const turnBoost=INP.thrust?1.28:1;
       let turnL=!!INP.left, turnR=!!INP.right;
       // Steer da tap/schermo: priorità se attivo e nessun tasto SX/DX premuto dai pad
       if(typeof FLY_STEER!=='undefined'&&FLY_STEER.active&&!INP.left&&!INP.right){
         if(FLY_STEER.nx<-0.1)turnL=true;
         else if(FLY_STEER.nx>0.1)turnR=true;
       }
-      if(turnL)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt*turnBoost;
-      if(turnR) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt*turnBoost;
+      const turnAmt=playerShip.turnSpeed*dt*turnBoost;
+      if(turnL)  playerShip.mesh.rotation.y+=turnAmt;
+      if(turnR) playerShip.mesh.rotation.y-=turnAmt;
+      // Bank visuale in virata
+      const bankTarget=(turnL?1:0)+(turnR?-1:0);
+      playerShip._bank=lerp(playerShip._bank||0,bankTarget*0.38,cl(dt*7,0,1));
+      playerShip.mesh.rotation.z=playerShip._bank;
       if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
       RUN_STATS.distance+=playerShip.velocity.length()*dt;
       updateNavRisk(dt);
