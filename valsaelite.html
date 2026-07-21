@@ -95,11 +95,6 @@ body.suborbit-active #a11y-strip{display:none !important;}
   pointer-events:auto;
 }
 #tutorial-modal.show{display:flex !important;}
-#bp-preview-wrap{margin:0 0 6px;border-radius:8px;overflow:hidden;border:1px solid rgba(60,140,220,.38);
-  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);height:150px;min-height:120px;max-height:150px;
-  position:relative;touch-action:none;cursor:grab;flex:0 0 auto;}
-#bp-preview-wrap:active{cursor:grabbing}
-#bp-preview-wrap canvas{display:block;width:100%!important;height:100%!important}
 #bp-grid-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
 #bp-toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .bp-tool{padding:6px 12px;border-radius:4px;border:1px solid rgba(70,180,160,.45);background:rgba(20,60,70,.55);
@@ -408,14 +403,13 @@ body.boarding-active #boarding-hud{display:block}
 #bp-panel{
   flex:1;min-width:0;max-width:min(420px,44vw);display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden;
 }
-.bp-preview-section{order:1;flex:0 0 auto;}
-.bp-modules-section{order:2;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
-.bp-stats-section{order:3;flex:0 0 auto;}
+.bp-modules-section{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
+.bp-stats-section{flex:0 0 auto;}
 #bp-stats-hull-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
 .bp-section-title{font-size:8px;letter-spacing:.16em;color:#446688;margin:0 0 4px;font-family:var(--FM);}
 .bp-module-list{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
-  flex:1 1 auto;min-height:140px;max-height:min(42vh,340px);
+  flex:1 1 auto;min-height:180px;max-height:min(52vh,420px);
   overflow-y:auto;overflow-x:hidden;margin-bottom:6px;padding:4px 6px 8px 2px;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   border:1px solid rgba(44,100,190,.22);border-radius:8px;
@@ -473,13 +467,10 @@ body.boarding-active #boarding-hud{display:block}
   #bp-wrap{flex-direction:column;align-items:stretch;max-height:none;width:100%;flex:0 0 auto;gap:8px;}
   #bp-grid-col{width:100%;}
   #bp-panel{max-width:100%;width:100%;overflow:visible;flex:1 1 auto;}
-  .bp-modules-section{order:1;flex:1 1 auto;min-height:min(40vh,300px);}
-  .bp-preview-section{order:2;flex:0 0 auto;}
-  .bp-stats-section{order:3;}
-  #bp-preview-wrap{height:108px;min-height:96px;max-height:14vh;margin-bottom:4px;}
+  .bp-modules-section{flex:1 1 auto;min-height:min(48vh,380px);}
   .bp-module-list{
     grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
-    min-height:min(40vh,300px);max-height:min(52vh,420px);
+    min-height:min(48vh,380px);max-height:min(58vh,480px);
     flex:1 1 auto;
   }
   .bp-mod-btn{min-height:64px;padding:8px 4px;}
@@ -634,8 +625,6 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 #intro-slideshow .is-btn.ghost{background:transparent;border-color:rgba(70,180,160,.25);color:#7aab9e}
 
 /* Blueprint polish */
-#bp-preview-wrap{border:1px solid rgba(70,180,160,.35)!important;box-shadow:inset 0 0 40px rgba(20,80,70,.15),0 8px 24px rgba(0,0,0,.35);
-  background:radial-gradient(80% 70% at 50% 40%,#0a1a24 0%,#040a12 100%)!important;border-radius:6px!important}
 #bp-cv{box-shadow:0 0 0 1px rgba(196,137,58,.12)}
 
 /* Control rows: two lines on narrow screens, one row on desktop */
@@ -778,7 +767,8 @@ body.suborbit-active #smsg{z-index:6260 !important;}
       <div style="flex:1;min-width:0">
         <div id="idlg-name" style="font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.08em"></div>
         <div id="idlg-type" style="font-size:9px;color:#557799;font-family:var(--FM);margin-top:3px;letter-spacing:.12em"></div>
-        <div id="idlg-text" style="font-size:12px;color:#99bbcc;font-family:var(--FM);margin-top:10px;line-height:1.7;border-left:2px solid rgba(34,119,238,.45);padding-left:10px;font-style:italic;max-height:80px;overflow:hidden"></div>
+        <div id="idlg-mood" style="font-size:8px;color:#6a9a90;font-family:var(--FM);margin-top:4px;letter-spacing:.1em"></div>
+        <div id="idlg-text" style="font-size:13px;color:#b8d4e0;font-family:var(--FM);margin-top:10px;line-height:1.75;border-left:2px solid rgba(62,207,187,.55);padding-left:10px;font-style:italic;max-height:min(28vh,160px);overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
       </div>
     </div>
     <!-- trade offer (shown conditionally) -->
@@ -925,10 +915,6 @@ body.suborbit-active #smsg{z-index:6260 !important;}
         <div class="bp-section-title">MODULI · scorri · clicca · piazza (attacca allo scafo)</div>
         <div class="bp-mod-scroll-hint">↕ scorri per tutti i pezzi</div>
         <div class="bp-module-list" id="bp-module-list"></div>
-      </div>
-      <div class="bp-preview-section">
-        <div class="bp-section-title">ANTEPRIMA 3D · RUOTA CON IL DRAG</div>
-        <div id="bp-preview-wrap"><!-- canvas da JS --></div>
       </div>
       <div id="bp-stats-hull-row" class="bp-stats-section">
         <div>
@@ -1871,6 +1857,7 @@ const PS={
   doubleShot:false, bigShot:false, maxHp:100, hpRegen:0, radarMult:1,
   driftDamp:1.0, tacticalRadar:false, jammer:false, interdictBonus:1.0,
   boostInstalled:false, missileInstalled:false, missiles:0, missileMax:0, turnMult:1, weaponVolley:1,
+  shieldMax:0, shieldHp:0,
   modules:['eng1','wep1','nav1'],
   // Inventario moduli blueprint: {bpId: quantità disponibile, non ancora piazzata}.
   bpInv:{},
@@ -1888,6 +1875,9 @@ function applyBlueprintToPS(){
   PS.missileMax=PS.missileInstalled?(4+st.missilePods*2):0;
   PS.missiles=cl(PS.missiles,0,PS.missileMax);
   PS.weaponVolley=1+Math.min(4,Math.floor(Math.max(0,st.weapons-1)/2));
+  PS.shieldMax=st.shieldHp|0;
+  if(PS.shieldHp==null||PS.shieldHp>PS.shieldMax)PS.shieldHp=PS.shieldMax;
+  if(PS.shieldHp<0)PS.shieldHp=0;
 }
 function applyModules(){
   applyBlueprintToPS();
@@ -2075,23 +2065,23 @@ function stripBlueprintToUnlocked(){
   }
 }
 
-// Default: doppia spine scafo continua (niente buchi); pezzi attaccati ai lati
-const defaultBlueprint=[
-  {r:3,c:0,id:'weapon'},{r:4,c:0,id:'weapon'},
-  {r:3,c:1,id:'hull'},{r:4,c:1,id:'hull'},
-  {r:3,c:2,id:'cockpit'}, // w×2 → c2–c3 su r3
-  {r:4,c:2,id:'hull'},{r:4,c:3,id:'hull'},
-  {r:2,c:3,id:'fin'},
-  {r:3,c:4,id:'hull'},{r:4,c:4,id:'hull'},
-  {r:1,c:4,id:'wing_l'},{r:5,c:4,id:'wing_r'},
-  {r:3,c:5,id:'hull'},{r:4,c:5,id:'hull'},
-  {r:2,c:5,id:'shield'},
-  {r:5,c:5,id:'cargo'}, // w×2 → c5–c6 su r5, tocca scafo
-  {r:3,c:6,id:'hull'},{r:4,c:6,id:'hull'},
-  {r:3,c:7,id:'hull'},{r:4,c:7,id:'hull'},
-  {r:2,c:7,id:'engine'},{r:5,c:7,id:'engine'},
-  {r:3,c:8,id:'engine'},{r:4,c:8,id:'engine'},
-];
+// Default: blocco scafo compatto; ali sul bordo; niente celle scafo isolate dietro i motori
+const defaultBlueprint=(()=>{
+  const items=[];
+  // Corpo pieno 4×7 (righe 2–5, colonne 1–7) — la colonna 8 è solo motori di poppa
+  for(let r=2;r<=5;r++)for(let c=1;c<=7;c++)items.push({r,c,id:'hull'});
+  items.push({r:3,c:0,id:'weapon'},{r:4,c:0,id:'weapon'});
+  items.push({r:3,c:2,id:'cockpit'}); // w×2 → r3,c2–c3
+  items.push({r:2,c:3,id:'fin'});
+  items.push({r:1,c:4,id:'wing_l'}); // h×2 → r1–r2,c4
+  items.push({r:5,c:4,id:'wing_r'}); // h×2 → r5–r6,c4
+  items.push({r:2,c:5,id:'shield'});
+  items.push({r:5,c:5,id:'cargo'}); // w×2 → r5,c5–c6
+  items.push({r:2,c:7,id:'engine'}); // bordo alto, tocca scafo
+  items.push({r:3,c:8,id:'engine'},{r:4,c:8,id:'engine'}); // poppa sulla spine
+  items.push({r:5,c:7,id:'engine'}); // bordo basso
+  return items;
+})();
 
 // Runtime grid: array[row][col] = moduleId | null
 let bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
@@ -2116,7 +2106,6 @@ function bpUndo(){
   bpGrid=snap.grid.map(row=>row.slice());
   PS.bpInv=Object.assign({},snap.inv);
   buildBpPalette();drawBlueprint();
-  bpRefreshPreviewNow();
   notify('Blueprint: annullato.',1200);
 }
 function bpMirrorSymmetry(){
@@ -2139,6 +2128,14 @@ function bpMirrorSymmetry(){
 function initBlueprintGrid(){
   bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
   defaultBlueprint.forEach(({r,c,id})=>{if(r<BP_ROWS&&c<BP_COLS)bpStampModule(r,c,id);});
+}
+/** Ripristina la nave starter solida se la griglia è vuota/sconnessa (prima apertura / salvataggio rotto). */
+function ensureStarterBlueprintOk(){
+  const conn=typeof bpValidateConnectivity==='function'?bpValidateConnectivity():{ok:false};
+  const cells=bpStructuralCellCount();
+  if(conn.ok&&cells>=8&&bpCountModules('cockpit')>=1)return false;
+  initBlueprintGrid();
+  return true;
 }
 initBlueprintGrid();
 
@@ -2307,28 +2304,6 @@ function drawBlueprint(){
     · Missili <span class="bp-stat-val">${stats.missilePods>0?(4+stats.missilePods*2):0}</span><br>
     Valore <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span> ₡
   `;
-  scheduleBpLiveRebuild();
-}
-
-/** Ricostruisce la nave e aggiorna l’anteprima 3D al prossimo frame (coalesced). */
-function scheduleBpLiveRebuild(){
-  if(scheduleBpLiveRebuild._raf)return;
-  scheduleBpLiveRebuild._raf=requestAnimationFrame(()=>{
-    scheduleBpLiveRebuild._raf=0;
-    bpRefreshPreviewNow();
-  });
-}
-/** Aggiornamento immediato anteprima cantiere. */
-function bpRefreshPreviewNow(){
-  const modal=document.getElementById('blueprint-modal');
-  const open=modal&&modal.classList.contains('show');
-  if(typeof rebuildPlayerMesh==='function'&&playerShip){
-    rebuildPlayerMesh({skipPreviewSync:open});
-  }
-  if(open){
-    if(!BP_PV)ensureBpPreview3d();
-    else syncBpPreview3d();
-  }
 }
 
 function roundRect(ctx,x,y,w,h,r){
@@ -2341,18 +2316,19 @@ function openBlueprintModal(){
   if(typeof closeOverlappingModals==='function')closeOverlappingModals('blueprint');
   setPausedReason('blueprint',true);
   bpInvInit();
+  // Prima apertura / griglia rotta: forza configurazione starter connessa
+  if(ensureStarterBlueprintOk())notify('Cantiere: nave starter ripristinata (scafo continuo).',2200);
   stripBlueprintToUnlocked();
+  // Se lo strip ha spezzato qualcosa, ripristina di nuovo
+  if(ensureStarterBlueprintOk()){/* già notificati */}
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
   drawBlueprint();
   setupBpEvents();
   setupBpHullPaintUi();
-  bpRefreshPreviewNow();
   const conn=bpValidateConnectivity();
   if(!conn.ok)notify('Attenzione: '+conn.msg+' Ripristina lo scafo continuo prima di confermare.',3200);
-  // Layout mobile: aspetta reflow del riquadro (altezza CSS) prima di ridimensionare il canvas
-  setTimeout(()=>{bpRefreshPreviewNow();if(typeof bpResizePreviewRenderer==='function')bpResizePreviewRenderer();tryShowTutorialBlueprint();},80);
-  setTimeout(()=>{bpRefreshPreviewNow();},220);
+  setTimeout(()=>tryShowTutorialBlueprint(),80);
 }
 
 function bpStructuralCellCount(){
@@ -2523,7 +2499,7 @@ function setupBpHullPaintUi(){
       inp.value=normalizeHullHex(p.hex);
       updateBpHullRepHint();
       clearTimeout(_bpHullPaintDebounce);
-      _bpHullPaintDebounce=setTimeout(()=>bpRefreshPreviewNow(),40);
+      _bpHullPaintDebounce=setTimeout(()=>updateBpHullRepHint(),40);
     });
     presets.appendChild(b);
   });
@@ -2531,7 +2507,7 @@ function setupBpHullPaintUi(){
     PS.hullPaintHex=normalizeHullHex(inp.value);
     updateBpHullRepHint();
     clearTimeout(_bpHullPaintDebounce);
-    _bpHullPaintDebounce=setTimeout(()=>bpRefreshPreviewNow(),60);
+    _bpHullPaintDebounce=setTimeout(()=>updateBpHullRepHint(),60);
   };
   updateBpHullRepHint();
 }
@@ -2715,12 +2691,18 @@ function bpListModuleAnchors(id){
   const m=BP_MODULES.find(x=>x.id===id);
   if(!m)return[];
   const out=[];
+  // 1×1: ogni cella è un pezzo indipendente (anche se adiacenti allo stesso tipo)
+  if(m.w===1&&m.h===1){
+    for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+      if(bpGrid[r][c]===id)out.push({r,c});
+    }
+    return out;
+  }
   for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
     if(bpGrid[r][c]!==id)continue;
     const left=c===0||bpGrid[r][c-1]!==id;
     const top=r===0||bpGrid[r-1][c]!==id;
     if(!left||!top)continue;
-    if(m.w===1&&m.h===1){out.push({r,c});continue;}
     let ok=true;
     for(let dr=0;dr<m.h&&ok;dr++)for(let dc=0;dc<m.w;dc++){
       if(r+dr>=BP_ROWS||c+dc>=BP_COLS||bpGrid[r+dr][c+dc]!==id)ok=false;
@@ -3016,7 +2998,6 @@ function rebuildPlayerMesh(opt){
   playerShip._hasBoostEng=hasBoostEng;
   const span=Math.max(st?st.spanC:1,st?st.spanR:1,3);
   playerShip.radius=Math.max(5,span*BP_CELL_U*0.45);
-  if(!opt.skipPreviewSync)scheduleBpPreviewSync();
 }
 
 // ─────────────────────────────────────────────────
@@ -3865,7 +3846,7 @@ function tryShowTutorialSuborbit(){
 }
 function tryShowTutorialBlueprint(){
   return showTutorialOnce('valsaelite_tut_blueprint','Blueprint nave',
-    '<p>Trascina i moduli sulla griglia; tasto destro per rimuovere e recuperare in inventario.</p><p>La <strong>vernice fusoliera</strong> influenza le reazioni diplomatiche al conferma.</p><p style="opacity:.85;margin-top:8px;font-size:11px">La miniatura 3D in alto si aggiorna mentre modifichi il layout.</p>');
+    '<p>Trascina i moduli sulla griglia; tasto destro per rimuovere e recuperare in inventario.</p><p>La <strong>vernice fusoliera</strong> influenza le reazioni diplomatiche al conferma.</p><p style="opacity:.85;margin-top:8px;font-size:11px">La nave 3D si aggiorna quando confermi la costruzione.</p>');
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
@@ -3941,210 +3922,6 @@ function updateBoardingButtonVisibility(){
     }
   }
   b.style.display=show?'flex':'none';
-}
-
-// ─────────────────────────────────────────────────
-// Blueprint: anteprima 3D (secondo renderer, clone mesh giocatore)
-// ─────────────────────────────────────────────────
-let BP_PV=null,_bpPvRaf=0;
-function disposeBpPreviewMeshes(root){
-  if(!root)return;
-  root.traverse(ch=>{
-    // Clone preview: dispose SOLO geo/mat clonate — mai texture condivise con la nave in volo.
-    if(!(ch.userData&&ch.userData._bpPreviewOwned))return;
-    if(ch.geometry){ch.geometry.dispose();ch.geometry=null;}
-    if(ch.material){
-      const mats=Array.isArray(ch.material)?ch.material:[ch.material];
-      mats.forEach(mat=>{
-        if(!mat)return;
-        // Non dispose map/envMap: possono essere shared; i materiali blueprint non usano texture.
-        if(typeof mat.dispose==='function')mat.dispose();
-      });
-    }
-  });
-}
-function cloneShipForBpPreview(src){
-  if(!src)return null;
-  const m=src.clone(true);
-  m.traverse(ch=>{
-    if(!ch.isMesh)return;
-    if(ch.geometry){
-      ch.geometry=ch.geometry.clone();
-      ch.userData=ch.userData||{};
-      ch.userData._bpPreviewOwned=true;
-    }
-    if(ch.material){
-      if(Array.isArray(ch.material))ch.material=ch.material.map(x=>x?x.clone():x);
-      else ch.material=ch.material.clone();
-      ch.userData=ch.userData||{};
-      ch.userData._bpPreviewOwned=true;
-      // Leggero boost luminosità per leggibilità su canvas piccolo (mobile)
-      const mats=Array.isArray(ch.material)?ch.material:[ch.material];
-      mats.forEach(mat=>{
-        if(!mat)return;
-        if(mat.color&&mat.color.offsetHSL)mat.color.offsetHSL(0,0.03,0.1);
-        if(mat.emissiveIntensity!=null)mat.emissiveIntensity=Math.min(2.2,(mat.emissiveIntensity||0)+0.28);
-        if(mat.opacity!=null&&mat.transparent&&mat.opacity<0.5)mat.opacity=Math.min(0.95,mat.opacity+0.25);
-      });
-    }
-  });
-  return m;
-}
-/** Dimensioni reali del riquadro anteprima (CSS height fissa / responsive). */
-function bpPreviewSize(){
-  const wrap=document.getElementById('bp-preview-wrap');
-  if(!wrap)return{w:280,h:140};
-  const rect=wrap.getBoundingClientRect();
-  let w=Math.floor(rect.width||wrap.clientWidth||0);
-  let h=Math.floor(rect.height||wrap.clientHeight||0);
-  if(w<48){
-    const pw=wrap.parentElement?(wrap.parentElement.clientWidth||0):0;
-    w=Math.max(160,pw||280);
-  }
-  if(h<48){
-    const cs=getComputedStyle(wrap);
-    h=Math.floor(parseFloat(cs.height)||parseFloat(cs.minHeight)||0)||120;
-  }
-  return{w:Math.max(120,w),h:Math.max(88,Math.min(h,220))};
-}
-function bpFitPreviewCamera(mesh){
-  if(!BP_PV||!mesh)return;
-  const box=new THREE.Box3().setFromObject(mesh);
-  const size=box.getSize(new THREE.Vector3());
-  const maxD=Math.max(size.x,size.y,size.z,0.001);
-  const {w,h}=bpPreviewSize();
-  BP_PV.cam.aspect=Math.max(0.2,w/h);
-  const fov=BP_PV.cam.fov*(Math.PI/180);
-  const dist=(maxD*0.55)/Math.tan(fov*0.5)*1.4;
-  BP_PV.cam.position.set(dist*0.72,dist*0.38,dist*0.9);
-  BP_PV.cam.near=Math.max(0.05,dist/100);
-  BP_PV.cam.far=Math.max(400,dist*12);
-  BP_PV.cam.lookAt(0,0,0);
-  BP_PV.cam.updateProjectionMatrix();
-}
-function bpResizePreviewRenderer(){
-  if(!BP_PV||!BP_PV.renderer)return;
-  const {w,h}=bpPreviewSize();
-  const el=BP_PV.renderer.domElement;
-  if(el.width!==w||el.height!==h){
-    BP_PV.renderer.setSize(w,h,false);
-    BP_PV.cam.aspect=w/Math.max(1,h);
-    BP_PV.cam.updateProjectionMatrix();
-  }
-  el.style.width='100%';
-  el.style.height='100%';
-}
-function ensureBpPreview3d(){
-  const wrap=document.getElementById('bp-preview-wrap');
-  if(!wrap||typeof THREE==='undefined'||!playerShip||!playerShip.mesh)return;
-  if(!BP_PV){
-    BP_PV={
-      renderer:new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'}),
-      scene:new THREE.Scene(),
-      cam:new THREE.PerspectiveCamera(42,2,0.08,800),
-      mesh:null,
-      amb:new THREE.HemisphereLight(0xd8ecff,0x142028,1.2),
-      dir:new THREE.DirectionalLight(0xffffff,1.05),
-      fill:new THREE.DirectionalLight(0x88b8ff,0.45)
-    };
-    BP_PV.dir.position.set(6,16,12);
-    BP_PV.fill.position.set(-10,6,-8);
-    BP_PV.scene.add(BP_PV.amb,BP_PV.dir,BP_PV.fill);
-    const r=BP_PV.renderer;
-    r.setClearColor(0x0a1828,1);
-    r.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
-    const {w,h}=bpPreviewSize();
-    r.setSize(w,h,false);
-    BP_PV.cam.aspect=w/Math.max(1,h);BP_PV.cam.updateProjectionMatrix();
-    wrap.innerHTML='';
-    wrap.appendChild(r.domElement);
-    r.domElement.style.width='100%';
-    r.domElement.style.height='100%';
-    r.domElement.style.display='block';
-    // Drag to rotate preview
-    let drag=false,lx=0,ly=0;
-    const onDown=(e)=>{drag=true;lx=e.clientX||(e.touches&&e.touches[0].clientX)||0;ly=e.clientY||(e.touches&&e.touches[0].clientY)||0;};
-    const onUp=()=>{drag=false;};
-    const onMove=(e)=>{
-      if(!drag||!BP_PV.mesh)return;
-      const x=e.clientX||(e.touches&&e.touches[0].clientX)||0;
-      const y=e.clientY||(e.touches&&e.touches[0].clientY)||0;
-      BP_PV.mesh.rotation.y+=(x-lx)*0.01;
-      BP_PV.mesh.rotation.x=cl(BP_PV.mesh.rotation.x+(y-ly)*0.008,-0.8,0.8);
-      lx=x;ly=y;BP_PV._userSpin=true;
-    };
-    wrap.addEventListener('mousedown',onDown);
-    wrap.addEventListener('touchstart',onDown,{passive:true});
-    window.addEventListener('mouseup',onUp);
-    window.addEventListener('touchend',onUp);
-    window.addEventListener('mousemove',onMove);
-    window.addEventListener('touchmove',onMove,{passive:true});
-    if(typeof ResizeObserver!=='undefined'){
-      BP_PV._ro=new ResizeObserver(()=>{
-        bpResizePreviewRenderer();
-        if(BP_PV.mesh)bpFitPreviewCamera(BP_PV.mesh);
-        if(BP_PV.renderer&&BP_PV.scene&&BP_PV.cam)BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
-      });
-      BP_PV._ro.observe(wrap);
-    }
-  }
-  syncBpPreview3d();
-}
-function syncBpPreview3d(){
-  if(!BP_PV||!playerShip||!playerShip.mesh)return;
-  const wrap=document.getElementById('bp-preview-wrap');
-  const modal=document.getElementById('blueprint-modal');
-  if(!wrap||!modal||!modal.classList.contains('show'))return;
-  // Conserva orientamento utente tra un refresh e l’altro
-  const prevY=BP_PV.mesh?BP_PV.mesh.rotation.y:0;
-  const prevX=BP_PV.mesh?BP_PV.mesh.rotation.x:0;
-  if(BP_PV.mesh){
-    BP_PV.scene.remove(BP_PV.mesh);
-    disposeBpPreviewMeshes(BP_PV.mesh);
-    BP_PV.mesh=null;
-  }
-  if(!playerShip.mesh.children.length){
-    // Mesh vuota: forza rebuild prima di clonare
-    if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh({skipPreviewSync:true});
-  }
-  const m=cloneShipForBpPreview(playerShip.mesh);
-  if(!m||!m.children.length)return;
-  BP_PV.scene.add(m);
-  BP_PV.mesh=m;
-  const box=new THREE.Box3().setFromObject(m);
-  const center=box.getCenter(new THREE.Vector3());
-  const size=box.getSize(new THREE.Vector3());
-  if(!isFinite(center.x)||!isFinite(size.x)||size.lengthSq()<1e-6)return;
-  m.position.sub(center);
-  const maxD=Math.max(size.x,size.y,size.z,.001);
-  m.scale.setScalar(26/maxD);
-  m.rotation.y=BP_PV._userSpin?prevY: (BP_PV._spinY||0.55);
-  m.rotation.x=BP_PV._userSpin?prevX:0.12;
-  BP_PV._spinY=m.rotation.y;
-  bpResizePreviewRenderer();
-  bpFitPreviewCamera(m);
-  BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
-}
-function scheduleBpPreviewSync(){
-  if(_bpPvRaf)cancelAnimationFrame(_bpPvRaf);
-  _bpPvRaf=requestAnimationFrame(()=>{_bpPvRaf=0;syncBpPreview3d();});
-}
-function tickBpPreview3dFrame(){
-  if(!BP_PV||!BP_PV.renderer)return;
-  const modal=document.getElementById('blueprint-modal');
-  if(!modal||!modal.classList.contains('show'))return;
-  // Flush pending live rebuild nello stesso frame del render anteprima
-  if(scheduleBpLiveRebuild._raf){
-    cancelAnimationFrame(scheduleBpLiveRebuild._raf);
-    scheduleBpLiveRebuild._raf=0;
-    bpRefreshPreviewNow();
-  }
-  if(!BP_PV.mesh){syncBpPreview3d();if(!BP_PV.mesh)return;}
-  if(!BP_PV._userSpin){
-    BP_PV.mesh.rotation.y+=0.012;
-    BP_PV._spinY=BP_PV.mesh.rotation.y;
-  }
-  BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
 }
 
 // ─────────────────────────────────────────────────
@@ -4322,6 +4099,12 @@ class Ship{
     if(!this.alive)return;
     this.energy=Math.min(100,this.energy+this.energyRegen*dt);
     if(this.isPlayer&&PS.hpRegen>0&&this.health<this.maxHealth)this.health=Math.min(this.maxHealth,this.health+PS.hpRegen*dt);
+    if(this.isPlayer&&PS.shieldMax>0&&PS.shieldHp<PS.shieldMax){
+      // Rigenera scudo solo fuori fuoco recente
+      if(!this._recentHitT||this._recentHitT<=0)PS.shieldHp=Math.min(PS.shieldMax,PS.shieldHp+10*dt);
+      else this._recentHitT-=dt;
+    }
+    if(this._hitFlash>0)this._hitFlash-=dt;
     if(this.fireCooldown>0)this.fireCooldown-=dt;
     if(this._burstLeft>0&&this.fireCooldown<=0){
       this._emitProjectile();this._burstLeft--;
@@ -4396,7 +4179,8 @@ class Ship{
     this.energy-=ec;
     this._emitProjectile();
     this._burstLeft=nBurst-1;
-      this.fireCooldown=this._burstLeft>0?0.048:0.18;
+    // Cadenza più snella in combattimento (player); NPC resta leggermente più lento
+    this.fireCooldown=this._burstLeft>0?0.042:(this.isPlayer?0.14:0.2);
   }
   /** Direzione di volata del cannone: asse locale −Z dalla canna (hardpoint → punta). */
   _getMuzzleBore(hpIdx){
@@ -4449,12 +4233,25 @@ class Ship{
     if(this.isPlayer&&PS.bigShot&&lastProj)lastProj.mesh.scale.set(2,2,2);
   }
   takeDamage(amt){
-    if(!this.alive)return;this.health=Math.max(0,this.health-amt);
+    if(!this.alive)return;
+    // Scudo blueprint: assorbe una frazione prima dello scafo
+    let absorbed=0;
+    if(this.isPlayer&&PS.shieldHp>0&&amt>0){
+      absorbed=Math.min(PS.shieldHp,Math.round(amt*0.55));
+      PS.shieldHp-=absorbed;
+      amt=Math.max(0,amt-absorbed);
+    }
+    this.health=Math.max(0,this.health-amt);
     if(this.isPlayer){
+      this._recentHitT=2.4;
       const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');
-      playTone(amt>14?140:200,.1,.055,'sawtooth');
+      playTone(amt>14?140:absorbed?260:200,.1,.055,'sawtooth');
       if(typeof playCombatSfx==='function')playCombatSfx('hit');
       const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
+      if(absorbed>0&&typeof notify==='function'&&Math.random()<0.35)notify('Scudo −'+absorbed,900);
+      if(this.health>0&&this.health<=28)notify('⚠ SCAFO CRITICO',1400);
+    }else{
+      this._hitFlash=0.22;
     }
     if(this.health===0)this.die();
   }
@@ -4470,6 +4267,41 @@ class Ship{
 // PROJECTILES
 // ─────────────────────────────────────────────────
 const PROJS=[];
+const COMBAT_FLOATERS=[];
+function spawnCombatFloater(worldPos,dmg,crit){
+  if(!worldPos)return;
+  COMBAT_FLOATERS.push({
+    x:worldPos.x,y:worldPos.y+2,z:worldPos.z,
+    t:0.85,dmg:dmg|0,crit:!!crit
+  });
+  if(COMBAT_FLOATERS.length>18)COMBAT_FLOATERS.shift();
+}
+function updateCombatFloaters(dt){
+  for(let i=COMBAT_FLOATERS.length-1;i>=0;i--){
+    COMBAT_FLOATERS[i].t-=dt;
+    COMBAT_FLOATERS[i].y+=14*dt;
+    if(COMBAT_FLOATERS[i].t<=0)COMBAT_FLOATERS.splice(i,1);
+  }
+}
+function drawCombatFloaters(ctx,w,h){
+  if(!COMBAT_FLOATERS.length||!cam)return;
+  COMBAT_FLOATERS.forEach(f=>{
+    const v=new THREE.Vector3(f.x,f.y,f.z).project(cam);
+    if(v.z>1||v.z<-1)return;
+    const sx=(v.x*.5+.5)*w, sy=(-v.y*.5+.5)*h;
+    const a=Math.max(0,Math.min(1,f.t/0.85));
+    ctx.save();
+    ctx.globalAlpha=a;
+    ctx.font=(f.crit?'bold 16px ':'bold 13px ')+(getComputedStyle(document.body).getPropertyValue('--FD')||'Orbitron,sans-serif').trim();
+    ctx.fillStyle=f.crit?'#ffe08a':'#9ef0ff';
+    ctx.strokeStyle='rgba(0,0,0,.55)';
+    ctx.lineWidth=3;
+    const label=(f.crit?'CRIT ':'')+'-'+f.dmg;
+    ctx.strokeText(label,sx,sy);
+    ctx.fillText(label,sx,sy);
+    ctx.restore();
+  });
+}
 function disposeProjTrail(pr){
   if(!pr.trailLine)return;
   scene.remove(pr.trailLine);
@@ -4509,15 +4341,22 @@ function updateProjs(dt){
       for(let j=0;j<NPCS.length;j++){
         const ns=NPCS[j];if(!ns.ship.alive)continue;
         if(pr.mesh.position.distanceToSquared(ns.ship.mesh.position)<(ns.ship.radius+1)*(ns.ship.radius+1)){
-          const dmg=pr.kind==='missile'?Math.round(28*PS.dmgBonus):Math.round(14*PS.dmgBonus);
+          const base=pr.kind==='missile'?28:14;
+          let dmg=Math.round(base*PS.dmgBonus);
+          // Crit casuale (più frequente a mirino OK)
+          const mirOk=targetNpc===ns&&targetLeadState&&targetLeadState.status==='MIRINO OK';
+          if(Math.random()<(mirOk?0.18:0.07)){dmg=Math.round(dmg*1.45);ns._critPop=0.5;}
           const was=ns.ship.alive;ns.ship.takeDamage(dmg);hit=true;
+          if(typeof spawnCombatFloater==='function')spawnCombatFloater(ns.ship.mesh.position,dmg,!!ns._critPop);
           // Hit spark coerente: colore per fazione del bersaglio.
           const hitCol=(NCOLORS[ns.faction]||NCOLORS.pirate).a;
-          for(let s=0;s<4;s++){
+          for(let s=0;s<(ns._critPop?8:5);s++){
             const sp=getP();if(!sp)break;
-            const v=new THREE.Vector3((Math.random()-.5)*40,(Math.random()-.5)*28,(Math.random()-.5)*40);
-            sp.spawn(pr.mesh.position.clone(),v,hitCol,.12,1.6);
+            const v=new THREE.Vector3((Math.random()-.5)*48,(Math.random()-.5)*32,(Math.random()-.5)*48);
+            sp.spawn(pr.mesh.position.clone(),v,ns._critPop?0xffe088:hitCol,.14,1.8);
           }
+          if(typeof playTone==='function')playTone(ns._critPop?920:640,.02,.03,'square');
+          ns._critPop=0;
           if(!ns.ship.alive&&was){
             PS.activeMissions.forEach(m=>{
               if(m.type==='combat'&&!m.done&&m.killFaction===ns.faction){
@@ -4767,13 +4606,27 @@ function npcAI(ns,dt){
   if(wantsFight){
     const chaseR=10500;
     if(dist<=chaseR){
+      // Strafe / orbita: evita il "tutto di fronte" monocorde
+      if(ns._strafeSign==null)ns._strafeSign=Math.random()<0.5?-1:1;
+      if(ns._strafeT==null)ns._strafeT=0;
+      ns._strafeT-=dt;
+      if(ns._strafeT<=0){ns._strafeSign*=-1;ns._strafeT=1.6+Math.random()*2.2;}
       const turn=ship.turnSpeed*dt*(type==='pirate'||ns.angry?1.12+fStyle.aggr:1*fStyle.turnMul);
-      if(cY>0.06)ship.mesh.rotation.y+=turn;
-      else if(cY<-0.06)ship.mesh.rotation.y-=turn;
-      const thrustMult=(type==='pirate'||ns.angry?1.18:1.05)*fStyle.thrustMul;
-      if(dist>950&&dot>-0.14)ship.applyThrust(dt*thrustMult);
-      let fireDot=(type==='pirate'||ns.angry)?0.74:fStyle.fireDot;
-      let fireDist=(type==='pirate'||ns.angry)?4000:fStyle.fireDist;
+      const orbitBand=type==='pirate'?780:980;
+      if(dist<orbitBand){
+        // Cerchia mantenendo il naso verso il player
+        if(cY>0.04)ship.mesh.rotation.y+=turn*0.85;
+        else if(cY<-0.04)ship.mesh.rotation.y-=turn*0.85;
+        ship.mesh.rotation.y+=ns._strafeSign*turn*0.55;
+        ship.applyThrust(dt*0.7*fStyle.thrustMul);
+      }else{
+        if(cY>0.06)ship.mesh.rotation.y+=turn;
+        else if(cY<-0.06)ship.mesh.rotation.y-=turn;
+        const thrustMult=(type==='pirate'||ns.angry?1.18:1.05)*fStyle.thrustMul;
+        if(dist>950&&dot>-0.14)ship.applyThrust(dt*thrustMult);
+      }
+      let fireDot=(type==='pirate'||ns.angry)?0.7:fStyle.fireDot-0.04;
+      let fireDist=(type==='pirate'||ns.angry)?4200:fStyle.fireDist;
       if(playerShip.alive&&PS.jammer&&dist<2800){fireDot+=0.08;fireDist*=0.88;}
       if(faction==='savigno'&&dist<1200&&dot>.45){ship.mesh.rotation.y+=(Math.random()<.5?-1:1)*ship.turnSpeed*dt*1.4;}
       if(dot>fireDot&&dist<fireDist)ship.fire();
@@ -5242,6 +5095,53 @@ function getRepLabel(faction){
   if(v>50)return 'ALLEATO';if(v>20)return 'AMICO';if(v>0)return 'NEUTRALE+';
   if(v>-20)return 'NEUTRALE';if(v>-50)return 'SOSPETTOSO';return 'OSTILE';
 }
+function getDlgMood(ns){
+  const v=rep[ns.faction]||0;
+  if(ns.angry||ns.type==='pirate'||v<=-30)return 'TONO: TAGLIENTE';
+  if(v>40)return 'TONO: CONFIDENTE';
+  if(v>15)return 'TONO: APERTO';
+  if(v<-10)return 'TONO: GUARDINGO';
+  return 'TONO: PROFESSIONALE';
+}
+let _idlgTypeTmr=0;
+function typeIdlgText(full,done){
+  const el=document.getElementById('idlg-text');if(!el)return;
+  clearInterval(_idlgTypeTmr);
+  const text=String(full||'');
+  if(!text){el.textContent='';if(done)done();return;}
+  // Preferisci lettura immediata se reduced-motion
+  if(document.body.classList.contains('reduced-motion')||text.length>220){
+    el.textContent=text;if(done)done();return;
+  }
+  let i=0;el.textContent='';
+  _idlgTypeTmr=setInterval(()=>{
+    i+=1;el.textContent=text.slice(0,i);
+    if(i>=text.length){clearInterval(_idlgTypeTmr);_idlgTypeTmr=0;if(done)done();}
+  },12);
+}
+function pickDlgOpening(ns){
+  const pool=DIALOGUES[ns.faction]||DIALOGUES.pirate;
+  const entry=pool[(ns.seed||0)%pool.length]||pick(pool);
+  const lines=entry.lines||['...'];
+  const idx=(ns.seed||0)%lines.length;
+  // Apertura influenzata da reputazione / storia
+  const v=rep[ns.faction]||0;
+  if(ns.angry)return 'Hai già sparato. Non fingere cortesia — parla in fretta.';
+  if(typeof STORY!=='undefined'&&STORY.chapter>=4&&(ns.seed%3===0)){
+    const storyBits={
+      bazzano:'Il Patto non è più solo un fascicolo: a Prime qualcuno controlla le rotte due volte.',
+      crespellano:'Se cerchi archivi, non chiedere il permesso. Chiedi chi ha paura di firmare.',
+      calcara:'C\'è un timbro che brucia più del plasma. Non è sul listino prezzi.',
+      monteveglio:'La Rocca non dorme. Le stelle sopra di noi sembrano giudici, non ornamenti.',
+      savigno:'L\'aroma giusto non mente. Il resto del sistema sì.',
+      pirate:'Il Patto? Lo vendo a pezzi. Tu sembri uno che compra storie care.'
+    };
+    return storyBits[ns.faction]||lines[idx];
+  }
+  if(v>35)return lines[Math.min(lines.length-1,idx)]+' (Ti riconoscono.)';
+  if(v<-20)return 'Non avvicinarti troppo. Parla, poi sparisci.';
+  return lines[idx];
+}
 
 function buildDlgChoices(ns){
   const {faction,type,ship}=ns;
@@ -5251,15 +5151,50 @@ function buildDlgChoices(ns){
   // ── Greeting
   choices.push({label:'[SALUTA] "Buon viaggio, comandante."',cls:'',fn:()=>{
     const greets={
-      bazzano:'Taproblem. Vola sicuro — ma non troppo lontano dalla nostra zona.',
-      crespellano:'...si. Vola. Non che ci sia molto da vedere da queste parti.',
-      calcara:'Grazie. Abbiamo appena inaugurato il sesto hangar. Nel caso tu abbia bisogno.',
-      monteveglio:'Per l\'onore della Rocca, che il tuo viaggio sia onorevole.',
-      savigno:'Ricevuto. Attento ai tartufi contraffatti fuori dal sistema.',
-      pirate:'Mmh. Non ti fido. Ma oggi sono di buon umore.',
+      bazzano:'Taproblem. Vola sicuro — ma non troppo lontano dalla nostra zona. A Prime qualcuno conta le scie.',
+      crespellano:'...sì. Vola. Qui le mappe mentono per abitudine, non per malizia.',
+      calcara:'Grazie. Abbiamo appena inaugurato un altro hangar. Se ti serve un contratto, parla chiaro.',
+      monteveglio:'Per l\'onore della Rocca. Se cerchi prove, non portarci scuse.',
+      savigno:'Ricevuto. Attento ai tartufi contraffatti — e alle promesse di Calcara.',
+      pirate:'Mmh. Non mi fido. Ma oggi non ho voglia di fare buchi nella tua carena.',
     };
     showIdlgLine(ns,greets[faction]||'Ricevuto.',()=>closeIdlg());
   }});
+
+  // ── Press on the Pact / story
+  choices.push({label:'[PATTO] "Sai qualcosa del Patto del Molino?"',cls:'',fn:()=>{
+    const bits={
+      bazzano:v=>{
+        if(v>20)return 'Sotto traccia: tre rotte, un archivio, e un nome che a Prime non dicono ad alta voce. Non sono io a dartelo gratis.';
+        return 'Il Patto? Carta vecchia e nervi nuovi. Se non sei inviato, fai il turista.';
+      },
+      crespellano:()=>'Negli scaffali sbagliati c\'è più verità che nei comunicati. Porta pazienza — o una chiave.',
+      calcara:()=>'Se ha un prezzo, lo abbiamo già messo a budget. Se non ce l\'ha, non esiste.',
+      monteveglio:()=>'Il Patto non si compra: si merita. La Rocca ascolta chi torna con prove, non con rumor.',
+      savigno:()=>'Si sente nell\'aria, come un tartufo vero. Il resto è propaganda orbitale.',
+      pirate:()=>'Io vendo pezzi di storia al chilo. Tu hai crediti o solo domande?'
+    };
+    const fn=bits[faction];
+    const line=typeof fn==='function'?fn(rep[faction]||0):(fn||'...');
+    showIdlgLine(ns,line,()=>closeIdlg());
+  }});
+
+  // ── Threaten / bluff
+  if(!hostile){
+    choices.push({label:'[PRESSIONE] "Parla chiaro, o sparo."',cls:'hostile',fn:()=>{
+      changeRep(faction,-6);renderRep();
+      const pushBack={
+        bazzano:'Hai appena perso punti a Prime. Parla ancora così e ti marchiamo.',
+        crespellano:'Minacce? Almeno sei onesto. Meglio di un funzionario.',
+        calcara:'Registrato. La prossima fattura includerà "comportamento ostile".',
+        monteveglio:'Deporre le armi. O dimostrare di meritarle.',
+        savigno:'420 Cr di multa morale. Paghi in silenzio.',
+        pirate:'Ah. Finalmente. Preferisco chi grida a chi sorride.',
+      };
+      if((rep[faction]||0)<-10){ns.angry=true;showIdlgLine(ns,'Basta parole.',()=>{closeIdlg();});}
+      else showIdlgLine(ns,pushBack[faction]||'...',()=>closeIdlg());
+    }});
+  }
 
   // ── Commerce (merchants/couriers/transport)
   if(type==='merchant'||type==='courier'||type==='escort'||type==='freighter'){
@@ -5434,10 +5369,11 @@ function renderIdlgChoices(choices){
 }
 
 function showIdlgLine(ns,line,cb){
-  document.getElementById('idlg-text').textContent=line;
-  document.getElementById('idlg-choices').innerHTML='';
-  const btn=document.createElement('button');btn.className='choice-btn';btn.textContent='[OK] Capito.';
-  btn.addEventListener('click',cb);document.getElementById('idlg-choices').appendChild(btn);
+  typeIdlgText(line,()=>{
+    document.getElementById('idlg-choices').innerHTML='';
+    const btn=document.createElement('button');btn.className='choice-btn';btn.textContent='[OK] Capito.';
+    btn.addEventListener('click',cb);document.getElementById('idlg-choices').appendChild(btn);
+  });
 }
 
 function openIdlg(ns){
@@ -5446,7 +5382,7 @@ function openIdlg(ns){
   activeDlgNpc=ns;
   GAME.state='dialogue';
   setPausedReason('dialogue',true);
-  const {faction,type,name:npcName}=ns;
+  const {faction,type}=ns;
   const f=FACTIONS[faction];
   const names=NPC_NAMES[faction]||['Pilota Sconosciuto'];
   if(!ns.displayName)ns.displayName=pick(names);
@@ -5454,12 +5390,13 @@ function openIdlg(ns){
   document.getElementById('idlg-name').textContent=ns.displayName;
   document.getElementById('idlg-name').style.color=f?f.color:'#aabbcc';
   document.getElementById('idlg-type').textContent=(NPC_TITLES[type]||type.toUpperCase())+' · '+(f?f.name:'SENZA FAZIONE')+' · '+getRepLabel(faction);
-  document.getElementById('idlg-text').textContent=pick(DIALOGUES[faction]||DIALOGUES.pirate).lines[0];
+  const moodEl=document.getElementById('idlg-mood');
+  if(moodEl)moodEl.textContent=getDlgMood(ns);
   document.getElementById('idlg-trade').style.display='none';
-  // Draw portrait
   const pc=document.getElementById('pilot-portrait');
   drawPilotPortrait(pc,ns.seed,faction);
-  renderIdlgChoices(buildDlgChoices(ns));
+  document.getElementById('idlg-choices').innerHTML='';
+  typeIdlgText(pickDlgOpening(ns),()=>renderIdlgChoices(buildDlgChoices(ns)));
   document.getElementById('idlg').style.display='flex';
 }
 
@@ -11022,7 +10959,6 @@ function animate(){
   }
   // Keep suborbital minigame updating even when main world is paused.
   updatePlanetSkim(dt);
-  tickBpPreview3dFrame();
   if(gameplayPaused()){
     const tHud=performance.now();
     updateHUD();
@@ -11240,6 +11176,7 @@ function animate(){
       profileFrame('npc',performance.now()-tNpc);
       const tProjs=performance.now();
       updateProjs(dt);
+      updateCombatFloaters(dt);
       profileFrame('projs',performance.now()-tProjs);
       updateTargeting(dt);
     }
@@ -11249,6 +11186,10 @@ function animate(){
     if(navDestId)drawNavArrow();
     drawTargetAssist();
     drawLockedShipTarget();
+    {
+      const cv=document.getElementById('navcv');
+      if(cv){const ctx=cv.getContext('2d');drawCombatFloaters(ctx,cv.width,cv.height);}
+    }
     drawAnomalyScreenFX();
     drawSeqTransition(dt);
     // Camera
