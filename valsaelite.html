@@ -96,9 +96,10 @@ body.suborbit-active #a11y-strip{display:none !important;}
 }
 #tutorial-modal.show{display:flex !important;}
 #bp-preview-wrap{margin:0 0 6px;border-radius:8px;overflow:hidden;border:1px solid rgba(60,140,220,.38);
-  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:240px;position:relative;touch-action:none;cursor:grab;}
+  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);height:150px;min-height:120px;max-height:150px;
+  position:relative;touch-action:none;cursor:grab;flex:0 0 auto;}
 #bp-preview-wrap:active{cursor:grabbing}
-#bp-preview-wrap canvas{display:block;width:100%;height:240px}
+#bp-preview-wrap canvas{display:block;width:100%!important;height:100%!important}
 #bp-grid-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
 #bp-toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .bp-tool{padding:6px 12px;border-radius:4px;border:1px solid rgba(70,180,160,.45);background:rgba(20,60,70,.55);
@@ -407,11 +408,15 @@ body.boarding-active #boarding-hud{display:block}
 #bp-panel{
   flex:1;min-width:0;max-width:min(420px,44vw);display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden;
 }
+.bp-preview-section{order:1;flex:0 0 auto;}
+.bp-modules-section{order:2;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
+.bp-stats-section{order:3;flex:0 0 auto;}
+#bp-stats-hull-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
 .bp-section-title{font-size:8px;letter-spacing:.16em;color:#446688;margin:0 0 4px;font-family:var(--FM);}
 .bp-module-list{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
-  flex:1 1 auto;min-height:100px;max-height:min(32vh,260px);
-  overflow-y:auto;overflow-x:hidden;margin-bottom:8px;padding:4px 6px 8px 2px;
+  flex:1 1 auto;min-height:140px;max-height:min(42vh,340px);
+  overflow-y:auto;overflow-x:hidden;margin-bottom:6px;padding:4px 6px 8px 2px;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   border:1px solid rgba(44,100,190,.22);border-radius:8px;
   background:rgba(0,8,18,.45);
@@ -462,11 +467,27 @@ body.boarding-active #boarding-hud{display:block}
 #cv.shake{animation:cvshake .28s ease-out}
 @keyframes cvshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}}
 @media(max-width:700px){
-  #bp-wrap{flex-direction:column;align-items:center;max-height:none;}
-  #bp-panel{max-width:100%;}
-  .bp-module-list{grid-template-columns:repeat(3,minmax(0,1fr));max-height:min(36vh,280px);}
+  #blueprint-modal{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;}
+  #bp-title{font-size:14px;margin-bottom:0;}
+  #bp-subtitle{font-size:8px;margin-bottom:4px;max-height:2.6em;overflow:hidden;}
+  #bp-wrap{flex-direction:column;align-items:stretch;max-height:none;width:100%;flex:0 0 auto;gap:8px;}
+  #bp-grid-col{width:100%;}
+  #bp-panel{max-width:100%;width:100%;overflow:visible;flex:1 1 auto;}
+  .bp-modules-section{order:1;flex:1 1 auto;min-height:min(40vh,300px);}
+  .bp-preview-section{order:2;flex:0 0 auto;}
+  .bp-stats-section{order:3;}
+  #bp-preview-wrap{height:108px;min-height:96px;max-height:14vh;margin-bottom:4px;}
+  .bp-module-list{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+    min-height:min(40vh,300px);max-height:min(52vh,420px);
+    flex:1 1 auto;
+  }
+  .bp-mod-btn{min-height:64px;padding:8px 4px;}
+  .bp-mod-icon{font-size:18px;}
+  .bp-mod-name{font-size:8px;}
   #bp-stats-hull-row{grid-template-columns:1fr;}
-  #bp-cv{width:min(340px,95vw) !important;height:auto !important;}
+  #bp-close{margin-top:8px;padding:10px 24px;width:min(100%,360px);}
+  #bp-cv{width:min(320px,92vw) !important;height:auto !important;}
   #hud{padding:6px 6px max(6px,env(safe-area-inset-bottom))}
   .ht{gap:4px}
   .ht .hp{flex:1 1 100%;min-width:0;max-width:100%}
@@ -900,12 +921,16 @@ body.suborbit-active #smsg{z-index:6260 !important;}
       </div>
     </div>
     <div id="bp-panel">
-      <div class="bp-section-title">ANTEPRIMA 3D · RUOTA CON IL DRAG</div>
-      <div id="bp-preview-wrap"><!-- canvas da JS --></div>
-      <div class="bp-section-title" style="margin-top:2px">MODULI · scorri · clicca · piazza (attacca allo scafo)</div>
-      <div class="bp-mod-scroll-hint">↕ scorri per tutti i pezzi</div>
-      <div class="bp-module-list" id="bp-module-list"></div>
-      <div id="bp-stats-hull-row">
+      <div class="bp-modules-section">
+        <div class="bp-section-title">MODULI · scorri · clicca · piazza (attacca allo scafo)</div>
+        <div class="bp-mod-scroll-hint">↕ scorri per tutti i pezzi</div>
+        <div class="bp-module-list" id="bp-module-list"></div>
+      </div>
+      <div class="bp-preview-section">
+        <div class="bp-section-title">ANTEPRIMA 3D · RUOTA CON IL DRAG</div>
+        <div id="bp-preview-wrap"><!-- canvas da JS --></div>
+      </div>
+      <div id="bp-stats-hull-row" class="bp-stats-section">
         <div>
           <div class="bp-section-title">STATISTICHE</div>
           <div class="bp-stats" id="bp-stats-panel"></div>
@@ -2050,23 +2075,22 @@ function stripBlueprintToUnlocked(){
   }
 }
 
-// Default: scafo continuo prua→poppa; ogni pezzo tocca lo scafo
+// Default: doppia spine scafo continua (niente buchi); pezzi attaccati ai lati
 const defaultBlueprint=[
   {r:3,c:0,id:'weapon'},{r:4,c:0,id:'weapon'},
   {r:3,c:1,id:'hull'},{r:4,c:1,id:'hull'},
-  {r:3,c:2,id:'cockpit'},
-  {r:4,c:3,id:'hull'},
+  {r:3,c:2,id:'cockpit'}, // w×2 → c2–c3 su r3
+  {r:4,c:2,id:'hull'},{r:4,c:3,id:'hull'},
   {r:2,c:3,id:'fin'},
   {r:3,c:4,id:'hull'},{r:4,c:4,id:'hull'},
   {r:1,c:4,id:'wing_l'},{r:5,c:4,id:'wing_r'},
   {r:3,c:5,id:'hull'},{r:4,c:5,id:'hull'},
   {r:2,c:5,id:'shield'},
+  {r:5,c:5,id:'cargo'}, // w×2 → c5–c6 su r5, tocca scafo
   {r:3,c:6,id:'hull'},{r:4,c:6,id:'hull'},
-  {r:5,c:6,id:'cargo'},
   {r:3,c:7,id:'hull'},{r:4,c:7,id:'hull'},
-  {r:3,c:8,id:'hull'},{r:4,c:8,id:'hull'},
-  {r:2,c:8,id:'engine'},{r:5,c:8,id:'engine'},
-  {r:3,c:9,id:'engine'},{r:4,c:9,id:'engine'},
+  {r:2,c:7,id:'engine'},{r:5,c:7,id:'engine'},
+  {r:3,c:8,id:'engine'},{r:4,c:8,id:'engine'},
 ];
 
 // Runtime grid: array[row][col] = moduleId | null
@@ -2326,7 +2350,9 @@ function openBlueprintModal(){
   bpRefreshPreviewNow();
   const conn=bpValidateConnectivity();
   if(!conn.ok)notify('Attenzione: '+conn.msg+' Ripristina lo scafo continuo prima di confermare.',3200);
-  setTimeout(()=>{bpRefreshPreviewNow();tryShowTutorialBlueprint();},80);
+  // Layout mobile: aspetta reflow del riquadro (altezza CSS) prima di ridimensionare il canvas
+  setTimeout(()=>{bpRefreshPreviewNow();if(typeof bpResizePreviewRenderer==='function')bpResizePreviewRenderer();tryShowTutorialBlueprint();},80);
+  setTimeout(()=>{bpRefreshPreviewNow();},220);
 }
 
 function bpStructuralCellCount(){
@@ -2949,12 +2975,12 @@ function rebuildPlayerMesh(opt){
         addMesh(new THREE.BoxGeometry(sx*0.7,0.06,sz*0.7),gm,p.x,p.y-u*0.62,p.z);
       }else if(id==='wing_l'||id==='wing_r'){
         const side=id==='wing_l'?-1:1;
-        const span=u*1.55+mod.h*u*0.25;
-        // Root attaccato allo scafo
-        addMesh(new THREE.BoxGeometry(u*0.45,u*0.28,sz*0.9),hm,p.x,p.y,p.z);
-        addMesh(new THREE.BoxGeometry(span,u*0.14,sz*1.0),hm,p.x+side*span*0.35,p.y,p.z);
-        addMesh(new THREE.BoxGeometry(u*0.12,u*0.85,sz*0.5),hm2,p.x+side*(span*0.6),p.y+u*0.32,p.z);
-        addMesh(new THREE.BoxGeometry(span*0.65,0.05,u*0.22),gm,p.x+side*span*0.3,p.y-u*0.08,p.z);
+        const span=u*1.05+mod.h*u*0.18;
+        // Root attaccato allo scafo + ala corta (niente pezzi “fluttuanti”)
+        addMesh(new THREE.BoxGeometry(u*0.55,u*0.3,sz*0.95),hm,p.x,p.y,p.z);
+        addMesh(new THREE.BoxGeometry(span,u*0.16,sz*0.95),hm,p.x+side*span*0.28,p.y,p.z);
+        addMesh(new THREE.BoxGeometry(u*0.14,u*0.7,sz*0.45),hm2,p.x+side*(span*0.48),p.y+u*0.28,p.z);
+        addMesh(new THREE.BoxGeometry(span*0.55,0.05,u*0.2),gm,p.x+side*span*0.22,p.y-u*0.08,p.z);
       }else if(id==='fin'){
         addMesh(new THREE.BoxGeometry(u*0.35,u*0.2,u*0.35),hm,p.x,p.y,p.z);
         addMesh(new THREE.BoxGeometry(u*0.14,u*1.25,sz*0.8),hm,p.x,p.y+u*0.55,p.z);
@@ -3952,9 +3978,61 @@ function cloneShipForBpPreview(src){
       else ch.material=ch.material.clone();
       ch.userData=ch.userData||{};
       ch.userData._bpPreviewOwned=true;
+      // Leggero boost luminosità per leggibilità su canvas piccolo (mobile)
+      const mats=Array.isArray(ch.material)?ch.material:[ch.material];
+      mats.forEach(mat=>{
+        if(!mat)return;
+        if(mat.color&&mat.color.offsetHSL)mat.color.offsetHSL(0,0.03,0.1);
+        if(mat.emissiveIntensity!=null)mat.emissiveIntensity=Math.min(2.2,(mat.emissiveIntensity||0)+0.28);
+        if(mat.opacity!=null&&mat.transparent&&mat.opacity<0.5)mat.opacity=Math.min(0.95,mat.opacity+0.25);
+      });
     }
   });
   return m;
+}
+/** Dimensioni reali del riquadro anteprima (CSS height fissa / responsive). */
+function bpPreviewSize(){
+  const wrap=document.getElementById('bp-preview-wrap');
+  if(!wrap)return{w:280,h:140};
+  const rect=wrap.getBoundingClientRect();
+  let w=Math.floor(rect.width||wrap.clientWidth||0);
+  let h=Math.floor(rect.height||wrap.clientHeight||0);
+  if(w<48){
+    const pw=wrap.parentElement?(wrap.parentElement.clientWidth||0):0;
+    w=Math.max(160,pw||280);
+  }
+  if(h<48){
+    const cs=getComputedStyle(wrap);
+    h=Math.floor(parseFloat(cs.height)||parseFloat(cs.minHeight)||0)||120;
+  }
+  return{w:Math.max(120,w),h:Math.max(88,Math.min(h,220))};
+}
+function bpFitPreviewCamera(mesh){
+  if(!BP_PV||!mesh)return;
+  const box=new THREE.Box3().setFromObject(mesh);
+  const size=box.getSize(new THREE.Vector3());
+  const maxD=Math.max(size.x,size.y,size.z,0.001);
+  const {w,h}=bpPreviewSize();
+  BP_PV.cam.aspect=Math.max(0.2,w/h);
+  const fov=BP_PV.cam.fov*(Math.PI/180);
+  const dist=(maxD*0.55)/Math.tan(fov*0.5)*1.4;
+  BP_PV.cam.position.set(dist*0.72,dist*0.38,dist*0.9);
+  BP_PV.cam.near=Math.max(0.05,dist/100);
+  BP_PV.cam.far=Math.max(400,dist*12);
+  BP_PV.cam.lookAt(0,0,0);
+  BP_PV.cam.updateProjectionMatrix();
+}
+function bpResizePreviewRenderer(){
+  if(!BP_PV||!BP_PV.renderer)return;
+  const {w,h}=bpPreviewSize();
+  const el=BP_PV.renderer.domElement;
+  if(el.width!==w||el.height!==h){
+    BP_PV.renderer.setSize(w,h,false);
+    BP_PV.cam.aspect=w/Math.max(1,h);
+    BP_PV.cam.updateProjectionMatrix();
+  }
+  el.style.width='100%';
+  el.style.height='100%';
 }
 function ensureBpPreview3d(){
   const wrap=document.getElementById('bp-preview-wrap');
@@ -3963,23 +4041,26 @@ function ensureBpPreview3d(){
     BP_PV={
       renderer:new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'}),
       scene:new THREE.Scene(),
-      cam:new THREE.PerspectiveCamera(38,2,0.12,520),
+      cam:new THREE.PerspectiveCamera(42,2,0.08,800),
       mesh:null,
-      amb:new THREE.HemisphereLight(0xb0c8ff,0x1a1420,.88),
-      dir:new THREE.DirectionalLight(0xffffff,.52)
+      amb:new THREE.HemisphereLight(0xd8ecff,0x142028,1.2),
+      dir:new THREE.DirectionalLight(0xffffff,1.05),
+      fill:new THREE.DirectionalLight(0x88b8ff,0.45)
     };
-    BP_PV.dir.position.set(4,14,10);
-    BP_PV.scene.add(BP_PV.amb,BP_PV.dir);
-    BP_PV.cam.position.set(0,28,110);BP_PV.cam.lookAt(0,2,0);
+    BP_PV.dir.position.set(6,16,12);
+    BP_PV.fill.position.set(-10,6,-8);
+    BP_PV.scene.add(BP_PV.amb,BP_PV.dir,BP_PV.fill);
     const r=BP_PV.renderer;
-    r.setClearColor(0x040a14,1);
-    r.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
-    const w=Math.max(200,wrap.clientWidth||400);
-    const h=240;
-    r.setSize(w,h);
-    BP_PV.cam.aspect=w/h;BP_PV.cam.updateProjectionMatrix();
+    r.setClearColor(0x0a1828,1);
+    r.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
+    const {w,h}=bpPreviewSize();
+    r.setSize(w,h,false);
+    BP_PV.cam.aspect=w/Math.max(1,h);BP_PV.cam.updateProjectionMatrix();
     wrap.innerHTML='';
     wrap.appendChild(r.domElement);
+    r.domElement.style.width='100%';
+    r.domElement.style.height='100%';
+    r.domElement.style.display='block';
     // Drag to rotate preview
     let drag=false,lx=0,ly=0;
     const onDown=(e)=>{drag=true;lx=e.clientX||(e.touches&&e.touches[0].clientX)||0;ly=e.clientY||(e.touches&&e.touches[0].clientY)||0;};
@@ -3998,6 +4079,14 @@ function ensureBpPreview3d(){
     window.addEventListener('touchend',onUp);
     window.addEventListener('mousemove',onMove);
     window.addEventListener('touchmove',onMove,{passive:true});
+    if(typeof ResizeObserver!=='undefined'){
+      BP_PV._ro=new ResizeObserver(()=>{
+        bpResizePreviewRenderer();
+        if(BP_PV.mesh)bpFitPreviewCamera(BP_PV.mesh);
+        if(BP_PV.renderer&&BP_PV.scene&&BP_PV.cam)BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
+      });
+      BP_PV._ro.observe(wrap);
+    }
   }
   syncBpPreview3d();
 }
@@ -4014,26 +4103,26 @@ function syncBpPreview3d(){
     disposeBpPreviewMeshes(BP_PV.mesh);
     BP_PV.mesh=null;
   }
+  if(!playerShip.mesh.children.length){
+    // Mesh vuota: forza rebuild prima di clonare
+    if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh({skipPreviewSync:true});
+  }
   const m=cloneShipForBpPreview(playerShip.mesh);
-  if(!m)return;
+  if(!m||!m.children.length)return;
   BP_PV.scene.add(m);
   BP_PV.mesh=m;
   const box=new THREE.Box3().setFromObject(m);
   const center=box.getCenter(new THREE.Vector3());
   const size=box.getSize(new THREE.Vector3());
+  if(!isFinite(center.x)||!isFinite(size.x)||size.lengthSq()<1e-6)return;
   m.position.sub(center);
   const maxD=Math.max(size.x,size.y,size.z,.001);
-  const target=42;
-  m.scale.setScalar(target/maxD);
-  m.rotation.y=BP_PV._userSpin?prevY: (BP_PV._spinY||0);
-  m.rotation.x=BP_PV._userSpin?prevX:0;
+  m.scale.setScalar(26/maxD);
+  m.rotation.y=BP_PV._userSpin?prevY: (BP_PV._spinY||0.55);
+  m.rotation.x=BP_PV._userSpin?prevX:0.12;
   BP_PV._spinY=m.rotation.y;
-  const w=Math.max(200,wrap.clientWidth||400);
-  const h=240;
-  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==h){
-    BP_PV.renderer.setSize(w,h);
-    BP_PV.cam.aspect=w/h;BP_PV.cam.updateProjectionMatrix();
-  }
+  bpResizePreviewRenderer();
+  bpFitPreviewCamera(m);
   BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
 }
 function scheduleBpPreviewSync(){
