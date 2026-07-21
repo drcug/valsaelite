@@ -237,23 +237,39 @@ body.boarding-active #boarding-hud{display:block}
 .cb.th{border-color:rgba(25,90,190,.6)}.cb.th:active{background:rgba(5,25,80,.9)}
 .cb svg{width:21px;height:21px;pointer-events:none}
 
-/* Throttle mobile */
-.throttle-wrap{pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  gap:4px;min-width:52px;height:118px;padding:6px 4px;border-radius:12px;
-  background:rgba(3,10,28,.9);border:1.5px solid rgba(60,200,170,.55);
-  touch-action:none;-webkit-user-select:none;user-select:none}
-.throttle-wrap .th-lbl{font:700 9px var(--FD);letter-spacing:.1em;color:#7fdcc8}
-.throttle{width:88px;height:28px;transform:rotate(-90deg);transform-origin:center center;
-  margin:30px 0;padding:0;background:transparent;cursor:pointer;-webkit-appearance:none;appearance:none}
-.throttle::-webkit-slider-runnable-track{height:8px;background:rgba(255,255,255,.12);border-radius:4px}
-.throttle::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6;margin-top:-7px}
-.throttle::-moz-range-track{height:8px;background:rgba(255,255,255,.12);border-radius:4px;border:none}
-.throttle::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6}
+/* Throttle — barra laterale destra, fuori dalla fila comandi */
+#throttle-rail{
+  pointer-events:auto;position:fixed;right:max(10px,env(safe-area-inset-right));
+  bottom:max(118px,calc(env(safe-area-inset-bottom) + 108px));
+  z-index:18;display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:44px;padding:8px 6px 10px;border-radius:14px;
+  background:linear-gradient(180deg,rgba(4,18,28,.94),rgba(2,10,18,.92));
+  border:1.5px solid rgba(62,207,187,.55);
+  box-shadow:0 0 0 1px rgba(196,137,58,.18),0 10px 28px rgba(0,0,0,.45);
+  touch-action:none;-webkit-user-select:none;user-select:none;
+}
+#throttle-rail .th-top{font:700 8px var(--FD);letter-spacing:.14em;color:#7fdcc8}
+#throttle-rail .th-track{
+  position:relative;width:18px;height:132px;border-radius:10px;overflow:hidden;
+  background:rgba(255,255,255,.06);border:1px solid rgba(70,180,160,.35);
+}
+#throttle-rail .th-fill{
+  position:absolute;left:0;right:0;bottom:0;height:0%;
+  background:linear-gradient(0deg,#1a7a6a,#3ecfbb 55%,#c8fff0);
+  border-radius:0 0 9px 9px;pointer-events:none;
+  box-shadow:0 0 12px rgba(62,207,187,.35);
+}
+#throttle-rail .th-knob{
+  position:absolute;left:50%;width:28px;height:18px;margin-left:-14px;
+  bottom:0;border-radius:5px;pointer-events:none;
+  background:linear-gradient(180deg,#e8fff6,#3ecfbb);
+  border:2px solid #f4fff9;box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+#throttle-rail .th-bot{font:700 8px var(--FD);letter-spacing:.1em;color:#668888}
+#btnth.throttle-fallback{display:none}
 @media (hover:hover) and (pointer:fine){
-  .throttle-wrap{display:none}
-  .throttle-fallback{display:flex!important}
+  #throttle-rail{display:none}
+  #btnth.throttle-fallback{display:flex!important}
 }
 .cr-info{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:var(--FM);font-size:10px}
 .cr-info .lb{color:#446688;font-size:9px;letter-spacing:.12em;margin-bottom:3px}
@@ -488,6 +504,9 @@ body.suborbit-active #suborbit{display:block !important;opacity:1 !important;z-i
 body.suborbit-active #suborbit-hud{display:block !important;z-index:6100 !important;top:max(72px,env(safe-area-inset-top));bottom:auto;max-width:min(96vw,460px);text-align:center;line-height:1.45}
 body.suborbit-active #suborbit-ui{display:block !important}
 /* Volo suborbitale: nasconde tutto l'HUD navetta (anche desktop — prima era rotto dentro @media) */
+body.boarding-active #throttle-rail,
+body.suborbit-active #throttle-rail,
+body.docked-active #throttle-rail{display:none!important}
 body.suborbit-active #hud{display:none !important;}
 body.suborbit-active #hud-overlay{display:none !important;}
 body.suborbit-active #radar,
@@ -656,11 +675,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <div class="hb-controls">
       <div class="ctrl-rows">
         <div class="cg flight-primary">
-          <div id="throttle-wrap" class="throttle-wrap" title="Motori / Throttle">
-            <span class="th-lbl">MOT</span>
-            <input type="range" id="throttle" class="throttle" min="0" max="100" value="0" step="1" aria-label="Throttle motori">
-            <button type="button" id="btnth" class="cb th throttle-fallback" title="Accelerazione / Motori [W]" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg><span class="lbl">ACCEL</span></button>
-          </div>
+          <button type="button" id="btnth" class="cb th throttle-fallback" title="Accelerazione / Motori [W]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg><span class="lbl">ACCEL</span></button>
           <button id="btnfi" class="cb fi" title="Fuoco [Spazio]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg><span class="lbl">FUE</span></button>
           <button id="btnboost" class="cb boost" title="Boost afterburner [S/Shift/B]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="lbl">BOOST</span></button>
           <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)" title="Hail [T/H]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="lbl">HAIL</span></button>
@@ -675,6 +690,16 @@ body.suborbit-active #smsg{z-index:6260 !important;}
       </div>
     </div>
   </div>
+</div>
+
+<!-- Throttle laterale (mobile): non invade la fila comandi -->
+<div id="throttle-rail" title="Motori / Throttle" aria-label="Throttle motori">
+  <span class="th-top">MAX</span>
+  <div class="th-track" id="th-track">
+    <div class="th-fill" id="th-fill"></div>
+    <div class="th-knob" id="th-knob"></div>
+  </div>
+  <span class="th-bot">MOT</span>
 </div>
 
 <div id="radar"><canvas id="rcv" width="100" height="100"></canvas></div>
@@ -854,7 +879,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
   <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">1) Scegli un modulo · 2) Clicca sulla griglia per piazzarlo · 3) Tasto destro / UNDO per togliere · L’anteprima 3D si aggiorna subito · CONFERMA applica in volo</div>
+  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Ogni pezzo sulla griglia appare subito in 3D · UNDO / SIMMETRIA · CONFERMA applica in volo</div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
       <canvas id="bp-cv"></canvas>
@@ -1606,6 +1631,7 @@ function renderDiaryContent(){
   el.innerHTML=html;
 }
 function openDiary(){
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('diary');
   renderDiaryContent();
   document.getElementById('diary-modal').classList.add('show');
   if(GAME.state==='flying'||(GAME.state==='suborbit'&&SUBORBIT.active))setPausedReason('diary',true);
@@ -1968,17 +1994,17 @@ const BP_COLS=12, BP_ROWS=8, BP_CELL=36;
 const BP_MODULES=[
   {id:'hull',     label:'Scafo',        icon:'▪',  color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null},
   {id:'cockpit',  label:'Cabina',       icon:'👁', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null},
-  {id:'engine',   label:'Motore',       icon:'🔥', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:'eng1'},
+  {id:'engine',   label:'Motore',       icon:'🔥', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:null},
   {id:'engine2',  label:'Motore II',    icon:'⚡', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2'},
   {id:'boost_eng',label:'Postbruciatore',icon:'💥',color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3'},
-  {id:'weapon',   label:'Cannone',      icon:'🔫', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:'wep1'},
+  {id:'weapon',   label:'Cannone',      icon:'🔫', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:null},
   {id:'weapon2',  label:'Cannone II',   icon:'⭐', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2'},
   {id:'missile',  label:'Lanciamissili',icon:'🚀', color:'#7a4012', desc:'Sblocca missili [Q]. +capacità.',      cost:1500,canRotate:false, w:2,h:1, unlockShop:'wep2'},
-  {id:'shield',   label:'Scudo',        icon:'🛡', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:'shd1'},
-  {id:'cargo',    label:'Stiva',        icon:'📦', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:'crg1'},
-  {id:'wing_l',   label:'Ala Sinistra', icon:'◀',  color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:'nav1'},
-  {id:'wing_r',   label:'Ala Destra',   icon:'▶',  color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:'nav1'},
-  {id:'fin',      label:'Timone',       icon:'↑',  color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:'nav1'},
+  {id:'shield',   label:'Scudo',        icon:'🛡', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'cargo',    label:'Stiva',        icon:'📦', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:null},
+  {id:'wing_l',   label:'Ala Sinistra', icon:'◀',  color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:null},
+  {id:'wing_r',   label:'Ala Destra',   icon:'▶',  color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:null},
+  {id:'fin',      label:'Timone',       icon:'↑',  color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:null},
 ];
 
 /** Sblocco pezzi blueprint: il modulo richiesto O un livello superiore della stessa linea (es. eng3 sblocca anche voci «eng2»). */
@@ -2013,15 +2039,18 @@ function stripBlueprintToUnlocked(){
   }
 }
 
-// Default blueprint simmetrico rispetto all'asse centrale (col 5.5 → cockpit su 5-6)
+// Default: prua a sinistra (c bassi), poppa a destra (c alti)
 const defaultBlueprint=[
-  {r:3,c:3,id:'hull'},{r:3,c:4,id:'hull'},{r:3,c:7,id:'hull'},{r:3,c:8,id:'hull'},
-  {r:4,c:4,id:'hull'},{r:4,c:7,id:'hull'},
-  {r:3,c:5,id:'cockpit'},
-  {r:1,c:3,id:'wing_l'},{r:1,c:8,id:'wing_r'},
-  {r:2,c:5,id:'fin'},{r:2,c:6,id:'fin'},
-  {r:3,c:9,id:'engine'},{r:4,c:9,id:'engine'},{r:3,c:2,id:'engine'},{r:4,c:2,id:'engine'},
-  {r:4,c:5,id:'weapon'},
+  {r:3,c:0,id:'weapon'},{r:4,c:0,id:'weapon'},
+  {r:3,c:1,id:'hull'},{r:4,c:1,id:'hull'},
+  {r:3,c:2,id:'cockpit'},
+  {r:2,c:2,id:'fin'},
+  {r:3,c:4,id:'hull'},{r:4,c:4,id:'hull'},
+  {r:3,c:5,id:'hull'},{r:4,c:5,id:'hull'},
+  {r:1,c:4,id:'wing_l'},{r:5,c:4,id:'wing_r'},
+  {r:3,c:6,id:'shield'},
+  {r:4,c:7,id:'cargo'},
+  {r:2,c:9,id:'engine'},{r:3,c:9,id:'engine'},{r:4,c:9,id:'engine'},{r:5,c:9,id:'engine'},
 ];
 
 // Runtime grid: array[row][col] = moduleId | null
@@ -2081,12 +2110,13 @@ function bpInvInit(){
     if(BP_FREE.has(m.id)){PS.bpInv[m.id]=999;return;}
     if(typeof PS.bpInv[m.id]!=='number')PS.bpInv[m.id]=0;
   });
-  // Lo stock iniziale include i moduli già presenti nel blueprint di default,
-  // così la nave di partenza resta piazzabile senza spendere crediti extra.
+  // Stock iniziale: pezzi già piazzati + riserva per sperimentare il cantiere
   BP_MODULES.forEach(m=>{
     if(BP_FREE.has(m.id))return;
     const placed=bpCountModules(m.id);
-    if(PS.bpInv[m.id]<placed)PS.bpInv[m.id]=placed;
+    const starter={engine:6,weapon:4,shield:3,cargo:3,wing_l:2,wing_r:2,fin:3}[m.id]|0;
+    const want=Math.max(placed,starter);
+    if(PS.bpInv[m.id]<want)PS.bpInv[m.id]=want;
   });
 }
 function bpInvAvail(id){if(BP_FREE.has(id))return 999;return PS.bpInv?.[id]|0;}
@@ -2194,39 +2224,27 @@ function drawBlueprint(){
   const mr=Math.floor(BP_ROWS/2);
   ctx.beginPath();ctx.moveTo(0,mr*BP_CELL+1+BP_CELL/2);ctx.lineTo(W,mr*BP_CELL+1+BP_CELL/2);ctx.stroke();
 
-  // Cells
+  // Cells — solo agli anchor (moduli multi-cella disegnati una volta)
   const drawn=new Set();
-  for(let r=0;r<BP_ROWS;r++){
-    for(let c=0;c<BP_COLS;c++){
-      const id=bpGrid[r][c];if(!id)continue;
-      const key=r+','+c;if(drawn.has(key))continue;
-      const m=BP_MODULES.find(x=>x.id===id);if(!m)continue;
-      drawn.add(key);
-
+  BP_MODULES.forEach(m=>{
+    bpListModuleAnchors(m.id).forEach(({r,c})=>{
+      const key=r+','+c+','+m.id;if(drawn.has(key))return;drawn.add(key);
       const x=c*BP_CELL+2, y=r*BP_CELL+2;
       const cw=m.w*BP_CELL-4, ch=m.h*BP_CELL-4;
-
-      // Background
       ctx.fillStyle=m.color+'cc';
       roundRect(ctx,x,y,cw,ch,4);ctx.fill();
-
-      // Border
-      const isSel=bpSelected===id;
+      const isSel=bpSelected===m.id;
       ctx.strokeStyle=isSel?'#ffffff':m.color;ctx.lineWidth=isSel?2:1.2;
       roundRect(ctx,x,y,cw,ch,4);ctx.stroke();
-
-      // Icon
       ctx.font=`${Math.round(BP_CELL*.38)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillStyle='rgba(255,255,255,.85)';
-      ctx.fillText(m.icon,x+cw/2,y+ch/2);
-
-      // Label for wide cells
-      if(m.w>=2){
-        ctx.font=`bold 8px Share Tech Mono`;ctx.textBaseline='bottom';ctx.fillStyle='rgba(255,255,255,.6)';
-        ctx.fillText(m.label.toUpperCase(),x+cw/2,y+ch-3);
+      ctx.fillStyle='rgba(255,255,255,.9)';
+      ctx.fillText(m.icon,x+cw/2,y+ch/2-2);
+      if(m.w>=2||m.h>=2){
+        ctx.font='8px Share Tech Mono';ctx.fillStyle='rgba(255,255,255,.65)';
+        ctx.fillText(m.label,x+cw/2,y+ch/2+12);
       }
-    }
-  }
+    });
+  });
 
   // Hover/selected highlight for palette
   if(bpSelected){
@@ -2268,6 +2286,7 @@ function roundRect(ctx,x,y,w,h,r){
 }
 
 function openBlueprintModal(){
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('blueprint');
   setPausedReason('blueprint',true);
   bpInvInit();
   stripBlueprintToUnlocked();
@@ -2584,23 +2603,24 @@ function bpStructuralGridExtents(){
 
 /** Mezzi-assi monoblocco 1×1 in spazio nave (coerenti con bpShipLocalFromBlockDims). */
 function bpShipHullCellHalfExtents(spec){
-  const L=spec.fuselageLen;
-  const hx=0.178,hy=0.228;
-  const hz=Math.max(0.3,(L*0.82/BP_COLS)*0.46);
-  return{hx,hy,hz};
+  const u=BP_CELL_U*0.46;
+  return{hx:u,hy:u*0.72,hz:u};
 }
 
 /**
- * Centro geometrico blocco blueprint (anchor r,c, dimensioni w×h in celle) → coordinate nave.
+ * Centro geometrico blocco blueprint → spazio nave.
+ * Colonne (c) = asse longitudinale Z (0 = prua/−Z, max = poppa/+Z)
+ * Righe (r) = asse laterale X (0 = sinistra/−X, max = destra/+X)
+ * Ogni cella ≈ BP_CELL_U unità → cambiare pezzi cambia davvero la silhouette.
  */
+const BP_CELL_U=1.65;
 function bpShipLocalFromBlockDims(r,c,mw,mh,spec){
   mw=Math.max(1,mw|0);mh=Math.max(1,mh|0);
   const cc=c+(mw-1)*0.5;
   const rr=r+(mh-1)*0.5;
-  const fracC=(cc+0.5)/BP_COLS;
-  const x=(cc+0.5-BP_COLS/2)*0.38;
-  const y=-(rr+0.5-BP_ROWS/2)*0.48-0.12;
-  const z=-spec.fuselageLen*0.38+fracC*spec.fuselageLen*0.82;
+  const x=(rr+0.5-BP_ROWS/2)*BP_CELL_U;
+  const z=(cc+0.5-BP_COLS/2)*BP_CELL_U;
+  const y=0;
   return{x,y,z};
 }
 /** Centro cella singola (shortcut). */
@@ -2665,387 +2685,150 @@ function readPlayerBlueprintMeshSpec(){
   };
 }
 
-// ── Rebuild player 3D mesh from blueprint ─────────
-// Scafo = voxel celle hull + dimensioni da estensione griglia; cabina = moduli cockpit orientati;
-// muso alla prua (c min); spine/pannelli/poppa adattati al bounding. Poi ali/motori/cannoni/stiva/scudo/pinna.
+// ── Rebuild player 3D mesh from blueprint (grid-faithful) ─
+// Ogni modulo sul blueprint diventa un pezzo 3D nella stessa posizione.
+// Nessuna fusoliera “unica” che nasconde le differenze di layout.
 function rebuildPlayerMesh(){
   if(!playerShip)return;
   while(playerShip.mesh.children.length)playerShip.mesh.remove(playerShip.mesh.children[0]);
+  playerShip._shieldRing=null;
+  playerShip._hardpoints=[];
+  playerShip._nextHardpoint=0;
+  playerShip._engineCount=0;
+  playerShip._hasBoostEng=false;
 
   const bc=normalizeHullHex(PS.hullPaintHex), ah=0x55ddff;
   const hullCol=new THREE.Color(bc);
-  // Boost luminance so dark paints stay readable in space
   hullCol.offsetHSL(0,0.04,0.14);
   const hullHi=hullCol.clone();hullHi.offsetHSL(0,0.02,0.16);
   const hullLo=hullCol.clone().multiplyScalar(0.62);
-  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.28,metalness:.62,emissive:hullCol.clone().multiplyScalar(0.18),emissiveIntensity:.45});
-  const hm2=new THREE.MeshStandardMaterial({color:hullHi,roughness:.2,metalness:.72,emissive:ah,emissiveIntensity:.28});
-  const hmd=new THREE.MeshStandardMaterial({color:hullLo,roughness:.48,metalness:.5,emissive:0x061018,emissiveIntensity:.12});
-  const ck=new THREE.MeshStandardMaterial({color:0x0a2840,roughness:.04,metalness:.95,transparent:true,opacity:.88,emissive:0x226688,emissiveIntensity:.65});
-  const em=new THREE.MeshStandardMaterial({color:0x101820,roughness:.62,metalness:.6});
+  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.32,metalness:.58,emissive:hullCol.clone().multiplyScalar(0.16),emissiveIntensity:.4});
+  const hm2=new THREE.MeshStandardMaterial({color:hullHi,roughness:.22,metalness:.7,emissive:ah,emissiveIntensity:.22});
+  const hmd=new THREE.MeshStandardMaterial({color:hullLo,roughness:.5,metalness:.45,emissive:0x061018,emissiveIntensity:.1});
+  const ck=new THREE.MeshStandardMaterial({color:0x0a2840,roughness:.04,metalness:.95,transparent:true,opacity:.88,emissive:0x226688,emissiveIntensity:.7});
+  const em=new THREE.MeshStandardMaterial({color:0x101820,roughness:.55,metalness:.65});
   const gm=new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false});
-  const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.95,emissive:ah,emissiveIntensity:1.7});
+  const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.95,emissive:ah,emissiveIntensity:1.5});
   const boostMat=new THREE.MeshStandardMaterial({color:0xff6622,roughness:.18,metalness:.55,emissive:0xff3300,emissiveIntensity:1.25});
+  const wepMat=new THREE.MeshStandardMaterial({color:0x4a1520,roughness:.4,metalness:.7,emissive:0x330810,emissiveIntensity:.35});
+  const shMat=new THREE.MeshStandardMaterial({color:0x1144aa,emissive:0x0033ff,emissiveIntensity:.85,metalness:.9,roughness:.25});
+  const cargoMat=new THREE.MeshStandardMaterial({color:0x1e3b28,roughness:.5,metalness:.25});
 
   const spec=readPlayerBlueprintMeshSpec();
-  const{
-    engCount,weapCount,wingL,wingR,cargoCount2,hasBoostEng,shieldCount,finCount,
-    hullBlocks,cockpitPlaced,wingSpan,fuselageLen,fuselageW,fuselageH,weapon1,weapon2
-  }=spec;
-  const st=spec.struct;
   const he=bpShipHullCellHalfExtents(spec);
-
-  // ── Scafo: fusoliera continua + voxel soft (silhouette meno "lego") ─
-  let bx0=1e9,bx1=-1e9,by0=1e9,by1=-1e9,bz0=1e9,bz1=-1e9;
-  let hullVox=0;
-  const hullPts=[];
-  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
-    if(bpGrid[r][c]!=='hull'&&bpGrid[r][c]!=='cockpit')continue;
-    const p=bpShipLocalFromAnchor(r,c,spec);
-    hullPts.push(p);
-    bx0=Math.min(bx0,p.x-he.hx);bx1=Math.max(bx1,p.x+he.hx);
-    by0=Math.min(by0,p.y-he.hy);by1=Math.max(by1,p.y+he.hy);
-    bz0=Math.min(bz0,p.z-he.hz);bz1=Math.max(bz1,p.z+he.hz);
-    hullVox++;
-  }
-  if(hullPts.length){
-    const fw=Math.max(fuselageW*0.92,(bx1-bx0)*0.92);
-    const fh=Math.max(fuselageH*0.85,(by1-by0)*0.9);
-    const fd=Math.max(fuselageLen*0.95,(bz1-bz0)*1.05);
-    const cx=(bx0+bx1)*0.5, cy=(by0+by1)*0.5, cz=(bz0+bz1)*0.5;
-    // Core tapered body
-    const body=new THREE.Mesh(new THREE.BoxGeometry(fw*0.72,fh*0.78,fd*0.88),hm);
-    body.position.set(cx,cy,cz);
-    playerShip.mesh.add(body);
-    const bellyR=Math.min(fw,fh)*0.22;
-    const belly=new THREE.Mesh(new THREE.CylinderGeometry(bellyR,bellyR*0.92,fd*0.62,12),hmd);
-    belly.rotation.x=Math.PI/2;
-    belly.position.set(cx,cy-fh*0.12,cz);
-    playerShip.mesh.add(belly);
-    // Soft hull beads only on hull cells (detail without full minecraft look)
-    const hullRound=new THREE.SphereGeometry(Math.min(he.hx,he.hy,he.hz)*0.95,8,6);
-    for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
-      if(bpGrid[r][c]!=='hull')continue;
-      const p=bpShipLocalFromAnchor(r,c,spec);
-      const bead=new THREE.Mesh(hullRound,hm2);
-      bead.position.set(p.x,p.y,p.z);
-      bead.scale.set(1.05,0.88,1.12);
-      playerShip.mesh.add(bead);
-    }
-  }
-  // Volume di raccordo se pochi scafi ma cabina presente (evita mesh “vuota”)
-  if(hullVox===0&&cockpitPlaced&&st.n>0){
-    const rc=Math.round((st.minR+st.maxR)*0.5);
-    const cc=Math.round((st.minC+st.maxC)*0.5);
-    const pc=bpShipLocalFromAnchor(rc,cc,spec);
-    const stubW=Math.max(fuselageW*0.55,he.hx*4);
-    const stubH=Math.max(fuselageH*0.5,he.hy*3);
-    const stubD=Math.max(fuselageLen*0.22,he.hz*4);
-    const stub=new THREE.Mesh(new THREE.BoxGeometry(stubW,stubH,stubD),hmd);
-    stub.position.set(pc.x,pc.y,pc.z);
-    playerShip.mesh.add(stub);
-    bx0=Math.min(bx0,pc.x-stubW/2);bx1=Math.max(bx1,pc.x+stubW/2);
-    by0=Math.min(by0,pc.y-stubH/2);by1=Math.max(by1,pc.y+stubH/2);
-    bz0=Math.min(bz0,pc.z-stubD/2);bz1=Math.max(bz1,pc.z+stubD/2);
-  }
-
-  // ── Prua / muso (colonna c minima struttura) ────────────────────────────────
-  let prowX=0,prowY=0,prowZ=0,prowN=0;
-  for(let r=0;r<BP_ROWS;r++){
-    const id=bpGrid[r][st.minC];
-    if(id!=='hull'&&id!=='cockpit')continue;
-    const p=bpShipLocalFromAnchor(r,st.minC,spec);
-    prowX+=p.x;prowY+=p.y;prowZ+=p.z;prowN++;
-  }
-  if(!prowN){prowX=0;prowY=0;prowZ=-fuselageLen*0.36;prowN=1;}
-  else{prowX/=prowN;prowY/=prowN;prowZ/=prowN;}
-  let scx=0,scy=0,scz=0,scn=0;
-  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
-    const id=bpGrid[r][c];
-    if(id!=='hull'&&id!=='cockpit')continue;
-    const p=bpShipLocalFromAnchor(r,c,spec);
-    scx+=p.x;scy+=p.y;scz+=p.z;scn++;
-  }
-  if(scn){scx/=scn;scy/=scn;scz/=scn;}
-  const fwd=new THREE.Vector3(prowX-scx,prowY-scy,prowZ-scz);
-  if(fwd.lengthSq()<1e-4)fwd.set(0,0,-1);else fwd.normalize();
-  const noseG=new THREE.Group();
-  noseG.position.set(prowX,prowY+0.06,prowZ);
-  noseG.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),fwd);
-  const noseBridge=Math.max(fuselageW*0.38,he.hy*2.8);
-  const noseH=Math.max(fuselageH*0.72,he.hy*2.6);
-  const nb=new THREE.Mesh(new THREE.BoxGeometry(noseBridge*0.92,noseH*0.82,4.2),hm2);
-  nb.position.set(0,0,-2.15);noseG.add(nb);
-  const ntGeo=new THREE.ConeGeometry(Math.max(0.85,noseBridge*0.22),3.8,10);ntGeo.rotateX(Math.PI/2);
-  const nt=new THREE.Mesh(ntGeo,hm2);nt.position.set(0,.06,-4.5);noseG.add(nt);
-  const ntCap=new THREE.Mesh(new THREE.ConeGeometry(.28,1.45,8),tm);ntCap.rotation.x=Math.PI/2;ntCap.position.set(0,.06,-6.5);noseG.add(ntCap);
-  // Anello sensoriale sulla prua
-  const noseRing=new THREE.Mesh(new THREE.TorusGeometry(Math.max(0.55,noseBridge*0.16),0.06,8,20),tm);
-  noseRing.rotation.y=Math.PI/2;noseRing.position.set(0,.08,-5.2);noseG.add(noseRing);
-  playerShip.mesh.add(noseG);
-
-  // ── Cabina: un blocco orientato per ogni modulo cockpit sul blueprint ─────
-  if(cockpitPlaced){
-    const dxCol=0.38;
-    const dzCol=fuselageLen*0.82/BP_COLS;
-    const halfLen=Math.hypot(dxCol,dzCol);
-    const depth=halfLen*2*0.94;
-    const beam=Math.min(fuselageW*0.42,he.hy*3.6);
-    const vert=Math.max(he.hy*2.5,fuselageH*0.42);
-    bpListModuleAnchors('cockpit').forEach(({r,c})=>{
-      const p=bpShipLocalFromModuleId(r,c,'cockpit',spec);
-      const cg=new THREE.Group();
-      cg.position.set(p.x,p.y,p.z);
-      const dir=new THREE.Vector3(dxCol,0,dzCol).normalize();
-      cg.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
-      const ckFrame=new THREE.Mesh(new THREE.BoxGeometry(beam*1.15,.28,depth*0.78),tm);
-      ckFrame.position.set(0,vert*0.48,0);cg.add(ckFrame);
-      const canopyR=Math.min(1.12,Math.max(0.55,depth*0.32));
-      const canMesh=new THREE.Mesh(new THREE.SphereGeometry(canopyR,14,10),ck);
-      canMesh.scale.set(beam*0.55/canopyR,vert*0.42/canopyR,depth*0.28/canopyR);
-      canMesh.position.set(0,vert*0.38,0);cg.add(canMesh);
-      const scanLine=new THREE.Mesh(new THREE.BoxGeometry(beam*0.92,.05,depth*0.7),gm);
-      scanLine.position.set(0,vert*0.62,0);cg.add(scanLine);
-      playerShip.mesh.add(cg);
-      bx0=Math.min(bx0,p.x-beam);bx1=Math.max(bx1,p.x+beam);
-      by0=Math.min(by0,p.y);by1=Math.max(by1,p.y+vert);
-      bz0=Math.min(bz0,p.z-depth*0.55);bz1=Math.max(bz1,p.z+depth*0.55);
-    });
-  }
-
-  // ── Spine / keel (adattati al bounding hull ± cabina) ─────────────────────
-  const hasBBox=hullVox>0||(cockpitPlaced&&st.n>0);
-  if(hasBBox&&bx1>bx0){
-    const midX=(bx0+bx1)*0.5,midZ=(bz0+bz1)*0.5;
-    const spLen=Math.max(4.2,bz1-bz0+he.hz*2.2);
-    const spine=new THREE.Mesh(new THREE.BoxGeometry(.62,1.05,spLen),hm2);
-    spine.position.set(midX,by1+0.42,midZ);playerShip.mesh.add(spine);
-    const keel=new THREE.Mesh(new THREE.BoxGeometry(Math.min(1.45,bx1-bx0+0.8),.78,spLen*0.92),hmd);
-    keel.position.set(midX,by0-0.35,midZ);playerShip.mesh.add(keel);
-  }else{
-    const spine=new THREE.Mesh(new THREE.BoxGeometry(.7,1,10),hm2);spine.position.set(0,1.4,0);playerShip.mesh.add(spine);
-    const keel=new THREE.Mesh(new THREE.BoxGeometry(1.2,.8,10),hmd);keel.position.set(0,-1.3,-1);playerShip.mesh.add(keel);
-  }
-
-  // ── Side emissive panels ───────────────────────────────────────────────────
-  if(hasBBox&&bx1>bx0){
-    const midX=(bx0+bx1)*0.5,midZ=(bz0+bz1)*0.5,panelZSpan=Math.min(6.2,Math.max(4,bz1-bz0+1.2));
-    const px=Math.max(1.35,(bx1-bx0)*0.5+0.35);
-    [-1,1].forEach(s=>{
-      const panel=new THREE.Mesh(new THREE.BoxGeometry(.08,1.1,panelZSpan),tm);
-      panel.position.set(midX+s*px,(by0+by1)*0.5,midZ);playerShip.mesh.add(panel);
-    });
-  }else{
-    [-1,1].forEach(s=>{
-      const panel=new THREE.Mesh(new THREE.BoxGeometry(.08,1.1,5.5),tm);panel.position.set(s*1.62,0,-1.5);playerShip.mesh.add(panel);
-    });
-  }
-
-  // ── Wings (simmetriche: stessa estensione, X specchiata sull'asse) ───
-  const wingAbs=[];
-  [-1,1].forEach(side=>{
-    const span=(side<0?wingL:wingR);
-    if(span<=0)return;
-    const wc=bpWingSideCenter(side,spec);
-    if(wc)wingAbs.push(Math.abs(wc.x));
-  });
-  const wingMirrorX=wingAbs.length?Math.max(...wingAbs):(7+wingL*2+wingR*2)*0.35;
-  [-1,1].forEach(side=>{
-    const span=(side<0?wingL:wingR);
-    if(span<=0)return;
-    const ww=Math.max(3.2, 5.5+span*2.4);
-    const wc=bpWingSideCenter(side,spec);
-    const baseX=side*wingMirrorX;
-    const baseZ=wc?wc.z+0.35:0.8;
-    const baseY=wc?Math.min(wc.y+0.4,0.35):0.15;
-    const finOutX=baseX+side*(ww/2+0.4);
-    const finZ=baseZ-1.2;
-    const wGeo=new THREE.BoxGeometry(ww,.28,7);
-    const w=new THREE.Mesh(wGeo,hm);w.position.set(baseX,baseY,baseZ);w.rotation.y=0;playerShip.mesh.add(w);
-    const finGeo=new THREE.BoxGeometry(.25,2.8+span*.5,2.4);
-    const fin=new THREE.Mesh(finGeo,hm);fin.position.set(finOutX,1.2,finZ);playerShip.mesh.add(fin);
-    const finTip=new THREE.Mesh(new THREE.BoxGeometry(.22,.25,2.2),tm);finTip.position.set(finOutX,2.65,finZ+0.1);playerShip.mesh.add(finTip);
-    const wChan=new THREE.Mesh(new THREE.BoxGeometry(ww*.8,.06,1.2),gm);wChan.position.set(baseX,baseY-0.17,baseZ-0.8);playerShip.mesh.add(wChan);
-    const wt=new THREE.Mesh(new THREE.BoxGeometry(ww,.26,1.2),tm);wt.position.set(baseX,baseY-0.03,baseZ-2);playerShip.mesh.add(wt);
-  });
-
-  // ── Engines (posizione da anchor griglia; materiale boost sul modulo boost_eng) ─
-  const engAnchors=bpCollectEngineAnchors();
+  const u=BP_CELL_U;
   const engPositions=[];
-  if(engAnchors.length===0&&engCount>0){
-    const spread=2.4+Math.min(engCount,6)*0.55;
-    for(let i=0;i<engCount;i++){
-      const t=engCount<=1?0:(i/(engCount-1))*2-1;
-      const ex=t*spread,ey=-.65-Math.abs(t)*.12,ez=4.2;
-      engPositions.push([ex,ey,ez]);
-      const isBoostPos=hasBoostEng&&i===Math.floor(engCount/2);
-      const nacMat=isBoostPos?boostMat:em;
-      const nacGeo=new THREE.CylinderGeometry(.9,.75,5.5,6);nacGeo.rotateX(Math.PI/2);
-      const nac=new THREE.Mesh(nacGeo,nacMat);nac.position.set(ex,ey,ez);playerShip.mesh.add(nac);
-      const nozO=new THREE.Mesh(new THREE.TorusGeometry(.9,.12,6,16),em);nozO.position.set(ex,ey,ez+3.1);nozO.rotation.y=Math.PI/2;playerShip.mesh.add(nozO);
-      const nozG=new THREE.Mesh(new THREE.CircleGeometry(.75,16),isBoostPos?new THREE.MeshBasicMaterial({color:0xff4400,transparent:true,opacity:.9,blending:THREE.AdditiveBlending}):gm.clone());
-      nozG.position.set(ex,ey,ez+3.3);nozG.rotation.y=Math.PI;playerShip.mesh.add(nozG);
-      const pylon=new THREE.Mesh(new THREE.BoxGeometry(.5,.9,2.2),hm);pylon.position.set(ex,ey+.5,ez-0.4);playerShip.mesh.add(pylon);
-    }
-  }else{
-    engAnchors.forEach((a)=>{
-      const bpId=a.k==='engine'?'engine':a.k==='engine2'?'engine2':'boost_eng';
-      const p=bpShipLocalFromModuleId(a.r,a.c,bpId,spec);
-      const ex=p.x,ey=p.y-0.52,ez=Math.max(p.z+0.45,2.55);
-      engPositions.push([ex,ey,ez]);
-      const isBoostPos=a.k==='boost';
-      const nacMat=isBoostPos?boostMat:em;
-      const nacGeo=new THREE.CylinderGeometry(.9,.75,5.5,6);nacGeo.rotateX(Math.PI/2);
-      const nac=new THREE.Mesh(nacGeo,nacMat);nac.position.set(ex,ey,ez);playerShip.mesh.add(nac);
-      const nozO=new THREE.Mesh(new THREE.TorusGeometry(.9,.12,6,16),em);nozO.position.set(ex,ey,ez+3.1);nozO.rotation.y=Math.PI/2;playerShip.mesh.add(nozO);
-      const nozG=new THREE.Mesh(new THREE.CircleGeometry(.75,16),isBoostPos?new THREE.MeshBasicMaterial({color:0xff4400,transparent:true,opacity:.9,blending:THREE.AdditiveBlending}):gm.clone());
-      nozG.position.set(ex,ey,ez+3.3);nozG.rotation.y=Math.PI;playerShip.mesh.add(nozG);
-      const pylon=new THREE.Mesh(new THREE.BoxGeometry(.5,.9,2.2),hm);pylon.position.set(ex,ey+.5,ez-0.4);playerShip.mesh.add(pylon);
-    });
-  }
-
-  // ── Weapon mounts (hardpoint da anchor; fallback layout classico se nessun anchor) ─
-  const weapon2n=weapon2;
   const hardpoints=[];
-  const weapAnchors=bpCollectWeaponAnchors();
-  if(weapAnchors.length===0&&weapCount>0){
-    for(let i=0;i<Math.min(weapCount,6);i++){
-      const wx=(i%2===0?-1:1)*(1.4+Math.floor(i/2)*2.2);
-      const big=i>=weapon1&&weapon2n>0;
-      const wz=-3.5;
-      const wp=new THREE.Mesh(new THREE.BoxGeometry(big?.42:.35,big?.42:.35,big?2.8:2.2),hmd);wp.position.set(wx,-.9,wz);playerShip.mesh.add(wp);
-      const wTip=new THREE.Mesh(new THREE.ConeGeometry(big?.3:.18,big?1.1:.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,-.9,big?wz-2.1:wz-1.5);playerShip.mesh.add(wTip);
-      hardpoints.push(new THREE.Vector3(wx,-.9,big?wz-2.7:wz-2.0));
-    }
-  }else{
-    weapAnchors.forEach((a)=>{
-      const big=!!a.big;
-      const p=bpShipLocalFromModuleId(a.r,a.c,big?'weapon2':'weapon',spec);
-      const wx=p.x,wy=p.y-0.82,wz=p.z-1.35;
-      const wp=new THREE.Mesh(new THREE.BoxGeometry(big?.42:.35,big?.42:.35,big?2.8:2.2),hmd);wp.position.set(wx,wy,wz);playerShip.mesh.add(wp);
-      const wTip=new THREE.Mesh(new THREE.ConeGeometry(big?.3:.18,big?1.1:.8,4),tm);wTip.rotation.x=Math.PI/2;wTip.position.set(wx,wy,big?wz-2.1:wz-1.5);playerShip.mesh.add(wTip);
-      hardpoints.push(new THREE.Vector3(wx,wy,big?wz-2.7:wz-2.0));
-    });
-  }
-  if(!hardpoints.length)hardpoints.push(new THREE.Vector3(0,-.2,-5.5));
-  playerShip._hardpoints=hardpoints;
-  playerShip._nextHardpoint=0;
+  let hasBoostEng=false;
 
-  // ── Lanciamissili (blocco 2×1, centro modulo) ─────────────────────────────
-  bpListModuleAnchors('missile').forEach(({r,c})=>{
-    const p=bpShipLocalFromModuleId(r,c,'missile',spec);
-    const dxCol=0.38,dzCol=fuselageLen*0.82/BP_COLS;
-    const mg=new THREE.Group();
-    mg.position.set(p.x,p.y-0.55,p.z+0.15);
-    const dir=new THREE.Vector3(dxCol,0,dzCol).normalize();
-    mg.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
-    const body=new THREE.Mesh(new THREE.BoxGeometry(1.05,.32,1.75),new THREE.MeshStandardMaterial({color:0x5a3010,roughness:.45,metalness:.55}));
-    body.position.set(0,0,0);mg.add(body);
-    for(let t=-0.28;t<=0.29;t+=0.28){
-      const tube=new THREE.Mesh(new THREE.CylinderGeometry(.12,.1,.85,6),tm);
-      tube.rotation.x=Math.PI/2;tube.position.set(t*1.1,0.12,-0.35);mg.add(tube);
-    }
-    playerShip.mesh.add(mg);
+  function addMesh(geo,mat,x,y,z,rx,ry,rz){
+    const m=new THREE.Mesh(geo,mat);
+    m.position.set(x,y,z);
+    if(rx)m.rotation.x=rx;if(ry)m.rotation.y=ry;if(rz)m.rotation.z=rz;
+    playerShip.mesh.add(m);
+    return m;
+  }
+
+  // Disegna SOLO agli anchor (niente doppi pezzi per moduli multi-cella)
+  const ids=BP_MODULES.map(m=>m.id);
+  ids.forEach(id=>{
+    const mod=BP_MODULES.find(x=>x.id===id);if(!mod)return;
+    bpListModuleAnchors(id).forEach(({r,c})=>{
+      const p=bpShipLocalFromModuleId(r,c,id,spec);
+      const bw=mod.w*u*0.92, bh=Math.max(u*0.55,mod.h*u*0.55), bd=mod.h>1?mod.h*u*0.9:u*0.9;
+      // Per moduli alti (ali 1×2) scambia: w=larghezza celle su c, h=righe su r
+      const sx=mod.h*u*0.9; // span X (righe)
+      const sz=mod.w*u*0.9; // span Z (colonne)
+
+      if(id==='hull'){
+        addMesh(new THREE.BoxGeometry(sx*0.95,u*0.7,sz*0.95),hm,p.x,p.y,p.z);
+        addMesh(new THREE.BoxGeometry(sx*0.7,u*0.18,sz*0.7),hm2,p.x,p.y+u*0.32,p.z);
+      }else if(id==='cockpit'){
+        addMesh(new THREE.BoxGeometry(sx*0.85,u*0.45,sz*0.95),hm2,p.x,p.y,p.z);
+        const can=addMesh(new THREE.SphereGeometry(u*0.42,12,10),ck,p.x,p.y+u*0.38,p.z-sz*0.05);
+        can.scale.set(sx*0.55/(u*0.42),0.85,sz*0.45/(u*0.42));
+        addMesh(new THREE.BoxGeometry(sx*0.7,0.06,sz*0.5),gm,p.x,p.y+u*0.55,p.z);
+      }else if(id==='engine'||id==='engine2'||id==='boost_eng'){
+        const boost=id==='boost_eng';if(boost)hasBoostEng=true;
+        const mat=boost?boostMat:em;
+        const rad=id==='engine2'?u*0.38:u*0.32;
+        const len=id==='engine2'?u*1.35:u*1.15;
+        const nac=new THREE.CylinderGeometry(rad*0.92,rad,len,8);nac.rotateX(Math.PI/2);
+        addMesh(nac,mat,p.x,p.y-u*0.1,p.z);
+        addMesh(new THREE.TorusGeometry(rad,0.06,6,14),em,p.x,p.y-u*0.1,p.z+len*0.48,0,Math.PI/2,0);
+        const glow=new THREE.MeshBasicMaterial({color:boost?0xff4400:ah,transparent:true,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false});
+        addMesh(new THREE.CircleGeometry(rad*0.85,12),glow,p.x,p.y-u*0.1,p.z+len*0.55,0,Math.PI,0);
+        engPositions.push([p.x,p.y-u*0.1,p.z]);
+      }else if(id==='weapon'||id==='weapon2'){
+        const big=id==='weapon2';
+        addMesh(new THREE.BoxGeometry(u*0.28,u*0.28,sz*0.95),wepMat,p.x,p.y-u*0.15,p.z);
+        const tip=new THREE.ConeGeometry(big?0.22:0.16,big?u*0.55:u*0.4,5);tip.rotateX(Math.PI/2);
+        addMesh(tip,tm,p.x,p.y-u*0.15,p.z-sz*0.55);
+        hardpoints.push(new THREE.Vector3(p.x,p.y-u*0.15,p.z-sz*0.75));
+      }else if(id==='missile'){
+        addMesh(new THREE.BoxGeometry(sx*0.7,u*0.28,sz*0.9),new THREE.MeshStandardMaterial({color:0x5a3010,roughness:.45,metalness:.55}),p.x,p.y-u*0.2,p.z);
+        for(let t=-0.28;t<=0.29;t+=0.28){
+          const tube=new THREE.CylinderGeometry(0.1,0.09,u*0.7,6);tube.rotateX(Math.PI/2);
+          addMesh(tube,tm,p.x+t*sx*0.35,p.y-u*0.05,p.z-sz*0.15);
+        }
+      }else if(id==='shield'){
+        addMesh(new THREE.SphereGeometry(u*0.38,10,8),shMat,p.x,p.y+u*0.25,p.z);
+        if(bpCountModules('shield')>=2&&!playerShip._shieldRing){
+          const ring=new THREE.Mesh(
+            new THREE.TorusGeometry(u*2.4,0.07,8,28),
+            new THREE.MeshBasicMaterial({color:0x3388ff,transparent:true,opacity:.4,blending:THREE.AdditiveBlending,depthWrite:false})
+          );
+          ring.rotation.x=Math.PI/2;ring.position.set(p.x,p.y+u*0.2,p.z);
+          playerShip.mesh.add(ring);playerShip._shieldRing=ring;
+        }
+      }else if(id==='cargo'){
+        const pod=addMesh(new THREE.BoxGeometry(sx*0.85,u*0.7,sz*0.85),cargoMat,p.x,p.y-u*0.35,p.z);
+        addMesh(new THREE.BoxGeometry(sx*0.7,0.06,sz*0.7),gm,p.x,p.y-u*0.7,p.z);
+      }else if(id==='wing_l'||id==='wing_r'){
+        const side=id==='wing_l'?-1:1;
+        // Ala piatta che si estende verso l'esterno (X)
+        const span=u*1.8+mod.h*u*0.35;
+        addMesh(new THREE.BoxGeometry(span,u*0.14,sz*1.05),hm,p.x+side*span*0.25,p.y,p.z);
+        addMesh(new THREE.BoxGeometry(u*0.12,u*0.9,sz*0.55),hm2,p.x+side*(span*0.55),p.y+u*0.35,p.z);
+        addMesh(new THREE.BoxGeometry(span*0.7,0.05,u*0.25),gm,p.x+side*span*0.2,p.y-u*0.08,p.z);
+      }else if(id==='fin'){
+        addMesh(new THREE.BoxGeometry(u*0.14,u*1.35,sz*0.85),hm,p.x,p.y+u*0.55,p.z);
+        addMesh(new THREE.BoxGeometry(u*0.12,u*0.12,sz*0.7),tm,p.x,p.y+u*1.2,p.z);
+      }else{
+        addMesh(new THREE.BoxGeometry(sx*0.8,u*0.5,sz*0.8),hm,p.x,p.y,p.z);
+      }
+    });
   });
 
-  // ── Cargo pods (centro blocco stiva) + gondola se pesante ─────
-  const carAnch=bpListModuleAnchors('cargo');
-  const podMat=new THREE.MeshStandardMaterial({color:0x1e3b28,roughness:.5,metalness:.2});
-  let cargoMeanZ=1.2;
-  if(carAnch.length&&cargoCount2>0){
-    const nPod=Math.min(cargoCount2,carAnch.length,6);
-    let sumZ=0;
-    for(let i=0;i<nPod;i++){
-      const a=carAnch[i];
-      const p=bpShipLocalFromModuleId(a.r,a.c,'cargo',spec);
-      sumZ+=p.z;
-      const cy=p.y-1.35+Math.min(i,2)*0.18;
-      const pod=new THREE.Mesh(new THREE.SphereGeometry(1.6+i*.22,12,8),podMat);pod.scale.set(1,.75,1.4);pod.position.set(p.x,cy,p.z+0.45);playerShip.mesh.add(pod);
+  // Prua tip se c'è struttura a c minima
+  const st=spec.struct;
+  if(st&&st.n>0){
+    let noseX=0,noseN=0;
+    for(let r=0;r<BP_ROWS;r++){
+      const id=bpGrid[r][st.minC];
+      if(!id)continue;
+      const p=bpShipLocalFromAnchor(r,st.minC,spec);
+      noseX+=p.x;noseN++;
     }
-    cargoMeanZ=sumZ/nPod;
-  }else{
-    for(let i=0;i<Math.min(cargoCount2,3);i++){
-      const cx2=(i===0?0:i%2===1?3.5:-3.5);
-      const cy2=i===0?-1.5:-.8;
-      const pod=new THREE.Mesh(new THREE.SphereGeometry(1.6+i*.3,12,8),podMat);pod.scale.set(1,.75,1.4);pod.position.set(cx2,cy2,2);playerShip.mesh.add(pod);
-    }
-  }
-  if(cargoCount2>=3){
-    const gMat=new THREE.MeshStandardMaterial({color:0x2a4018,roughness:.55,metalness:.3});
-    const gondola=new THREE.Mesh(new THREE.BoxGeometry(3.6,1.3,7.2),gMat);
-    gondola.position.set(0,-2.2,cargoMeanZ);
-    playerShip.mesh.add(gondola);
-    const gStrip=new THREE.Mesh(new THREE.BoxGeometry(3.2,.08,6),gm.clone());
-    gStrip.position.set(0,-2.9,cargoMeanZ);playerShip.mesh.add(gStrip);
-  }
-
-  // ── Shield emitters + anello (anchor shield; fallback classico) ─
-  const shAnch=bpListModuleAnchors('shield');
-  if(shieldCount>0){
-    if(shAnch.length){
-      const nEmit=Math.min(shieldCount,shAnch.length,4);
-      let mx=0,my=0,mz=0;
-      for(let i=0;i<nEmit;i++){
-        const p=bpShipLocalFromModuleId(shAnch[i].r,shAnch[i].c,'shield',spec);
-        mx+=p.x;my+=p.y;mz+=p.z;
-        const sEmit=new THREE.Mesh(new THREE.SphereGeometry(.55,10,8),new THREE.MeshStandardMaterial({color:0x1144aa,emissive:0x0033ff,emissiveIntensity:.8,metalness:.9}));
-        sEmit.position.set(p.x,p.y+0.65,p.z+0.2);playerShip.mesh.add(sEmit);
-      }
-      mx/=nEmit;my/=nEmit;mz/=nEmit;
-      if(shieldCount>=2){
-        const ring=new THREE.Mesh(
-          new THREE.TorusGeometry(4.2,.14,8,32),
-          new THREE.MeshBasicMaterial({color:0x3388ff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false})
-        );
-        ring.rotation.x=Math.PI/2;ring.position.set(mx,my+0.5,mz+0.15);
-        playerShip.mesh.add(ring);
-        playerShip._shieldRing=ring;
-      }
-    }else{
-      for(let i=0;i<Math.min(shieldCount,3);i++){
-        const sx=(i%2===0?0:i===1?4:-4);
-        const sEmit=new THREE.Mesh(new THREE.SphereGeometry(.55,10,8),new THREE.MeshStandardMaterial({color:0x1144aa,emissive:0x0033ff,emissiveIntensity:.8,metalness:.9}));
-        sEmit.position.set(sx,.5,-2+i*1.5);playerShip.mesh.add(sEmit);
-      }
-      if(shieldCount>=2){
-        const ring=new THREE.Mesh(
-          new THREE.TorusGeometry(4.2,.14,8,32),
-          new THREE.MeshBasicMaterial({color:0x3388ff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false})
-        );
-        ring.rotation.x=Math.PI/2;ring.position.set(0,.5,-1.4);
-        playerShip.mesh.add(ring);
-        playerShip._shieldRing=ring;
-      }
+    if(noseN){
+      const nx=noseX/noseN;
+      const nz=(st.minC+0.5-BP_COLS/2)*BP_CELL_U-u*0.75;
+      const cone=new THREE.ConeGeometry(u*0.35,u*0.9,8);cone.rotateX(Math.PI/2);
+      addMesh(cone,hm2,nx,0.05,nz);
+      addMesh(new THREE.ConeGeometry(0.12,u*0.35,6),tm,nx,0.05,nz-u*0.55,Math.PI/2,0,0);
     }
   }
 
-  // ── Tail fin (pinna: media anchor fin) ────────────────────────
-  const finAnch=bpListModuleAnchors('fin');
-  const tailH=2.2+finCount*.6;
-  let tailFx=0,tailFy=0,tailFz=5;
-  if(finAnch.length){
-    let sx=0,sy=0,sz=0;
-    finAnch.forEach(({r,c})=>{
-      const p=bpShipLocalFromModuleId(r,c,'fin',spec);
-      sx+=p.x;sy+=p.y;sz+=p.z;
-    });
-    const n=finAnch.length;
-    tailFx=sx/n;tailFy=sy/n;tailFz=sz/n+1.35;
-  }
-  const tailFin=new THREE.Mesh(new THREE.BoxGeometry(.3,tailH,3.2),hm);tailFin.position.set(tailFx,tailFy+tailH/2,tailFz);playerShip.mesh.add(tailFin);
-  const tailTip=new THREE.Mesh(new THREE.BoxGeometry(.25,.25,3),tm);tailTip.position.set(tailFx,tailFy+tailH+.3,tailFz+0.1);playerShip.mesh.add(tailTip);
-
-  // ── Aft strip (poppa ≈ fine volume strutturale) ─────────────────────────────
-  const aftZ=(hasBBox&&bz1>-1e8&&bz0<1e8)?bz1+1.45:6.5;
-  const aftX=scn?scx:0,aftY=(hasBBox&&by1>by0)?(by0+by1)*0.22:0;
-  const aft=new THREE.Mesh(new THREE.BoxGeometry(2.8,1.5,2.5),hmd);aft.position.set(aftX,aftY,aftZ);playerShip.mesh.add(aft);
-  const aftStrip=new THREE.Mesh(new THREE.BoxGeometry(2.6,.08,.5),gm.clone());aftStrip.position.set(aftX,aftY-0.7,aftZ+1.3);playerShip.mesh.add(aftStrip);
-
-  // Store for afterburner glow refs
+  if(!hardpoints.length)hardpoints.push(new THREE.Vector3(0,-0.2,-(BP_COLS/2)*BP_CELL_U));
+  playerShip._hardpoints=hardpoints;
   playerShip._engineCount=engPositions.length;
   playerShip._hasBoostEng=hasBoostEng;
+  // Raggio collisione proporzionale alla footprint
+  const span=Math.max(st?st.spanC:1,st?st.spanR:1,3);
+  playerShip.radius=Math.max(5,span*BP_CELL_U*0.45);
   scheduleBpPreviewSync();
 }
+
 // ─────────────────────────────────────────────────
 // THREE.JS SETUP
 // ─────────────────────────────────────────────────
@@ -3907,6 +3690,7 @@ function tryShowTutorialMap(){
     '<p><strong>M</strong> apre la mappa. Clicca una stazione → <strong>NAVIGA QUI</strong> per la freccia di rotta.</p><p>Scroll zoom · drag pan · cerca per nome in alto a sinistra.</p>');
 }
 function openHelpModal(){
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('help');
   const m=document.getElementById('help-modal');if(m)m.classList.add('show');
   setPausedReason('dialogue',true);
 }
@@ -4022,7 +3806,7 @@ function ensureBpPreview3d(){
     };
     BP_PV.dir.position.set(4,14,10);
     BP_PV.scene.add(BP_PV.amb,BP_PV.dir);
-    BP_PV.cam.position.set(0,22,86);BP_PV.cam.lookAt(0,2,0);
+    BP_PV.cam.position.set(0,28,110);BP_PV.cam.lookAt(0,2,0);
     const r=BP_PV.renderer;
     r.setClearColor(0x040a14,1);
     r.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
@@ -4074,7 +3858,7 @@ function syncBpPreview3d(){
   const size=box.getSize(new THREE.Vector3());
   m.position.sub(center);
   const maxD=Math.max(size.x,size.y,size.z,.001);
-  const target=34;
+  const target=42;
   m.scale.setScalar(target/maxD);
   const w=Math.max(200,wrap.clientWidth||400);
   const h=240;
@@ -4866,17 +4650,71 @@ function touch(id,act){
 }
 touch('btnl','left');touch('btnr','right');touch('btnth','thrust');touch('btnfi','fire');
 touch('btnboost','boost');
-/** Throttle analogico (mobile): 0–1 → spinta progressiva. */
+/** Throttle analogico laterale (mobile): drag verticale 0–1. */
 const FLY_THROTTLE={v:0};
-(function initThrottleSlider(){
-  const el=document.getElementById('throttle');if(!el)return;
-  const sync=()=>{FLY_THROTTLE.v=cl((+el.value||0)/100,0,1);INP.thrust=FLY_THROTTLE.v>0.04;};
-  el.addEventListener('input',sync,{passive:true});
-  el.addEventListener('change',sync,{passive:true});
-  // Rilascia a 0 se leave (opzionale: mantieni)
-  el.addEventListener('pointerup',()=>{/* keep value for hold-cruise */},{passive:true});
-  sync();
+(function initThrottleRail(){
+  const rail=document.getElementById('throttle-rail');
+  const track=document.getElementById('th-track');
+  const fill=document.getElementById('th-fill');
+  const knob=document.getElementById('th-knob');
+  if(!rail||!track||!fill||!knob)return;
+  const setV=(v)=>{
+    FLY_THROTTLE.v=cl(v,0,1);
+    INP.thrust=FLY_THROTTLE.v>0.04;
+    const pct=Math.round(FLY_THROTTLE.v*100);
+    fill.style.height=pct+'%';
+    knob.style.bottom='calc('+pct+'% - 9px)';
+  };
+  const fromEvent=(e)=>{
+    const t=e.touches?e.touches[0]:e;
+    const rect=track.getBoundingClientRect();
+    const y=cl(t.clientY-rect.top,0,rect.height);
+    setV(1-y/Math.max(1,rect.height));
+  };
+  let drag=false;
+  const down=e=>{e.preventDefault();drag=true;fromEvent(e);};
+  const move=e=>{if(!drag)return;e.preventDefault();fromEvent(e);};
+  const up=()=>{drag=false;};
+  rail.addEventListener('pointerdown',down,{passive:false});
+  window.addEventListener('pointermove',move,{passive:false});
+  window.addEventListener('pointerup',up,{passive:true});
+  rail.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('touchend',up,{passive:true});
+  setV(0);
 })();
+/** Chiude altri overlay UI (niente stack di modali). */
+function closeOverlappingModals(except){
+  except=except||'';
+  if(except!=='diary'&&GAME.pausedReasons&&GAME.pausedReasons.diary&&typeof closeDiary==='function')closeDiary();
+  if(except!=='blueprint'){
+    const bm=document.getElementById('blueprint-modal');
+    if(bm&&bm.classList.contains('show')){
+      // Chiudi senza applicare se forzato da altro modal; se invalido, forza hide
+      try{
+        if(bpCountModules('cockpit')>=1&&bpStructuralCellCount()>=4){
+          setPausedReason('blueprint',false);
+          bm.classList.remove('show');
+        }else{
+          setPausedReason('blueprint',false);
+          bm.classList.remove('show');
+        }
+      }catch(_){bm.classList.remove('show');setPausedReason('blueprint',false);}
+    }
+  }
+  if(except!=='map'){
+    const gm=document.getElementById('gmap');
+    if(gm&&gm.style.display==='block'&&typeof closeMap==='function')closeMap();
+  }
+  if(except!=='help'&&typeof closeHelpModal==='function')closeHelpModal();
+  if(except!=='dialogue'){
+    const idlg=document.getElementById('idlg');
+    if(idlg&&idlg.style.display==='flex'&&typeof closeIdlg==='function')closeIdlg();
+  }
+  if(except!=='story'&&typeof dismissStoryBanner==='function'&&typeof storyBannerOpen==='function'&&storyBannerOpen()){
+    // Non forzare chiusura storia a meno che non apriamo un altro UI critico
+  }
+}
 function touchTap(id,fn){
   const b=document.getElementById(id);if(!b||typeof fn!=='function')return;
   b.addEventListener('touchstart',e=>{e.preventDefault();fn();},{passive:false});
@@ -4895,7 +4733,7 @@ if(_bpBoardBtn)_bpBoardBtn.addEventListener('pointerup',e=>{
 /** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
 const FLY_STEER={active:false,nx:0};
 (function initFlyScreenSteer(){
-  const uiSel='button,a,input,select,textarea,.cb,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,.btouch-pad,#boarding-hud';
+  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,.btouch-pad,#boarding-hud';
   const isUi=t=>{
     if(!t||!t.closest)return false;
     return !!t.closest(uiSel);
@@ -5338,6 +5176,7 @@ function showIdlgLine(ns,line,cb){
 
 function openIdlg(ns){
   if(GAME.state!=='flying')return;
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('dialogue');
   activeDlgNpc=ns;
   GAME.state='dialogue';
   setPausedReason('dialogue',true);
@@ -10315,6 +10154,7 @@ function handleMapClick(e){
 function toggleMap(){
   const el=document.getElementById('gmap');
   if(el.style.display==='block'){closeMap();return;}
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('map');
   setPausedReason('map',true);
   el.style.display='block';
   resizeGM();
@@ -10515,6 +10355,11 @@ function drawRadar(){
 // HUD UPDATE
 // ─────────────────────────────────────────────────
 function updateHUD(){
+  const thrRail=document.getElementById('throttle-rail');
+  if(thrRail){
+    const showFly=GAME.state==='flying'&&!gameplayPaused()&&!document.body.classList.contains('boarding-active');
+    thrRail.style.display=showFly?'':'none';
+  }
   document.getElementById('bh').style.width=Math.max(0,playerShip.health)+'%';
   document.getElementById('bh').style.background=playerShip.health<30?'linear-gradient(90deg,#cc2200,#ff5522)':'linear-gradient(90deg,#1155ff,#33aaff)';
   document.getElementById('be').style.width=Math.max(0,playerShip.energy)+'%';

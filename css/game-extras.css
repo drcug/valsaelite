@@ -197,9 +197,9 @@ body:not(.landing-pano) #land-pano{display:none!important;opacity:0!important;}
   background:linear-gradient(180deg,#4a6578,#2a4050)!important;
   filter:none;
 }
-.throttle-wrap{
+.throttle-wrap,.throttle{display:none!important}
+#throttle-rail{
   border-color:rgba(62,207,187,.55)!important;
-  box-shadow:0 0 12px rgba(46,200,160,.25);
 }
 
 /* Help modal */
