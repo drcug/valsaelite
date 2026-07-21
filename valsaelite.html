@@ -4332,7 +4332,11 @@ window.addEventListener('keyup',e=>{
 });
 function touch(id,act){
   const b=document.getElementById(id);if(!b)return;
-  const on=e=>{e.preventDefault();INP[act]=true;};const off=e=>{e.preventDefault();INP[act]=false;};
+  const on=e=>{
+    if(typeof storyBannerOpen==='function'&&storyBannerOpen()){e.preventDefault();return;}
+    e.preventDefault();INP[act]=true;
+  };
+  const off=e=>{e.preventDefault();INP[act]=false;};
   b.addEventListener('touchstart',on,{passive:false});b.addEventListener('touchend',off,{passive:false});
   b.addEventListener('mousedown',on);b.addEventListener('mouseup',off);b.addEventListener('mouseleave',off);
 }
@@ -4844,7 +4848,7 @@ const SUBORBIT={
   smoothX:0,smoothY:0,smoothGy:0,
   anchor:new THREE.Vector3(),
   prevFog:null,prevClear:SPACE_CLEAR_COLOR,
-  skyMesh:null,skyTex:null,
+  skyMesh:null,skyTex:null,horizonMesh:null,_skyTilt:.1,_terraMaps:null,
   runGoal:32000,corridorComplete:false,corridorBonusTaken:false,_lastProgBracket:0,
   autoExitRemaining:null,
   // Qualità “commercial”: stress, set piece, FX, statistiche run, debrief.
@@ -4852,15 +4856,16 @@ const SUBORBIT={
   flashHit:0,flashMiss:0,_lowHpPip:false,runStats:null,loadingTip:'',hudStressVis:0,_debriefCb:null
 };
 const SUBORBIT_PTYPE_BASE={
-  earth:{fog:0x88b8de,clear:0x72a5d6,terrain:0x4c7247,prop:0x4f6f43,enemy:0xcc5533,hazard:0xaa33ff,pickup:0x44ddee},
-  green:{fog:0x74a28f,clear:0x628f80,terrain:0x3e6d44,prop:0x4a774a,enemy:0xd76537,hazard:0xb247ff,pickup:0x66f0c8},
-  ice:{fog:0xc0d8ee,clear:0x9abfdd,terrain:0xa2b7c9,prop:0x8ea7be,enemy:0xff6f5c,hazard:0x7a93ff,pickup:0x86f2ff},
-  barren:{fog:0xc8ab88,clear:0xae855e,terrain:0x8a6345,prop:0x8f7258,enemy:0xff8844,hazard:0xe25cff,pickup:0x69f1ff},
-  industrial:{fog:0xa99a8f,clear:0x7b7670,terrain:0x5f5f63,prop:0x7a6f66,enemy:0xff774a,hazard:0xff40c6,pickup:0x57dfff},
-  fortress:{fog:0x9a9fc9,clear:0x676d9e,terrain:0x505a7a,prop:0x66749b,enemy:0xff6650,hazard:0xd569ff,pickup:0x72cbff},
-  rock:{fog:0x9f8f82,clear:0x75665a,terrain:0x6e6057,prop:0x7d7065,enemy:0xff7e4f,hazard:0xc35bff,pickup:0x61d7ff},
-  asteroid:{fog:0x8b8477,clear:0x615a50,terrain:0x5f564d,prop:0x6c6258,enemy:0xff9e54,hazard:0xb06cff,pickup:0x76e0ff},
-  default:{fog:0xa8c6df,clear:SUBORBIT_CLEAR_COLOR,terrain:0x4f7148,prop:0x666e78,enemy:0xcc5533,hazard:0xaa33ff,pickup:0x44ddee}
+  // Palette base per tipo — poi override da illustrazioni pianeta
+  earth:{fog:0x5a8a88,clear:0x2a4a55,terrain:0x2f5a3a,prop:0xc4a878,enemy:0xcc5533,hazard:0xaa33ff,pickup:0x6bf6ff,horizon:0x7ab0a0,accent:0xd4a050},
+  green:{fog:0x5a6850,clear:0x3a4a40,terrain:0x3a5040,prop:0x8a9070,enemy:0xd76537,hazard:0xb247ff,pickup:0x66f0c8,horizon:0x6a7858,accent:0xc4b070},
+  ice:{fog:0x6a9890,clear:0x2a5a58,terrain:0x5a7880,prop:0xc87840,enemy:0xff6f5c,hazard:0x7a93ff,pickup:0x86f2ff,horizon:0x88c8c0,accent:0xff8844},
+  barren:{fog:0xc8a050,clear:0x3a6868,terrain:0xa86830,prop:0x8a9098,enemy:0xff8844,hazard:0xe25cff,pickup:0x69f1ff,horizon:0xe0b060,accent:0xffcc66},
+  industrial:{fog:0x5a4838,clear:0x2a2a28,terrain:0x3a3834,prop:0xc87840,enemy:0xff774a,hazard:0xff40c6,pickup:0x57dfff,horizon:0x6a5848,accent:0xff9933},
+  fortress:{fog:0x4a5848,clear:0x2a4038,terrain:0x2a3830,prop:0xa87848,enemy:0xff6650,hazard:0xd569ff,pickup:0x72cbff,horizon:0x5a6858,accent:0xc49200},
+  rock:{fog:0x3d4c4d,clear:0x252e31,terrain:0x363535,prop:0x7d7065,enemy:0xff7e4f,hazard:0xc35bff,pickup:0x61d7ff,horizon:0x4a5858,accent:0x88aacc},
+  asteroid:{fog:0x444737,clear:0x2a312a,terrain:0x3b3728,prop:0x6c6258,enemy:0xff9e54,hazard:0xb06cff,pickup:0x76e0ff,horizon:0x555040,accent:0xffaa55},
+  default:{fog:0x5a8a88,clear:SUBORBIT_CLEAR_COLOR,terrain:0x4f7148,prop:0x666e78,enemy:0xcc5533,hazard:0xaa33ff,pickup:0x44ddee,horizon:0x7ab0a0,accent:0xd4a050}
 };
 const SUBORBIT_FACTION_STYLE={
   bazzano:{pickupBias:.2,enemyBias:-.08,hazardBias:-.06,tag:'CORRIDOIO COMMERCIALE',runGoalMult:.9,autoExitDelay:4.8,objectiveHud:'COMMERCIO',
@@ -4875,16 +4880,59 @@ const SUBORBIT_FACTION_STYLE={
     milestones:{25:'Vena aromatica al 25% — sospensioni dense.',50:'Cuore tartufero: raccolta segnata.',75:'Ultimo tratto: mercato e scia privata.'}}
 };
 const SUBORBIT_PLANET_STYLE={
-  bazzano:{clear:0x6f9fd6,fog:0x88b6e4,pickup:0x6bf6ff,tag:'CAPITALE BAZZANESE',spawnEnemyBase:1.12,spawnPickupBase:.72,spawnHazardBase:1.58,cityStyle:'utopia'},
-  crespellano:{clear:0x9a7556,fog:0xc8a37f,terrain:0x7f5d45,tag:'SCUOLE A TESTA IN GIU',spawnEnemyBase:.88,spawnPickupBase:1.15,spawnHazardBase:.92,cityStyle:'rough',runGoal:27200},
-  calcara:{clear:0x6f6661,fog:0xa89686,terrain:0x666264,enemy:0xff9c4f,hazard:0xff58d4,tag:'ORBITA OLIGARCHICA',spawnEnemyBase:.78,spawnPickupBase:1.35,spawnHazardBase:.7,enemyGeo:'cube',pickupGeo:'crate',hazardGeo:'mine',cityStyle:'industrial'},
-  monteveglio:{clear:0x5f659a,fog:0x9498c8,enemy:0xff6e60,hazard:0xdf6fff,tag:'ROCCA DA GUERRA',spawnEnemyBase:.7,spawnPickupBase:1.28,spawnHazardBase:1.05,enemyHp:3,enemyGeo:'shard',hazardGeo:'spike',boss:true,bossName:'Araldo Corazzato',bossHp:10,bossColor:0xff7744,bossTriggerKills:6,cityStyle:'fortress',runGoal:39200},
-  oliveto:{clear:0x5f8b76,fog:0x7da591,terrain:0x406e4d,tag:'BIBLIOTECA DELL\'ORDINE',spawnEnemyBase:1.06,spawnPickupBase:.76,spawnHazardBase:1.7,cityStyle:'utopia'},
-  savigno:{clear:0x83abd3,fog:0xbdd7ee,pickup:0x9bf9ff,tag:'VENA TARTUFERA',spawnEnemyBase:1.2,spawnPickupBase:.62,spawnHazardBase:1.9,tractorPull:1.2,pickupGeo:'capsule',boss:true,bossName:'Predone dei Tartufi',bossHp:9,bossColor:0x66eeff,bossTriggerKills:5,cityStyle:'warped'},
-  san_chierlo:{clear:0x8ab6de,fog:0xc8dff1,pickup:0xb0ffff,tag:'RICERCA TARTUFI',spawnEnemyBase:1.25,spawnPickupBase:.58,spawnHazardBase:2.05,tractorPull:1.28,pickupGeo:'capsule',cityStyle:'utopia'},
-  zappolino:{clear:0x646ba5,fog:0x9fa5d2,enemy:0xff6a66,tag:'ANELLO DI DIFESA',spawnEnemyBase:.74,spawnPickupBase:1.24,spawnHazardBase:1.15,enemyHp:3,enemyGeo:'drone',hazardGeo:'mine',cityStyle:'fortress'},
-  castelletto:{clear:0x585047,fog:0x847a6e,terrain:0x584d43,pickup:0x98e6ff,tag:'POMPA LIBERA',spawnEnemyBase:1.05,spawnPickupBase:.95,spawnHazardBase:1.4,cityStyle:'rough'},
-  serravalle:{clear:0x4f5869,fog:0x727f97,terrain:0x4c515f,hazard:0x8f74ff,tag:'FRONTIERA ESTERNA',spawnEnemyBase:.82,spawnPickupBase:1.16,spawnHazardBase:1.12,cityStyle:'warped'}
+  // Palette allineate alle illustrazioni panoramiche Forbidden Planet
+  bazzano:{
+    clear:0x1e3a48,fog:0x5a8a82,terrain:0x2a5c38,prop:0xd2b080,horizon:0x6aa8a0,accent:0xe0b060,
+    pickup:0x6bf6ff,tag:'CAPITALE BAZZANESE',spawnEnemyBase:1.12,spawnPickupBase:.72,spawnHazardBase:1.58,
+    cityStyle:'utopia',terrainStyle:'continents',skyTilt:.12
+  },
+  crespellano:{
+    clear:0x2a5858,fog:0xc8a050,terrain:0xa86828,prop:0x9aa0a8,horizon:0xe0b060,accent:0xffcc66,
+    tag:'SCUOLE A TESTA IN GIU',spawnEnemyBase:.88,spawnPickupBase:1.15,spawnHazardBase:.92,
+    cityStyle:'spires',terrainStyle:'desert',runGoal:27200,skyTilt:.08
+  },
+  calcara:{
+    clear:0x222220,fog:0x5a4838,terrain:0x3a3834,prop:0xc87840,horizon:0x6a5848,accent:0xff9933,
+    enemy:0xff9c4f,hazard:0xff58d4,tag:'ORBITA OLIGARCHICA',spawnEnemyBase:.78,spawnPickupBase:1.35,spawnHazardBase:.7,
+    enemyGeo:'cube',pickupGeo:'crate',hazardGeo:'mine',cityStyle:'industrial',terrainStyle:'industrial',skyTilt:.05
+  },
+  monteveglio:{
+    clear:0x243830,fog:0x4a5848,terrain:0x2a3830,prop:0xa87848,horizon:0x5a6858,accent:0xc49200,
+    enemy:0xff6e60,hazard:0xdf6fff,tag:'ROCCA DA GUERRA',spawnEnemyBase:.7,spawnPickupBase:1.28,spawnHazardBase:1.05,
+    enemyHp:3,enemyGeo:'shard',hazardGeo:'spike',boss:true,bossName:'Araldo Corazzato',bossHp:10,bossColor:0xff7744,
+    bossTriggerKills:6,cityStyle:'fortress',terrainStyle:'fortress',runGoal:39200,skyTilt:.1
+  },
+  oliveto:{
+    clear:0x2e3a34,fog:0x5a6850,terrain:0x3a5040,prop:0xb0a878,horizon:0x6a7858,accent:0xc4b070,
+    tag:'BIBLIOTECA DELL\'ORDINE',spawnEnemyBase:1.06,spawnPickupBase:.76,spawnHazardBase:1.7,
+    cityStyle:'utopia',terrainStyle:'garden',skyTilt:.09
+  },
+  savigno:{
+    clear:0x1a4848,fog:0x6a9890,terrain:0x5a7888,prop:0xc87840,horizon:0x88c8c0,accent:0xff8844,
+    pickup:0x9bf9ff,tag:'VENA TARTUFERA',spawnEnemyBase:1.2,spawnPickupBase:.62,spawnHazardBase:1.9,
+    tractorPull:1.2,pickupGeo:'capsule',boss:true,bossName:'Predone dei Tartufi',bossHp:9,bossColor:0x66eeff,
+    bossTriggerKills:5,cityStyle:'domes',terrainStyle:'icePlateau',skyTilt:.14
+  },
+  san_chierlo:{
+    clear:0x1e5058,fog:0x78a8a8,terrain:0x688898,prop:0xd08850,horizon:0x98d0c8,accent:0xffaa66,
+    pickup:0xb0ffff,tag:'RICERCA TARTUFI',spawnEnemyBase:1.25,spawnPickupBase:.58,spawnHazardBase:2.05,
+    tractorPull:1.28,pickupGeo:'capsule',cityStyle:'domes',terrainStyle:'icePlateau',skyTilt:.13
+  },
+  zappolino:{
+    clear:0x283840,fog:0x4a5868,terrain:0x303840,prop:0xa87858,horizon:0x5a6878,accent:0xc49200,
+    enemy:0xff6a66,tag:'ANELLO DI DIFESA',spawnEnemyBase:.74,spawnPickupBase:1.24,spawnHazardBase:1.15,
+    enemyHp:3,enemyGeo:'drone',hazardGeo:'mine',cityStyle:'fortress',terrainStyle:'fortress',skyTilt:.1
+  },
+  castelletto:{
+    clear:0x2a312a,fog:0x555040,terrain:0x3b3728,prop:0x98a070,horizon:0x666050,accent:0xffaa55,
+    pickup:0x98e6ff,tag:'POMPA LIBERA',spawnEnemyBase:1.05,spawnPickupBase:.95,spawnHazardBase:1.4,
+    cityStyle:'rough',terrainStyle:'rock',skyTilt:.06
+  },
+  serravalle:{
+    clear:0x1e282c,fog:0x3d4c4d,terrain:0x363535,prop:0x7d8078,horizon:0x4a5858,accent:0x88aacc,
+    hazard:0x8f74ff,tag:'FRONTIERA ESTERNA',spawnEnemyBase:.82,spawnPickupBase:1.16,spawnHazardBase:1.12,
+    cityStyle:'warped',terrainStyle:'rock',skyTilt:.07
+  }
 };
 const SUBORBIT_PTYPE_LOOT={
   earth:[['vino',.34],['documenti',.22],['cristalli',.44]],
@@ -4977,7 +5025,8 @@ function getSuborbitProfile(sm){
     spawnEnemyBase:1.0,spawnPickupBase:1.0,spawnHazardBase:1.0,
     enemyHp:2,enemyWobble:34,enemyHitDmg:10,hazardHitDmg:14,tractorPull:1,
     enemyGeo:'octa',pickupGeo:'orb',hazardGeo:'knot',tag:'SUBORBITALE ATTIVO',
-    cityStyle:'rough',enemyBrain:'swarm',pickupKind:'mixed',
+    cityStyle:'rough',terrainStyle:'continents',skyTilt:.1,
+    enemyBrain:'swarm',pickupKind:'mixed',
     runGoalMult:1,autoExitDelay:5.5,objectiveHud:null,milestones:null
   },base,fact,planet);
   profile.spawnEnemyBase=Math.max(.58,profile.spawnEnemyBase+(profile.enemyBias||0));
@@ -4996,18 +5045,65 @@ function getSuborbitProfile(sm){
   }
   return profile;
 }
+function getSuborbitTerrainMap(pType){
+  if(!SUBORBIT._terraMaps)SUBORBIT._terraMaps={};
+  const key=pType||'earth';
+  if(SUBORBIT._terraMaps[key])return SUBORBIT._terraMaps[key];
+  const src=TX[key]&&TX[key].map;
+  if(!src)return null;
+  const t=src.clone();
+  t.wrapS=t.wrapT=THREE.RepeatWrapping;
+  t.repeat.set(5,9);
+  t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+  if(THREE.SRGBColorSpace!==undefined)t.colorSpace=THREE.SRGBColorSpace;
+  else if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;
+  t.needsUpdate=true;
+  SUBORBIT._terraMaps[key]=t;
+  return t;
+}
+function ensureSuborbitHorizon(b){
+  const col=(b&&(b.horizon!=null?b.horizon:b.fog))||0x7ab0a0;
+  if(!SUBORBIT.horizonMesh){
+    const geo=new THREE.RingGeometry(2400,6400,72);
+    const mat=new THREE.MeshBasicMaterial({
+      color:col,transparent:true,opacity:.38,side:THREE.DoubleSide,
+      fog:false,depthWrite:false,blending:THREE.AdditiveBlending
+    });
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.rotation.x=-Math.PI/2;
+    mesh.renderOrder=-15;
+    mesh.frustumCulled=false;
+    scene.add(mesh);
+    SUBORBIT.horizonMesh=mesh;
+  }else{
+    SUBORBIT.horizonMesh.material.color.setHex(col);
+    SUBORBIT.horizonMesh.material.opacity=.38;
+    SUBORBIT.horizonMesh.visible=true;
+  }
+}
 function applySuborbitBiome(sm){
   const b=SUBORBIT.profile||getSuborbitProfile(sm);
-  scene.fog=new THREE.Fog(b.fog,240,5600);
+  // Nebbia morbida: lascia leggere il panorama e la fascia d'orizzonte
+  scene.fog=new THREE.Fog(b.fog,980,8800);
   renderer.setClearColor(b.clear,1);
+  SUBORBIT._skyTilt=(b.skyTilt!=null)?b.skyTilt:.1;
   setSuborbitSkyPano(sm);
+  ensureSuborbitHorizon(b);
+  const pType=(sm&&sm.sd&&sm.sd.pType)||'earth';
+  const terraMap=getSuborbitTerrainMap(pType);
+  const accentHex=(b.accent!=null)?b.accent:(b.horizon!=null?b.horizon:b.terrain);
   for(const ch of SUBORBIT.terrain.chunks){
     if(ch.mesh&&ch.mesh.material){
       const tm=ch.mesh.material;
       tm.color.setHex(b.terrain);
-      tm.emissive=new THREE.Color(b.terrain);
-      tm.emissiveIntensity=.07;
-      tm.roughness=.76;tm.metalness=.06;tm.flatShading=false;
+      if(terraMap){
+        tm.map=terraMap;
+        tm.map.needsUpdate=true;
+      }
+      tm.emissive=new THREE.Color(accentHex);
+      tm.emissiveIntensity=.045;
+      tm.roughness=.78;tm.metalness=.05;tm.flatShading=false;
+      tm.needsUpdate=true;
     }
   }
   const st=b.cityStyle||'rough';
@@ -5018,6 +5114,8 @@ function applySuborbitBiome(sm){
     p.material.color.offsetHSL((sd-.5)*.08,.06,.12);
     let rt=.74,rr=.6,mt=.14,mr=.05,etM=.2,erM=.17;
     if(st==='utopia'){rt=.42;rr=.34;mt=.42;mr=.34;etM=.28;erM=.24;}
+    else if(st==='domes'){rt=.28;rr=.42;mt=.72;mr=.48;etM=.38;erM=.22;}
+    else if(st==='spires'){rt=.36;rr=.5;mt=.58;mr=.32;etM=.26;erM=.16;}
     else if(st==='warped'){rt=.82;rr=.72;mt=.2;mr=.12;etM=.14;erM=.12;}
     else if(st==='industrial'){rt=.66;rr=.56;mt=.22;mr=.11;etM=.17;erM=.15;}
     else if(st==='fortress'){rt=.58;rr=.5;mt=.26;mr=.16;etM=.19;erM=.16;}
@@ -5053,12 +5151,14 @@ function setSuborbitSkyPano(sm){
   const url=(typeof planetPano==='function'&&sm&&sm.sd)?planetPano(sm.sd.id):null;
   if(!url){clearSuborbitSkyPano();return;}
   const loader=new THREE.TextureLoader();
+  const tilt=(SUBORBIT.profile&&SUBORBIT.profile.skyTilt!=null)?SUBORBIT.profile.skyTilt:(SUBORBIT._skyTilt||.1);
+  SUBORBIT._skyTilt=tilt;
   loader.load(url,(tex)=>{
     tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;
     if(THREE.SRGBColorSpace!==undefined)tex.colorSpace=THREE.SRGBColorSpace;
     else if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;
     if(!SUBORBIT.skyMesh){
-      const geo=new THREE.SphereGeometry(4200,32,20);
+      const geo=new THREE.SphereGeometry(7600,48,28);
       const mat=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,fog:false,depthWrite:false});
       const mesh=new THREE.Mesh(geo,mat);
       mesh.renderOrder=-20;
@@ -5072,15 +5172,28 @@ function setSuborbitSkyPano(sm){
       SUBORBIT.skyMesh.visible=true;
     }
     SUBORBIT.skyTex=tex;
+    SUBORBIT.skyMesh.rotation.x=tilt;
+    SUBORBIT.skyMesh.rotation.z=tilt*.35;
   },undefined,()=>{/* silent */});
 }
 function clearSuborbitSkyPano(){
   if(SUBORBIT.skyMesh)SUBORBIT.skyMesh.visible=false;
+  if(SUBORBIT.horizonMesh)SUBORBIT.horizonMesh.visible=false;
 }
 function updateSuborbitSkyFollow(){
-  if(!SUBORBIT.skyMesh||!SUBORBIT.active)return;
-  SUBORBIT.skyMesh.position.copy(SUBORBIT.anchor);
-  SUBORBIT.skyMesh.position.y+=180;
+  if(!SUBORBIT.active)return;
+  if(SUBORBIT.skyMesh){
+    SUBORBIT.skyMesh.position.copy(SUBORBIT.anchor);
+    SUBORBIT.skyMesh.position.y+=90;
+    SUBORBIT.skyMesh.rotation.x=SUBORBIT._skyTilt||.1;
+    SUBORBIT.skyMesh.rotation.y=SUBORBIT.offset*0.000018;
+    SUBORBIT.skyMesh.rotation.z=(SUBORBIT._skyTilt||.1)*.35;
+  }
+  if(SUBORBIT.horizonMesh){
+    SUBORBIT.horizonMesh.position.copy(SUBORBIT.anchor);
+    SUBORBIT.horizonMesh.position.y+=28;
+    SUBORBIT.horizonMesh.rotation.z=SUBORBIT.offset*0.00001;
+  }
 }
 /** Palette per tipo nemico (mesh composte: hull + sensori). */
 function setSuborbitEnemyKindVisual(e){
@@ -5124,11 +5237,40 @@ function setSpaceFlightObjectsVisible(on){
 }
 function hashRand(seed,i){const n=Math.sin(seed*97.1+i*12.9898)*43758.5453;return n-Math.floor(n);}
 function suborbitHeight(seed,x,z){
+  const style=(SUBORBIT.profile&&SUBORBIT.profile.terrainStyle)||'continents';
   const ridge=Math.sin(z*.0042+seed*.31)*64+Math.sin(z*.0105-seed*.12)*28;
   const dunes=Math.sin((x*.012)+(z*.008))*14+Math.cos((x*.007)-(z*.005))*11;
   const sideWall=Math.max(0,Math.abs(x)-540)*.12;
   const noise=(hashRand(seed,x*.0027+z*.0011)-.5)*10;
   const detail=Math.sin(x*.051+z*.033)*1.35+Math.sin(x*.019-z*.024)*0.85;
+  if(style==='icePlateau'){
+    const cell=Math.floor(z/300)+Math.floor(x/340)*19;
+    const plateau=hashRand(seed,cell+3.1);
+    const base=plateau>.42?(52+plateau*48):(6+plateau*22);
+    const cliff=Math.pow(Math.abs(Math.sin(z*.007+seed*.4)),3)*18;
+    return base+cliff+detail*.45+sideWall*.7+noise*.4;
+  }
+  if(style==='desert'){
+    return 16+dunes*2.05+Math.sin(z*.0028+seed*.2)*20+noise*.55+sideWall*.35+detail*.35;
+  }
+  if(style==='continents'){
+    const land=Math.sin(x*.0032+seed*.11)+Math.cos(z*.0026-seed*.19);
+    const hills=land>0?(38+ridge*.55):(10+ridge*.22);
+    return hills+dunes*.45+noise+sideWall+detail;
+  }
+  if(style==='industrial'){
+    const terrace=Math.floor(Math.abs(x)/90)*3.2;
+    return 20+Math.abs(Math.sin(z*.0055))*22+terrace+noise*.7+sideWall*.8+detail*.25;
+  }
+  if(style==='fortress'){
+    return 28+ridge*.72+Math.max(0,Math.sin(z*.0048)*38)+sideWall*1.35+noise+detail*.5;
+  }
+  if(style==='garden'){
+    return 22+ridge*.38+dunes*.9+Math.sin(x*.018)*9+noise*.8+sideWall*.45+detail;
+  }
+  if(style==='rock'){
+    return 18+ridge*1.15+Math.abs(dunes)*1.35+noise*1.85+sideWall+detail;
+  }
   return 26+ridge+dunes+noise+sideWall+detail;
 }
 function mkSuborbitChunk(){
@@ -5416,25 +5558,45 @@ function mkSuborbitLatheTower(style,seed){
     const t=f/Math.max(1,floors-1);
     let maxR=11;
     if(style==='utopia')maxR=7+Math.sin(t*Math.PI)*9+hashRand(seed,f)*6;
+    else if(style==='spires')maxR=2.2+(t<.15?8:0)+hashRand(seed,f)*2.4+(f%3===0?7:0);
+    else if(style==='domes')maxR=14+Math.sin(t*Math.PI)*.8+hashRand(seed,f)*4;
     else if(style==='fortress')maxR=15+hashRand(seed,f)*14+t*10;
     else if(style==='industrial')maxR=10+(t>.52?11:0)+hashRand(seed,f+2)*12;
     else if(style==='warped')maxR=8+Math.sin(f*.85+seed*2)*7+hashRand(seed,f)*9;
     else maxR=9+hashRand(seed,f)*12;
     pts.push(new THREE.Vector2(maxR,y));
-    y+=(style==='fortress'?28:20)+hashRand(seed,f+4)*34;
-    pts.push(new THREE.Vector2(maxR*.82,y));
+    y+=(style==='fortress'?28:(style==='spires'?34:20))+hashRand(seed,f+4)*34;
+    pts.push(new THREE.Vector2(maxR*(style==='spires'?.55:.82),y));
   }
   pts.push(new THREE.Vector2(.35,y+8+hashRand(seed,8)*36));
-  const segs=style==='utopia'?24:18;
+  const segs=(style==='utopia'||style==='domes')?24:18;
   return new THREE.LatheGeometry(pts,segs);
 }
 function mkSuborbitPropGeo(style,seed,propKind){
   const r=hashRand((seed*17.3)|0,seed*.31);
   if(propKind==='rock'){
+    const ts=(SUBORBIT.profile&&SUBORBIT.profile.terrainStyle)||'';
+    if(ts==='icePlateau'||style==='domes'){
+      if(r<.5)return new THREE.ConeGeometry(12+r*10,28+r*60,7);
+      return new THREE.OctahedronGeometry(14+r*10,0);
+    }
     if(r<.32)return new THREE.IcosahedronGeometry(13+r*11,0);
     if(r<.64)return new THREE.DodecahedronGeometry(11+r*9,0);
     if(r<.88)return new THREE.OctahedronGeometry(12+r*8,0);
     return new THREE.ConeGeometry(10+r*8,26+r*52,8);
+  }
+  if(style==='domes'){
+    if(r<.58)return new THREE.SphereGeometry(18+r*16,16,12,0,Math.PI*2,0,Math.PI*.58);
+    if(r<.82)return new THREE.CylinderGeometry(2.2+r*1.8,3.5+r*2,70+r*90,8);
+    try{return mkSuborbitLatheTower(style,seed);}catch(_){}
+    return new THREE.ConeGeometry(8+r*6,48+r*60,10);
+  }
+  if(style==='spires'){
+    if(r<.72){
+      try{return mkSuborbitLatheTower(style,seed);}catch(_){}
+      return new THREE.CylinderGeometry(2.4+r*2,3.8+r*2.5,90+r*130,10);
+    }
+    return new THREE.ConeGeometry(5+r*4,80+r*110,8);
   }
   if(r<.68){
     try{return mkSuborbitLatheTower(style,seed);}catch(_){}
@@ -5474,10 +5636,12 @@ function applySuborbitPropLook(){
     const h=Math.max(8,bb.max.y-bb.min.y);
     p.userData.h=h;
     p.userData.yFoot=-bb.min.y;
-    // Utopia = più emissivo e "pulito", warped = più scuro/metallico.
     if(style==='utopia'){p.material.roughness=.32;p.material.metalness=.62;p.material.emissiveIntensity=pk==='tower'?.14:.09;}
+    else if(style==='domes'){p.material.roughness=.26;p.material.metalness=.78;p.material.emissiveIntensity=pk==='tower'?.2:.1;}
+    else if(style==='spires'){p.material.roughness=.34;p.material.metalness=.58;p.material.emissiveIntensity=pk==='tower'?.12:.07;}
     else if(style==='warped'){p.material.roughness=.76;p.material.metalness=.28;p.material.emissiveIntensity=.065;}
     else if(style==='industrial'){p.material.roughness=.55;p.material.metalness=.48;p.material.emissiveIntensity=pk==='tower'?.09:.06;}
+    else if(style==='fortress'){p.material.roughness=.5;p.material.metalness=.4;p.material.emissiveIntensity=pk==='tower'?.1:.06;}
     else{p.material.roughness=.72;p.material.metalness=.22;p.material.emissiveIntensity=pk==='tower'?.075:.05;}
   }
 }
