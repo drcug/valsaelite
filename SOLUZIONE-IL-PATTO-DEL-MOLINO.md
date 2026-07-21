@@ -58,6 +58,20 @@ Walkthrough completa della campagna principale, passo per passo.
 
 ---
 
+## 2b. Tab RADICI (incontri psicologici)
+
+Nelle stazioni principali compare il tab **RADICI**: dialoghi con gente che conosceva Zvan **prima** di Imperium (compagni, famiglia, ex amici).  
+
+- Ritratti: **Zvan Marìa** a sinistra + interlocutore a destra (evidenziato chi parla).  
+- Dialetto **bazzanese** autentico nei testi locali; Zvan spesso inciampa o parla “da Imperium”.  
+- Tema: scoprire di essere **estraneo al proprio posto**.  
+- Si sbloccano con i capitoli; una volta vissuti restano “FATTO”.  
+- Salvati in `PS.rootSeen`.  
+
+Luoghi tipici: Bazzano (osteria, zia, specchio), Crespellano (cugina), Calcara (ex compagno), Monteveglio (paladina d’infanzia), Savigno (zio), Castelletto (altra esule).
+
+---
+
 ## 3. Percorso campagna (8 capitoli)
 
 ### Mappa stazioni chiave
