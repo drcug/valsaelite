@@ -131,15 +131,15 @@ body.boarding-active #boarding-touch{display:flex}
 #boarding-hud .bh-bar>div{height:100%;background:linear-gradient(90deg,#ff4430,#ffb838 46%,#fff3a0);transition:width .15s}
 #boarding-hud .bh-obj{color:#9ee2ff;margin-top:6px}
 #boarding-hud .bh-hint{color:#6786a6;margin-top:7px;font-size:9px}
-#boarding-prompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);z-index:20;
+#boarding-prompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);z-index:36;
   background:var(--panel);border:1px solid rgba(255,160,80,.55);border-radius:8px;
   padding:10px 18px;text-align:center;font-family:var(--FM);font-size:11px;pointer-events:auto;
   box-shadow:0 0 0 1px rgba(196,137,58,.12),0 12px 36px rgba(0,0,0,.45);animation:pb 2s infinite;max-width:min(92vw,320px)}
 #boarding-prompt .bp-title{color:#ffd0a0;font-weight:700;font-size:14px;letter-spacing:.1em;font-family:var(--FD)}
 #boarding-prompt .bp-sub{color:#886648;font-size:9px;margin:3px 0 8px}
-#boarding-prompt button{pointer-events:auto;background:linear-gradient(180deg,#c46828,#a04818);color:#fff;border:none;
+#boarding-prompt button{pointer-events:auto;touch-action:manipulation;position:relative;z-index:37;background:linear-gradient(180deg,#c46828,#a04818);color:#fff;border:none;
   border-radius:5px;padding:7px 22px;font-family:var(--FD);font-weight:700;font-size:13px;
-  cursor:pointer;letter-spacing:.1em;width:100%}
+  cursor:pointer;letter-spacing:.1em;width:100%;-webkit-tap-highlight-color:transparent}
 
 /* Rep panel collapsible */
 .rp .rp-toggle{display:block;width:100%;background:transparent;border:none;padding:0;margin:0 0 3px;
@@ -745,7 +745,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="boarding-prompt">
   <div class="bp-title" id="bpnm"></div>
   <div class="bp-sub" id="bpds">[G] abborda</div>
-  <button type="button" id="bpbtn-board">ABBORDA</button>
+  <button type="button" id="bpbtn-board" onclick="tryBoardingTrigger()">ABBORDA</button>
 </div>
 <div id="suborbit-ui">
   <div class="srow">
@@ -1058,7 +1058,7 @@ const GOODS = {
   cristalli: {name:'Cristalli atmosferici',        unit:'unit'},
 };
 const SG = {
-  bazzano:    {vino:{s:90,b:115,sl:80},salumi:{s:55,b:180,sl:125},documenti:{s:100,b:11,sl:4}},
+  bazzano:    {vino:{s:90,b:115,sl:80},salumi:{s:55,b:180,sl:125},documenti:{s:100,b:11,sl:4},piadine:{s:40,b:22,sl:10}},
   sirena:     {vino:{s:60,b:130,sl:88},salumi:{s:40,b:195,sl:138}},
   lavino:     {tartufi:{s:20,b:450,sl:330},funghi:{s:50,b:160,sl:110}},
   zola:       {vino:{s:40,b:125,sl:82},salumi:{s:30,b:170,sl:118},carburante:{s:80,b:40,sl:25}},
@@ -1146,6 +1146,30 @@ const STORY = {
         desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
+    {
+      num:6, title:'L\'Ombra di Imperium',
+      intro:'Il Patto e\' intero, ma Imperium non applaude: manda un ispettore di sesto livello a "recuperare la documentazione". A Castelletto Rock ti aspetta una busta nera e un messaggio: "Consegna il rapporto, Zvan — o tornerai a Imperium in catene di carta." Devi portare i documenti imperiali alla roccia, dimostrando che il mulino gira per Valsamoggio, non per i corridoi di marmo.',
+      mission:{id:'story_6', type:'delivery', sid:'bazzano', targetSid:'castelletto',
+        title:'[STORIA] Rapporto a Castelletto',
+        desc:'Consegna i documenti imperiali a Castelletto Rock. L\'ispettore vuole la tua firma: non firmare oltre il necessario.',
+        reward:1100, repGain:{bazzano:10}, cargo:{type:'documenti',qty:1}, done:false, active:false},
+    },
+    {
+      num:7, title:'Fuoco sulla Rocca',
+      intro:'Castelletto non era solo un deposito: era un\'imboscata. I pirati — pagati da chi non ama il Patto vivo — aprono il fuoco sull\'anello esterno. L\'ispettore sparisce nei relitti. Il Consiglio ti chiede di fare cio\' che Imperium non puo\' ammettere: ripulire il vuoto. Tre scafi pirata. Niente bollettini.',
+      mission:{id:'story_7', type:'combat', sid:'castelletto',
+        title:'[STORIA] Caccia ai Pirati',
+        desc:'Abbatti 3 navi pirata nel sistema. Castelletto e le rotte mercantili devono tornare respirabili.',
+        reward:1400, repGain:{bazzano:12,savigno:8}, killFaction:'pirate',killsNeeded:3,killsDone:0, done:false, active:false},
+    },
+    {
+      num:8, title:'Il Mulino Acceso',
+      intro:'Torni a Bazzano Prime con le scie ancora calde. Il mulino simbolico e\' stato riacceso: non macina grano, macina orgogli. Imperium ti offre una promozione a sesto livello se resti zitto. Tu consegni invece una cassa di piadine e il silenzio giusto — quello che tiene insieme cinque fazioni. Il ritorno, dopo vent\'anni, e\' completo solo quando accetti di restare.',
+      mission:{id:'story_8', type:'delivery', sid:'bazzano', targetSid:'bazzano',
+        title:'[STORIA] Accendi il Mulino',
+        desc:'Consegna una cassa di piadine a Bazzano Prime per la cerimonia del Mulino Acceso. Poi il Patto e\' davvero vivo.',
+        reward:2500, repGain:{bazzano:25,crespellano:10,monteveglio:10,savigno:10,calcara:5}, cargo:{type:'piadine',qty:1}, done:false, active:false},
+    },
   ],
 };
 
@@ -1155,6 +1179,9 @@ const STORY_LINES={
   story_3:'[MONTEVEGLIO] "Il Castellano non vuole copie imperiali: vuole prove. Tre navi calcaresi nel vuoto non sono poesia — sono messaggio. Porta il messaggio, riporta il frammento."',
   story_4:'[SAVIGNO] "Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo — e in quanto ricordi ancora il sapore di casa. Tre chili: non e\' ricatto, e\' tradizione."',
   story_5:'[BAZZANO PRIME] "I tre pezzi tornano a casa. Anche tu. Se Calcara intercetta, non e\' pirateria — e\' revisione di testo. Non lasciare che riscrivano il Patto mentre cerchi un parcheggio in orbita."',
+  story_6:'[IMPERIUM] "Ispettore in arrivo. Consegna il rapporto a Castelletto. Non firmare cio\' che non hai letto — e non leggere cio\' che non puoi difendere."',
+  story_7:'[CASTELLETTO] "I pirati non sono casuali: qualcuno paga il fuoco. Tre scafi. Poi il vuoto torna a essere solo vuoto."',
+  story_8:'[BAZZANO] "Il mulino gira. Porta le piadine alla cerimonia — e resta, Zvan. Imperium puo\' aspettare un funzionario che ha ritrovato casa."',
 };
 SDATA.forEach(sd=>{
   if(sd.sat)sd.satR=Math.round(sd.satR*SAT_ORBIT_SCALE);
@@ -1255,29 +1282,39 @@ const STORY_INTERLUDES=[
     body:'Un comunicato pirata intercettato: "Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto."'},
   {id:'il_palato',after:4,minRep:{savigno:25},title:'Il Palato del Consiglio',
     body:'Nonna Graziella (se a bordo) scuote la testa: "Tre chili? I Savignesi non vendono la storia, la degustano. Sei entrato nella loro bocca, comandante."'},
+  {id:'il_ispettore',after:5,minRep:{bazzano:20},title:'L\'Ispettore di Sesto Livello',
+    body:'Un canale cifrato da Imperium: "Il Patto e\' patrimonio dell\'Impero. Preparati a restituire le carte." A Bazzano rispondono con un sorriso di pietra: "Qui le carte hanno sapore di casa."'},
+  {id:'la_rocca_nera',after:6,minRep:{},title:'La Roccia Nera',
+    body:'Castelletto segnala scie non registrate. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare.'},
+  {id:'il_mulino',after:7,minRep:{bazzano:30},title:'Il Mulino Acceso',
+    body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: "Promozione a sesto livello — se taci." Tu scegli il rumore del mulino.'},
 ];
 const _shownInterludes=new Set();
 function diaryStationLabel(sid){
   const s=typeof SDATA!=='undefined'?SDATA.find(x=>x.id===sid):null;
   return s?s.name:String(sid||'—');
 }
+function storyChapterCount(){
+  return (STORY.chapters&&STORY.chapters.length)||8;
+}
 function storyStepDone(step){
-  if(step<1||step>5)return false;
-  if(step<5)return STORY.chapter>step;
+  const n=storyChapterCount();
+  if(step<1||step>n)return false;
+  if(step<n)return STORY.chapter>step;
   return !!STORY.won;
 }
 /** Testo completo intro/missione solo se capitolo già raggiunto (o campagna vinta). */
 function diaryChapterRevealed(step){
-  if(step<1||step>5)return false;
+  const n=storyChapterCount();
+  if(step<1||step>n)return false;
   if(STORY.won)return true;
   return STORY.chapter>=step;
 }
 function renderDiaryContent(){
   const el=document.getElementById('diary-body');if(!el)return;
   let html='';
-  if(STORY.chapter<1&&!STORY.won){
-    html+='<div class="diary-ch pending"><h3>Prologo</h3><p class="dm">'+STORY.prologue.slice(0,260)+(STORY.prologue.length>260?'…':'')+'</p><div class="dst">Il primo capitolo parte automaticamente dopo il prologo. I capitoli successivi appariranno qui man mano che avanzi.</div></div>';
-  }else{
+  // Prologo sempre per intero (niente taglio a 260 caratteri)
+  html+='<div class="diary-ch '+(STORY.chapter>=1||STORY.won?'done':'pending')+'"><h3>Prologo</h3><p class="dm">'+STORY.prologue+'</p><div class="dst">'+(STORY.chapter<1&&!STORY.won?'Il primo capitolo parte automaticamente dopo il prologo.':'Inizio della campagna.')+'</div></div>';
   STORY.chapters.forEach((ch,i)=>{
     const step=i+1;
     if(!diaryChapterRevealed(step))return;
@@ -1295,12 +1332,14 @@ function renderDiaryContent(){
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
         extra+=` <em style="color:#88ccaa">Acquista tartufi a Savigno Deep, Zappolino o stazioni tartuifere.</em>`;
       }
+      if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
+        extra+=` <em style="color:#88ccaa">Compra piadine a Bazzano o Crespellano prima della cerimonia.</em>`;
+      }
     }
-    html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro.length>300?ch.intro.slice(0,300)+'…':ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p><div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
+    html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p><div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
   });
-  }
   if(STORY.won){
-    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto. Epilogo disponibile nella schermata finale.</p></div>'+html;
+    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso. Epilogo e missioni sandbox disponibili.</p></div>'+html;
   }
   el.innerHTML=html;
 }
@@ -1917,8 +1956,10 @@ function scheduleBpLiveRebuild(){
   clearTimeout(scheduleBpLiveRebuild._t);
   scheduleBpLiveRebuild._t=setTimeout(()=>{
     if(typeof rebuildPlayerMesh==='function'&&playerShip)rebuildPlayerMesh();
-    if(typeof scheduleBpPreviewSync==='function')scheduleBpPreviewSync();
-  },50);
+    // Forza sync immediato (non solo via rAF) così l'anteprima riflette il grid
+    if(typeof ensureBpPreview3d==='function')ensureBpPreview3d();
+    else if(typeof scheduleBpPreviewSync==='function')scheduleBpPreviewSync();
+  },30);
 }
 
 function roundRect(ctx,x,y,w,h,r){
@@ -1933,11 +1974,12 @@ function openBlueprintModal(){
   stripBlueprintToUnlocked();
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
+  if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh();
   drawBlueprint();
   setupBpEvents();
   setupBpHullPaintUi();
   ensureBpPreview3d();
-  setTimeout(()=>tryShowTutorialBlueprint(),120);
+  setTimeout(()=>{ensureBpPreview3d();tryShowTutorialBlueprint();},120);
 }
 
 function bpStructuralCellCount(){
@@ -3607,16 +3649,37 @@ let BP_PV=null,_bpPvRaf=0;
 function disposeBpPreviewMeshes(root){
   if(!root)return;
   root.traverse(ch=>{
-    if(ch.geometry)ch.geometry.dispose();
+    // Clone preview: dispose SOLO geo/mat clonate — mai texture condivise con la nave in volo.
+    if(!(ch.userData&&ch.userData._bpPreviewOwned))return;
+    if(ch.geometry){ch.geometry.dispose();ch.geometry=null;}
     if(ch.material){
       const mats=Array.isArray(ch.material)?ch.material:[ch.material];
       mats.forEach(mat=>{
         if(!mat)return;
-        if(mat.map)mat.map.dispose();
+        // Non dispose map/envMap: possono essere shared; i materiali blueprint non usano texture.
         if(typeof mat.dispose==='function')mat.dispose();
       });
     }
   });
+}
+function cloneShipForBpPreview(src){
+  if(!src)return null;
+  const m=src.clone(true);
+  m.traverse(ch=>{
+    if(!ch.isMesh)return;
+    if(ch.geometry){
+      ch.geometry=ch.geometry.clone();
+      ch.userData=ch.userData||{};
+      ch.userData._bpPreviewOwned=true;
+    }
+    if(ch.material){
+      if(Array.isArray(ch.material))ch.material=ch.material.map(x=>x?x.clone():x);
+      else ch.material=ch.material.clone();
+      ch.userData=ch.userData||{};
+      ch.userData._bpPreviewOwned=true;
+    }
+  });
+  return m;
 }
 function ensureBpPreview3d(){
   const wrap=document.getElementById('bp-preview-wrap');
@@ -3654,7 +3717,9 @@ function syncBpPreview3d(){
     disposeBpPreviewMeshes(BP_PV.mesh);
     BP_PV.mesh=null;
   }
-  const m=playerShip.mesh.clone(true);
+  // Assicura che la nave di volo rifletta il grid corrente prima del clone
+  const m=cloneShipForBpPreview(playerShip.mesh);
+  if(!m)return;
   m.rotation.set(0,0,0);
   BP_PV.scene.add(m);
   BP_PV.mesh=m;
@@ -4434,6 +4499,36 @@ touchTap('btnmiss',()=>launchPlayerMissile());
 touchTap('btntgt',()=>cycleTarget());
 touchTap('btnboard',()=>tryBoardingTrigger());
 touchTap('bpbtn-board',()=>tryBoardingTrigger());
+// Backup click (alcuni browser mobile mangiano il secondo evento dopo touchstart)
+const _bpBoardBtn=document.getElementById('bpbtn-board');
+if(_bpBoardBtn)_bpBoardBtn.addEventListener('pointerup',e=>{
+  if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();tryBoardingTrigger();}
+},{passive:false});
+
+/** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
+const FLY_STEER={active:false,nx:0};
+(function initFlyScreenSteer(){
+  const uiSel='button,a,input,select,textarea,.cb,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,.btouch-pad,#boarding-hud';
+  const isUi=t=>{
+    if(!t||!t.closest)return false;
+    return !!t.closest(uiSel);
+  };
+  const apply=(e)=>{
+    if(GAME.state!=='flying'){FLY_STEER.active=false;return;}
+    if(typeof storyBannerOpen==='function'&&storyBannerOpen()){FLY_STEER.active=false;return;}
+    if(GAME.pausedReasons&&Object.values(GAME.pausedReasons).some(Boolean)){FLY_STEER.active=false;return;}
+    if(isUi(e.target)){FLY_STEER.active=false;return;}
+    const w=Math.max(1,window.innerWidth||1);
+    const nx=(e.clientX/w)*2-1;
+    FLY_STEER.active=true;
+    FLY_STEER.nx=nx;
+  };
+  const end=()=>{FLY_STEER.active=false;};
+  window.addEventListener('pointerdown',apply,{passive:true});
+  window.addEventListener('pointermove',e=>{if(FLY_STEER.active||(e.buttons&1))apply(e);},{passive:true});
+  window.addEventListener('pointerup',end,{passive:true});
+  window.addEventListener('pointercancel',end,{passive:true});
+})();
 const _repToggle=document.getElementById('rep-toggle');
 if(_repToggle)_repToggle.addEventListener('click',(e)=>{e.preventDefault();toggleRepPanel();});
 touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');touch('sob-down','boost');touch('sob-fire','fire');touch('sob-tr','tractor');
@@ -8508,33 +8603,52 @@ function updateHulks(dt){
     }
   }
 }
-function findNearHulk(){
+function findNearHulk(rangePad){
   if(!playerShip||!playerShip.alive)return null;
+  const pad=(rangePad!=null)?rangePad:1100;
   let best=null, bestD=Infinity;
   for(const h of HULKS){
     if(h.looted)continue;
     const d=playerShip.mesh.position.distanceTo(h.mesh.position);
-    const r=(h.mesh.userData&&h.mesh.userData.bbR?h.mesh.userData.bbR:300)+720;
+    const r=(h.mesh.userData&&h.mesh.userData.bbR?h.mesh.userData.bbR:300)+pad;
     if(d<r && d<bestD){best=h;bestD=d;}
   }
   return best;
 }
 function tryBoardingTrigger(){
-  if(GAME.state!=='flying')return false;
-  const hulk=findNearHulk();
-  if(hulk){enterBoarding({kind:'hulk',hulk});return true;}
-  const ns=findBoardingTarget();
-  if(ns){enterBoarding({kind:'ship',npc:ns});return true;}
+  if(GAME.state!=='flying'){notify('Abbordaggio solo in volo.',1400);return false;}
+  // Usa il target memorizzato dal prompt, altrimenti cerca di nuovo
+  let hulk=BOARDING._promptHulk||findNearHulk(1400);
+  if(hulk&&hulk.looted)hulk=null;
+  if(!hulk)hulk=findNearHulk(1400);
+  if(hulk){
+    BOARDING._promptHulk=null;
+    enterBoarding({kind:'hulk',hulk});
+    return true;
+  }
+  const ns=BOARDING._promptNpc||findBoardingTarget();
+  if(ns){
+    BOARDING._promptNpc=null;
+    enterBoarding({kind:'ship',npc:ns});
+    return true;
+  }
   notify('Nessun bersaglio abbordabile vicino.',1600);
   return false;
 }
 function updateBoardingPrompt(){
-  if(GAME.state!=='flying'){const el=document.getElementById('boarding-prompt');if(el)el.style.display='none';return;}
+  if(GAME.state!=='flying'){
+    const el=document.getElementById('boarding-prompt');
+    if(el)el.style.display='none';
+    BOARDING._promptHulk=null;BOARDING._promptNpc=null;
+    return;
+  }
   const el=document.getElementById('boarding-prompt');if(!el)return;
   const title=document.getElementById('bpnm');
   const sub=document.getElementById('bpds');
-  const hulk=findNearHulk();
+  const hulk=findNearHulk(1400);
   const ns=hulk?null:findBoardingTarget();
+  BOARDING._promptHulk=hulk||null;
+  BOARDING._promptNpc=ns||null;
   if(hulk){
     const arch=HULK_ARCHETYPES[hulk.archetype]?.label||'Relitto';
     const d=Math.round(playerShip.mesh.position.distanceTo(hulk.mesh.position));
@@ -8886,7 +9000,10 @@ function completeMission(m){
   else if(m.id==='story_2'){advanceStory(3);PS.cargo.frammento=(PS.cargo.frammento||0)+1;}
   else if(m.id==='story_3'){advanceStory(4);PS.cargo.frammento=(PS.cargo.frammento||0)+1;}
   else if(m.id==='story_4'){advanceStory(5);PS.cargo.frammento=(PS.cargo.frammento||0)+1;}
-  else if(m.id==='story_5'){setTimeout(()=>triggerVictory(),2500);}
+  else if(m.id==='story_5'){advanceStory(6);}
+  else if(m.id==='story_6'){advanceStory(7);}
+  else if(m.id==='story_7'){advanceStory(8);}
+  else if(m.id==='story_8'){setTimeout(()=>triggerVictory(),2500);}
   if(m.id&&m.id.startsWith('story_'))setTimeout(checkStoryInterludes,3200);
 }
 
@@ -10027,7 +10144,7 @@ function triggerVictory(){
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
   const epilogue=storyEpilogueBody();
-  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br><br><em style="color:#aaccee">'+epilogue+'</em><br><br>Fine del Capitolo I: "Il Patto del Molino"';
+  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br><br><em style="color:#aaccee">'+epilogue+'</em><br><br>Fine della campagna: "Il Patto del Molino" · Mulino Acceso';
   const st=document.getElementById('go-stats');if(st)st.textContent=formatRunStats();
   document.getElementById('gor-sandbox').style.display='inline-block';
   document.getElementById('gor-load').style.display='none';
@@ -10456,8 +10573,14 @@ function animate(){
   if((GAME.state==='flying'||GAME.state==='dialogue')&&playerShip.alive){
     if(GAME.state==='flying'){
       const turnBoost=INP.thrust?1.22:1;
-      if(INP.left)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt*turnBoost;
-      if(INP.right) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt*turnBoost;
+      let turnL=!!INP.left, turnR=!!INP.right;
+      // Steer da tap/schermo: priorità se attivo e nessun tasto SX/DX premuto dai pad
+      if(typeof FLY_STEER!=='undefined'&&FLY_STEER.active&&!INP.left&&!INP.right){
+        if(FLY_STEER.nx<-0.1)turnL=true;
+        else if(FLY_STEER.nx>0.1)turnR=true;
+      }
+      if(turnL)  playerShip.mesh.rotation.y+=playerShip.turnSpeed*dt*turnBoost;
+      if(turnR) playerShip.mesh.rotation.y-=playerShip.turnSpeed*dt*turnBoost;
       if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
       RUN_STATS.distance+=playerShip.velocity.length()*dt;
       updateNavRisk(dt);

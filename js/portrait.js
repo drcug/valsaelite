@@ -419,6 +419,32 @@
     };
   }
 
+  /** Disegna busto/testa con lift luminosità (i midtoni scuri sparivano sul fondo dark UI). */
+  function drawBrightSprite(ctx, img, dx, dy, dw, dh, lift) {
+    lift = (lift == null) ? 1.35 : lift;
+    const iw = img.naturalWidth || img.width || 128;
+    const ih = img.naturalHeight || img.height || 160;
+    const c = document.createElement('canvas');
+    c.width = iw; c.height = ih;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, iw, ih);
+    x.drawImage(img, 0, 0);
+    x.globalCompositeOperation = 'source-atop';
+    x.globalAlpha = Math.min(0.55, Math.max(0, (lift - 1) * 0.85));
+    x.fillStyle = '#fff4e8';
+    x.fillRect(0, 0, iw, ih);
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
+    // Leggero contrasto via overlay caldo
+    x.globalCompositeOperation = 'soft-light';
+    x.globalAlpha = 0.35;
+    x.fillStyle = '#ffe8c8';
+    x.fillRect(0, 0, iw, ih);
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
+    ctx.drawImage(c, dx, dy, dw, dh);
+  }
+
   function drawLayeredBust(ctx, W, H, seed, factionId, opt) {
     opt = opt || {};
     const fCol = drawPortraitBg(ctx, W, H, factionId);
@@ -439,23 +465,12 @@
       const im = PortraitParts.get(playerL.head);
       if (im) {
         rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
-        ctx.drawImage(im, rect.dx, rect.dy, rect.dw, rect.dh);
+        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.15);
         drawn = true;
       }
     }
 
-    if (!drawn && atlas.ready && atlas.img && !isPlayer) {
-      rect = computeAtlasRect(W, H, atlas.img, seed);
-      if (rect) {
-        ctx.drawImage(
-          atlas.img,
-          rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch,
-          rect.dx, rect.dy, rect.dw, rect.dh
-        );
-        drawn = true;
-      }
-    }
-
+    // Preferisci head PNG (facce leggibili) rispetto all'atlas grezzo
     if (!drawn) {
       const heads = (L.parts && L.parts.heads) || [];
       const path = isPlayer && playerL.head
@@ -464,7 +479,24 @@
       const im = PortraitParts.get(path);
       if (im) {
         rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
-        ctx.drawImage(im, rect.dx, rect.dy, rect.dw, rect.dh);
+        drawBrightSprite(ctx, im, rect.dx, rect.dy, rect.dw, rect.dh, 1.4);
+        drawn = true;
+      }
+    }
+
+    if (!drawn && atlas.ready && atlas.img && !isPlayer) {
+      rect = computeAtlasRect(W, H, atlas.img, seed);
+      if (rect) {
+        // Estrai tile e illumina
+        const tile = document.createElement('canvas');
+        tile.width = rect.cw; tile.height = rect.ch;
+        const tx = tile.getContext('2d');
+        tx.drawImage(
+          atlas.img,
+          rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch,
+          0, 0, rect.cw, rect.ch
+        );
+        drawBrightSprite(ctx, tile, rect.dx, rect.dy, rect.dw, rect.dh, 1.4);
         drawn = true;
       }
     }

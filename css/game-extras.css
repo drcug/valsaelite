@@ -31,6 +31,8 @@ body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
   #a11y-strip,#fx-toggle{z-index:14;}
   #hud{z-index:20;}
   .hb,.flight-primary,.cb-row-extra,.cb{z-index:22;}
+  #boarding-prompt{z-index:36!important;bottom:max(148px,22vh)!important;}
+  #dprompt{z-index:35!important;}
   /* Extra bottom inset so controls sit above home indicator, not under chrome */
   #hud{padding-bottom:max(14px,env(safe-area-inset-bottom))!important;}
 }
@@ -138,7 +140,7 @@ body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
 #story-banner .st{font-size:clamp(18px,3vw,24px);font-weight:700;color:var(--bright);margin-bottom:8px;
   text-shadow:0 0 20px rgba(62,207,187,.2);letter-spacing:.06em}
 #story-banner .sd{font-size:12px;color:#9ec4bc;font-family:var(--FM);line-height:1.68;
-  max-height:min(28vh,200px);overflow-y:auto;padding:8px 6px 8px 12px;margin:0 0 10px;
+  max-height:min(42vh,320px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 6px 8px 12px;margin:0 0 10px;
   text-align:left;border-left:2px solid rgba(62,207,187,.45)}
 #story-banner .sb-foot{font-size:9px;color:#4a7068;font-family:var(--FM);letter-spacing:.12em;margin-top:2px}
 #story-banner .sb-dismiss{
@@ -269,7 +271,7 @@ body:not(.landing-pano) #land-pano{display:none!important;opacity:0!important;}
   #story-banner{width:min(100vw - 12px,640px);max-height:94vh;}
   #story-banner .sb-art-wrap{max-height:28vh;}
   #story-banner .sb-body{padding:10px 14px 12px;}
-  #story-banner .sd{max-height:min(22vh,160px);font-size:11px;}
+  #story-banner .sd{max-height:min(36vh,280px);font-size:11px;}
   #land-title .lt-name{font-size:clamp(18px,5.5vw,32px)!important;letter-spacing:.1em;}
   .ht .hp{padding:6px 8px;}
   #radar{width:68px;height:68px;}
