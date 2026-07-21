@@ -112,6 +112,10 @@
     ((L.parts && L.parts.heads) || []).forEach(push);
     HAIR_PATHS.forEach(push);
     ACC_PATHS.forEach(push);
+    if (L.player) {
+      push(L.player.head);
+      push(L.player.hair);
+    }
     return urls;
   }
 
@@ -221,12 +225,15 @@
     return c;
   }
 
+  /** Overlay allineato 1:1 al busto (stesse dimensioni e posizione). */
   function overlayRect(base, scale, yOff) {
-    const dw = base.dw * scale;
-    const dh = base.dh * scale;
+    const s = (scale != null && scale > 0) ? scale : 1;
+    const dw = base.dw * s;
+    const dh = base.dh * s;
+    const yo = yOff || 0;
     return {
       dx: base.dx + (base.dw - dw) * 0.5,
-      dy: base.dy + base.dh * yOff + (base.dh - dh) * 0.5,
+      dy: base.dy + base.dh * yo + (base.dh - dh) * 0.5,
       dw, dh
     };
   }
@@ -398,10 +405,29 @@
     ctx.strokeRect(3, 3, W - 6, H - 6);
   }
 
-  function drawLayeredBust(ctx, W, H, seed, factionId) {
+  function bustDestRect(W, H, iw, ih) {
+    const pad = (L.view && L.view.pad != null) ? L.view.pad : 0.02;
+    const scaleMul = (L.view && L.view.scaleMul != null) ? L.view.scaleMul : 1;
+    const maxW = Math.max(12, W * (1 - 2 * pad));
+    const maxH = Math.max(12, H * (1 - 2 * pad));
+    const sc = Math.min(maxW / iw, maxH / ih) * scaleMul;
+    const dw = iw * sc, dh = ih * sc;
+    return {
+      dx: (W - dw) * 0.5,
+      dy: H * ((L.view && L.view.centerYFrac) || 0.52) - dh * 0.5,
+      dw, dh
+    };
+  }
+
+  function drawLayeredBust(ctx, W, H, seed, factionId, opt) {
+    opt = opt || {};
     const fCol = drawPortraitBg(ctx, W, H, factionId);
     const fac = portraitFaceFromSeed(seed);
-    const hairTint = portraitHairTint(seed);
+    const isPlayer = !!opt.player;
+    const playerL = L.player || {};
+    let hairTint = isPlayer ? (playerL.hairTint || '#f2f2f5') : portraitHairTint(seed);
+    let hairPath = (isPlayer && playerL.complete) ? null : (isPlayer ? (playerL.hair || null) : fac.hairPath);
+    let accPath = isPlayer ? null : fac.accPath;
     const ov = L.overlay || {};
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -409,7 +435,16 @@
     let rect = null;
     let drawn = false;
 
-    if (atlas.ready && atlas.img) {
+    if (isPlayer && playerL.head) {
+      const im = PortraitParts.get(playerL.head);
+      if (im) {
+        rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
+        ctx.drawImage(im, rect.dx, rect.dy, rect.dw, rect.dh);
+        drawn = true;
+      }
+    }
+
+    if (!drawn && atlas.ready && atlas.img && !isPlayer) {
       rect = computeAtlasRect(W, H, atlas.img, seed);
       if (rect) {
         ctx.drawImage(
@@ -423,40 +458,34 @@
 
     if (!drawn) {
       const heads = (L.parts && L.parts.heads) || [];
-      const path = heads[portraitAtlasIndex(seed) % Math.max(1, heads.length)];
+      const path = isPlayer && playerL.head
+        ? playerL.head
+        : heads[portraitAtlasIndex(seed) % Math.max(1, heads.length)];
       const im = PortraitParts.get(path);
       if (im) {
-        const pad = 0.03;
-        const maxW = W * (1 - 2 * pad);
-        const maxH = H * (1 - 2 * pad);
-        const sc = Math.min(maxW / im.naturalWidth, maxH / im.naturalHeight) * (L.view.scaleMul || 1);
-        const dw = im.naturalWidth * sc;
-        const dh = im.naturalHeight * sc;
-        const dx = (W - dw) * 0.5;
-        const dy = H * (L.view.centerYFrac || 0.52) - dh * 0.5;
-        rect = { dx, dy, dw, dh };
-        ctx.drawImage(im, dx, dy, dw, dh);
+        rect = bustDestRect(W, H, im.naturalWidth || 128, im.naturalHeight || 160);
+        ctx.drawImage(im, rect.dx, rect.dy, rect.dw, rect.dh);
         drawn = true;
       }
     }
 
     if (!drawn || !rect) return false;
 
-    // Capelli: tint SOLO sullo sprite overlay
-    if (fac.hairPath) {
-      const hairImg = PortraitParts.get(fac.hairPath);
+    // Capelli: stesso rect del busto; tint SOLO sullo sprite
+    if (hairPath) {
+      const hairImg = PortraitParts.get(hairPath);
       if (hairImg) {
         const tinted = tintHairSprite(hairImg, hairTint) || hairImg;
-        const hr = overlayRect(rect, ov.hairScale || 1.22, ov.hairY != null ? ov.hairY : -0.06);
+        const hr = overlayRect(rect, ov.hairScale != null ? ov.hairScale : 1, ov.hairY || 0);
         ctx.drawImage(tinted, hr.dx, hr.dy, hr.dw, hr.dh);
       }
     }
 
-    // Accessori (occhiali / visori / maschere) — nessun tint capelli
-    if (fac.accPath) {
-      const accImg = PortraitParts.get(fac.accPath);
+    // Accessori — stesso rect, nessun tint capelli
+    if (accPath) {
+      const accImg = PortraitParts.get(accPath);
       if (accImg) {
-        const ar = overlayRect(rect, ov.accScale || 1.05, ov.accY != null ? ov.accY : 0.04);
+        const ar = overlayRect(rect, ov.accScale != null ? ov.accScale : 1, ov.accY || 0);
         ctx.drawImage(accImg, ar.dx, ar.dy, ar.dw, ar.dh);
       }
     }
@@ -537,7 +566,7 @@
       const factionId = opt.factionId || 'bazzano';
       const forceProcedural = !!opt.procedural;
 
-      if (!forceProcedural && drawLayeredBust(ctx, W, H, seed, factionId)) {
+      if (!forceProcedural && drawLayeredBust(ctx, W, H, seed, factionId, opt)) {
         return 'bust';
       }
 
@@ -554,6 +583,9 @@
     drawCanvas(canvas, seed, factionId, opt) {
       opt = Object.assign({}, opt || {}, { seed, factionId });
       return PortraitRenderer.draw(canvas.getContext('2d'), canvas.width, canvas.height, opt);
+    },
+    drawPlayer(canvas) {
+      return PortraitRenderer.drawCanvas(canvas, 1, 'bazzano', { player: true });
     }
   };
 

@@ -96,8 +96,8 @@ body.suborbit-active #a11y-strip{display:none !important;}
 }
 #tutorial-modal.show{display:flex !important;}
 #bp-preview-wrap{margin:0 0 6px;border-radius:8px;overflow:hidden;border:1px solid rgba(60,140,220,.38);
-  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:132px;position:relative;}
-#bp-preview-wrap canvas{display:block;width:100%;height:132px}
+  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:168px;position:relative;}
+#bp-preview-wrap canvas{display:block;width:100%;height:168px}
 
 /* ─ Abbordaggio / Space hulk ─ */
 #boarding{display:none;position:fixed;inset:0;z-index:90;background:
@@ -431,6 +431,7 @@ body.boarding-active #boarding-touch{display:flex}
   .cb{width:clamp(48px,13.5vw,56px);height:clamp(48px,13.5vw,56px);font-size:7px;gap:1px}
   .cb svg{width:17px;height:17px}
   #dprompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
+  #boarding-prompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
   #dlg{bottom:max(115px,17vh);max-width:94vw}
   #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
   #heat-lbl{bottom:max(134px,20vh);font-size:8px}
@@ -541,7 +542,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="hud">
   <div class="ht">
     <div class="hp">
-      <div class="lb">COMANDANTE</div>
+      <div class="lb" id="cmd-lb">ZVAN MARÌA</div>
       <div class="bw"><div id="bh" class="br bh" style="width:100%"></div></div>
       <div class="bw"><div id="be" class="br be" style="width:100%"></div></div>
       <div id="crew-lb" style="font-size:9px;color:#446688;margin-top:2px"></div>
@@ -550,8 +551,8 @@ body.suborbit-active #smsg{z-index:6260 !important;}
       <button type="button" class="lb rp-toggle" id="rep-toggle" aria-expanded="false" title="Mostra/nascondi reputazione">REPUTAZIONE ▸</button>
       <div id="rrws" class="rp-body"></div>
     </div>
-    <div class="hp" style="text-align:right;min-width:140px">
-      <div id="tnm" style="font-size:13px;font-weight:700;color:var(--bright)">—</div>
+    <div class="hp" id="tgt-panel" style="text-align:right;min-width:140px;display:none">
+      <div id="tnm" style="font-size:13px;font-weight:700;color:var(--bright)"></div>
       <div id="tds" style="font-size:9px;color:#446688;margin-top:1px"></div>
       <div class="bw" style="margin-top:4px;width:130px;margin-left:auto"><div id="bte" class="br bt" style="width:0%"></div></div>
     </div>
@@ -796,8 +797,8 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 </div>
 <div id="diary-modal" aria-modal="true" role="dialog" aria-labelledby="diary-title">
   <div id="diary-inner">
-    <div id="diary-title">DIARIO · IL PATTO DEL MOLINO</div>
-    <div id="diary-sub">Obiettivi della campagna principale</div>
+    <div id="diary-title">DIARIO · ZVAN MARÌA</div>
+    <div id="diary-sub">Funzionario VII · Ritorno a Valsamoggio · Il Patto del Molino</div>
     <div id="diary-body"></div>
     <div id="diary-foot">Le missioni con [STORIA] compaiono negli slot Missioni delle stazioni indicate.<br>Tasto [J] apre/chiude questo pannello.</div>
     <button type="button" id="diary-close" onclick="closeDiary()">CHIUDI</button>
@@ -886,7 +887,7 @@ let _bootStoryTimers=[];
 function cancelBootStory(){_bootStoryTimers.forEach(clearTimeout);_bootStoryTimers=[];}
 function scheduleBootStory(){
   cancelBootStory();
-  _bootStoryTimers.push(setTimeout(()=>showStoryBanner('PROLOGO','Sistema Valsamoggio — 2087',STORY.prologue,11000),4200));
+  _bootStoryTimers.push(setTimeout(()=>showStoryBanner('PROLOGO','Zvan Marìa — Ritorno a Valsamoggio',STORY.prologue,11000),4200));
   _bootStoryTimers.push(setTimeout(()=>advanceStory(1),15500));
 }
 let _hullRepSnapHex='#0a1e55';
@@ -1101,19 +1102,21 @@ const CREW_POOL = [
 const STORY = {
   chapter: 0,  // current chapter (0=not started)
   won:false,   // true dopo triggerVictory (Patto restaurato)
-  prologue:'Nel 2087 il Sistema Valsamoggio brilla come un anello sul dito del Sole: cinque mondi, cinque orgogli, un solo cielo stellato che tutti pretendono di possedere. Un tempo le fazioni giurarono sul "Patto del Molino", un trattato scritto a Bazzano quando ancora si divideva solo il vino e non l\'orbita. Poi il documento scomparve — o fu nascosto — e ogni cometa divenne un pretesto per litigare. Tu sei il messaggero che il Consiglio ha scelto quando gli altri avevano smesso di fidarsi: non perché tu sia il migliore, ma perché sei l\'unico abbastanza testardo da attraversare tutto il sistema e tornare vivo.',
+  playerName:'Zvan Marìa',
+  playerTitle:'Funzionario di settimo livello · Impero Galattico',
+  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Per vent\'anni hai lavorato a Imperium — tra corridoi di marmo, bolle di sicurezza e rapporti che nessuno leggeva — senza rimettere piede nel Sistema Valsamoggio da cui sei partito. Ora i superiori ti rimandano a casa: non per pietà, ma perché le cinque fazioni stanno per far collassare l\'anello orbitale e serve qualcuno che conosca il dialetto, il vino e i rancori. Il "Patto del Molino" è sparito. Il guaio è tuo. E, dopo due decenni, c\'è anche la questione del ritorno: non sei più solo un messaggero — sei un figlio del sistema che deve dimostrare di non essere diventato un estraneo.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'Il Consiglio di Bazzano Prime ti ha convocato in notturna: niente fanfare, solo un ologramma tremulo e l\'odore di carta bruciata. Il Patto originale non esiste più come volume unico: qualcuno lo ha smembrato in tre sigilli. Il primo frammento, dicono, dorme nell\'archivio di Crespellano — classificato come "niente", perché lì il catalogo è più importante della storia. Recuperalo prima che Calcara lo "autentichi" al posto loro.',
+      intro:'A Bazzano Prime ti aspettano come "l\'imperiale tornato". Alcuni stringono la mano, altri contano i giorni che hai passato lontano. Il Consiglio — e il tuo superiorato a Imperium — vogliono lo stesso pezzo: il primo frammento del Patto, nascosto a Crespellano sotto l\'etichetta "niente". Recuperalo. Dimostra che il ritorno serve a qualcosa.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Porta le credenziali diplomatiche (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
+        desc:'Porta le credenziali imperiali (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
       num:2, title:'Niente e\' Qualcosa',
-      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto, con la filigrana del mulino. Calcara pretende di certificarla: ufficialmente per sicurezza, in pratica per metterci il loro timbro — e il loro prezzo. Se accetti, entrerai nel gioco delle copie: chi controlla l\'archivio, controlla la memoria.',
+      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto. Calcara vuole certificartela: ufficialmente per sicurezza, in pratica per metterci il loro timbro. Da Imperium ti arriva un messaggio cifrato: "Autorizza, ma non firmare tu." Se accetti, entri nel gioco delle copie — e del ritorno a metà.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
         desc:'Porta il Frammento del Patto a Calcara Station. Osserva chi firma troppo in fretta: l\'Oligarchia non ama i testimoni che ricordano il testo originale.',
@@ -1121,7 +1124,7 @@ const STORY = {
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\' — e\' marketing." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto come in un torneo — solo che qui le "frecce di luce" lasciano il segno.',
+      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi né ai funzionari imperiali tornati dopo vent\'anni. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\'." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
         desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema. Il Castellano osserva: vuole sangue cosmico, non scuse da bollo.',
@@ -1129,7 +1132,7 @@ const STORY = {
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo, orgoglio e silenzio. Savigno Deep custodisce l\'anello finale del Patto, ma i savignesi non vendono la storia — la scambiano. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali, come tre giuramenti sul palato del cosmo.',
+      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo. Savigno Deep custodisce l\'anello finale. I savignesi ricordano chi sei stato prima di Imperium — e ti chiedono se sei ancora capace di sederti a tavola senza parlare di rapporti. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
         desc:'Consegna 3 kg di Tartufi Spaziali al Consiglio di Savigno Deep per ottenere il sigillo. Compra i tartufi a Savigno o nelle stazioni tartuifere prima di tornare.',
@@ -1137,7 +1140,7 @@ const STORY = {
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'Hai ricomposto il trittico: carta, sangue, tartufo. Ora Bazzano deve decidere se riaccendere il mulino o lasciare che Calcara lo trasformi in concessionaria. Il cielo sopra Prime si riempie di scie ostili — non e\' piu\' una consegna, e\' una processione armata. Riporta i frammenti al Consiglio: se atterri, la storia respira di nuovo.',
+      intro:'Hai ricomposto il trittico. Ora Bazzano deve decidere se riaccendere il mulino o lasciarlo a Calcara. Il cielo sopra Prime si riempie di scie ostili. Riporta i frammenti al Consiglio: se atterri, la storia — e il tuo ritorno — hanno un senso. Se fallisci, Imperium ti richiederà come "risorsa bruciata".',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
         desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
@@ -1147,11 +1150,11 @@ const STORY = {
 };
 
 const STORY_LINES={
-  story_1:'[COMUNICAZIONE] "Comandante, l\'archivio di Crespellano non apre porte: apre scatoloni etichettati male. Se trovi qualcosa che puzza di pergamena e burocrazia, e\' probabile che sia il Patto — o un\'altra cosa che aspetta da vent\'anni."',
-  story_2:'[CALCARA] "Autenticazione rapida: troppo rapida. Qualcuno ha gia\' preparato il timbro mentre tu ancora decollavi. Ricorda: qui l\'ufficialita\' e\' un prodotto, non un fatto."',
-  story_3:'[MONTEVEGLIO] "Il Castellano non vuole copie: vuole prove. Tre navi calcaresi nel vuoto non sono poesia — sono messaggio. Porta il messaggio, riporta il frammento."',
-  story_4:'[SAVIGNO] "Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo. Tre chili: non e\' ricatto, e\' tradizione. E tradizione, qui, batte la legge."',
-  story_5:'[BAZZANO PRIME] "I tre pezzi tornano a casa. Se Calcara intercetta, non e\' pirateria — e\' revisione di testo. Non lasciare che riscrivano il Patto mentre tu ancora cerchi un parcheggio in orbita."',
+  story_1:'[IMPERIUM → ZVAN] "Funzionario Marìa: l\'archivio di Crespellano non apre porte, apre scatoloni. Se puzza di pergamena e burocrazia, e\' il Patto — o un\'altra cosa che aspetta da vent\'anni, come te."',
+  story_2:'[CALCARA] "Autenticazione rapida: troppo rapida. Qualcuno ha gia\' preparato il timbro mentre tu ancora decollavi da Imperium. Ricorda: qui l\'ufficialita\' e\' un prodotto, non un fatto."',
+  story_3:'[MONTEVEGLIO] "Il Castellano non vuole copie imperiali: vuole prove. Tre navi calcaresi nel vuoto non sono poesia — sono messaggio. Porta il messaggio, riporta il frammento."',
+  story_4:'[SAVIGNO] "Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo — e in quanto ricordi ancora il sapore di casa. Tre chili: non e\' ricatto, e\' tradizione."',
+  story_5:'[BAZZANO PRIME] "I tre pezzi tornano a casa. Anche tu. Se Calcara intercetta, non e\' pirateria — e\' revisione di testo. Non lasciare che riscrivano il Patto mentre cerchi un parcheggio in orbita."',
 };
 SDATA.forEach(sd=>{
   if(sd.sat)sd.satR=Math.round(sd.satR*SAT_ORBIT_SCALE);
@@ -1709,14 +1712,15 @@ function stripBlueprintToUnlocked(){
   }
 }
 
-// Default blueprint: ogni voce è anchor (r,c) di un modulo; bpStampModule espande w×h.
+// Default blueprint simmetrico rispetto all'asse centrale (col 5.5 → cockpit su 5-6)
 const defaultBlueprint=[
-  {r:3,c:3,id:'hull'},{r:3,c:6,id:'hull'},{r:3,c:7,id:'hull'},{r:3,c:2,id:'hull'},{r:4,c:2,id:'hull'},
-  {r:3,c:4,id:'cockpit'},
-  {r:1,c:4,id:'wing_l'},{r:1,c:6,id:'wing_r'},
-  {r:3,c:8,id:'fin'},
-  {r:3,c:9,id:'engine'},{r:2,c:9,id:'engine'},{r:4,c:9,id:'engine'},
-  {r:3,c:1,id:'weapon'},
+  {r:3,c:3,id:'hull'},{r:3,c:4,id:'hull'},{r:3,c:7,id:'hull'},{r:3,c:8,id:'hull'},
+  {r:4,c:4,id:'hull'},{r:4,c:7,id:'hull'},
+  {r:3,c:5,id:'cockpit'},
+  {r:1,c:3,id:'wing_l'},{r:1,c:8,id:'wing_r'},
+  {r:2,c:5,id:'fin'},{r:2,c:6,id:'fin'},
+  {r:3,c:9,id:'engine'},{r:4,c:9,id:'engine'},{r:3,c:2,id:'engine'},{r:4,c:2,id:'engine'},
+  {r:4,c:5,id:'weapon'},
 ];
 
 // Runtime grid: array[row][col] = moduleId | null
@@ -1906,7 +1910,15 @@ function drawBlueprint(){
     · Missili <span class="bp-stat-val">${stats.missilePods>0?(4+stats.missilePods*2):0}</span><br>
     Valore <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span> ₡
   `;
-  scheduleBpPreviewSync();
+  scheduleBpLiveRebuild();
+}
+
+function scheduleBpLiveRebuild(){
+  clearTimeout(scheduleBpLiveRebuild._t);
+  scheduleBpLiveRebuild._t=setTimeout(()=>{
+    if(typeof rebuildPlayerMesh==='function'&&playerShip)rebuildPlayerMesh();
+    if(typeof scheduleBpPreviewSync==='function')scheduleBpPreviewSync();
+  },50);
 }
 
 function roundRect(ctx,x,y,w,h,r){
@@ -1928,8 +1940,46 @@ function openBlueprintModal(){
   setTimeout(()=>tryShowTutorialBlueprint(),120);
 }
 
+function bpStructuralCellCount(){
+  let n=0;
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    const id=bpGrid[r][c];
+    if(id==='hull'||id==='cockpit')n++;
+  }
+  return n;
+}
+/** Guardrail: non smantellare sotto i minimi strutturali. */
+function bpCanRemoveModule(id, r0, c0, w, h){
+  if(id==='cockpit'&&bpCountModules('cockpit')<=1){
+    notify('Serve almeno una Cabina di pilotaggio.',1800);
+    return false;
+  }
+  // Simula rimozione
+  const snap=[];
+  for(let dr=0;dr<h;dr++)for(let dc=0;dc<w;dc++){
+    const rr=r0+dr,cc=c0+dc;
+    if(rr>=0&&rr<BP_ROWS&&cc>=0&&cc<BP_COLS){
+      snap.push([rr,cc,bpGrid[rr][cc]]);
+      bpGrid[rr][cc]=null;
+    }
+  }
+  const hullLeft=bpStructuralCellCount();
+  const cockLeft=bpCountModules('cockpit');
+  // ripristina
+  snap.forEach(([rr,cc,v])=>{bpGrid[rr][cc]=v;});
+  if(cockLeft<1){
+    notify('Non puoi rimuovere l\'ultima cabina.',1800);
+    return false;
+  }
+  if(hullLeft<4){
+    notify('Struttura minima: almeno 4 celle di scafo/cabina.',2200);
+    return false;
+  }
+  return true;
+}
 function closeBlueprintModal(){
   if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');return;}
+  if(bpStructuralCellCount()<4){notify('Blueprint invalido: struttura troppo ridotta (min. 4 celle scafo/cabina).');return;}
   setPausedReason('blueprint',false);
   document.getElementById('blueprint-modal').classList.remove('show');
   applyModules();
@@ -2051,6 +2101,7 @@ function setupBpEvents(){
       if(m){let r0=r,c0=c;
         while(c0>0&&bpGrid[r][c0-1]===id)c0--;
         while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
+        if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
         bpClearRect(r0,c0,m.w,m.h);
         bpInvRestore(id,1);
       }else bpGrid[r][c]=null;
@@ -2072,8 +2123,9 @@ function setupBpEvents(){
         notify('Inventario vuoto per «'+m.label+'»: acquistane uno nella palette.',2000);
         return;
       }
-      // Rimuovi moduli sovrapposti e rimettili nell'inventario (anchor in alto a sinistra per modulo).
-      const restored=new Set();
+      // Rimuovi moduli sovrapposti (con guardrail) e rimettili nell'inventario.
+      const toClear=[];
+      const seen=new Set();
       for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
         const c0=bpGrid[r+dr][c+dc];
         if(c0&&c0!==bpSelected){
@@ -2082,13 +2134,16 @@ function setupBpEvents(){
             while(cc>0&&bpGrid[rr][cc-1]===c0)cc--;
             while(rr>0&&bpGrid[rr-1][cc]===c0)rr--;
             const key=rr+','+cc+','+c0;
-            if(!restored.has(key)){
-              bpClearRect(rr,cc,om.w,om.h);
-              bpInvRestore(c0,1);
-              restored.add(key);
-            }
-          }else bpGrid[r+dr][c+dc]=null;
+            if(!seen.has(key)){seen.add(key);toClear.push({id:c0,rr,cc,w:om.w,h:om.h});}
+          }
         }
+      }
+      for(const t of toClear){
+        if(!bpCanRemoveModule(t.id,t.rr,t.cc,t.w,t.h))return;
+      }
+      for(const t of toClear){
+        bpClearRect(t.rr,t.cc,t.w,t.h);
+        bpInvRestore(t.id,1);
       }
       // Consuma una unità del modulo selezionato e piazza il blocco.
       bpInvConsume(bpSelected,1);
@@ -2115,7 +2170,9 @@ function setupBpEvents(){
   cv.addEventListener('touchend',()=>{bpDragFrom=null;});
   cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);const id=bpGrid[r][c];if(!id)return;
     const m=BP_MODULES.find(x=>x.id===id);
-    if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;bpClearRect(r0,c0,m.w,m.h);bpInvRestore(id,1);}
+    if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
+      if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
+      bpClearRect(r0,c0,m.w,m.h);bpInvRestore(id,1);}
     else bpGrid[r][c]=null;
     buildBpPalette();drawBlueprint();});
 }
@@ -2407,24 +2464,32 @@ function rebuildPlayerMesh(){
     });
   }
 
-  // ── Wings (width from blueprint; posizione media anchor wing_l / wing_r) ───
+  // ── Wings (simmetriche: stessa estensione, X specchiata sull'asse) ───
+  const wingAbs=[];
   [-1,1].forEach(side=>{
     const span=(side<0?wingL:wingR);
     if(span<=0)return;
-    const ww=Math.max(3.2,wingSpan+span*2.2);
     const wc=bpWingSideCenter(side,spec);
-    const baseX=wc?wc.x:side*(ww/2+1.6);
+    if(wc)wingAbs.push(Math.abs(wc.x));
+  });
+  const wingMirrorX=wingAbs.length?Math.max(...wingAbs):(7+wingL*2+wingR*2)*0.35;
+  [-1,1].forEach(side=>{
+    const span=(side<0?wingL:wingR);
+    if(span<=0)return;
+    const ww=Math.max(3.2, 5.5+span*2.4);
+    const wc=bpWingSideCenter(side,spec);
+    const baseX=side*wingMirrorX;
     const baseZ=wc?wc.z+0.35:0.8;
     const baseY=wc?Math.min(wc.y+0.4,0.35):0.15;
     const finOutX=baseX+side*(ww/2+0.4);
     const finZ=baseZ-1.2;
     const wGeo=new THREE.BoxGeometry(ww,.28,7);
-    const w=new THREE.Mesh(wGeo,hm);w.position.set(baseX,baseY,baseZ);w.rotation.y=side*-.18;playerShip.mesh.add(w);
+    const w=new THREE.Mesh(wGeo,hm);w.position.set(baseX,baseY,baseZ);w.rotation.y=0;playerShip.mesh.add(w);
     const finGeo=new THREE.BoxGeometry(.25,2.8+span*.5,2.4);
     const fin=new THREE.Mesh(finGeo,hm);fin.position.set(finOutX,1.2,finZ);playerShip.mesh.add(fin);
     const finTip=new THREE.Mesh(new THREE.BoxGeometry(.22,.25,2.2),tm);finTip.position.set(finOutX,2.65,finZ+0.1);playerShip.mesh.add(finTip);
-    const wChan=new THREE.Mesh(new THREE.BoxGeometry(ww*.8,.06,1.2),gm);wChan.position.set(baseX,baseY-0.17,baseZ-0.8);wChan.rotation.y=side*-.18;playerShip.mesh.add(wChan);
-    const wt=new THREE.Mesh(new THREE.BoxGeometry(ww,.26,1.2),tm);wt.position.set(baseX,baseY-0.03,baseZ-2);wt.rotation.y=side*-.18;playerShip.mesh.add(wt);
+    const wChan=new THREE.Mesh(new THREE.BoxGeometry(ww*.8,.06,1.2),gm);wChan.position.set(baseX,baseY-0.17,baseZ-0.8);playerShip.mesh.add(wChan);
+    const wt=new THREE.Mesh(new THREE.BoxGeometry(ww,.26,1.2),tm);wt.position.set(baseX,baseY-0.03,baseZ-2);playerShip.mesh.add(wt);
   });
 
   // ── Engines (posizione da anchor griglia; materiale boost sul modulo boost_eng) ─
@@ -3572,8 +3637,8 @@ function ensureBpPreview3d(){
     r.setClearColor(0x040a14,1);
     r.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
     const w=Math.max(200,wrap.clientWidth||400);
-    r.setSize(w,132);
-    BP_PV.cam.aspect=w/132;BP_PV.cam.updateProjectionMatrix();
+    r.setSize(w,168);
+    BP_PV.cam.aspect=w/168;BP_PV.cam.updateProjectionMatrix();
     wrap.innerHTML='';
     wrap.appendChild(r.domElement);
   }
@@ -3601,9 +3666,9 @@ function syncBpPreview3d(){
   const target=34;
   m.scale.setScalar(target/maxD);
   const w=Math.max(200,wrap.clientWidth||400);
-  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==132){
-    BP_PV.renderer.setSize(w,132);
-    BP_PV.cam.aspect=w/132;BP_PV.cam.updateProjectionMatrix();
+  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==168){
+    BP_PV.renderer.setSize(w,168);
+    BP_PV.cam.aspect=w/168;BP_PV.cam.updateProjectionMatrix();
   }
   BP_PV.mesh.rotation.y=0;
   BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
@@ -9895,7 +9960,7 @@ function updateHUD(){
   document.getElementById('crew-lb').textContent=PS.crew.length?'Eq: '+PS.crew.map(id=>CREW_POOL.find(c=>c.id===id)?.name.split(' ')[0]||id).join(' · '):'';
   let tgt=null,td=Infinity;
   NPCS.forEach(ns=>{if(ns.ship.alive){const d=ns.ship.mesh.position.distanceTo(playerShip.mesh.position);if(d<td){td=d;tgt=ns;}}});
-  const tgtPanel=document.getElementById('tnm')&&document.getElementById('tnm').closest('.hp');
+  const tgtPanel=document.getElementById('tgt-panel');
   if(tgt&&td<48000){
     if(tgtPanel)tgtPanel.style.display='';
     const f=FACTIONS[tgt.faction];const locked=targetNpc&&targetNpc===tgt;const mir=locked&&targetLeadState.status==='MIRINO OK';document.getElementById('tnm').textContent=(mir?'MIRINO · ':locked?'TARGET · ':'')+(f?.short||tgt.faction||'PIRATA').toUpperCase();document.getElementById('tnm').style.color=locked?'#ff9966':(f?f.color:(tgt.faction==='pirate'?'#ff4422':'#aabbcc'));
