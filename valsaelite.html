@@ -229,6 +229,22 @@ body.boarding-active #boarding-hud{display:block}
 .cb.fi{border-color:rgba(200,50,20,.5)}.cb.fi:active{background:rgba(70,10,5,.9)}
 .cb.th{border-color:rgba(25,90,190,.6)}.cb.th:active{background:rgba(5,25,80,.9)}
 .cb svg{width:21px;height:21px;pointer-events:none}
+
+/* Throttle mobile */
+.throttle-wrap{pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:4px;min-width:52px;height:118px;padding:6px 4px;border-radius:12px;
+  background:rgba(3,10,28,.9);border:1.5px solid rgba(60,200,170,.55);
+  touch-action:none;-webkit-user-select:none;user-select:none}
+.throttle-wrap .th-lbl{font:700 9px var(--FD);letter-spacing:.1em;color:#7fdcc8}
+.throttle{writing-mode:bt-lr;-webkit-appearance:slider-vertical;appearance:slider-vertical;
+  width:28px;height:88px;padding:0;margin:0;background:transparent;cursor:pointer}
+.throttle::-webkit-slider-runnable-track{width:8px;background:rgba(255,255,255,.12);border-radius:4px}
+.throttle::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6;margin-left:-7px}
+@media (hover:hover) and (pointer:fine){
+  .throttle-wrap{display:none}
+  .throttle-fallback{display:flex!important}
+}
 .cr-info{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:var(--FM);font-size:10px}
 .cr-info .lb{color:#446688;font-size:9px;letter-spacing:.12em;margin-bottom:3px}
 .cv2{color:#ffcc33;font-weight:700;font-size:13px}
@@ -630,7 +646,11 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <div class="hb-controls">
       <div class="ctrl-rows">
         <div class="cg flight-primary">
-          <button id="btnth" class="cb th" title="Accelerazione / Motori [W]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg><span class="lbl">ACCEL</span></button>
+          <div id="throttle-wrap" class="throttle-wrap" title="Motori / Throttle">
+            <span class="th-lbl">MOT</span>
+            <input type="range" id="throttle" class="throttle" min="0" max="100" value="0" step="1" aria-label="Throttle motori">
+            <button type="button" id="btnth" class="cb th throttle-fallback" title="Accelerazione / Motori [W]" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg><span class="lbl">ACCEL</span></button>
+          </div>
           <button id="btnfi" class="cb fi" title="Fuoco [Spazio]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg><span class="lbl">FUE</span></button>
           <button id="btnboost" class="cb boost" title="Boost afterburner [S/Shift/B]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="lbl">BOOST</span></button>
           <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)" title="Hail [T/H]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="lbl">HAIL</span></button>
@@ -823,8 +843,8 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
-  <div id="bp-title">CANTIERE NAVALE</div>
-  <div id="bp-subtitle">PROGETTO MODULARE · CLICCA CELLA · TRASCINA MODULO</div>
+  <div id="bp-title">CANTIERE · BLUEPRINT</div>
+  <div id="bp-subtitle">Scegli un modulo a destra → clicca sulla griglia · tasto destro rimuove · anteprima 3D live · CONFERMA per applicare</div>
   <div id="bp-wrap">
     <canvas id="bp-cv"></canvas>
     <div id="bp-panel">
@@ -931,6 +951,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="js/assets.js"></script>
+<script src="js/story-sys.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/suborbit-daily.js"></script>
@@ -1246,7 +1267,7 @@ const SDATA = [
    orbitR:25500, orbitSpeed:0.025, sat:false,
    pType:'asteroid', pR:285, dR:570,
    desc:'"CASTELLETTO — ABBIAMO BENZINA." Neutrale per mancanza di interesse altrui. Unico posto dove non chiedono da dove vieni.',
-   svcs:['repair','tavern']},
+   svcs:['repair','trade','missions','tavern']},
 
   // ── SAVIGNO-ADJACENT outer bodies ────────────────
   {id:'serravalle', name:'Serravalle Frontier',  faction:'savigno',
@@ -1290,7 +1311,7 @@ const SG = {
   savigno:    {tartufi:{s:50,b:420,sl:298},funghi:{s:88,b:150,sl:105}},
   zappolino:  {armi_vere:{s:8,b:650,sl:460}},
   san_chierlo:{tartufi:{s:25,b:440,sl:310},funghi:{s:40,b:155,sl:105}},
-  castelletto:{carburante:{s:200,b:45,sl:30}},
+  castelletto:{carburante:{s:220,b:36,sl:24},armi_vere:{s:14,b:260,sl:150},documenti:{s:30,b:12,sl:5}},
   serravalle: {carburante:{s:150,b:48,sl:32},materiali:{s:60,b:70,sl:48}},
 };
 
@@ -1325,66 +1346,66 @@ const STORY = {
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'A Bazzano Prime ti aspettano come "l\'imperiale tornato". Alcuni stringono la mano, altri contano i giorni che hai passato lontano. Il Consiglio — e il tuo superiorato a Imperium — vogliono lo stesso pezzo: il primo frammento del Patto, nascosto a Crespellano sotto l\'etichetta "niente". Recuperalo. Dimostra che il ritorno serve a qualcosa.',
+      intro:'A Bazzano Prime ti aspettano come "l\'imperiale tornato". Il Consiglio vuole il primo frammento del Patto a Crespellano. Ti consegnano le credenziali: portale.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Porta le credenziali imperiali (modulistica) e recupera il frammento custodito nell\'archivio crespellanese. Diffida: a Crespellano "niente" puo\' valere piu\' d\'oro.',
+        desc:'Porta le credenziali imperiali (modulistica) e recupera il frammento custodito nell\'archivio crespellanese.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
       num:2, title:'Niente e\' Qualcosa',
-      intro:'Hai visto l\'etichetta: "Niente — da non aprire prima del semaforo". Dentro c\'e\' la prima pagina del Patto. Calcara vuole certificartela: ufficialmente per sicurezza, in pratica per metterci il loro timbro. Da Imperium ti arriva un messaggio cifrato: "Autorizza, ma non firmare tu." Se accetti, entri nel gioco delle copie — e del ritorno a metà.',
+      intro:'Dentro c\'e\' la prima pagina del Patto. Calcara vuole certificartela. Autorizza, ma non firmare tu.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
-        desc:'Porta il Frammento del Patto a Calcara Station. Osserva chi firma troppo in fretta: l\'Oligarchia non ama i testimoni che ricordano il testo originale.',
+        desc:'Porta il Frammento del Patto a Calcara Station.',
         reward:700, repGain:{crespellano:12,calcara:-5}, cargo:{type:'frammento',qty:1}, done:false, active:false},
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'Il Castellano di Monteveglio non crede alle certificazioni calcaresi né ai funzionari imperiali tornati dopo vent\'anni. "Se la verità ha bisogno di un hangar," dice, "non e\' piu\' verita\'." Ti offre il secondo sigillo solo se dimostri di non essere una pedina d\'oro: affronta le navi calcaresi nel vuoto.',
+      intro:'Il Castellano di Monteveglio vuole prove, non timbri: affronta le navi calcaresi nel vuoto.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
-        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema. Il Castellano osserva: vuole sangue cosmico, non scuse da bollo.',
+        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema.',
         reward:900, repGain:{monteveglio:20,calcara:-25}, killFaction:'calcara',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Il terzo sigillo non e\' carta: e\' ghiaccio e tartufo. Savigno Deep custodisce l\'anello finale. I savignesi ricordano chi sei stato prima di Imperium — e ti chiedono se sei ancora capace di sederti a tavola senza parlare di rapporti. Il prezzo e\' umiliante e sacro: tre chili di tartufi spaziali.',
+      intro:'Savigno vuole tartufi — e vuole che tu ricordi casa. Prima di accettare: fai un volo suborbitale sul pianeta (SUBORBITA) per ispezionare i depositi.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Consegna 3 kg di Tartufi Spaziali al Consiglio di Savigno Deep per ottenere il sigillo. Compra i tartufi a Savigno o nelle stazioni tartuifere prima di tornare.',
-        reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, done:false, active:false},
+        desc:'Completa un volo SUBORBITALE su Savigno, poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
+        reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, requireSuborbit:true, done:false, active:false},
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'Hai ricomposto il trittico. Ora Bazzano deve decidere se riaccendere il mulino o lasciarlo a Calcara. Il cielo sopra Prime si riempie di scie ostili. Riporta i frammenti al Consiglio: se atterri, la storia — e il tuo ritorno — hanno un senso. Se fallisci, Imperium ti richiederà come "risorsa bruciata".',
+      intro:'Hai ricomposto il trittico. Riporta i frammenti a Bazzano Prime.',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
-        desc:'Riporta i tre frammenti a Bazzano Prime. Le navi calcaresi potrebbero intercettarti: il Patto, una volta intero, minaccia il loro monopolio sulla parola "ufficiale".',
+        desc:'Riporta i tre frammenti a Bazzano Prime.',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
     {
       num:6, title:'L\'Ombra di Imperium',
-      intro:'Il Patto e\' intero, ma Imperium non applaude: manda un ispettore di sesto livello a "recuperare la documentazione". A Castelletto Rock ti aspetta una busta nera e un messaggio: "Consegna il rapporto, Zvan — o tornerai a Imperium in catene di carta." Devi portare i documenti imperiali alla roccia, dimostrando che il mulino gira per Valsamoggio, non per i corridoi di marmo.',
+      intro:'Imperium manda un ispettore. Prima di firmare: abborda uno Space Hulk e recupera le prove occultate nei relitti — poi porta i documenti a Castelletto.',
       mission:{id:'story_6', type:'delivery', sid:'bazzano', targetSid:'castelletto',
-        title:'[STORIA] Rapporto a Castelletto',
-        desc:'Consegna i documenti imperiali a Castelletto Rock. L\'ispettore vuole la tua firma: non firmare oltre il necessario.',
-        reward:1100, repGain:{bazzano:10}, cargo:{type:'documenti',qty:1}, done:false, active:false},
+        title:'[STORIA] Relitto e Rapporto',
+        desc:'Abborda uno SPACE HULK (obbligatorio), poi consegna i documenti imperiali a Castelletto Rock.',
+        reward:1100, repGain:{bazzano:10}, cargo:{type:'documenti',qty:1}, requireHulk:true, done:false, active:false},
     },
     {
       num:7, title:'Fuoco sulla Rocca',
-      intro:'Castelletto non era solo un deposito: era un\'imboscata. I pirati — pagati da chi non ama il Patto vivo — aprono il fuoco sull\'anello esterno. L\'ispettore sparisce nei relitti. Il Consiglio ti chiede di fare cio\' che Imperium non puo\' ammettere: ripulire il vuoto. Tre scafi pirata. Niente bollettini.',
+      intro:'I pirati — pagati da chi non ama il Patto — aprono il fuoco sull\'anello esterno. Ripulisci il vuoto.',
       mission:{id:'story_7', type:'combat', sid:'castelletto',
         title:'[STORIA] Caccia ai Pirati',
-        desc:'Abbatti 3 navi pirata nel sistema. Castelletto e le rotte mercantili devono tornare respirabili.',
+        desc:'Abbatti 3 navi pirata. Accetta a Castelletto Rock.',
         reward:1400, repGain:{bazzano:12,savigno:8}, killFaction:'pirate',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:8, title:'Il Mulino Acceso',
-      intro:'Torni a Bazzano Prime con le scie ancora calde. Il mulino simbolico e\' stato riacceso: non macina grano, macina orgogli. Imperium ti offre una promozione a sesto livello se resti zitto. Tu consegni invece una cassa di piadine e il silenzio giusto — quello che tiene insieme cinque fazioni. Il ritorno, dopo vent\'anni, e\' completo solo quando accetti di restare.',
+      intro:'La cerimonia del Mulino Acceso. Consegna le piadine a Bazzano — poi il Patto e\' davvero vivo.',
       mission:{id:'story_8', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Accendi il Mulino',
-        desc:'Consegna una cassa di piadine a Bazzano Prime per la cerimonia del Mulino Acceso. Poi il Patto e\' davvero vivo.',
+        desc:'Consegna una cassa di piadine a Bazzano Prime per la cerimonia.',
         reward:2500, repGain:{bazzano:25,crespellano:10,monteveglio:10,savigno:10,calcara:5}, cargo:{type:'piadine',qty:1}, done:false, active:false},
     },
   ],
@@ -1551,11 +1572,13 @@ function renderDiaryContent(){
     else if(m.cargo){
       const gn=(typeof GOODS!=='undefined'&&GOODS[m.cargo.type])?GOODS[m.cargo.type].name:m.cargo.type;
       extra=`Carico: ${gn} ×${m.cargo.qty||1}. Destinazione: <strong>${tgt}</strong>.`;
+      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede volo SUBORBITALE completato.</em>`;
+      if(m.requireHulk&&!done)extra+=` <em style="color:#ffb080">Richiede abbordaggio SPACE HULK.</em>`;
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
-        extra+=` <em style="color:#88ccaa">Acquista tartufi a Savigno Deep, Zappolino o stazioni tartuifere.</em>`;
+        extra+=` <em style="color:#88ccaa">I tartufi vengono forniti all'accettazione (dopo il suborbitale).</em>`;
       }
       if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
-        extra+=` <em style="color:#88ccaa">Compra piadine a Bazzano o Crespellano prima della cerimonia.</em>`;
+        extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
       }
     }
     html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p><div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
@@ -2592,14 +2615,14 @@ function rebuildPlayerMesh(){
   hullCol.offsetHSL(0,0.04,0.14);
   const hullHi=hullCol.clone();hullHi.offsetHSL(0,0.02,0.16);
   const hullLo=hullCol.clone().multiplyScalar(0.62);
-  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.34,metalness:.55,emissive:hullCol.clone().multiplyScalar(0.22),emissiveIntensity:.4});
-  const hm2=new THREE.MeshStandardMaterial({color:hullHi,roughness:.26,metalness:.65,emissive:ah,emissiveIntensity:.18});
-  const hmd=new THREE.MeshStandardMaterial({color:hullLo,roughness:.55,metalness:.42,emissive:0x061018,emissiveIntensity:.1});
-  const ck=new THREE.MeshStandardMaterial({color:0x0a2840,roughness:.04,metalness:.92,transparent:true,opacity:.9,emissive:0x226688,emissiveIntensity:.55});
-  const em=new THREE.MeshStandardMaterial({color:0x101820,roughness:.7,metalness:.55});
-  const gm=new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false});
-  const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.1,metalness:.92,emissive:ah,emissiveIntensity:1.55});
-  const boostMat=new THREE.MeshStandardMaterial({color:0xff6622,roughness:.2,metalness:.5,emissive:0xff3300,emissiveIntensity:1.1});
+  const hm=new THREE.MeshStandardMaterial({color:hullCol,roughness:.28,metalness:.62,emissive:hullCol.clone().multiplyScalar(0.18),emissiveIntensity:.45});
+  const hm2=new THREE.MeshStandardMaterial({color:hullHi,roughness:.2,metalness:.72,emissive:ah,emissiveIntensity:.28});
+  const hmd=new THREE.MeshStandardMaterial({color:hullLo,roughness:.48,metalness:.5,emissive:0x061018,emissiveIntensity:.12});
+  const ck=new THREE.MeshStandardMaterial({color:0x0a2840,roughness:.04,metalness:.95,transparent:true,opacity:.88,emissive:0x226688,emissiveIntensity:.65});
+  const em=new THREE.MeshStandardMaterial({color:0x101820,roughness:.62,metalness:.6});
+  const gm=new THREE.MeshBasicMaterial({color:ah,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false});
+  const tm=new THREE.MeshStandardMaterial({color:ah,roughness:.08,metalness:.95,emissive:ah,emissiveIntensity:1.7});
+  const boostMat=new THREE.MeshStandardMaterial({color:0xff6622,roughness:.18,metalness:.55,emissive:0xff3300,emissiveIntensity:1.25});
 
   const spec=readPlayerBlueprintMeshSpec();
   const{
@@ -4445,16 +4468,22 @@ const FLEET=[
   ['bazzano','bazzano','courier'],['savigno','savigno','courier'],
   ['calcara','calcara','courier'],['monteveglio','monteveglio','courier'],
 ];
-const EXTRA_FLEET_MULT=3;
+const EXTRA_FLEET_MULT=4;
 for(let k=0;k<EXTRA_FLEET_MULT;k++)FLEET.push(
   ['bazzano','bazzano','patrol'],['bazzano','sirena','merchant'],['bazzano','lavino','freighter'],
   ['crespellano','crespellano','patrol'],['crespellano','pragatto','pirate'],['calcara','bazzano','freighter'],
   ['calcara','calcara','escort'],['calcara','calcara','merchant'],['monteveglio','monteveglio','patrol'],
   ['monteveglio','oliveto','merchant'],['monteveglio','oliveto','freighter'],['savigno','savigno','patrol'],
   ['savigno','zappolino','escort'],['savigno','zappolino','freighter'],['pirate','castelletto','pirate'],
-  ['pirate','castelletto','pirate']
+  ['pirate','castelletto','pirate'],['pirate','serravalle','pirate'],['pirate','castelletto','pirate'],
+  ['calcara','calcara','escort'],['pirate','castelletto','pirate']
 );
-const DYNAMIC_NPC_SPAWN={timer:38,interval:34,max:140};
+const DYNAMIC_NPC_SPAWN={timer:28,interval:34,max:160};
+function refreshDynamicSpawnTuning(){
+  if(typeof StorySys==='undefined')return;
+  DYNAMIC_NPC_SPAWN.interval=StorySys.npcSpawnInterval();
+  DYNAMIC_NPC_SPAWN.max=StorySys.npcMax();
+}
 const LOADER={
   startedAt:performance.now(),
   fleetTotal:0,
@@ -4489,8 +4518,14 @@ function lazySpawnFleet(batchSize){
   runBatch();
 }
 function spawnDynamicNpc(){
+  if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
   if(NPCS.length>=DYNAMIC_NPC_SPAWN.max)return;
-  const pick=FLEET[(Math.random()*FLEET.length)|0];
+  let pick=FLEET[(Math.random()*FLEET.length)|0];
+  // Più pirati / ostili man mano che la storia avanza
+  if(typeof StorySys!=='undefined'&&Math.random()<StorySys.pirateWeightBonus()){
+    const pirates=FLEET.filter(f=>f[0]==='pirate'||f[2]==='pirate');
+    if(pirates.length)pick=pirates[(Math.random()*pirates.length)|0];
+  }
   if(!pick)return;
   spawnNpc(pick[0],pick[1],pick[2]);
 }
@@ -4728,6 +4763,17 @@ function touch(id,act){
 }
 touch('btnl','left');touch('btnr','right');touch('btnth','thrust');touch('btnfi','fire');
 touch('btnboost','boost');
+/** Throttle analogico (mobile): 0–1 → spinta progressiva. */
+const FLY_THROTTLE={v:0};
+(function initThrottleSlider(){
+  const el=document.getElementById('throttle');if(!el)return;
+  const sync=()=>{FLY_THROTTLE.v=cl((+el.value||0)/100,0,1);INP.thrust=FLY_THROTTLE.v>0.04;};
+  el.addEventListener('input',sync,{passive:true});
+  el.addEventListener('change',sync,{passive:true});
+  // Rilascia a 0 se leave (opzionale: mantieni)
+  el.addEventListener('pointerup',()=>{/* keep value for hold-cruise */},{passive:true});
+  sync();
+})();
 function touchTap(id,fn){
   const b=document.getElementById(id);if(!b||typeof fn!=='function')return;
   b.addEventListener('touchstart',e=>{e.preventDefault();fn();},{passive:false});
@@ -6512,6 +6558,9 @@ function enterSuborbit(sm){
 function leaveSuborbit(opts){
   opts=opts||{};
   const sum=suborbitSnapshotSummary(opts);
+  if(sum&&(sum.completed||SUBORBIT.corridorComplete||sum.progressPct>=55)){
+    if(typeof StorySys!=='undefined')StorySys.markSuborbit();
+  }
   suborbitTelemetry('leave',sum);
   triggerSeqTransition('suborbit-out',0.48,'#a9d5ff');
   SUBORBIT.active=false;SUBORBIT.planet=null;
@@ -7129,6 +7178,7 @@ function leaveBoarding(opts){
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='none';
   if(opts.success){
     RUN_STATS.boardings++;
+    if(typeof StorySys!=='undefined')StorySys.markBoarding(BOARDING.kind);
     const sh=BOARDING.sourceHulk;
     const repeatHulk=BOARDING.kind==='hulk'&&sh&&sh.looted;
     const rewMul=repeatHulk?0.42:1;
@@ -8768,6 +8818,10 @@ function spawnHulks(){
     {x:4800,  z:27800,  arch:'military'},
     {x:28800, z:-17200, arch:'hospital'},
     {x:-4200, z:-23000, arch:'xeno'},
+    {x:11200, z:9200,   arch:'cargo'},
+    {x:-14800,z:19800,  arch:'military'},
+    {x:19600, z:-21000, arch:'xeno'},
+    {x:-22000,z:-8000,  arch:'hospital'},
   ];
   positions.forEach((p,i)=>{
     const seed=((i+1)*104729 + p.x*31 + p.z*17)|0;
@@ -8951,9 +9005,14 @@ function checkDeliveryOnDock(stId){
     if(m.done||m.type!=='delivery'||m.targetSid!==stId)continue;
     const ct=m.cargo&&m.cargo.type;
     if(!ct)continue;
-    // Special: story_4 tartufi check
-    if(m.id==='story_4'&&stId==='savigno'){const h=PS.cargo[ct]||0;if(h>=3){PS.cargo[ct]-=3;if(PS.cargo[ct]<=0)delete PS.cargo[ct];completeMission(m);}continue;}
-    if((PS.cargo[ct]||0)>0){PS.cargo[ct]--;if(!PS.cargo[ct])delete PS.cargo[ct];completeMission(m);}
+    const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
+    if((PS.cargo[ct]||0)<need)continue;
+    if(typeof StorySys!=='undefined'){
+      if(!StorySys.consumeCargo(m))continue;
+    }else{
+      PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
+    }
+    completeMission(m);
   }
 }
 
@@ -9178,8 +9237,31 @@ function doSellCargoAtStation(gk,stId){
   notify('Venduto '+(GOODS[gk]?.name||gk)+' per '+fmt(price));
   buildDock(GAME.dockedSt);
 }
-function doDeliver(mId){const m=PS.activeMissions.find(x=>x.id===mId);if(!m||m.done)return;const ct=m.cargo.type;if(!(PS.cargo[ct]>0))return;PS.cargo[ct]--;if(!PS.cargo[ct])delete PS.cargo[ct];completeMission(m);buildDock(GAME.dockedSt);}
-function doSellAll(stId){let e=0;const sg=SG[stId]||{};Object.entries(PS.cargo).forEach(([gk,qty])=>{const sp=sg[gk]?.sl||Math.round((Object.entries(SG).find(([,v])=>v[gk])?.[1][gk]?.sl)||15);e+=sp*qty;});PS.credits+=e;PS.cargo={};notify('Stiva svuotata! +'+fmt(e));buildDock(GAME.dockedSt);}
+function doDeliver(mId){
+  const m=PS.activeMissions.find(x=>x.id===mId);if(!m||m.done)return;
+  if(typeof StorySys!=='undefined'){
+    if(!StorySys.consumeCargo(m)){notify('Carico insufficiente per la consegna.',1800);return;}
+  }else{
+    const ct=m.cargo&&m.cargo.type;const need=(m.cargo&&m.cargo.qty)||1;
+    if(!ct||(PS.cargo[ct]||0)<need)return;
+    PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
+  }
+  completeMission(m);buildDock(GAME.dockedSt);
+}
+function doSellAll(stId){
+  let e=0;const sg=SG[stId]||{};
+  const protectedTypes=new Set(['frammento']);
+  // Non vendere carico di missioni storia attive
+  PS.activeMissions.forEach(m=>{if(m&&m.cargo&&m.cargo.type)protectedTypes.add(m.cargo.type);});
+  Object.entries(PS.cargo).forEach(([gk,qty])=>{
+    if(protectedTypes.has(gk))return;
+    const sp=sg[gk]?.sl||Math.round((Object.entries(SG).find(([,v])=>v[gk])?.[1][gk]?.sl)||15);
+    e+=sp*qty;delete PS.cargo[gk];
+  });
+  PS.credits+=e;
+  notify(e>0?('Stiva svuotata! +'+fmt(e)+' (carico storia protetto)'):'Niente da vendere (carico storia protetto).');
+  buildDock(GAME.dockedSt);
+}
 
 function tRecruit(pnl,st){
   pnl.innerHTML='<div class="stt">EQUIPAGGIO ('+PS.crew.length+'/4)</div>';
@@ -9223,7 +9305,19 @@ function tMissions(pnl,st){
     });
   }
 }
-function doAccept(mId,stId){const st=stations.find(s=>s.sd.id===stId);if(!st)return;const m=st.missionsList.find(x=>x.id===mId);if(!m||m.active||m.done)return;if(PS.activeMissions.some(x=>x.id===mId))return;m.active=true;PS.activeMissions.push(m);notify('Missione accettata: '+m.title);buildDock(GAME.dockedSt);}
+function doAccept(mId,stId){
+  const st=stations.find(s=>s.sd.id===stId);if(!st)return;
+  const m=st.missionsList.find(x=>x.id===mId);if(!m||m.active||m.done)return;
+  if(PS.activeMissions.some(x=>x.id===mId))return;
+  if(typeof StorySys!=='undefined'){
+    const gate=StorySys.canAccept(m);
+    if(!gate.ok){notify(gate.msg||'Requisiti missione non soddisfatti.',2600);return;}
+  }
+  m.active=true;PS.activeMissions.push(m);
+  if(typeof StorySys!=='undefined')StorySys.grantMissionCargo(m);
+  notify('Missione accettata: '+m.title);
+  buildDock(GAME.dockedSt);
+}
 
 function tTavern(pnl,st){
   pnl.innerHTML='<div class="stt">OSTERIA — VOCI DI CORRIDOIO</div>';
@@ -9252,8 +9346,11 @@ function completeMission(m){
   else if(m.id==='story_5'){advanceStory(6);}
   else if(m.id==='story_6'){advanceStory(7);}
   else if(m.id==='story_7'){advanceStory(8);}
-  else if(m.id==='story_8'){setTimeout(()=>triggerVictory(),2500);}
-  if(m.id&&m.id.startsWith('story_'))setTimeout(checkStoryInterludes,3200);
+  else if(m.id==='story_8'){setTimeout(()=>playFinaleSequence(),600);}
+  if(m.id&&m.id.startsWith('story_')){
+    if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
+    setTimeout(checkStoryInterludes,3200);
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -10401,6 +10498,26 @@ function triggerVictory(){
   stations.forEach(st=>appendEpilogueMissions(st.missionsList,st.sd.id,st.sd));
 }
 
+const FINALE_SLIDES=[
+  {chap:'FINALE · I',title:'Il Mulino Acceso',
+    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Imperium resta in coda — tu resti a casa.',
+    art:'sprites/story/finale_seq.jpg'},
+  {chap:'FINALE · II',title:'Zvan Marìa',
+    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Il Patto e\' vivo non perche\' lo dice un bollo — perche\' qualcuno ha deciso di restare.',
+    art:'sprites/story/finale.jpg'}
+];
+function playFinaleSequence(){
+  // Riusa lo slideshow intro con slide finali, poi vittoria
+  const prev=INTRO_SLIDES.slice();
+  INTRO_SLIDES.length=0;
+  FINALE_SLIDES.forEach(s=>INTRO_SLIDES.push(s));
+  playIntroSlideshow(()=>{
+    INTRO_SLIDES.length=0;
+    prev.forEach(s=>INTRO_SLIDES.push(s));
+    triggerVictory();
+  });
+}
+
 // ─────────────────────────────────────────────────
 // MAIN LOOP
 // ─────────────────────────────────────────────────
@@ -10835,7 +10952,11 @@ function animate(){
       const bankTarget=(turnL?1:0)+(turnR?-1:0);
       playerShip._bank=lerp(playerShip._bank||0,bankTarget*0.38,cl(dt*7,0,1));
       playerShip.mesh.rotation.z=playerShip._bank;
-      if(INP.thrust){playerShip.applyThrust(dt);if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');}
+      if(INP.thrust||(typeof FLY_THROTTLE!=='undefined'&&FLY_THROTTLE.v>0.04)){
+        const thrMul=(typeof FLY_THROTTLE!=='undefined'&&FLY_THROTTLE.v>0.04)?(0.35+FLY_THROTTLE.v*0.9):1;
+        playerShip.applyThrust(dt,thrMul);
+        if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');
+      }
       RUN_STATS.distance+=playerShip.velocity.length()*dt;
       updateNavRisk(dt);
       if(INP.thrust&&NAV_EFFECT.inCorridor){

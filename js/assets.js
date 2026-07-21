@@ -64,7 +64,8 @@
     if (/ombra|imperium|castelletto|rapporto/i.test(t)) return STORY_ART[6];
     if (/fuoco|pirat|caccia/i.test(t)) return STORY_ART[7];
     if (/mulino acceso|piadin/i.test(t)) return STORY_ART[8];
-    if (/consigliere|bazzano|patto|vittoria|molino/i.test(t)) return STORY_ART.finale;
+    if (/finale|mulino acceso|vittoria/i.test(t)) return STORY_ART.finale;
+    if (/consigliere|bazzano|patto|molino/i.test(t)) return STORY_ART.finale;
     if (/pressione|pirata/i.test(t)) return STORY_ART.stamp;
     return STORY_ART.prologue;
   }
