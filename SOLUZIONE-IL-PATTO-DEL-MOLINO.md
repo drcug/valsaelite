@@ -67,15 +67,16 @@ Walkthrough completa della campagna principale, passo per passo.
 
 ## 2b. Tab RADICI (incontri psicologici)
 
-Nelle stazioni principali compare il tab **RADICI**: dialoghi con gente che conosceva Zvan **prima** di Imperium (compagni, famiglia, ex amici).  
+Nelle stazioni principali compare il tab **RADICI**: dialoghi in italiano chiaro (con spicchi di bazzanese) con chi conosceva Zvan **prima** di Imperium.
 
 - Ritratti: **Zvan Marìa** a sinistra + interlocutore a destra (evidenziato chi parla).  
-- Dialetto **bazzanese** autentico nei testi locali; Zvan spesso inciampa o parla “da Imperium”.  
-- Tema: scoprire di essere **estraneo al proprio posto**.  
+- Testo in finestra **scrollabile** (niente typewriter).  
+- Tema: ritorno, estraneità; col procedere dei capitoli emergono casate di Imperium, anomalie e **macguffinium**.  
 - Si sbloccano con i capitoli; una volta vissuti restano “FATTO”.  
-- Salvati in `PS.rootSeen`.  
+- Salvati in `PS.rootSeen` / `PS.loreFlags`.
 
-Luoghi tipici: Bazzano (osteria, zia, specchio), Crespellano (cugina), Calcara (ex compagno), Monteveglio (paladina d’infanzia), Savigno (zio), Castelletto (altra esule).
+### Palazzo Beghelli (dal cap. 4)
+Astronave enorme (più grande di uno space hulk) della casata minore Beghelli. Sul radar come blocco dorato. Vicino: **[T]** radio. Con connessioni (rep + RADICI) puoi chiedere aiuto — spesso con scarso successo.
 
 ---
 

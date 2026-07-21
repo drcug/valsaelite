@@ -35,7 +35,10 @@
         hullPaintHex:ps.hullPaintHex,missiles:ps.missiles,
         activeMissionIds:ps.activeMissions.map(m=>m.id),
         sandboxMode:!!ps.sandboxMode,
-        rootSeen:{...(ps.rootSeen||{})}
+        rootSeen:{...(ps.rootSeen||{})},
+        loreFlags:{...(ps.loreFlags||{})},
+        beghelliAppeared:!!ps.beghelliAppeared,
+        beghelliAidUsed:ps.beghelliAidUsed|0
       },
       STORY:{chapter:global.STORY.chapter,won:!!global.STORY.won},
       storyMissions:storyMissionSnap(global.STORY),
@@ -102,7 +105,10 @@
       crew:[...d.crew],modules:[...d.modules],bpInv:{...d.bpInv},
       hullPaintHex:d.hullPaintHex,missiles:d.missiles,
       sandboxMode:!!d.sandboxMode,activeMissions:[],
-      rootSeen:{...(d.rootSeen||{})}
+      rootSeen:{...(d.rootSeen||{})},
+      loreFlags:{...(d.loreFlags||{})},
+      beghelliAppeared:!!d.beghelliAppeared,
+      beghelliAidUsed:d.beghelliAidUsed|0
     });
     global.STORY.chapter=data.STORY.chapter|0;
     global.STORY.won=!!data.STORY.won;
@@ -119,6 +125,12 @@
     }
     global.navDestId=data.navDestId||null;
     global.navDestPending=null;
+    if(typeof global.BEGHELLI!=='undefined'){
+      global.BEGHELLI.aidUsed=ps.beghelliAidUsed|0;
+      if(ps.beghelliAppeared||(global.STORY.chapter|0)>=4||global.STORY.won){
+        if(typeof global.ensureBeghelliPalace==='function')global.ensureBeghelliPalace(true);
+      }
+    }
     if(data.hulksLooted){
       (global.HULKS||[]).forEach(h=>{
         if(data.hulksLooted[h.id]){

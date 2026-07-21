@@ -362,7 +362,17 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 .choice-btn.trade{border-color:rgba(255,200,50,.3);color:#ffdd88;}
 .choice-btn.trade:hover{background:rgba(255,200,50,.1);}
 
-/* Dialoghi RADICI — Zvan + locali */
+/* Dialoghi radio: testo intero in finestra scrollabile (niente typewriter) */
+.idlg-scroll{
+  font-size:13px;color:#b8d4e0;font-family:var(--FM);margin-top:10px;line-height:1.75;
+  border-left:2px solid rgba(62,207,187,.55);padding:4px 10px 8px 12px;font-style:normal;
+  max-height:min(38vh,280px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(62,207,187,.55) rgba(0,0,0,.2);
+}
+.idlg-scroll::-webkit-scrollbar{width:8px}
+.idlg-scroll::-webkit-scrollbar-thumb{background:rgba(62,207,187,.5);border-radius:4px}
+#idlg > div{max-height:min(92vh,720px);overflow:auto}
 #rootdlg .rootdlg-panel{
   width:min(640px,96vw);max-height:min(92vh,720px);overflow:auto;
   background:linear-gradient(165deg,rgba(6,20,28,.98),rgba(2,8,16,.99));
@@ -407,10 +417,14 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 .rootdlg-type{font-size:9px;font-family:var(--FM);color:#557799;letter-spacing:.12em;margin-top:3px}
 .rootdlg-text{
   font-size:13px;color:#b8d4e0;font-family:var(--FM);margin-top:10px;line-height:1.75;
-  border-left:2px solid rgba(196,137,58,.55);padding-left:12px;font-style:italic;
-  max-height:min(28vh,180px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  border-left:2px solid rgba(196,137,58,.55);padding-left:12px;font-style:normal;
+  max-height:min(42vh,320px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding-right:8px;
+  scrollbar-width:thin;scrollbar-color:rgba(196,137,58,.55) rgba(0,0,0,.2);
 }
-.rootdlg-choices{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:200px;overflow-y:auto}
+.rootdlg-text::-webkit-scrollbar{width:8px}
+.rootdlg-text::-webkit-scrollbar-thumb{background:rgba(196,137,58,.5);border-radius:4px}
+.rootdlg-choices{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:min(28vh,220px);overflow-y:auto}
 .rootdlg-close{
   display:block;margin:14px auto 4px;padding:8px 28px;border-radius:6px;
   border:1px solid rgba(70,180,160,.35);background:rgba(255,255,255,.03);
@@ -420,7 +434,7 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 @media(max-width:700px){
   .root-port canvas{width:96px;height:120px}
   .rootdlg-vs{display:none}
-  .rootdlg-text{max-height:22vh;font-size:12px}
+  .rootdlg-text{max-height:min(36vh,280px);font-size:12px}
   .root-talk-tag{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -866,7 +880,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
         <div id="idlg-name" style="font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.08em"></div>
         <div id="idlg-type" style="font-size:9px;color:#557799;font-family:var(--FM);margin-top:3px;letter-spacing:.12em"></div>
         <div id="idlg-mood" style="font-size:8px;color:#6a9a90;font-family:var(--FM);margin-top:4px;letter-spacing:.1em"></div>
-        <div id="idlg-text" style="font-size:13px;color:#b8d4e0;font-family:var(--FM);margin-top:10px;line-height:1.75;border-left:2px solid rgba(62,207,187,.55);padding-left:10px;font-style:italic;max-height:min(28vh,160px);overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+        <div id="idlg-text" class="idlg-scroll"></div>
       </div>
     </div>
     <!-- trade offer (shown conditionally) -->
@@ -1549,7 +1563,7 @@ const STORY = {
   won:false,   // true dopo triggerVictory (Patto restaurato)
   playerName:'Zvan Marìa',
   playerTitle:'Funzionario di settimo livello · Impero Galattico',
-  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Per vent\'anni hai lavorato a Imperium — tra corridoi di marmo, bolle di sicurezza e rapporti che nessuno leggeva — senza rimettere piede nel Sistema Valsamoggio da cui sei partito. Ora i superiori ti rimandano a casa: non per pietà, ma perché le cinque fazioni stanno per far collassare l\'anello orbitale e serve qualcuno che conosca il dialetto, il vino e i rancori. Il "Patto del Molino" è sparito. Il guaio è tuo. E, dopo due decenni, c\'è anche la questione del ritorno: non sei più solo un messaggero — sei un figlio del sistema che deve dimostrare di non essere diventato un estraneo.',
+  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Per vent\'anni hai lavorato a Imperium — corridoi di marmo, bolle di sicurezza, rapporti che nessuno leggeva — senza rimettere piede nel Sistema Valsamoggio. Ora i superiori ti rimandano a casa: le cinque fazioni stanno per far collassare l\'anello orbitale e serve qualcuno che conosca il dialetto, il vino e i rancori. Il "Patto del Molino" è sparito. Il guaio è tuo. Dopo due decenni c\'è anche la questione del ritorno: non sei più solo un messaggero, sei un figlio del sistema che deve dimostrare di non essere diventato un estraneo. A Imperium le grandi casate si combattono per il potere; Valsamoggio, periferia, sembra fuori da quella lotta. Almeno fino a quando il Mulino non torna a girare.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
@@ -1716,28 +1730,35 @@ function advanceStory(ch){
     }
   }
   if(ch===1)setTimeout(()=>tryShowTutorialChain(),1200);
+  if(ch>=4&&typeof ensureBeghelliPalace==='function')setTimeout(()=>ensureBeghelliPalace(),1600);
 }
 
 // Interludi intermedi: nodi narrativi non bloccanti, condizionati da rep/frammenti.
 const STORY_INTERLUDES=[
   {id:'il_consigliere',after:1,minRep:{bazzano:25},title:'Il Consigliere di Bazzano',
-    body:'Un ologramma del consigliere Dosi ti raggiunge in volo: "Stai facendo piu\' di quanto ti sia stato chiesto. Continua cosi\': il Patto ha bisogno di testardi, non di eroi."'},
+    body:'Un ologramma del consigliere Dosi ti raggiunge in volo: «Stai facendo più di quanto ti sia stato chiesto. Continua così: il Patto ha bisogno di testardi, non di eroi. A Imperium le casate maggiori si azzannano; noi siamo il patio di servizio. Teniamolo ordinato.»'},
   {id:'il_timbro',after:2,minRep:{calcara:-1},title:'Il Timbro di Calcara',
-    body:'Un archivista calcarese ti fissa dallo schermo: "Hai consegnato. Ora il timbro e\' nostro. Ma i timbri, comandante, possono anche scomparire. Ricordatelo."'},
+    body:'Un archivista calcarese ti fissa dallo schermo: «Hai consegnato. Ora il timbro è nostro. I timbri, comandante, possono anche scomparire. Ricordatelo.»'},
   {id:'la_copia',after:2,minRep:{calcara:-25},title:'La Copia in Circolazione',
-    body:'Rete di Bazzano segnala frammenti "autenticati" che circolano senza di te. Calcara non ti perdona l\'originale: aspettati piu\' scorte sulle rotte mercantili.'},
+    body:'Rete di Bazzano segnala frammenti «autenticati» che circolano senza di te. Calcara non ti perdona l\'originale: aspettati più scorte sulle rotte mercantili.'},
   {id:'la_rocca',after:3,minRep:{monteveglio:20},title:'La Rocca Ti Riconosce',
-    body:'Il Castellano incide il tuo nome sulla Tavola del Torneo: "Frecce di luce, sangue cosmico, verita\' intera. Ti aspettiamo alla prossima giostra."'},
+    body:'Il Castellano incide il tuo nome sulla Tavola del Torneo: «Frecce di luce, sangue cosmico, verità intera. Ti aspettiamo alla prossima giostra.» Qualcuno mormora che i Beghelli stanno rientrando in sistema.'},
+  {id:'anomalie_voce',after:3,minRep:{},title:'Voci dalle anomalie',
+    body:'Un pilota ubriaco a Castelletto: «Nelle pieghe dello spazio qualcosa luccica storto. Dicono macguffinium — materia a nove dimensioni. Se è vero, le casate di Imperium smetteranno di fingere che Valsamoggio non conti.»'},
   {id:'la_pressione',after:3,minRep:{calcara:-40},title:'Pressione Calcarese',
-    body:'Un comunicato pirata intercettato: "Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto."'},
+    body:'Un comunicato pirata intercettato: «Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto.»'},
   {id:'il_palato',after:4,minRep:{savigno:25},title:'Il Palato del Consiglio',
-    body:'Nonna Graziella (se a bordo) scuote la testa: "Tre chili? I Savignesi non vendono la storia, la degustano. Sei entrato nella loro bocca, comandante."'},
+    body:'Nonna Graziella (se a bordo) scuote la testa: «Tre chili? I Savignesi non vendono la storia, la degustano. Sei entrato nella loro bocca, comandante.»'},
+  {id:'beghelli_arrivo',after:4,minRep:{},title:'Palazzo Beghelli',
+    body:'Radar: firma enorme, più grande di uno space hulk. Palazzo mobile della Casata Beghelli — un tempo padroni di Valsamoggio, ora casata minore. Puoi chiamarli in radio se sei abbastanza vicino. Aiuto sì, se hai connessioni. Risultati? Probabilmente pochi.'},
   {id:'il_ispettore',after:5,minRep:{bazzano:20},title:'L\'Ispettore di Sesto Livello',
-    body:'Un canale cifrato da Imperium: "Il Patto e\' patrimonio dell\'Impero. Preparati a restituire le carte." A Bazzano rispondono con un sorriso di pietra: "Qui le carte hanno sapore di casa."'},
+    body:'Canale cifrato da Imperium: «Il Patto è patrimonio dell\'Impero. Preparati a restituire le carte.» Sotto, un allegato cancellato a metà: «…anomalie / macguff… — priorità stabilità.» A Bazzano rispondono: «Qui le carte hanno sapore di casa.»'},
   {id:'la_rocca_nera',after:6,minRep:{},title:'La Roccia Nera',
-    body:'Castelletto segnala scie non registrate. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare.'},
+    body:'Castelletto segnala scie non registrate. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare. Forse una casata. Forse solo fame.'},
+  {id:'patto_perche',after:6,minRep:{bazzano:15},title:'Perché il Mulino deve girare',
+    body:'Un funzionario anziano, off the record: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è macguffinium, le casate scendono qui e l\'Impero rischia di non sopravvivere alla guerra che ne segue. Il Patto non è nostalgia: è diga.»'},
   {id:'il_mulino',after:7,minRep:{bazzano:30},title:'Il Mulino Acceso',
-    body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: "Promozione a sesto livello — se taci." Tu scegli il rumore del mulino.'},
+    body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: «Promozione a sesto livello — se taci.» Tu scegli il rumore del mulino.'},
 ];
 const _shownInterludes=new Set();
 function diaryStationLabel(sid){
@@ -1796,7 +1817,20 @@ function renderDiaryContent(){
   // Note RADICI
   if(PS.rootSeen&&Object.keys(PS.rootSeen).filter(k=>k.indexOf('prompted_')!==0&&k.indexOf('root_')===0).length){
     const n=Object.keys(PS.rootSeen).filter(k=>k.indexOf('root_')===0).length;
-    html+='<div class="diary-ch done"><h3>Radici</h3><p class="dm">Hai riascoltato voci di chi ti conosceva prima di Imperium. Incontri vissuti: '+n+'. Il dialetto a tratti torna; a tratti no — e quello fa più male.</p><div class="dst">Tab RADICI nelle stazioni.</div></div>';
+    html+='<div class="diary-ch done"><h3>Radici</h3><p class="dm">Hai riascoltato voci di chi ti conosceva prima di Imperium. Incontri vissuti: '+n+'.</p><div class="dst">Tab RADICI nelle stazioni.</div></div>';
+  }
+  if(PS.loreFlags&&Object.keys(PS.loreFlags).length){
+    const bits=[];
+    if(PS.loreFlags.casate_rumore||PS.loreFlags.periferia)bits.push('A Imperium le grandi casate si combattono; Valsamoggio resta periferia finché il Mulino gira.');
+    if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)bits.push('Nelle anomalie si parla di macguffinium: materia a nove dimensioni, il materiale più prezioso dell\'universo.');
+    if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
+    if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli — un tempo dominante, ora minore — può offrire un aiuto limitato dal Palazzo.');
+    if(bits.length){
+      html+='<div class="diary-ch done"><h3>Cosa hai scoperto</h3><p class="dm">'+bits.join(' ')+'</p><div class="dst">Lore raccolta giocando · dialoghi, osterie, interludi.</div></div>';
+    }
+  }
+  if(PS.beghelliAppeared){
+    html+='<div class="diary-ch done"><h3>Palazzo Beghelli</h3><p class="dm">Un\'astronave più grande di uno space hulk è entrata in sistema: il Palazzo della Casata Beghelli. [T] in radio se sei vicino. Con connessioni giuste ottieni poco; senza, quasi niente.</p></div>';
   }
   el.innerHTML=html;
 }
@@ -1881,7 +1915,8 @@ const TAVERN = {
     {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta. Taebol chi si stupisce."'},
     {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — teba i cavalieri col fiasco pieno."'},
     {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
-    {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina."'},
+    {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina. Però Imperium lo vuole dritto: dicono che sotto le anomalie c\'è roba che fa litigare le casate."'},
+    {s:'Corriere in pausa',        t:'"A Imperium le grandi casate si mangiano i corridoi. Qui siamo patio di servizio. Finché il Mulino gira, restiamo invisibili. Se si spezza… non lo so."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
@@ -1910,6 +1945,7 @@ const TAVERN = {
     {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffe\'. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
     {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
     {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
+    {s:'Osservatore radar',        t:'"Hai visto quella firma enorme? Più grossa di uno hulk. Palazzo Beghelli. Casata minore, un tempo padroni. Chiamali in radio se ti senti coraggioso — o connesso."'},
   ],
 };
 
@@ -2045,6 +2081,10 @@ const PS={
   sandboxMode:false,
   /** Incontri RADICI già vissuti (id → 1) */
   rootSeen:{},
+  /** Flags lore scoperti in gioco (casate, macguffinium, Beghelli…) */
+  loreFlags:{},
+  beghelliAppeared:false,
+  beghelliAidUsed:0,
 };
 const cargoCnt=()=>Object.values(PS.cargo).reduce((a,b)=>a+b,0);
 
@@ -5403,7 +5443,10 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyM')toggleMap();
   if(e.code==='KeyE')startLanding();
   if(e.code==='KeyP')openBlueprintModal();
-  if(e.code==='KeyT'||e.code==='KeyH'){const n=getNpcForComm();if(n)openIdlg(n);}
+  if(e.code==='KeyT'||e.code==='KeyH'){
+    if(typeof nearBeghelli==='function'&&nearBeghelli(2200)){openBeghelliDialogue();return;}
+    const n=getNpcForComm();if(n)openIdlg(n);
+  }
   if(e.code==='KeyR'||e.code==='Tab'){e.preventDefault();cycleTarget();}
   if(e.code==='KeyQ'){e.preventDefault();launchPlayerMissile();}
   if(e.code==='KeyG'&&GAME.state==='flying'){e.preventDefault();tryBoardingTrigger();}
@@ -5570,7 +5613,10 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
 })();
 document.getElementById('btnmap').addEventListener('click',toggleMap);
 document.getElementById('btn-diary').addEventListener('click',()=>toggleDiary());
-document.getElementById('btnhail').addEventListener('click',()=>{const n=getNpcForComm();if(n)openIdlg(n);else notify('Nessuna nave nel raggio di comunicazione.');});
+document.getElementById('btnhail').addEventListener('click',()=>{
+  if(typeof nearBeghelli==='function'&&nearBeghelli(2200)){openBeghelliDialogue();return;}
+  const n=getNpcForComm();if(n)openIdlg(n);else notify('Nessuna nave nel raggio di comunicazione.');
+});
 
 // ─────────────────────────────────────────────────
 // LANDING / LAUNCH ANIMATIONS
@@ -5794,18 +5840,10 @@ function getDlgMood(ns){
 let _idlgTypeTmr=0;
 function typeIdlgText(full,done){
   const el=document.getElementById('idlg-text');if(!el)return;
-  clearInterval(_idlgTypeTmr);
-  const text=String(full||'');
-  if(!text){el.textContent='';if(done)done();return;}
-  // Preferisci lettura immediata se reduced-motion
-  if(document.body.classList.contains('reduced-motion')||text.length>220){
-    el.textContent=text;if(done)done();return;
-  }
-  let i=0;el.textContent='';
-  _idlgTypeTmr=setInterval(()=>{
-    i+=1;el.textContent=text.slice(0,i);
-    if(i>=text.length){clearInterval(_idlgTypeTmr);_idlgTypeTmr=0;if(done)done();}
-  },12);
+  clearInterval(_idlgTypeTmr);_idlgTypeTmr=0;
+  el.textContent=String(full||'');
+  el.scrollTop=0;
+  if(done)done();
 }
 function pickDlgOpening(ns){
   const pool=DIALOGUES[ns.faction]||DIALOGUES.pirate;
@@ -5816,12 +5854,12 @@ function pickDlgOpening(ns){
   if(ns.angry)return 'Hai già sparato. Non fingere cortesia — parla in fretta.';
   if(typeof STORY!=='undefined'&&STORY.chapter>=4&&(ns.seed%3===0)){
     const storyBits={
-      bazzano:'Il Patto non è più solo un fascicolo: a Prime qualcuno controlla le rotte due volte.',
-      crespellano:'Se cerchi archivi, non chiedere il permesso. Chiedi chi ha paura di firmare.',
-      calcara:'C\'è un timbro che brucia più del plasma. Non è sul listino prezzi.',
-      monteveglio:'La Rocca non dorme. Le stelle sopra di noi sembrano giudici, non ornamenti.',
-      savigno:'L\'aroma giusto non mente. Il resto del sistema sì.',
-      pirate:'Il Patto? Lo vendo a pezzi. Tu sembri uno che compra storie care.'
+      bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie — e le casate maggiori ascoltano i rapporti.',
+      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar.',
+      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium a mezza voce.',
+      monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: Palazzo Beghelli. Cortesia di casata. Aiuto limitato.',
+      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato.',
+      pirate:'Il Patto? Lo vendo a pezzi. E se qualcuno cerca macguffinium, vendo anche le mappe — care.'
     };
     return storyBits[ns.faction]||lines[idx];
   }
@@ -5835,26 +5873,26 @@ const DLG_TREES={
   bazzano:{
     start:'a1',
     nodes:{
-      a1:{text:'Canale aperto. Se hai carte in regola, parla. Se no, torci la rotta.',choices:[
+      a1:{text:'Canale aperto. Se hai carte in regola, parla. Altrimenti torci la rotta.',choices:[
         {label:'[UFFICIALE] "Sono Zvan Marìa, Funzionario VII."',next:'a2',fx:{rep:4}},
         {label:'[DISCRETO] "Solo di passaggio."',next:'a3'},
         {label:'[DOMANDA] "Novità sul Patto?"',next:'a4'}
       ]},
-      a2:{text:'Ricevuto, Funzionario. A Prime qualcuno aspetta un rapporto — e non ama i ritardi.',choices:[
+      a2:{text:'Ricevuto, Funzionario. A Prime aspettano un rapporto. Non amano i ritardi. E Imperium, dietro le quinte, tiene d\'occhio le nostre anomalie.',choices:[
         {label:'[OK] "Lo terrò a mente."',next:null,fx:{rep:2}},
-        {label:'[PRESSIONE] "Dimmi chi."',next:'a5',fx:{rep:-2}}
+        {label:'[PRESSIONE] "Dimmi chi aspetta."',next:'a5',fx:{rep:-2}}
       ]},
-      a3:{text:'Passaggio libero. Ma le scie si contano. Non fare il furbo vicino ai dazi.',choices:[
+      a3:{text:'Passaggio libero. Le scie si contano lo stesso. Non fare il furbo vicino ai dazi.',choices:[
         {label:'[CHIUDI] "Capito."',next:null}
       ]},
-      a4:{text:'Sotto traccia: tre rotte, un archivio, un nome che non dicono. Ti do un appiglio — a costo di simpatia.',choices:[
+      a4:{text:'Sotto traccia: tre rotte, un archivio, un nome che non dicono. Ti do un appiglio, a costo di simpatia.',choices:[
         {label:'[ACCETTA] "Parla."',next:'a6',fx:{rep:3,mission:'dlg_tip_bazz'}},
         {label:'[RIFIUTA] "Troppo caro."',next:null}
       ]},
-      a5:{text:'Non in radio. Se proprio vuoi sapere, porta documenti a Calcara e vedi chi suda.',choices:[
+      a5:{text:'Non in radio. Se proprio vuoi sapere, porta documenti a Calcara e vedi chi suda. Le casate di Imperium hanno orecchie lunghe anche qui.',choices:[
         {label:'[OK]',next:null,fx:{mission:'dlg_tip_calc'}}
       ]},
-      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta "modulistica" senza manifesto sa più del sindaco.',choices:[
+      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco.',choices:[
         {label:'[GRAZIE]',next:null,fx:{credits:40}}
       ]}
     }
@@ -5867,10 +5905,10 @@ const DLG_TREES={
         {label:'[BLUFF] "Ho amici a Calcara."',next:'p3',fx:{rep:-4}},
         {label:'[ATTACCA] Apri il fuoco',next:null,fx:{angry:true,rep:-20}}
       ]},
-      p2:{text:'Accettato. Questa volta. La prossima costa di più — e magari una missione sporca.',choices:[
+      p2:{text:'Accettato. Questa volta. La prossima costa di più — magari una missione sporca.',choices:[
         {label:'[OK]',next:null,fx:{mission:'dlg_pirate_job'}}
       ]},
-      p3:{text:'Calcara? Ah. Allora forse non sei solo carne da laser. Sparisci prima che cambi idea.',choices:[
+      p3:{text:'Calcara? Allora forse non sei solo carne da laser. Sparisci prima che cambi idea.',choices:[
         {label:'[FUGGI]',next:null}
       ]}
     }
@@ -5881,14 +5919,18 @@ const DLG_TREES={
       m1:{text:'Per l\'onore della Rocca: parla a viso alto, o deponi le armi.',choices:[
         {label:'[ONORE] "Cerco prove, non scuse."',next:'m2',fx:{rep:5}},
         {label:'[TORNEO] "Come si entra nel torneo?"',next:'m3'},
+        {label:'[BEGHELLI] "I Beghelli sono in sistema?"',next:'m4'},
         {label:'[CHIUDI]',next:null}
       ]},
       m2:{text:'Allora ascolta: tre ostili all\'Ordine, o un regalo decente al Castellano. Funzionano entrambi.',choices:[
         {label:'[ACCETTA SFIDA]',next:null,fx:{mission:'dlg_order_duel',rep:3}},
         {label:'[DOPO]',next:null}
       ]},
-      m3:{text:'Armatura obbligatoria. Laser ammessi — le chiamiamo frecce di luce. Torna quando sei pronto.',choices:[
-        {label:'[OK]',next:null}
+      m3:{text:'Iscriviti a Monteveglio Station. Porta armatura — anche se è plastica. Qui il gesto conta.',choices:[
+        {label:'[OK]',next:null,fx:{rep:2}}
+      ]},
+      m4:{text:'Il Palazzo Beghelli è una nave-cattedrale. Dominavano Valsamoggio quando eravamo provincia vera. Ora sono casata minore: cortesia, pochi favori, poca forza. Se hai connessioni, chiedi. Non aspettarti miracoli.',choices:[
+        {label:'[CAPITO]',next:null,fx:{rep:1}}
       ]}
     }
   },
@@ -11521,6 +11563,19 @@ function drawRadar(){
     ctx.lineWidth=1.4;
     ctx.strokeRect(cl(ax,5,W-5)-4,cl(ay,5,W-5)-4,8,8);
   });
+  // Palazzo Beghelli (nave-casata enorme)
+  if(typeof BEGHELLI!=='undefined'&&BEGHELLI.mesh){
+    const rx=(BEGHELLI.mesh.position.x-playerShip.mesh.position.x)*sc;
+    const ry=(BEGHELLI.mesh.position.z-playerShip.mesh.position.z)*sc;
+    const ax=cx+rx,ay=cy+ry;
+    if(clipR(ax,ay)){
+      const px=cl(ax,6,W-6),py=cl(ay,6,W-6);
+      ctx.fillStyle='rgba(196,160,80,.85)';
+      ctx.fillRect(px-6,py-4,12,8);
+      ctx.strokeStyle='rgba(255,220,140,.95)';ctx.lineWidth=1.5;
+      ctx.strokeRect(px-7,py-5,14,10);
+    }
+  }
   // NPC ships — triangolo orientato sulla velocità
   NPCS.forEach(ns=>{
     if(!ns.ship.alive)return;
@@ -12174,6 +12229,7 @@ function animate(){
       }
       checkNear();
       updateHulks(dt);
+      if(typeof updateBeghelli==='function')updateBeghelli(dt);
       updateBoardingPrompt();
 
       checkPlanetCrash();
@@ -12274,6 +12330,168 @@ function animate(){
   flushProfiler(performance.now());
 }
 spawnHulks();
+
+// ─────────────────────────────────────────────────
+// PALAZZO BEGHELLI — nave-casata (più grande di uno space hulk)
+// Compare dal cap. 4. Supporto limitato se hai connessioni.
+// ─────────────────────────────────────────────────
+const BEGHELLI={
+  mesh:null,
+  appeared:false,
+  aidUsed:0,
+  name:'Palazzo Beghelli',
+  pos:{x:14200,z:-11800}
+};
+function buildBeghelliMesh(){
+  const g=new THREE.Group();
+  const hull=new THREE.MeshStandardMaterial({color:0x2a2438,roughness:.35,metalness:.72,emissive:0x1a1030,emissiveIntensity:.25});
+  const gold=new THREE.MeshStandardMaterial({color:0xc4a050,roughness:.28,metalness:.85,emissive:0x664410,emissiveIntensity:.35});
+  const glass=new THREE.MeshStandardMaterial({color:0x88ccee,roughness:.08,metalness:.9,transparent:true,opacity:.55,emissive:0x224466,emissiveIntensity:.4});
+  // Corpo principale — enorme rispetto agli hulk (~300u di bb)
+  const body=new THREE.Mesh(new THREE.BoxGeometry(220,70,520),hull);g.add(body);
+  const wingL=new THREE.Mesh(new THREE.BoxGeometry(160,18,180),hull);wingL.position.set(-160,10,-40);g.add(wingL);
+  const wingR=wingL.clone();wingR.position.x=160;g.add(wingR);
+  const tower=new THREE.Mesh(new THREE.CylinderGeometry(28,36,120,8),gold);tower.position.set(0,95,-60);g.add(tower);
+  const dome=new THREE.Mesh(new THREE.SphereGeometry(42,16,12),glass);dome.position.set(0,160,-60);g.add(dome);
+  const spine=new THREE.Mesh(new THREE.BoxGeometry(24,16,480),gold);spine.position.set(0,42,0);g.add(spine);
+  // Luci di cortesia
+  for(let i=0;i<12;i++){
+    const p=new THREE.Mesh(new THREE.SphereGeometry(3.2,8,8),new THREE.MeshBasicMaterial({color:0xffdd88}));
+    p.position.set((i%2?1:-1)*95,28,-220+i*38);g.add(p);
+  }
+  const beacon=new THREE.PointLight(0xffcc66,2.2,2400);beacon.position.set(0,180,-60);g.add(beacon);
+  g.userData={bbR:420,beghelli:true,beacon};
+  return g;
+}
+function ensureBeghelliPalace(force){
+  const ch=(typeof STORY!=='undefined')?(STORY.chapter||0):0;
+  if(!force&&ch<4&&!(STORY&&STORY.won))return;
+  if(BEGHELLI.appeared&&BEGHELLI.mesh)return;
+  const mesh=buildBeghelliMesh();
+  mesh.position.set(BEGHELLI.pos.x,40,BEGHELLI.pos.z);
+  mesh.rotation.y=0.55;
+  scene.add(mesh);
+  BEGHELLI.mesh=mesh;
+  BEGHELLI.appeared=true;
+  if(PS)PS.beghelliAppeared=true;
+  if(typeof notify==='function'){
+    notify('Radar: firma enorme — Palazzo Beghelli in sistema. [T] radio se sei vicino.',4200);
+  }
+  if(typeof showStoryBanner==='function'){
+    showStoryBanner('CASATA BEGHELLI','Il Palazzo entra in orbita','Una nave da casata, più grande di uno space hulk. Un tempo dominavano Valsamoggio. Ora sono secondari — ma presenti.',7000);
+  }
+}
+function updateBeghelli(dt){
+  if(!BEGHELLI.mesh)return;
+  BEGHELLI.mesh.rotation.y+=dt*0.012;
+  const ud=BEGHELLI.mesh.userData;
+  if(ud&&ud.beacon){
+    ud.beacon.intensity=1.6+Math.sin(performance.now()/700)*0.6;
+  }
+}
+function nearBeghelli(pad){
+  if(!BEGHELLI.mesh||!playerShip||!playerShip.alive)return false;
+  const r=(BEGHELLI.mesh.userData.bbR||420)+(pad!=null?pad:1400);
+  return playerShip.mesh.position.distanceTo(BEGHELLI.mesh.position)<r;
+}
+function beghelliConnectionScore(){
+  let s=0;
+  const r=typeof rep!=='undefined'?rep:{};
+  if((r.bazzano||0)>=25)s+=2;
+  if((r.monteveglio||0)>=20)s+=2;
+  if((r.calcara||0)>=15)s+=1;
+  if(PS&&PS.loreFlags){
+    if(PS.loreFlags.beghelli_voce)s+=2;
+    if(PS.loreFlags.casate_rumore)s+=1;
+    if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)s+=1;
+  }
+  if(typeof RootDialogues!=='undefined'){
+    if(RootDialogues.isSeen&&RootDialogues.isSeen('root_mont_paladino'))s+=2;
+    if(RootDialogues.isSeen&&RootDialogues.isSeen('root_cast_esule'))s+=2;
+  }
+  return s;
+}
+function openBeghelliDialogue(){
+  if(!BEGHELLI.appeared||!nearBeghelli(2200)){
+    notify('Il Palazzo Beghelli è fuori raggio radio.',1800);return;
+  }
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('dialogue');
+  // Finto NPC per riusare il modal idlg
+  const ns={
+    displayName:'Segreteria Beghelli',
+    faction:'bazzano',
+    type:'escort',
+    seed:12001,
+    beghelli:true,
+    ship:{alive:true,health:999,mesh:BEGHELLI.mesh,velocity:new THREE.Vector3()},
+    angry:false
+  };
+  activeDlgNpc=ns;
+  GAME.state='dialogue';
+  setPausedReason('dialogue',true);
+  document.getElementById('idlg-name').textContent='SEGRETERIA BEGHELLI';
+  document.getElementById('idlg-name').style.color='#c4a050';
+  document.getElementById('idlg-type').textContent='CASATA MINORE · EX DOMINUS VALSAMOGGIO';
+  const moodEl=document.getElementById('idlg-mood');
+  if(moodEl)moodEl.textContent='TONO: CORTESIA DI CASATA';
+  document.getElementById('idlg-trade').style.display='none';
+  const pc=document.getElementById('pilot-portrait');
+  drawPilotPortrait(pc,12001,'bazzano',{name:'Beghelli',kind:'men'});
+  const score=beghelliConnectionScore();
+  let opening='Canale del Palazzo Beghelli. Siamo una casata minore. Un tempo Valsamoggio era nostro cortile; oggi Imperium ci lascia lo spazio di una firma. Parla, Funzionario.';
+  if(score>=5)opening='Canale privilegiato. Le tue connessioni sono… adeguate. Non aspettarti flotte: possiamo spostare una pratica, una scorta leggera, un favore. Poi torni solo.';
+  else if(score>=3)opening='Ti abbiamo in archivio. Cortesia sì. Forza no. Chiedi qualcosa di piccolo.';
+  typeIdlgText(opening,()=>{
+    const choices=[];
+    choices.push({label:'[LORE] "Perché Imperium tiene al Patto?"',cls:'',fn:()=>{
+      typeIdlgText('Perché Valsamoggio è periferia finché il Mulino gira. Se si spezza, le anomalie diventano campo aperto. Se c\'è macguffinium — materia a nove dimensioni — le casate maggiori scendono qui. L\'Impero potrebbe non sopravvivere a quella guerra. Il Patto è diga, non nostalgia.',()=>{
+        if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.macguffinium_voce=1;PS.loreFlags.patto_perche=1;}
+        renderIdlgChoices([{label:'[INDIETRO]',fn:()=>openBeghelliDialogue()}]);
+      });
+    }});
+    choices.push({label:'[AIUTO] "Mi serve supporto."',cls:'trade',fn:()=>{
+      if(BEGHELLI.aidUsed>=2){
+        typeIdlgText('Abbiamo già esteso la cortesia. Altre richieste richiederebbero una guerra di casata che non possiamo vincere. Arrivederci, Funzionario.',()=>{
+          renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
+        });
+        return;
+      }
+      if(score<3){
+        typeIdlgText('Le tue connessioni non bastano. Porta reputazione a Bazzano o Monteveglio, o parla con chi ancora ricorda i Beghelli. Poi richiama.',()=>{
+          renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
+        });
+        return;
+      }
+      BEGHELLI.aidUsed++;
+      if(PS)PS.beghelliAidUsed=BEGHELLI.aidUsed;
+      const roll=Math.random();
+      if(score>=5&&roll<0.55){
+        PS.credits+=180;
+        changeRep('bazzano',3);
+        typeIdlgText('Trasferiamo 180 crediti e una nota di cortesia a Prime. È tutto ciò che una casata minore può fare senza svegliare le maggiori. Usalo bene.',()=>{
+          notify('Beghelli: +180 Cr · piccolo favore.',2400);
+          renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
+        });
+      }else if(roll<0.4){
+        PS.credits+=80;
+        typeIdlgText('Otteniamo un anticipo di viaggio. Ottanta crediti. Non di più. Le casate maggiori stanno già ascoltando.',()=>{
+          notify('Beghelli: +80 Cr (favore magro).',2200);
+          renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
+        });
+      }else{
+        typeIdlgText('Abbiamo chiamato tre uffici. Due non rispondono. Il terzo manda i saluti. Supporto: nullo. Ma ora sanno il tuo nome — nel bene e nel male.',()=>{
+          notify('Beghelli: cortesia senza risultati.',2200);
+          changeRep('calcara',-1);
+          renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
+        });
+      }
+    }});
+    choices.push({label:'[CHIUDI] "Grazie. Chiudo."',cls:'',fn:()=>closeIdlg()});
+    renderIdlgChoices(choices);
+  });
+  document.getElementById('idlg').style.display='flex';
+}
+
 animate();
 </script>
 <script src="js/audio.js"></script>
