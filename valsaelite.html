@@ -2412,7 +2412,24 @@ function openBlueprintModal(){
   setupBpHullPaintUi();
   const conn=bpValidateConnectivity();
   if(!conn.ok)notify('Attenzione: '+conn.msg+' Ripristina lo scafo continuo prima di confermare.',3200);
-  setTimeout(()=>tryShowTutorialBlueprint(),80);
+  setTimeout(()=>{
+    tryShowTutorialBlueprint();
+    // Assicura scroll touch sulla lista moduli (iOS / nested scroll)
+    const list=document.getElementById('bp-module-list');
+    const wrap=document.getElementById('bp-wrap');
+    const modal=document.getElementById('blueprint-modal');
+    if(list&&!list._scrollFix){
+      list._scrollFix=true;
+      list.addEventListener('touchmove',e=>{e.stopPropagation();},{passive:true});
+      list.addEventListener('wheel',e=>{e.stopPropagation();},{passive:true});
+    }
+    if(wrap&&!wrap._scrollFix){
+      wrap._scrollFix=true;
+      wrap.addEventListener('touchmove',e=>{e.stopPropagation();},{passive:true});
+    }
+    if(modal)modal.scrollTop=0;
+    drawBpSilhouette();
+  },80);
 }
 
 function bpStructuralCellCount(){
@@ -3930,7 +3947,7 @@ function tryShowTutorialSuborbit(){
 }
 function tryShowTutorialBlueprint(){
   return showTutorialOnce('valsaelite_tut_blueprint','Blueprint nave',
-    '<p>Trascina i moduli sulla griglia; tasto destro per rimuovere e recuperare in inventario.</p><p>La <strong>vernice fusoliera</strong> influenza le reazioni diplomatiche al conferma.</p><p style="opacity:.85;margin-top:8px;font-size:11px">La nave 3D si aggiorna quando confermi la costruzione.</p>');
+    '<p>Trascina i moduli sulla griglia; tasto destro per rimuovere e recuperare in inventario.</p><p>La <strong>vernice fusoliera</strong> influenza le reazioni diplomatiche al conferma.</p><p style="opacity:.85;margin-top:8px;font-size:11px">La silhouette laterale si aggiorna mentre editi. La nave 3D in volo si ricostruisce alla conferma. Scorri la lista moduli e il pannello.</p>');
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
@@ -9491,7 +9508,8 @@ function buildDock(st){
   }
   document.getElementById('dkdc').textContent=sd.desc;
   document.getElementById('dkcr').textContent=fmt(PS.credits);
-  document.getElementById('dkhp').textContent=Math.round(playerShip.health)+'/100';
+  const sMax=PS.shieldMax|0,sHp=Math.round(PS.shieldHp||0);
+  document.getElementById('dkhp').textContent=Math.round(playerShip.health)+'/'+Math.round(playerShip.maxHealth||100)+(sMax?(' · SCU '+sHp+'/'+sMax):'');
   const panoStrip=document.getElementById('dk-pano');
   if(panoStrip){
     const url=(typeof planetPano==='function')?planetPano(sd.id):null;
