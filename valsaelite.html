@@ -101,6 +101,7 @@ body.suborbit-active #a11y-strip{display:none !important;}
   color:#c8efe6;font:700 10px var(--FD);letter-spacing:.1em;cursor:pointer}
 .bp-tool:hover{background:rgba(40,120,110,.55);border-color:#7fdcc8}
 .bp-tool.ghost{opacity:.75;border-style:dashed}
+.bp-tool.erase-on{background:rgba(160,40,40,.55)!important;border-color:#ff8866!important;color:#ffd0c8!important}
 
 /* ─ Abbordaggio / Space hulk ─ */
 #boarding{display:none;position:fixed;inset:0;z-index:90;background:
@@ -907,12 +908,13 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
   <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Ogni pezzo deve toccare lo SCAFO · Scorri la lista moduli · UNDO / SIMMETRIA · CONFERMA</div>
+  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Tocca un pezzo per rimuoverlo · Scegli un modulo e tocca per piazzarlo · UNDO / CANCELLA</div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
       <canvas id="bp-cv"></canvas>
       <div id="bp-toolbar">
         <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo piazzamento">UNDO</button>
+        <button type="button" class="bp-tool" id="bp-erase" title="Modalità cancella: tocca i pezzi da rimuovere">CANCELLA</button>
         <button type="button" class="bp-tool" id="bp-sym" title="Copia simmetrica sull’asse">SIMMETRIA</button>
         <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona modulo">DESELEZIONA</button>
       </div>
@@ -2673,13 +2675,25 @@ function setupBpEvents(){
   const undoBtn=document.getElementById('bp-undo');
   const symBtn=document.getElementById('bp-sym');
   const clearSel=document.getElementById('bp-clear-sel');
+  const eraseBtn=document.getElementById('bp-erase');
   if(undoBtn)undoBtn.addEventListener('click',()=>bpUndo());
   if(symBtn)symBtn.addEventListener('click',()=>bpMirrorSymmetry());
-  if(clearSel)clearSel.addEventListener('click',()=>{bpSelected=null;buildBpPalette();drawBlueprint();});
+  if(clearSel)clearSel.addEventListener('click',()=>{bpSelected=null;buildBpPalette();drawBlueprint();syncBpEraseBtn();});
+  if(eraseBtn)eraseBtn.addEventListener('click',()=>{
+    bpSelected=bpSelected==='__erase'?null:'__erase';
+    buildBpPalette();drawBlueprint();syncBpEraseBtn();
+  });
+  function syncBpEraseBtn(){
+    const b=document.getElementById('bp-erase');
+    if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
+  }
+  syncBpEraseBtn();
   function getCellAt(e){
     const rect=cv.getBoundingClientRect();
     const sx=cv.width/Math.max(rect.width,1),sy=cv.height/Math.max(rect.height,1);
-    const x=(e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
+    const clientX=e.clientX!=null?e.clientX:(e.touches&&e.touches[0]?e.touches[0].clientX:0);
+    const clientY=e.clientY!=null?e.clientY:(e.touches&&e.touches[0]?e.touches[0].clientY:0);
+    const x=(clientX-rect.left)*sx, y=(clientY-rect.top)*sy;
     return {r:Math.floor(y/BP_CELL),c:Math.floor(x/BP_CELL)};
   }
   function bpClearRect(r0,c0,w,h){
@@ -2687,20 +2701,46 @@ function setupBpEvents(){
       const rr=r0+dr,cc=c0+dc;if(rr>=0&&rr<BP_ROWS&&cc>=0&&cc<BP_COLS)bpGrid[rr][cc]=null;
     }
   }
-  function placeAt(r,c){
+  /** Trova l’anchor NW del pezzo che occupa (r,c). Per 1×1 = la cella stessa. */
+  function bpModuleOriginAt(r,c){
+    const id=bpGrid[r][c];if(!id)return null;
+    const m=BP_MODULES.find(x=>x.id===id);if(!m)return {r,c,id,w:1,h:1};
+    if(m.w===1&&m.h===1)return {r,c,id,w:1,h:1};
+    // Cerca l’anchor w×h che contiene (r,c)
+    for(let rr=Math.max(0,r-m.h+1);rr<=r;rr++){
+      for(let cc=Math.max(0,c-m.w+1);cc<=c;cc++){
+        let ok=true;
+        for(let dr=0;dr<m.h&&ok;dr++)for(let dc=0;dc<m.w;dc++){
+          if(bpGrid[rr+dr]?.[cc+dc]!==id)ok=false;
+        }
+        if(ok&&r>=rr&&r<rr+m.h&&c>=cc&&c<cc+m.w)return {r:rr,c:cc,id,w:m.w,h:m.h};
+      }
+    }
+    return {r,c,id,w:1,h:1};
+  }
+  /** Rimuove il pezzo sotto (r,c). Restituisce true se ha cancellato. */
+  function eraseAt(r,c){
+    if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return false;
+    const id=bpGrid[r][c];if(!id)return false;
+    const origin=bpModuleOriginAt(r,c);if(!origin)return false;
+    if(!bpCanRemoveModule(origin.id,origin.r,origin.c,origin.w,origin.h))return false;
+    bpPushUndo();
+    bpClearRect(origin.r,origin.c,origin.w,origin.h);
+    bpInvRestore(origin.id,1);
+    if(typeof playTone==='function')playTone(180,.025,.03,'triangle');
+    buildBpPalette();drawBlueprint();
+    return true;
+  }
+  function placeAt(r,c,opt){
+    opt=opt||{};
     if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return;
-    if(bpSelected==='__erase'){
-      const id=bpGrid[r][c];if(!id)return;
-      const m=BP_MODULES.find(x=>x.id===id);
-      if(m){let r0=r,c0=c;
-        while(c0>0&&bpGrid[r][c0-1]===id)c0--;
-        while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
-        if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
-        bpPushUndo();
-        bpClearRect(r0,c0,m.w,m.h);
-        bpInvRestore(id,1);
-      }else{bpPushUndo();bpGrid[r][c]=null;}
-      buildBpPalette();drawBlueprint();return;
+    const occupied=!!bpGrid[r][c];
+    // Cancella: modalità CANCELLA, nessuna selezione, long-press, oppure tap su pezzo già piazzato dello stesso tipo
+    const wantErase=opt.forceErase||bpSelected==='__erase'||bpSelected==null
+      ||(occupied&&bpSelected&&bpGrid[r][c]===bpSelected&&opt.tapEraseSame);
+    if(wantErase){
+      if(occupied)eraseAt(r,c);
+      return;
     }
     if(bpSelected){
       if(!bpBlueprintUnlocked(bpSelected)){notify('Pezzo bloccato: installa il modulo richiesto in officina.');return;}
@@ -2712,77 +2752,105 @@ function setupBpEvents(){
       for(let dr=0;dr<m.h&&sameAll;dr++)for(let dc=0;dc<m.w;dc++){
         if(bpGrid[r+dr][c+dc]!==bpSelected){sameAll=false;break;}
       }
-      if(sameAll)return;
-      // Verifica inventario PRIMA di smantellare gli occupanti, così un fallimento non distrugge nulla.
+      if(sameAll){
+        // Secondo tap sullo stesso pezzo → rimuovi
+        eraseAt(r,c);
+        return;
+      }
       if(bpInvAvail(bpSelected)<=0){
         notify('Inventario vuoto per «'+m.label+'»: acquistane uno nella palette.',2000);
         return;
       }
-      // Rimuovi moduli sovrapposti (con guardrail) e rimettili nell'inventario.
       const toClear=[];
       const seen=new Set();
       for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
         const c0=bpGrid[r+dr][c+dc];
         if(c0&&c0!==bpSelected){
-          const om=BP_MODULES.find(x=>x.id===c0);
-          if(om){let rr=r+dr,cc=c+dc;
-            while(cc>0&&bpGrid[rr][cc-1]===c0)cc--;
-            while(rr>0&&bpGrid[rr-1][cc]===c0)rr--;
-            const key=rr+','+cc+','+c0;
-            if(!seen.has(key)){seen.add(key);toClear.push({id:c0,rr,cc,w:om.w,h:om.h});}
+          const origin=bpModuleOriginAt(r+dr,c+dc);
+          if(origin){
+            const key=origin.r+','+origin.c+','+origin.id;
+            if(!seen.has(key)){seen.add(key);toClear.push(origin);}
           }
         }
       }
       for(const t of toClear){
-        if(!bpCanRemoveModule(t.id,t.rr,t.cc,t.w,t.h))return;
+        if(!bpCanRemoveModule(t.id,t.r,t.c,t.w,t.h))return;
       }
       const placeCheck=bpCanPlaceModule(bpSelected,r,c);
       if(!placeCheck.ok){notify(placeCheck.msg||'Piazzamento non valido.',2200);return;}
       bpPushUndo();
       for(const t of toClear){
-        bpClearRect(t.rr,t.cc,t.w,t.h);
+        bpClearRect(t.r,t.c,t.w,t.h);
         bpInvRestore(t.id,1);
       }
-      // Consuma una unità del modulo selezionato e piazza il blocco.
       bpInvConsume(bpSelected,1);
       for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++)bpGrid[r+dr][c+dc]=bpSelected;
-      // Dopo piazzamento: verifica connessione globale (in caso di overwrite)
       const conn=bpValidateConnectivity();
       if(!conn.ok){
-        // rollback ultimo passo
         const snap=BP_UNDO.pop();
         if(snap){bpGrid=snap.grid.map(row=>row.slice());PS.bpInv=Object.assign({},snap.inv);}
         notify(conn.msg||'Piazzamento spezzerebbe la nave.',2400);
         buildBpPalette();drawBlueprint();return;
       }
-      // Feedback leggero: una nota differenziata per categoria del modulo.
       const cat=bpSelected.startsWith('engine')||bpSelected==='boost_eng'?'eng'
         :bpSelected.startsWith('weapon')||bpSelected==='missile'?'wep'
         :bpSelected==='shield'?'shd'
         :bpSelected==='cargo'?'crg':'hull';
       const freq={eng:360,wep:560,shd:440,crg:300,hull:220}[cat];
       if(typeof playTone==='function')playTone(freq,.02,.025,'square');
-      // Se l'inventario è esaurito, deseleziona per evitare "click fantasma" durante un drag.
       if(bpInvAvail(bpSelected)<=0)bpSelected=null;
       buildBpPalette();
+      syncBpEraseBtn();
     }
     drawBlueprint();
   }
-  cv.addEventListener('mousedown',e=>{if(e.button!==0)return;const {r,c}=getCellAt(e);placeAt(r,c);bpDragFrom={r,c};});
-  cv.addEventListener('mousemove',e=>{if(!bpDragFrom||e.buttons!==1)return;const {r,c}=getCellAt(e);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}});
-  cv.addEventListener('mouseup',()=>{bpDragFrom=null;});
-  cv.addEventListener('mouseleave',()=>{bpDragFrom=null;});
-  cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const {r,c}=getCellAt(t);placeAt(r,c);bpDragFrom={r,c};},{passive:false});
-  cv.addEventListener('touchmove',e=>{e.preventDefault();if(!bpDragFrom)return;const t=e.touches[0];const {r,c}=getCellAt(t);if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}},{passive:false});
-  cv.addEventListener('touchend',()=>{bpDragFrom=null;});
-  cv.addEventListener('contextmenu',e=>{e.preventDefault();const {r,c}=getCellAt(e);const id=bpGrid[r][c];if(!id)return;
-    const m=BP_MODULES.find(x=>x.id===id);
-    if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
-      if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
-      bpPushUndo();
-      bpClearRect(r0,c0,m.w,m.h);bpInvRestore(id,1);}
-    else{bpPushUndo();bpGrid[r][c]=null;}
-    buildBpPalette();drawBlueprint();});
+  // Long-press → cancella sempre il pezzo sotto il dito
+  let _bpLongTmr=0,_bpLongCell=null,_bpLongFired=false;
+  function clearBpLong(){if(_bpLongTmr){clearTimeout(_bpLongTmr);_bpLongTmr=0;}_bpLongCell=null;}
+  function armBpLong(r,c){
+    clearBpLong();_bpLongFired=false;_bpLongCell={r,c};
+    _bpLongTmr=setTimeout(()=>{
+      _bpLongTmr=0;_bpLongFired=true;
+      if(_bpLongCell)eraseAt(_bpLongCell.r,_bpLongCell.c);
+      bpDragFrom=null;
+    },380);
+  }
+  cv.addEventListener('mousedown',e=>{
+    if(e.button!==0)return;
+    const {r,c}=getCellAt(e);
+    armBpLong(r,c);
+    placeAt(r,c);bpDragFrom={r,c};
+  });
+  cv.addEventListener('mousemove',e=>{
+    if(!bpDragFrom||e.buttons!==1)return;
+    const {r,c}=getCellAt(e);
+    if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c))clearBpLong();
+    if(_bpLongFired)return;
+    if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}
+  });
+  cv.addEventListener('mouseup',()=>{clearBpLong();bpDragFrom=null;});
+  cv.addEventListener('mouseleave',()=>{clearBpLong();bpDragFrom=null;});
+  cv.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    const t=e.touches[0];const {r,c}=getCellAt(t);
+    armBpLong(r,c);
+    placeAt(r,c);bpDragFrom={r,c};
+  },{passive:false});
+  cv.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(!bpDragFrom)return;
+    const t=e.touches[0];const {r,c}=getCellAt(t);
+    if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c))clearBpLong();
+    if(_bpLongFired)return;
+    if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}
+  },{passive:false});
+  cv.addEventListener('touchend',()=>{clearBpLong();bpDragFrom=null;});
+  cv.addEventListener('touchcancel',()=>{clearBpLong();bpDragFrom=null;});
+  cv.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+    const {r,c}=getCellAt(e);
+    eraseAt(r,c);
+  });
 }
 
 /**
