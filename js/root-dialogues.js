@@ -430,9 +430,14 @@
   function drawPortraits(enc, speaker) {
     const zvanCv = el('root-zvan-cv');
     const npcCv = el('root-npc-cv');
+    const zvanWrap = el('root-zvan-wrap');
+    const npcWrap = el('root-npc-wrap');
     if (zvanCv && typeof global.PortraitRenderer !== 'undefined') {
+      // Illustrazione dedicata di Zvan che parla (player bust)
       global.PortraitRenderer.drawPlayer(zvanCv);
-      zvanCv.parentElement && zvanCv.parentElement.classList.toggle('speaking', speaker === 'zvan');
+    }
+    if (zvanWrap) {
+      zvanWrap.classList.toggle('speaking', speaker === 'zvan' || !!enc.playerOnly);
     }
     if (npcCv && typeof global.PortraitRenderer !== 'undefined') {
       if (enc.playerOnly) {
@@ -443,7 +448,9 @@
           kind: enc.gender === 'f' ? 'women' : undefined
         });
       }
-      npcCv.parentElement && npcCv.parentElement.classList.toggle('speaking', speaker === 'npc');
+    }
+    if (npcWrap) {
+      npcWrap.classList.toggle('speaking', speaker === 'npc' && !enc.playerOnly);
     }
   }
 

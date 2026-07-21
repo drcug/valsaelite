@@ -372,16 +372,35 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 }
 .rootdlg-title{font-size:16px;font-weight:700;letter-spacing:.16em;color:var(--bright);text-align:center}
 .rootdlg-sub{font-size:10px;font-family:var(--FM);color:#6a9a90;text-align:center;margin:6px 0 14px;line-height:1.45}
-.rootdlg-portraits{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:12px}
-.root-port{text-align:center;opacity:.55;transition:opacity .2s,transform .2s}
-.root-port.speaking{opacity:1;transform:translateY(-2px)}
+.rootdlg-portraits{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin-bottom:14px}
+.root-port{text-align:center;opacity:.42;transition:opacity .25s,transform .25s;position:relative}
+.root-port.speaking{opacity:1;transform:translateY(-4px) scale(1.04)}
 .root-port canvas{
-  width:112px;height:140px;border-radius:8px;display:block;margin:0 auto;
+  width:128px;height:160px;border-radius:10px;display:block;margin:0 auto;
   border:1px solid rgba(70,180,160,.35);background:#2a3c48;
-  box-shadow:0 8px 20px rgba(0,0,0,.35);
+  box-shadow:0 8px 22px rgba(0,0,0,.45);
 }
-.root-port.speaking canvas{border-color:rgba(224,168,74,.65);box-shadow:0 0 0 1px rgba(224,168,74,.25),0 8px 22px rgba(0,0,0,.4)}
-.root-port-lbl{font-size:8px;font-family:var(--FM);letter-spacing:.12em;color:#668888;margin-top:6px}
+.root-port.speaking canvas{
+  border-color:rgba(62,207,187,.75);
+  box-shadow:0 0 0 2px rgba(62,207,187,.25),0 10px 28px rgba(0,0,0,.5);
+  animation:rootTalk 1.1s ease-in-out infinite;
+}
+.root-port.zvan-port.speaking canvas{
+  border-color:rgba(224,168,74,.8);
+  box-shadow:0 0 0 2px rgba(224,168,74,.28),0 10px 28px rgba(0,0,0,.5);
+}
+@keyframes rootTalk{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+.root-talk-tag{
+  display:none;position:absolute;left:50%;bottom:-2px;transform:translate(-50%,100%);
+  font-size:8px;font-family:var(--FM);letter-spacing:.14em;color:#e0a84a;
+  background:rgba(8,16,24,.92);border:1px solid rgba(224,168,74,.45);
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.root-port.speaking .root-talk-tag{display:block}
+.root-port-lbl{font-size:9px;font-family:var(--FM);letter-spacing:.12em;color:#668888;margin-top:6px}
 .root-port.speaking .root-port-lbl{color:#d4b070}
 .rootdlg-vs{font-size:9px;font-family:var(--FM);color:#446666;align-self:center;letter-spacing:.14em;padding-bottom:28px}
 .rootdlg-name{font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--bright);margin-top:4px}
@@ -399,9 +418,13 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 }
 .rootdlg-close:hover{background:rgba(62,207,187,.12);color:var(--bright)}
 @media(max-width:700px){
-  .root-port canvas{width:88px;height:110px}
+  .root-port canvas{width:96px;height:120px}
   .rootdlg-vs{display:none}
   .rootdlg-text{max-height:22vh;font-size:12px}
+  .root-talk-tag{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+  .root-port.speaking canvas{animation:none}
 }
 
 /* Afterburner button */
@@ -457,7 +480,8 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
   width:min(980px,100%);max-height:min(78vh,calc(100vh - 110px));padding:0 4px;flex:1 1 auto;min-height:0;
   overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
-#bp-cv{border:1px solid rgba(44,100,190,.3);border-radius:8px;background:#01050f;cursor:crosshair;touch-action:none;flex-shrink:0;box-sizing:border-box;}
+#bp-cv{border:1px solid rgba(44,100,190,.3);border-radius:8px;background:#01050f;cursor:crosshair;touch-action:pan-y;flex-shrink:0;box-sizing:border-box;}
+#bp-cv.bp-editing{touch-action:none;cursor:crosshair;}
 #bp-panel{
   flex:1;min-width:0;max-width:min(420px,44vw);display:flex;flex-direction:column;gap:0;min-height:0;overflow:visible;
 }
@@ -491,9 +515,9 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
 .bp-mod-btn.installed{background:rgba(51,200,100,.08);border-color:rgba(51,200,100,.4);color:#55ee88;}
 .bp-mod-btn.locked{opacity:.38;cursor:not-allowed;filter:grayscale(.85);border-style:dashed;}
 .bp-mod-btn.locked:hover{background:rgba(255,255,255,.03);border-color:rgba(44,100,190,.25);color:var(--txt);}
-.bp-mod-icon{font-size:14px;line-height:1;}
-.bp-mod-name{font-size:7px;font-family:var(--FM);color:inherit;line-height:1.1;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bp-mod-cnt{font-size:7px;font-family:var(--FM);letter-spacing:.03em;}
+.bp-mod-icon{font-size:11px;line-height:1;font-family:var(--FM);font-weight:700;letter-spacing:.06em;color:#9fd8c8;}
+.bp-mod-name{font-size:9px;font-family:var(--FM);color:inherit;line-height:1.15;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bp-mod-cnt{font-size:8px;font-family:var(--FM);letter-spacing:.03em;}
 .bp-hull-preset{
   flex:0 0 auto;padding:4px 8px;border-radius:5px;border:1px solid rgba(120,160,220,.35);
   font-family:var(--FM);font-size:8px;font-weight:700;color:#eaf4ff;text-shadow:0 1px 2px #000;
@@ -536,8 +560,8 @@ body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translat
   }
   #bp-side-cv{height:72px;max-width:100%;}
   .bp-mod-btn{min-height:64px;padding:8px 4px;}
-  .bp-mod-icon{font-size:18px;}
-  .bp-mod-name{font-size:8px;}
+  .bp-mod-icon{font-size:12px;}
+  .bp-mod-name{font-size:9px;}
   #bp-stats-hull-row{grid-template-columns:1fr;}
   #bp-close{margin-top:8px;padding:10px 24px;width:min(100%,360px);position:sticky;bottom:0;z-index:2;}
   /* Larghezza fluida + aspect-ratio bitmap: evita distorsione e hit-test sbagliato */
@@ -862,13 +886,15 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <div id="root-title" class="rootdlg-title">INCONTRO</div>
     <div id="root-sub" class="rootdlg-sub"></div>
     <div class="rootdlg-portraits">
-      <div class="root-port speaking" id="root-zvan-wrap">
-        <canvas id="root-zvan-cv" width="128" height="160"></canvas>
+      <div class="root-port zvan-port speaking" id="root-zvan-wrap">
+        <canvas id="root-zvan-cv" width="160" height="200"></canvas>
+        <div class="root-talk-tag">PARLA</div>
         <div class="root-port-lbl">ZVAN MARÌA</div>
       </div>
-      <div class="rootdlg-vs">PARLA</div>
+      <div class="rootdlg-vs">·</div>
       <div class="root-port" id="root-npc-wrap">
-        <canvas id="root-npc-cv" width="128" height="160"></canvas>
+        <canvas id="root-npc-cv" width="160" height="200"></canvas>
+        <div class="root-talk-tag">PARLA</div>
         <div class="root-port-lbl">INCONTRO</div>
       </div>
     </div>
@@ -1495,16 +1521,22 @@ const SG = {
 // ─────────────────────────────────────────────────
 const CREW_POOL = [
   {id:'marco',    name:'Marco il Tavo\'',    origin:'bazzano',    skill:'Pilota',        bonus:'+15% vel.',  fn:p=>{p.maxSpeed=Math.round(p.maxSpeed*1.15)}, cost:500, hired:false,
+   portrait:'sprites/faces/crew/marco.png', gender:'m',
    quote:'"Tavo\'! Csa fet? Sono il mejon pilota del sistema — taproblem entrare a Savigno senza mappe, ci sono stato tre volte."'},
   {id:'riccardo', name:'Sindaco Riccardo',   origin:'calcara',    skill:'Diplomatico',   bonus:'-12% prezzi',fn:p=>{p.tradeBonus=0.88}, cost:2200, hired:false,
+   portrait:'sprites/faces/crew/riccardo.png', gender:'m',
    quote:'"Ho una proposta tecnica: costruiamo un hangar. A Calcara. Costera\' quattro milioni. Non si discute il prezzo, si discute solo dove mettere il cartello di inaugurazione."'},
   {id:'lothar',   name:'Sir Lothar',         origin:'monteveglio',skill:'Combattente',   bonus:'+22% danno', fn:p=>{p.dmgBonus=1.22}, cost:900, hired:false,
+   portrait:'sprites/faces/crew/lothar.png', gender:'m',
    quote:'"Per la Rocca! Ho vinto il torneo del Castellano per tre anni di fila. Con l\'armatura spaziale. Le chiamiamo frecce di luce ma sono laser, lo so."'},
   {id:'graziella',name:'Nonna Graziella',    origin:'savigno',    skill:'Cuoca',         bonus:'+35% en.regen',fn:p=>{p.energyRegen=Math.round(p.energyRegen*1.35)}, cost:300, hired:false,
+   portrait:'sprites/faces/crew/graziella.png', gender:'f',
    quote:'"Ho portato tortellini al tartufo per tutta la ciurma. Mangiare bene e\' il primo principio della sopravvivenza cosmica."'},
   {id:'assessore',name:'L\'Assessore',       origin:'crespellano',skill:'Burocrate',     bonus:'Nessuno.',   fn:_=>{}, cost:0, hired:false,
+   portrait:'sprites/faces/crew/assessore.png', gender:'m',
    quote:'"Abbiamo fatto richiesta per il semaforo nel 2003. Ogni anno ci dicono "presto". E\' diventata la nostra tradizione piu\' antica."'},
   {id:'zappo',    name:'Capitano Zappo',     origin:'savigno',    skill:'Tattico',       bonus:'+1 proiettile/colpo',fn:p=>{p.doubleShot=true}, cost:1500, hired:false,
+   portrait:'sprites/faces/crew/zappo.png', gender:'m',
    quote:'"Ho difeso Zappolino per vent\'anni. La battaglia simulata la vinco sempre. Quella vera anche."'},
 ];
 
@@ -2169,19 +2201,19 @@ const BP_COLS=12, BP_ROWS=8, BP_CELL=36;
 // Blueprint module definitions (distinct from upgrade MODULES — these are structural)
 // unlockShop: station MODULES id required before this piece appears in the editor palette
 const BP_MODULES=[
-  {id:'hull',     label:'Scafo',        icon:'▪',  color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'cockpit',  label:'Cabina',       icon:'👁', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null},
-  {id:'engine',   label:'Motore',       icon:'🔥', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'engine2',  label:'Motore II',    icon:'⚡', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2'},
-  {id:'boost_eng',label:'Postbruciatore',icon:'💥',color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3'},
-  {id:'weapon',   label:'Cannone',      icon:'🔫', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'weapon2',  label:'Cannone II',   icon:'⭐', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2'},
-  {id:'missile',  label:'Lanciamissili',icon:'🚀', color:'#7a4012', desc:'Sblocca missili [Q]. +capacità.',      cost:1500,canRotate:false, w:2,h:1, unlockShop:'wep2'},
-  {id:'shield',   label:'Scudo',        icon:'🛡', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'cargo',    label:'Stiva',        icon:'📦', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:null},
-  {id:'wing_l',   label:'Ala Sinistra', icon:'◀',  color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:null},
-  {id:'wing_r',   label:'Ala Destra',   icon:'▶',  color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:null},
-  {id:'fin',      label:'Timone',       icon:'↑',  color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'hull',     label:'Scafo',         icon:'SC', color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'cockpit',  label:'Cabina',        icon:'CB', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null},
+  {id:'engine',   label:'Motore',        icon:'MT', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'engine2',  label:'Motore II',     icon:'M2', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2'},
+  {id:'boost_eng',label:'Postbruciatore',icon:'PB', color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3'},
+  {id:'weapon',   label:'Cannone',       icon:'CN', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'weapon2',  label:'Cannone II',    icon:'C2', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2'},
+  {id:'missile',  label:'Lanciamissili', icon:'MS', color:'#7a4012', desc:'Sblocca missili [Q]. +capacità.',      cost:1500,canRotate:false, w:2,h:1, unlockShop:'wep2'},
+  {id:'shield',   label:'Scudo',         icon:'SD', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'cargo',    label:'Stiva',         icon:'ST', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:null},
+  {id:'wing_l',   label:'Ala Sinistra',  icon:'AS', color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:null},
+  {id:'wing_r',   label:'Ala Destra',    icon:'AD', color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:null},
+  {id:'fin',      label:'Timone',        icon:'TM', color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:null},
 ];
 
 /** Sblocco pezzi blueprint: il modulo richiesto O un livello superiore della stessa linea (es. eng3 sblocca anche voci «eng2»). */
@@ -2862,7 +2894,7 @@ function buildBpPalette(){
   });
   // Erase button
   const erase=document.createElement('div');erase.className='bp-mod-btn'+(bpSelected==='__erase'?' selected':'');
-  erase.innerHTML='<span class="bp-mod-icon">🗑</span><span class="bp-mod-name">Cancella</span><span class="bp-mod-cnt" style="color:#886633">torna in inv.</span>';
+  erase.innerHTML='<span class="bp-mod-icon">X</span><span class="bp-mod-name">Cancella</span><span class="bp-mod-cnt" style="color:#886633">torna in inv.</span>';
   erase.addEventListener('click',()=>{bpSelected=bpSelected==='__erase'?null:'__erase';buildBpPalette();drawBlueprint();
     const b=document.getElementById('bp-erase');if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
   });
@@ -3053,6 +3085,11 @@ function setupBpEvents(){
   }
   // Long-press su cella occupata → cancella (anche con un modulo selezionato)
   let _bpLongTmr=0,_bpLongCell=null,_bpLongFired=false,_bpPendingPlace=null;
+  let _bpTouchScroll=null;
+  function bpSyncEditTouch(){
+    // Con pezzo selezionato: cattura tocco. Senza: lascia scrollare la finestra sulla griglia.
+    cv.classList.toggle('bp-editing',!!bpSelected);
+  }
   function clearBpLong(){if(_bpLongTmr){clearTimeout(_bpLongTmr);_bpLongTmr=0;}_bpLongCell=null;}
   function armBpLong(r,c){
     clearBpLong();_bpLongFired=false;_bpLongCell={r,c};
@@ -3067,8 +3104,12 @@ function setupBpEvents(){
     setBpHover(r,c);
     const occupied=!!(bpGrid[r]&&bpGrid[r][c]);
     _bpPendingPlace=null;_bpLongFired=false;
-    // Senza selezione / modalità CANCELLA: tocca = elimina subito
-    if(!bpSelected||bpSelected==='__erase'){
+    // Senza selezione: non editare — permette di scrollare la finestra trascinando sulla griglia
+    if(!bpSelected){
+      bpDragFrom=null;
+      return;
+    }
+    if(bpSelected==='__erase'){
       if(occupied)eraseAt(r,c);
       bpDragFrom={r,c,eraseDrag:true};
       return;
@@ -3090,7 +3131,6 @@ function setupBpEvents(){
     if(!bpDragFrom)return;
     if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c)){
       clearBpLong();
-      // Se si muove prima del long-press, esegui il piazzamento pendente
       if(_bpPendingPlace&&!_bpLongFired){
         placeAt(_bpPendingPlace.r,_bpPendingPlace.c);
         _bpPendingPlace=null;
@@ -3122,22 +3162,47 @@ function setupBpEvents(){
   });
   cv.addEventListener('mouseup',pointerUp);
   cv.addEventListener('mouseleave',()=>{bpHoverCell=null;pointerUp();drawBlueprint();});
-  cv.addEventListener('touchstart',e=>{e.preventDefault();pointerDown(e.touches[0]||e);},{passive:false});
-  cv.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches[0])pointerMove(e.touches[0]);},{passive:false});
+  cv.addEventListener('touchstart',e=>{
+    const t=e.touches[0]||e;
+    _bpTouchScroll={editing:!!bpSelected};
+    bpSyncEditTouch();
+    if(bpSelected){
+      e.preventDefault();
+      pointerDown(t);
+    }else{
+      setBpHover(getCellAt(t).r,getCellAt(t).c);
+    }
+  },{passive:false});
+  cv.addEventListener('touchmove',e=>{
+    const t=e.touches[0];if(!t)return;
+    if(_bpTouchScroll&&!_bpTouchScroll.editing){
+      setBpHover(getCellAt(t).r,getCellAt(t).c);
+      return;
+    }
+    e.preventDefault();
+    pointerMove(t);
+  },{passive:false});
   cv.addEventListener('touchend',e=>{
     if(e.changedTouches&&e.changedTouches[0]){
       const cell=getCellAt(e.changedTouches[0]);
       setBpHover(cell.r,cell.c);
     }
-    pointerUp();
+    if(_bpTouchScroll&&_bpTouchScroll.editing)pointerUp();
+    else{_bpPendingPlace=null;clearBpLong();bpDragFrom=null;}
+    _bpTouchScroll=null;
+    bpSyncEditTouch();
   });
-  cv.addEventListener('touchcancel',pointerUp);
+  cv.addEventListener('touchcancel',()=>{pointerUp();_bpTouchScroll=null;bpSyncEditTouch();});
   cv.addEventListener('contextmenu',e=>{
     e.preventDefault();
     const {r,c}=getCellAt(e);
     setBpHover(r,c);
     eraseAt(r,c);
   });
+  document.getElementById('bp-module-list')?.addEventListener('click',bpSyncEditTouch);
+  document.getElementById('bp-erase')?.addEventListener('click',bpSyncEditTouch);
+  document.getElementById('bp-clear-sel')?.addEventListener('click',bpSyncEditTouch);
+  bpSyncEditTouch();
 }
 
 /**
@@ -4682,6 +4747,17 @@ class Ship{
       const hi=this.isPlayer&&nHp?(hpBase+s)%nHp:0;
       const {worldMuzzle,dir}=this._getMuzzleBore(hi);
       let fireDir=dir.clone();
+      // Aim assist lieve sul lead del bersaglio bloccato (solo player)
+      if(this.isPlayer&&targetNpc&&targetNpc.ship&&targetNpc.ship.alive&&targetLeadPos){
+        const aim=targetLeadPos.clone().sub(worldMuzzle);
+        const al=aim.length();
+        if(al>40&&al<9200){
+          aim.normalize();
+          const align=fireDir.dot(aim);
+          if(align>0.55)fireDir.lerp(aim,0.28).normalize();
+          else if(align>0.25)fireDir.lerp(aim,0.14).normalize();
+        }
+      }
       if(!this.isPlayer&&targetLeadPos){
         const aim=targetLeadPos.clone().sub(worldMuzzle);aim.y=0;
         if(aim.lengthSq()>350){aim.normalize();fireDir.lerp(aim,.35).normalize();}
@@ -4845,7 +4921,9 @@ function updateProjs(dt){
     if(!hit&&pr.owner==='player'){
       for(let j=0;j<NPCS.length;j++){
         const ns=NPCS[j];if(!ns.ship.alive)continue;
-        if(pr.mesh.position.distanceToSquared(ns.ship.mesh.position)<(ns.ship.radius+1)*(ns.ship.radius+1)){
+        // Hitbox generosa: scafi lunghi ~15–30u ma radius base era ~7 → troppo difficile
+        const hitR=(ns.ship.radius||7)*2.35+6;
+        if(pr.mesh.position.distanceToSquared(ns.ship.mesh.position)<hitR*hitR){
           const base=pr.kind==='missile'?28:14;
           let dmg=Math.round(base*PS.dmgBonus);
           // Crit casuale (più frequente a mirino OK)
@@ -10029,7 +10107,7 @@ function switchTab(id,st){
   }
 }
 
-const MODULE_CATS={engine:'⚡ MOTORI',weapon:'🔫 ARMI',shield:'🛡 SCAFO / DIFESE',cargo:'📦 STIVA',special:'⭐ SPECIALI'};
+const MODULE_CATS={engine:'MOTORI',weapon:'ARMI',shield:'SCAFO / DIFESE',cargo:'STIVA',special:'SPECIALI'};
 function tModules(pnl,st){
   pnl.innerHTML='<div class="stt">OFFICINA MODULARE — '+st.sd.name.toUpperCase()+'</div>';
   pnl.innerHTML+='<div style="font-size:10px;color:#446688;font-family:var(--FM);margin-bottom:12px">Moduli installati: '+PS.modules.length+' | Crediti: '+fmt(PS.credits)+'</div>'
@@ -10242,18 +10320,27 @@ function tRecruit(pnl,st){
   av.forEach(cr=>{
     const seed=cr.name.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
     const fac=cr.origin||st.sd.faction||'bazzano';
-    pnl.innerHTML+='<div class="ic" style="align-items:center"><canvas class="crew-port" width="48" height="48" data-seed="'+seed+'" data-fac="'+fac+'" data-name="'+cr.name.replace(/"/g,'&quot;')+'" style="border-radius:8px;border:1px solid rgba(44,100,190,.3);flex-shrink:0"></canvas><div class="in2"><div class="nm">'+cr.name+' <span style="font-size:9px;color:#446688;font-family:var(--FM)">['+cr.skill+']</span></div>'
+    pnl.innerHTML+='<div class="ic" style="align-items:center"><canvas class="crew-port" width="72" height="90" data-seed="'+seed+'" data-fac="'+fac+'" data-name="'+cr.name.replace(/"/g,'&quot;')+'" data-crew="'+cr.id+'" style="width:72px;height:90px;border-radius:8px;border:1px solid rgba(44,100,190,.35);flex-shrink:0;background:#354858"></canvas><div class="in2"><div class="nm">'+cr.name+' <span style="font-size:9px;color:#446688;font-family:var(--FM)">['+cr.skill+']</span></div>'
     +'<div class="dc">'+cr.quote+'</div><div class="mr">Bonus: '+cr.bonus+'</div></div>'
     +'<div><div class="px">'+(cr.cost===0?'GRATIS':fmt(cr.cost))+'</div><button class="db hi2" onclick="doHire(\''+cr.id+'\')" '+((PS.credits<cr.cost&&cr.cost>0)||PS.crew.length>=4?'disabled':'')+'>INGAGGIA</button></div></div>';
   });
   pnl.querySelectorAll('canvas.crew-port').forEach(cv=>{
     const seed=+cv.dataset.seed|0;
     const fac=cv.dataset.fac||'bazzano';
-    drawPilotPortrait(cv,seed,fac,{name:cv.dataset.name||''});
+    drawPilotPortrait(cv,seed,fac,{name:cv.dataset.name||'',crewId:cv.dataset.crew||''});
   });
   if(PS.crew.length>0){
     pnl.innerHTML+='<div class="stt" style="margin-top:14px">ATTUALE EQUIPAGGIO</div>';
-    PS.crew.forEach(cid=>{const c=CREW_POOL.find(x=>x.id===cid);if(!c)return;pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+c.name+'</div><div class="dc">'+c.bonus+'</div></div><button class="db sl" onclick="doFire(\''+c.id+'\')">CONGEDA</button></div>';});
+    PS.crew.forEach(cid=>{
+      const c=CREW_POOL.find(x=>x.id===cid);if(!c)return;
+      const seed=c.name.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
+      pnl.innerHTML+='<div class="ic" style="align-items:center"><canvas class="crew-port" width="56" height="70" data-seed="'+seed+'" data-fac="'+(c.origin||'bazzano')+'" data-name="'+c.name.replace(/"/g,'&quot;')+'" data-crew="'+c.id+'" style="width:56px;height:70px;border-radius:6px;border:1px solid rgba(44,100,190,.3);flex-shrink:0;background:#354858"></canvas><div class="in2"><div class="nm">'+c.name+'</div><div class="dc">'+c.bonus+'</div></div><button class="db sl" onclick="doFire(\''+c.id+'\')">CONGEDA</button></div>';
+    });
+    pnl.querySelectorAll('canvas.crew-port').forEach(cv=>{
+      if(cv.dataset._drawn)return;
+      drawPilotPortrait(cv,+cv.dataset.seed|0,cv.dataset.fac||'bazzano',{name:cv.dataset.name||'',crewId:cv.dataset.crew||''});
+      cv.dataset._drawn='1';
+    });
   }
 }
 function doHire(id){const c=CREW_POOL.find(x=>x.id===id);if(!c||c.hired)return;if(PS.crew.length>=4||(c.cost>0&&PS.credits<c.cost))return;PS.credits-=c.cost;c.hired=true;PS.crew.push(id);if(c.fn)c.fn(PS);playerShip.energyRegen=PS.energyRegen;playerShip.maxSpeed=PS.maxSpeed;playerShip.dmgBonus=PS.dmgBonus;notify(c.name+' a bordo!');buildDock(GAME.dockedSt);}
@@ -10261,6 +10348,7 @@ function doFire(id){const idx=PS.crew.indexOf(id);if(idx<0)return;const c=CREW_P
 
 function tMissions(pnl,st){
   pnl.innerHTML='<div class="stt">MISSIONI — '+st.sd.name.toUpperCase()+'</div>';
+  pnl.innerHTML+='<div style="font-size:10px;font-family:var(--FM);color:#6a9a90;margin:-4px 0 12px;line-height:1.5">Come concludere: <b style="color:#88c8b0">consegna</b> = attracca alla destinazione col carico (o premi CONSEGNA). <b style="color:#c8a0ff">combattimento</b> = abbatti i bersagli richiesti in volo (si completa da sola).</div>';
   const av=st.missionsList.filter(m=>!m.active&&!m.done);
   if(!av.length)pnl.innerHTML+='<div style="color:#446688;font-family:var(--FM);font-size:11px;padding:12px">Nessuna missione disponibile.</div>';
   av.forEach(m=>{
@@ -10277,9 +10365,42 @@ function tMissions(pnl,st){
           ?(' · onda '+(1+(m.wavesDone||0))+'/'+m.wavesNeeded+' · kill '+(m.killsDone||0)+'/'+m.killsNeeded)
           :(' ('+(m.killsDone||0)+'/'+m.killsNeeded+')'))
         :(m.targetSid?' → '+(SDATA.find(s=>s.id===m.targetSid)?.name||m.targetSid):'');
-      pnl.innerHTML+='<div class="ic ma"><div class="nm" style="color:#bb77ff">'+m.title+prog+'</div><div class="dc">'+m.desc+(m.namedTarget?' · BERSAGLIO: '+m.namedTarget:'')+'</div></div>';
+      let how='';
+      let btn='';
+      if(m.type==='delivery'){
+        const ct=m.cargo&&m.cargo.type;
+        const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
+        const have=ct?(PS.cargo[ct]||0):0;
+        const here=m.targetSid===st.sd.id;
+        how=' · carico '+(ct||'?')+': '+have+'/'+need+(here?' · sei a destinazione':' · vai a destinazione e attracca');
+        if(here&&have>=need){
+          btn='<button class="db hi2" onclick="doDeliverMission(\''+m.id+'\')">CONSEGNA</button>';
+        }
+      }else if(m.type==='combat'){
+        how=' · abbattine abbastanza in volo: la missione si chiude da sola';
+      }
+      pnl.innerHTML+='<div class="ic ma"><div class="in2"><div class="nm" style="color:#bb77ff">'+m.title+prog+'</div><div class="dc">'+m.desc+(m.namedTarget?' · BERSAGLIO: '+m.namedTarget:'')+how+'</div></div>'+btn+'</div>';
     });
   }
+}
+function doDeliverMission(mId){
+  const m=PS.activeMissions.find(x=>x.id===mId);
+  if(!m||m.done||m.type!=='delivery')return;
+  if(!GAME.dockedSt||m.targetSid!==GAME.dockedSt.sd.id){
+    notify('Attracca alla destinazione per consegnare.',2000);return;
+  }
+  const ct=m.cargo&&m.cargo.type;
+  const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
+  if(!ct||(PS.cargo[ct]||0)<need){
+    notify('Ti manca il carico richiesto ('+(ct||'?')+' ×'+need+').',2200);return;
+  }
+  if(typeof StorySys!=='undefined'){
+    if(!StorySys.consumeCargo(m)){notify('Consegna non riuscita.',1800);return;}
+  }else{
+    PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
+  }
+  completeMission(m);
+  buildDock(GAME.dockedSt);
 }
 function doAccept(mId,stId){
   const st=stations.find(s=>s.sd.id===stId);if(!st)return;
@@ -10639,8 +10760,8 @@ function updateTargeting(dt){
     const to=FRAME_TMP.lookAhead.copy(targetNpc.ship.mesh.position).sub(playerShip.mesh.position);
     const d=to.length()||1;
     const dot=fwd.dot(to.multiplyScalar(1/d));
-    const stable=(d<9400&&dot>.46)?1.85:(d<11800&&dot>.3)?1.08:0;
-    targetLockQ=cl(targetLockQ+(stable>0?dt*stable:-dt*1.05),0,1);
+    const stable=(d<11000&&dot>.38)?2.1:(d<14000&&dot>.22)?1.25:0;
+    targetLockQ=cl(targetLockQ+(stable>0?dt*stable:-dt*0.85),0,1);
     if(d>lockMax||dot<-0.35||targetLockQ<=0.02){
       targetNpc=null;
       targetLeadPos=null;
@@ -10664,16 +10785,17 @@ function updateTargeting(dt){
     }
   }
   if(targetNpc){
-    const bulletSpeed=138;
+    // Deve coincidere con CANNON_SPEED player (~292) altrimenti il lead mente
+    const bulletSpeed=292;
     const to=FRAME_TMP.lookAhead.copy(targetNpc.ship.mesh.position).sub(playerShip.mesh.position);
-    const t=cl(to.length()/bulletSpeed,0,2.6);
+    const t=cl(to.length()/Math.max(60,bulletSpeed+(playerShip.velocity?.length()||0)*0.35),0,2.2);
     targetLeadPos=FRAME_TMP.camTarget.copy(targetNpc.ship.mesh.position).addScaledVector(targetNpc.ship.velocity,t);
     const dir=to.clone().normalize();
     const dot=fwd.dot(dir),dist=to.length();
     let status='MIRINO OK';
-    if(targetLockQ<.32)status='ACQUISIZIONE...';
-    else if(dist>7600)status='TROPPO LONTO';
-    else if(dot<0.62)status='RUOTA SU DI LUI';
+    if(targetLockQ<.22)status='ACQUISIZIONE...';
+    else if(dist>9800)status='TROPPO LONTO';
+    else if(dot<0.48)status='RUOTA SU DI LUI';
     targetLeadState={status,dist,dot,q:targetLockQ,hp:targetNpc.ship.health,faction:targetNpc.faction,name:targetNpc.displayName||targetNpc.type||'nave'};
   }else{
     targetLeadPos=null;

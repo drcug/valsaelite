@@ -104,14 +104,22 @@
     return f ? f.color : '#3ecfbb';
   }
 
+  function PortraitParts_loadExtras() {
+    const urls = [];
+    const push = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
+    ((L.parts && L.parts.heads) || []).forEach(push);
+    if (L.player) push(L.player.head);
+    // Ritratti dedicati equipaggio (CREW_POOL.portrait)
+    const pool = global.CREW_POOL || [];
+    pool.forEach((c) => { if (c && c.portrait) push(c.portrait); });
+    return urls;
+  }
+
   const PortraitParts = {
     load() {
       if (partsState.ready) return Promise.resolve(partsState.ok > 0);
       if (partsState.promise) return partsState.promise;
-      const urls = [];
-      const push = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
-      ((L.parts && L.parts.heads) || []).forEach(push);
-      if (L.player) push(L.player.head);
+      const urls = PortraitParts_loadExtras();
       partsState.loading = true;
       partsState.promise = Promise.all(urls.map((u) =>
         loadImage(absUrl(u)).then((im) => { partCache[u] = im; partsState.ok++; return true; })
@@ -124,7 +132,18 @@
       return partsState.promise;
     },
     get(path) { return path ? partCache[path] || null : null; },
-    get ready() { return partsState.ready && partsState.ok > 0; }
+    get ready() { return partsState.ready && partsState.ok > 0; },
+    reloadCrew() {
+      // Permette di ricaricare se CREW_POOL arriva dopo
+      const urls = [];
+      (global.CREW_POOL || []).forEach((c) => {
+        if (c && c.portrait && !partCache[c.portrait]) urls.push(c.portrait);
+      });
+      if (!urls.length) return Promise.resolve(true);
+      return Promise.all(urls.map((u) =>
+        loadImage(absUrl(u)).then((im) => { partCache[u] = im; partsState.ok++; return true; }).catch(() => false)
+      )).then(() => redrawAllVisiblePortraits());
+    }
   };
 
   const PortraitAtlas = {
@@ -228,6 +247,37 @@
     return tile;
   }
 
+  function resolveCrewPortraitPath(opt) {
+    opt = opt || {};
+    if (opt.portraitPath) return opt.portraitPath;
+    const id = opt.crewId || opt.crew || null;
+    if (!id || !global.CREW_POOL) return null;
+    const c = global.CREW_POOL.find((x) => x && x.id === id);
+    return c && c.portrait ? c.portrait : null;
+  }
+
+  function drawOpaqueBustImage(ctx, im, rect) {
+    // Composita su offscreen forzando alpha piena sui pixel non trasparenti
+    const tw = Math.max(1, Math.round(rect.dw));
+    const th = Math.max(1, Math.round(rect.dh));
+    const off = document.createElement('canvas');
+    off.width = tw; off.height = th;
+    const octx = off.getContext('2d');
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(im, 0, 0, tw, th);
+    try {
+      const img = octx.getImageData(0, 0, tw, th);
+      const d = img.data;
+      for (let i = 3; i < d.length; i += 4) {
+        if (d[i] > 28) d[i] = 255;
+        else d[i] = 0;
+      }
+      octx.putImageData(img, 0, 0);
+    } catch (_) { /* tainted / privacy — usa così com'è */ }
+    ctx.drawImage(off, rect.dx, rect.dy, rect.dw, rect.dh);
+  }
+
   function drawBust(ctx, W, H, seed, factionId, opt) {
     opt = opt || {};
     const drawOpt = Object.assign({}, opt, { factionId: factionId || opt.factionId });
@@ -239,18 +289,24 @@
     let path = null;
     if (isPlayer && playerL.head) path = playerL.head;
     else {
-      const heads = (L.parts && L.parts.heads) || [];
-      const idx = portraitAtlasIndex(seed, drawOpt);
-      path = heads[idx % Math.max(1, heads.length)];
+      path = resolveCrewPortraitPath(drawOpt);
+      if (!path) {
+        const heads = (L.parts && L.parts.heads) || [];
+        const idx = portraitAtlasIndex(seed, drawOpt);
+        path = heads[idx % Math.max(1, heads.length)];
+      }
     }
     let im = PortraitParts.get(path);
-    if (!im && !isPlayer) im = atlasTile(seed, drawOpt);
+    if (!im && path) {
+      // lazy load missing crew portrait
+      PortraitParts.reloadCrew();
+    }
+    if (!im && !isPlayer && !resolveCrewPortraitPath(drawOpt)) im = atlasTile(seed, drawOpt);
     if (!im) return false;
 
     const iw = im.naturalWidth || im.width || 128;
     const ih = im.naturalHeight || im.height || 160;
     const rect = bustDestRect(W, H, iw, ih);
-    // Soft drop shadow under bust for separation from plate
     ctx.save();
     ctx.globalAlpha = 0.35;
     ctx.fillStyle = '#000';
@@ -258,7 +314,7 @@
     ctx.ellipse(W * 0.5, rect.dy + rect.dh * 0.92, rect.dw * 0.38, rect.dh * 0.06, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
-    ctx.drawImage(im, rect.dx, rect.dy, rect.dw, rect.dh);
+    drawOpaqueBustImage(ctx, im, rect);
     drawPortraitFrame(ctx, W, H);
     return true;
   }
@@ -315,7 +371,8 @@
       const seed = +cv.dataset.seed | 0;
       const fac = cv.dataset.fac || 'bazzano';
       const name = cv.dataset.name || '';
-      PortraitRenderer.drawCanvas(cv, seed, fac, { name: name });
+      const crewId = cv.dataset.crew || '';
+      PortraitRenderer.drawCanvas(cv, seed, fac, { name: name, crewId: crewId });
     });
   }
 
@@ -370,5 +427,14 @@
   global.PortraitParts = PortraitParts;
   global.PortraitRenderer = PortraitRenderer;
 
-  Promise.all([PortraitParts.load(), PortraitAtlas.load()]).then(() => redrawAllVisiblePortraits());
+  Promise.all([PortraitParts.load(), PortraitAtlas.load()]).then(() => {
+    PortraitParts.reloadCrew();
+    redrawAllVisiblePortraits();
+  });
+  // CREW_POOL è definito dopo questo script: ricarica quando il DOM è pronto
+  if (global.document) {
+    global.document.addEventListener('DOMContentLoaded', () => {
+      PortraitParts.reloadCrew();
+    });
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

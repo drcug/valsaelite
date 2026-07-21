@@ -58,6 +58,13 @@ Walkthrough completa della campagna principale, passo per passo.
 
 ---
 
+## 2. Come si conclude una missione
+
+- **Consegna:** accetta la missione → ottieni/trasporta il carico → **attracca alla destinazione**. Se hai il carico giusto, si completa in automatico; altrimenti nel tab Missioni appare il pulsante **CONSEGNA**.
+- **Combattimento:** in volo abbatti i bersagli della fazione richiesta; al raggiungimento del conteggio la missione si chiude da sola (eventuali ondate ripartono).
+
+---
+
 ## 2b. Tab RADICI (incontri psicologici)
 
 Nelle stazioni principali compare il tab **RADICI**: dialoghi con gente che conosceva Zvan **prima** di Imperium (compagni, famiglia, ex amici).  
