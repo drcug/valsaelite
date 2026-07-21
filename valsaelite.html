@@ -36,10 +36,13 @@ body.low-hp{animation:lowHpPulse 2.2s ease-in-out infinite}
 body.reduced-motion #cv.shake{animation:none !important}
 body.reduced-motion .dfl{animation:dflSoft .35s ease-out}
 body.reduced-motion #hud-overlay.danger #vignette-danger{box-shadow:inset 0 0 40px 8px rgba(180,0,30,.18) !important}
+body.reduced-motion #dmgov.dfl{opacity:.22 !important}
+body.reduced-motion.low-hp{animation:none !important;filter:none !important}
 @keyframes dflSoft{0%{background:rgba(220,30,0,.12)}100%{background:transparent}}
 @media (prefers-reduced-motion: reduce){
   body{animation:none !important}
   #cv.shake{animation:none !important}
+  #dmgov.dfl{opacity:.2 !important}
 }
 /* Toggle UI per riduzione effetti */
 #fx-toggle{position:fixed;right:10px;top:10px;z-index:12;font:10px var(--FM);color:#88aacc;
@@ -187,11 +190,13 @@ body.boarding-active #boarding-hud{display:block}
 #radar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:100px;height:100px;z-index:11;pointer-events:none}
 #rcv{border-radius:50%;border:1px solid rgba(44,100,190,.3);background:rgba(0,3,12,.75);display:block}
 
-/* Story / Mission ticker */
-#mtick{position:fixed;top:116px;left:50%;transform:translateX(-50%);
+/* Story / Mission ticker — top-left, fuori dal radar centrale e dalle barre HUD */
+#mtick{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));transform:none;
   background:var(--panel);border:1px solid rgba(130,60,200,.3);border-radius:5px;
-  padding:4px 14px;font-family:var(--FM);font-size:10px;color:#bb77ff;
-  z-index:11;pointer-events:none;display:none;text-align:center;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  padding:4px 10px;font-family:var(--FM);font-size:10px;color:#bb77ff;
+  z-index:12;pointer-events:none;display:none;text-align:left;max-width:min(38vw,220px);
+  white-space:normal;line-height:1.35;overflow:hidden;text-overflow:ellipsis;
+  max-height:4.2em}
 
 /* Story chapter banner — layout base; stile completo in game-extras.css */
 #story-banner{display:none}
@@ -209,11 +214,11 @@ body.boarding-active #boarding-hud{display:block}
   border-radius:5px;padding:7px 22px;font-family:var(--FD);font-weight:700;font-size:13px;
   cursor:pointer;letter-spacing:.1em;width:100%}
 
-/* Dialogue */
-#dlg{display:none;position:fixed;left:50%;bottom:150px;transform:translateX(-50%);
+/* Dialogue — sopra i controlli touch, sotto l’HUD alto */
+#dlg{display:none;position:fixed;left:50%;bottom:max(165px,27vh);transform:translateX(-50%);
   z-index:30;width:min(480px,92vw);background:var(--panel);border:1px solid var(--border);
   border-radius:10px;padding:13px 17px;backdrop-filter:blur(14px);
-  font-family:var(--FM);font-size:11px;line-height:1.65}
+  font-family:var(--FM);font-size:11px;line-height:1.65;max-height:min(28vh,220px);overflow:auto}
 @keyframes su{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 #dlg{animation:su .2s ease}
 .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
@@ -325,9 +330,18 @@ body.boarding-active #boarding-hud{display:block}
 #ldck,#ldck-suborbit{position:static;bottom:auto;left:auto;transform:none;padding:11px 38px;background:var(--acc);color:#fff;border:none;border-radius:7px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.15em;cursor:pointer;z-index:55;box-shadow:0 0 22px rgba(34,119,238,.32);transition:all .14s}
 #ldck:hover,#ldck-suborbit:hover{background:#3388ff;box-shadow:0 0 30px rgba(34,119,238,.5)}
 
-/* Notifications */
-#notif{display:none;position:fixed;top:78px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:6px 16px;font-family:var(--FM);font-size:10px;color:var(--bright);z-index:35;text-align:center;pointer-events:none;white-space:nowrap}
-#smsg{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--acc);border-radius:8px;padding:14px 26px;font-family:var(--FM);font-size:12px;color:var(--bright);z-index:60;text-align:center;box-shadow:0 0 26px rgba(34,119,238,.4)}
+/* Notifications — in volo sotto il radar / sopra i controlli, non sopra HUD o radar */
+#notif{display:none;position:fixed;top:auto;bottom:max(168px,26vh);left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:7px 14px;
+  font-family:var(--FM);font-size:10px;color:var(--bright);z-index:28;text-align:center;
+  pointer-events:none;white-space:normal;max-width:min(92vw,420px);line-height:1.4;
+  box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#smsg{display:none;position:fixed;top:auto;bottom:max(210px,32vh);left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--acc);border-radius:8px;padding:12px 22px;
+  font-family:var(--FM);font-size:12px;color:var(--bright);z-index:29;text-align:center;
+  box-shadow:0 0 26px rgba(34,119,238,.35);max-width:min(92vw,440px);pointer-events:none}
+body.docked-ui #notif,body.menu-open #notif{top:78px;bottom:auto}
+body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translate(-50%,-50%)}
 
 /* Game over */
 #go{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.94);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;font-family:var(--FD);text-align:center;padding:20px}
@@ -500,7 +514,10 @@ body.boarding-active #boarding-hud{display:block}
   .ht .hp:nth-child(3) .bw{margin-left:0 !important;margin-right:auto;width:100% !important;max-width:100%}
   #radar{top:6px;width:72px;height:72px}
   #rcv{width:72px !important;height:72px !important}
-  #mtick{top:84px;max-width:min(92vw,320px);font-size:9px;padding:3px 8px}
+  #mtick{top:max(8px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));max-width:min(42vw,180px);font-size:9px;padding:3px 8px}
+  #notif{bottom:max(148px,24vh);z-index:28}
+  #smsg{bottom:max(190px,30vh);z-index:29}
+  #dlg{bottom:max(155px,26vh);max-height:min(26vh,200px)}
   .hb{flex-direction:column;align-items:stretch;gap:8px}
   .hb-left{flex:none;width:100%}
   .hb-controls{flex:none;width:100%}
@@ -924,6 +941,12 @@ body.suborbit-active #smsg{z-index:6260 !important;}
         <button type="button" class="bp-tool" id="bp-erase" title="Modalità cancella: tocca i pezzi da rimuovere">CANCELLA</button>
         <button type="button" class="bp-tool" id="bp-sym" title="Copia simmetrica sull’asse">SIMMETRIA</button>
         <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona modulo">DESELEZIONA</button>
+        <button type="button" class="bp-tool" id="bp-reset" title="Ripristina layout starter">STARTER</button>
+      </div>
+      <div id="bp-presets" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;justify-content:center">
+        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset cargo">KIT CARGO</button>
+        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento">KIT COMBAT</button>
+        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione">KIT SCOUT</button>
       </div>
     </div>
     <div id="bp-panel">
@@ -1038,6 +1061,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <script src="js/story-sys.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
+<script src="js/gameplay-polish.js"></script>
 <script src="js/suborbit-daily.js"></script>
 <script>
 'use strict';
@@ -1761,6 +1785,11 @@ const TAVERN = {
     {s:'Prof della scuola rovescia',t:'"Insegno da dieci anni nell\'istituto costruito alla rovescia. I ragazzi entrano dal tetto. Lo trovano normale. Siamo noi che ci siamo adattati."'},
     {s:'Custode dell\'archivio',   t:'"Qui dentro c\'e\' roba classificata male. A volte \'male\' e\' un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
+  calcara:[
+    {s:'Funzionario al bar',       t:'"Il quinto hangar e\' in fase di inaugurazione anticipata. Firmi qui, qui e — no, non leggere. Solo firma."'},
+    {s:'Contabile orbitale',       t:'"La reputazione qui e\' una fattura: sotto zero paghi pedaggio. Sopra quaranta ti facciamo lo sconto sulla lamiera."'},
+    {s:'Appaltatore stanco',       t:'"Crespellano aspetta il semaforo. Noi vendiamo il verde. Coincidenze? Preferisco chiamarle opportunità."'},
+  ],
   monteveglio:[
     {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser."'},
     {s:'Castellano (il vero)',     t:'"La nuova torre e\' quasi pronta. 200 metri. L\'ho promesso in campagna elettorale. Al contrario di Calcara che promette hangar e li costruisce davvero, troppo e troppi."'},
@@ -1872,12 +1901,15 @@ const MODULES=[
   {id:'eng1', cat:'engine', name:'Motori Potenziati I',   desc:'+20% velocità',          cost:800,  req:null,   fn:p=>{p.maxSpeed=Math.round(p.maxSpeed*1.20);}},
   {id:'eng2', cat:'engine', name:'Motori Potenziati II',  desc:'+15% spinta motori',     cost:1600, req:'eng1', fn:p=>{p.thrustPower=Math.round(p.thrustPower*1.15);}},
   {id:'eng3', cat:'engine', name:'Motori da Corsa',       desc:'+30% velocità max',      cost:3400, req:'eng2', fn:p=>{p.maxSpeed=Math.round(p.maxSpeed*1.30);}},
+  {id:'eng4', cat:'engine', name:'Motori Mk II Orbitale', desc:'+12% velocità · +10% spinta', cost:4800, req:'eng3', fn:p=>{p.maxSpeed=Math.round(p.maxSpeed*1.12);p.thrustPower=Math.round(p.thrustPower*1.10);}},
   {id:'wep1', cat:'weapon', name:'Cannoni Migliorati',    desc:'+25% danno',             cost:900,  req:null,   fn:p=>{p.dmgBonus*=1.25;}},
   {id:'wep2', cat:'weapon', name:'Doppio Cannone',        desc:'2 proiettili per colpo', cost:1800, req:'wep1', fn:p=>{p.doubleShot=true;}},
   {id:'wep3', cat:'weapon', name:'Cannone Plasma',        desc:'+40% danno extra-grande',cost:3500, req:'wep2', fn:p=>{p.dmgBonus*=1.40;p.bigShot=true;}},
   {id:'shd1', cat:'shield', name:'Scafo Rinforzato I',    desc:'+30 HP scafo (non scudo energetico)',         cost:700,  req:null,   fn:p=>{p.maxHp+=30;}},
   {id:'shd2', cat:'shield', name:'Scafo Rinforzato II',   desc:'+50 HP scafo · ring visivo difese',         cost:1500, req:'shd1', fn:p=>{p.maxHp+=50;}},
   {id:'shd3', cat:'shield', name:'Nano-Riparatori',       desc:'Regen HP lento in volo (scafo)', cost:2800, req:'shd2', fn:p=>{p.hpRegen=0.8;}},
+  {id:'esh1', cat:'shield', name:'Scudo Energetico Mk I', desc:'+40 capacità scudo energetico', cost:1600, req:'shd1', fn:p=>{p.shieldMax=(p.shieldMax||0)+40;p.shieldHp=Math.min((p.shieldHp||0)+40,p.shieldMax);}},
+  {id:'esh2', cat:'shield', name:'Scudo Energetico Mk II',desc:'+70 scudo · ricarica lenta in volo', cost:3200, req:'esh1', fn:p=>{p.shieldMax=(p.shieldMax||0)+70;p.shieldHp=Math.min((p.shieldHp||0)+70,p.shieldMax);p.shieldRegen=(p.shieldRegen||0)+2.2;}},
   {id:'crg1', cat:'cargo',  name:'Stiva Espansa I',       desc:'+6 unità stiva',         cost:500,  req:null,   fn:p=>{p.cargoMax+=6;}},
   {id:'crg2', cat:'cargo',  name:'Stiva Espansa II',      desc:'+10 unità stiva',        cost:1200, req:'crg1', fn:p=>{p.cargoMax+=10;}},
   {id:'crg3', cat:'cargo',  name:'Stiva Mercantile',      desc:'+20 stiva -5% acquisti', cost:2500, req:'crg2', fn:p=>{p.cargoMax+=20;p.tradeBonus*=0.95;}},
@@ -1927,9 +1959,11 @@ function applyModules(){
   PS.tradeBonus=1.0;PS.doubleShot=false;PS.bigShot=false;PS.hpRegen=0;PS.radarMult=1;
   PS.energyRegen=18;PS.maxHp=100;
   PS.driftDamp=1.0;PS.tacticalRadar=false;PS.jammer=false;PS.interdictBonus=1.0;
+  PS.shieldRegen=0;
   PS.crew.forEach(cid=>{const c=CREW_POOL.find(x=>x.id===cid);if(c&&c.fn)c.fn(PS);});
   PS.modules.forEach(mid=>{const m=MODULES.find(x=>x.id===mid);if(m)m.fn(PS);});
   if(PS.missileInstalled&&PS.missiles<=0)PS.missiles=PS.missileMax;
+  if(PS.shieldMax>0&&(PS.shieldHp==null||PS.shieldHp>PS.shieldMax))PS.shieldHp=PS.shieldMax;
   if(typeof playerShip!=='undefined'&&playerShip){
     playerShip.energyRegen=PS.energyRegen;
     playerShip.maxSpeed=PS.maxSpeed;
@@ -2078,9 +2112,10 @@ const BP_MODULES=[
 
 /** Sblocco pezzi blueprint: il modulo richiesto O un livello superiore della stessa linea (es. eng3 sblocca anche voci «eng2»). */
 const BP_UNLOCK_CHAIN={
-  eng1:['eng1','eng2','eng3'],eng2:['eng2','eng3'],eng3:['eng3'],
+  eng1:['eng1','eng2','eng3','eng4'],eng2:['eng2','eng3','eng4'],eng3:['eng3','eng4'],eng4:['eng4'],
   wep1:['wep1','wep2','wep3'],wep2:['wep2','wep3'],wep3:['wep3'],
-  shd1:['shd1','shd2','shd3'],shd2:['shd2','shd3'],shd3:['shd3'],
+  shd1:['shd1','shd2','shd3','esh1','esh2'],shd2:['shd2','shd3'],shd3:['shd3'],
+  esh1:['esh1','esh2'],esh2:['esh2'],
   crg1:['crg1','crg2','crg3'],crg2:['crg2','crg3'],crg3:['crg3'],
   nav1:['nav1','nav2']
 };
@@ -2314,6 +2349,9 @@ function drawBlueprint(){
   ctx.beginPath();ctx.moveTo(0,mr*BP_CELL+1+BP_CELL/2);ctx.lineTo(W,mr*BP_CELL+1+BP_CELL/2);ctx.stroke();
 
   // Cells — solo agli anchor (moduli multi-cella disegnati una volta)
+  const broken=(typeof GameplayPolish!=='undefined'&&GameplayPolish.bpBrokenCells)
+    ?GameplayPolish.bpBrokenCells(bpGrid,BP_ROWS,BP_COLS,bpIsStructure)
+    :new Set();
   const drawn=new Set();
   BP_MODULES.forEach(m=>{
     bpListModuleAnchors(m.id).forEach(({r,c})=>{
@@ -2322,9 +2360,14 @@ function drawBlueprint(){
       const cw=m.w*BP_CELL-4, ch=m.h*BP_CELL-4;
       ctx.fillStyle=m.color+'cc';
       roundRect(ctx,x,y,cw,ch,4);ctx.fill();
+      const isBroken=broken.has(r+','+c);
       const isSel=bpSelected===m.id;
-      ctx.strokeStyle=isSel?'#ffffff':m.color;ctx.lineWidth=isSel?2:1.2;
+      ctx.strokeStyle=isBroken?'#ff4422':(isSel?'#ffffff':m.color);ctx.lineWidth=isBroken?2.4:(isSel?2:1.2);
       roundRect(ctx,x,y,cw,ch,4);ctx.stroke();
+      if(isBroken){
+        ctx.fillStyle='rgba(255,40,30,.22)';
+        roundRect(ctx,x,y,cw,ch,4);ctx.fill();
+      }
       ctx.font=`${Math.round(BP_CELL*.38)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillStyle='rgba(255,255,255,.9)';
       ctx.fillText(m.icon,x+cw/2,y+ch/2-2);
@@ -2334,6 +2377,31 @@ function drawBlueprint(){
       }
     });
   });
+
+  // Ghost preview modulo selezionato sotto il cursore
+  if(bpHoverCell&&bpSelected&&bpSelected!=='__erase'){
+    const m=BP_MODULES.find(x=>x.id===bpSelected);
+    const hr=bpHoverCell.r|0, hc=bpHoverCell.c|0;
+    if(m&&hr>=0&&hc>=0&&hr+m.h<=BP_ROWS&&hc+m.w<=BP_COLS){
+      const gx=hc*BP_CELL+2, gy=hr*BP_CELL+2;
+      const gw=m.w*BP_CELL-4, gh=m.h*BP_CELL-4;
+      const placeOk=(typeof bpCanPlaceModule==='function')?bpCanPlaceModule(bpSelected,hr,hc).ok:true;
+      ctx.save();
+      ctx.globalAlpha=0.45;
+      ctx.fillStyle=placeOk?(m.color+'99'):'#ff442288';
+      roundRect(ctx,gx,gy,gw,gh,4);ctx.fill();
+      ctx.globalAlpha=0.9;
+      ctx.strokeStyle=placeOk?'#a8e8ff':'#ff8866';
+      ctx.lineWidth=2;
+      ctx.setLineDash([5,4]);
+      roundRect(ctx,gx,gy,gw,gh,4);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#fff';
+      ctx.font=`${Math.round(BP_CELL*.36)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(m.icon,gx+gw/2,gy+gh/2);
+      ctx.restore();
+    }
+  }
 
   // Feedback cella attiva (mobile/mouse): riquadro = cella che verrà installata/cancellata
   if(bpHoverCell){
@@ -2349,6 +2417,11 @@ function drawBlueprint(){
       ctx.fillRect(hx+1,hy+1,BP_CELL-2,BP_CELL-2);
       ctx.restore();
     }
+  }
+
+  if(broken.size){
+    ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(255,90,70,.9)';ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.fillText('⚠ Scafo spezzato — celle rosse non connesse (CONFERMA bloccata)',4,4);
   }
 
   // Hover/selected highlight for palette
@@ -2600,10 +2673,15 @@ function bpCanRemoveModule(id, r0, c0, w, h){
   return true;
 }
 function closeBlueprintModal(){
-  if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');return;}
-  if(bpStructuralCellCount()<4){notify('Blueprint invalido: struttura troppo ridotta (min. 4 celle scafo/cabina).');return;}
+  if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');return;}
+  if(bpStructuralCellCount()<4){notify('Blueprint invalido: struttura troppo ridotta (min. 4 celle scafo/cabina).');if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');return;}
   const conn=bpValidateConnectivity();
-  if(!conn.ok){notify(conn.msg||'Blueprint non connesso.',2600);return;}
+  if(!conn.ok){
+    notify((conn.msg||'Blueprint non connesso.')+' Celle spezzate in rosso.',2800);
+    drawBlueprint();
+    if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');
+    return;
+  }
   setPausedReason('blueprint',false);
   document.getElementById('blueprint-modal').classList.remove('show');
   applyModules();
@@ -2612,6 +2690,25 @@ function closeBlueprintModal(){
   if(typeof playChime==='function')playChime('success');
   const s=bpStats();
   notify(`Nave ricostruita · ARM ${s.weapons} · SCU ${s.shieldHp} · STIVA ${s.cargoMax}`+(repAdj?' · Livrea: simpatie aggiornate.':''),repAdj?3000:2400);
+}
+
+function applyBpPreset(kind){
+  if(typeof GameplayPolish==='undefined'||!GameplayPolish.buildBpPreset)return;
+  bpPushUndo();
+  const items=GameplayPolish.buildBpPreset(kind,defaultBlueprint);
+  bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
+  items.forEach(({r,c,id})=>{
+    if(r<0||c<0||r>=BP_ROWS||c>=BP_COLS)return;
+    const m=BP_MODULES.find(x=>x.id===id);
+    if(!m){bpGrid[r][c]=id;return;}
+    for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
+      if(r+dr<BP_ROWS&&c+dc<BP_COLS)bpGrid[r+dr][c+dc]=id;
+    }
+  });
+  stripBlueprintToUnlocked();
+  ensureStarterBlueprintOk();
+  buildBpPalette();drawBlueprint();
+  notify('Preset «'+kind+'» applicato. Controlla inventario/sblocchi.',2000);
 }
 
 let _bpHullPaintDebounce=null;
@@ -2719,6 +2816,16 @@ function setupBpEvents(){
     bpSelected=bpSelected==='__erase'?null:'__erase';
     buildBpPalette();drawBlueprint();syncBpEraseBtn();
   });
+  const resetBtn=document.getElementById('bp-reset');
+  if(resetBtn)resetBtn.addEventListener('click',()=>{
+    bpPushUndo();
+    initBlueprintGrid();
+    buildBpPalette();drawBlueprint();
+    notify('Layout starter ripristinato.',1600);
+  });
+  document.querySelectorAll('[data-bp-preset]').forEach(btn=>{
+    btn.addEventListener('click',()=>applyBpPreset(btn.getAttribute('data-bp-preset')));
+  });
   function syncBpEraseBtn(){
     const b=document.getElementById('bp-erase');
     if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
@@ -2744,8 +2851,15 @@ function setupBpEvents(){
     const x=(pt.x-rect.left-bl)*sx;
     const y=(pt.y-rect.top-bt)*sy;
     // Linee a n*BP_CELL+1 → la cella (r,c) occupa [c*BP_CELL+1, (c+1)*BP_CELL+1)
-    const c=Math.max(0,Math.min(BP_COLS-1,Math.floor((x-1)/BP_CELL)));
-    const r=Math.max(0,Math.min(BP_ROWS-1,Math.floor((y-1)/BP_CELL)));
+    let c=Math.max(0,Math.min(BP_COLS-1,Math.floor((x-1)/BP_CELL)));
+    let r=Math.max(0,Math.min(BP_ROWS-1,Math.floor((y-1)/BP_CELL)));
+    if(typeof GameplayPolish!=='undefined'&&GameplayPolish.snapBpCell){
+      const snapped=GameplayPolish.snapBpCell(r,c,x,y,{
+        BP_CELL,BP_ROWS,BP_COLS,bpGrid,
+        eraseMode:!bpSelected||bpSelected==='__erase'
+      });
+      r=snapped.r;c=snapped.c;
+    }
     return{r,c,x,y};
   }
   function setBpHover(r,c){
@@ -2784,7 +2898,8 @@ function setupBpEvents(){
     bpPushUndo();
     bpClearRect(origin.r,origin.c,origin.w,origin.h);
     bpInvRestore(origin.id,1);
-    if(typeof playTone==='function')playTone(180,.025,.03,'triangle');
+    if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayEraseSfx();
+    else if(typeof playTone==='function')playTone(180,.025,.03,'triangle');
     buildBpPalette();drawBlueprint();
     return true;
   }
@@ -2854,7 +2969,8 @@ function setupBpEvents(){
         :bpSelected==='shield'?'shd'
         :bpSelected==='cargo'?'crg':'hull';
       const freq={eng:360,wep:560,shd:440,crg:300,hull:220}[cat];
-      if(typeof playTone==='function')playTone(freq,.02,.025,'square');
+      if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayPlaceSfx();
+      else if(typeof playTone==='function')playTone(freq,.02,.025,'square');
       if(bpInvAvail(bpSelected)<=0)bpSelected=null;
       buildBpPalette();
       syncBpEraseBtn();
@@ -4111,8 +4227,11 @@ function tryShowTutorialSuborbit(){
     '<p>Usa <strong>WASD</strong> per quota e corsia. <strong>Spazio</strong> spara; con doppio cannone esce una raffica. I <strong>moduli potenza</strong> (sfera brillante) attivano una <strong>raffica tripla</strong> per pochi secondi.</p><p>Su touch: <strong>MOT</strong> al centro tra SX/DX = motori (stessa funzione di <strong>W</strong>).</p><p><strong>F</strong> trazione sul <strong>container più vicino</strong> (fascio dalla nave); <strong>ESC</strong> per attracco anticipato.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso = Charger, ciano = Strafer, viola = Swarm. A 25/50/75% compaiono <strong>segmenti speciali</strong> (varco stretto, deriva, ostacoli). A fine corsa vedi il <strong>riepilogo</strong>.</p>');
 }
 function tryShowTutorialBlueprint(){
-  return showTutorialOnce('valsaelite_tut_blueprint','Blueprint nave',
-    '<p>Trascina i moduli sulla griglia; tasto destro per rimuovere e recuperare in inventario.</p><p>La <strong>vernice fusoliera</strong> influenza le reazioni diplomatiche al conferma.</p><p style="opacity:.85;margin-top:8px;font-size:11px">La silhouette laterale si aggiorna mentre editi. La nave 3D in volo si ricostruisce alla conferma. Scorri la lista moduli e il pannello.</p>');
+  return showTutorialOnce('valsaelite_tut_blueprint','Cantiere · touch',
+    '<p><strong>Tocca un pezzo</strong> per rimuoverlo (senza selezione). Con un modulo scelto: <strong>tap</strong> piazza, <strong>long-press</strong> cancella.</p>'
+    +'<p>Il <strong>riquadro</strong> e il <strong>ghost</strong> mostrano la cella/ingombro reali. Ai bordi: snap automatico.</p>'
+    +'<p><strong>KIT CARGO / COMBAT / SCOUT</strong> e <strong>STARTER</strong> nella toolbar. Celle rosse = scafo spezzato (CONFERMA bloccata).</p>'
+    +'<p style="opacity:.85;margin-top:8px;font-size:11px">UNDO · CANCELLA · SIMMETRIA · vernice fusoliera. La silhouette laterale si aggiorna mentre editi.</p>');
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
@@ -4153,7 +4272,13 @@ function showResumePromptIfNeeded(){
 function formatRunStats(){
   const mins=Math.floor((Date.now()-RUN_STATS.startTime)/60000);
   const cred=PS.credits-(RUN_STATS.creditsAtStart||0);
-  return`Capitolo ${STORY.chapter}${STORY.won?' · VITTORIA':''} · Tempo ${mins} min · Kill ${RUN_STATS.kills} · Abbordaggi ${RUN_STATS.boardings} · Distanza ${Math.round(RUN_STATS.distance/1000)} km · Crediti netti ${cred>=0?'+':''}${fmt(Math.abs(cred)).replace(' Cr','')}`;
+  const base=`Capitolo ${STORY.chapter}${STORY.won?' · VITTORIA':''} · Tempo ${mins} min · Kill ${RUN_STATS.kills} · Abbordaggi ${RUN_STATS.boardings} · Missioni ${RUN_STATS.missionsDone||0} · Distanza ${Math.round(RUN_STATS.distance/1000)} km · Crediti netti ${cred>=0?'+':''}${fmt(Math.abs(cred)).replace(' Cr','')}`;
+  if(typeof GameplayPolish==='undefined'||!GameplayPolish.runRankFromStats)return base;
+  const rank=GameplayPolish.runRankFromStats({
+    mins,kills:RUN_STATS.kills,boardings:RUN_STATS.boardings,missions:RUN_STATS.missionsDone,
+    distanceKm:Math.round(RUN_STATS.distance/1000),credNet:cred,won:!!STORY.won
+  });
+  return base+` · Rango ${rank.grade} (${rank.score}) — ${rank.title}`;
 }
 function continueSandbox(){
   document.getElementById('go').classList.remove('show');
@@ -4366,8 +4491,9 @@ class Ship{
     this.energy=Math.min(100,this.energy+this.energyRegen*dt);
     if(this.isPlayer&&PS.hpRegen>0&&this.health<this.maxHealth)this.health=Math.min(this.maxHealth,this.health+PS.hpRegen*dt);
     if(this.isPlayer&&PS.shieldMax>0&&PS.shieldHp<PS.shieldMax){
-      // Rigenera scudo solo fuori fuoco recente
-      if(!this._recentHitT||this._recentHitT<=0)PS.shieldHp=Math.min(PS.shieldMax,PS.shieldHp+10*dt);
+      // Rigenera scudo solo fuori fuoco recente (Mk II accelera)
+      const regen=10+(PS.shieldRegen||0);
+      if(!this._recentHitT||this._recentHitT<=0)PS.shieldHp=Math.min(PS.shieldMax,PS.shieldHp+regen*dt);
       else this._recentHitT-=dt;
     }
     if(this._hitFlash>0)this._hitFlash-=dt;
@@ -4510,10 +4636,22 @@ class Ship{
     this.health=Math.max(0,this.health-amt);
     if(this.isPlayer){
       this._recentHitT=2.4;
-      const ov=document.getElementById('dmgov');ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');
+      const ov=document.getElementById('dmgov');
+      if(ov){
+        if(document.body.classList.contains('reduced-motion')){
+          ov.style.background='rgba(220,30,0,.12)';
+          ov.classList.remove('dfl');
+          clearTimeout(ov._softT);
+          ov._softT=setTimeout(()=>{ov.style.background='';},180);
+        }else{
+          ov.classList.remove('dfl');void ov.offsetWidth;ov.classList.add('dfl');
+        }
+      }
       playTone(amt>14?140:absorbed?260:200,.1,.055,'sawtooth');
       if(typeof playCombatSfx==='function')playCombatSfx('hit');
-      const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
+      if(!document.body.classList.contains('reduced-motion')){
+        const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
+      }
       if(absorbed>0&&typeof notify==='function'&&Math.random()<0.35)notify('Scudo −'+absorbed,900);
       if(this.health>0&&this.health<=28)notify('⚠ SCAFO CRITICO',1400);
     }else{
@@ -4958,40 +5096,50 @@ function npcAI(ns,dt){
   }
 
   const fStyle={
-    bazzano:{turnMul:.9,thrustMul:.95,fireDot:.84,fireDist:3200,patrolR:1500,aggr:0},
-    calcara:{turnMul:1.08,thrustMul:1.06,fireDot:.78,fireDist:3800,patrolR:1900,aggr:.18},
-    monteveglio:{turnMul:1.22,thrustMul:1.2,fireDot:.72,fireDist:3600,patrolR:1700,aggr:.28},
-    savigno:{turnMul:1.1,thrustMul:1.15,fireDot:.76,fireDist:3400,patrolR:2100,aggr:.12},
-    default:{turnMul:1,thrustMul:1,fireDot:.8,fireDist:3200,patrolR:1650,aggr:0}
-  }[faction]||{turnMul:1,thrustMul:1,fireDot:.8,fireDist:3200,patrolR:1650,aggr:0};
-  if(pirateAggro){fStyle.turnMul*=1.18;fStyle.thrustMul*=1.22;fStyle.fireDot-=0.06;fStyle.fireDist+=600;fStyle.aggr+=0.25;}
+    bazzano:{turnMul:.9,thrustMul:.95,fireDot:.84,fireDist:3200,patrolR:1500,aggr:0,tactic:'hold'},
+    calcara:{turnMul:1.08,thrustMul:1.06,fireDot:.78,fireDist:4200,patrolR:1900,aggr:.18,tactic:'kite'},
+    monteveglio:{turnMul:1.28,thrustMul:1.28,fireDot:.7,fireDist:3400,patrolR:1700,aggr:.35,tactic:'charge'},
+    savigno:{turnMul:1.12,thrustMul:1.18,fireDot:.76,fireDist:3600,patrolR:2100,aggr:.12,tactic:'jink'},
+    crespellano:{turnMul:1.05,thrustMul:1.08,fireDot:.8,fireDist:3300,patrolR:1800,aggr:.15,tactic:'flank'},
+    pirate:{turnMul:1.15,thrustMul:1.2,fireDot:.72,fireDist:4000,patrolR:2000,aggr:.3,tactic:'flank'},
+    default:{turnMul:1,thrustMul:1,fireDot:.8,fireDist:3200,patrolR:1650,aggr:0,tactic:'hold'}
+  }[faction]||{turnMul:1,thrustMul:1,fireDot:.8,fireDist:3200,patrolR:1650,aggr:0,tactic:'hold'};
+  if(pirateAggro||type==='pirate'){fStyle.turnMul*=1.12;fStyle.thrustMul*=1.15;fStyle.fireDot-=0.05;fStyle.fireDist+=500;fStyle.aggr+=0.2;fStyle.tactic='flank';}
 
   if(wantsFight){
-    const chaseR=pirateAggro?14000:10500;
+    const chaseR=pirateAggro||type==='pirate'?14000:10500;
     if(dist<=chaseR){
-      // Strafe / orbita: evita il "tutto di fronte" monocorde
       if(ns._strafeSign==null)ns._strafeSign=Math.random()<0.5?-1:1;
       if(ns._strafeT==null)ns._strafeT=0;
       ns._strafeT-=dt;
       if(ns._strafeT<=0){ns._strafeSign*=-1;ns._strafeT=1.6+Math.random()*2.2;}
       const turn=ship.turnSpeed*dt*(type==='pirate'||ns.angry?1.12+fStyle.aggr:1*fStyle.turnMul);
-      const orbitBand=type==='pirate'?780:980;
+      // Tattiche per fazione: kite=tiene distanza, charge=chiude, flank=affianca, hold=orbita classica
+      let orbitBand=type==='pirate'?780:980;
+      if(fStyle.tactic==='kite')orbitBand=1450;
+      else if(fStyle.tactic==='charge')orbitBand=520;
+      else if(fStyle.tactic==='flank')orbitBand=900;
       if(dist<orbitBand){
-        // Cerchia mantenendo il naso verso il player
         if(cY>0.04)ship.mesh.rotation.y+=turn*0.85;
         else if(cY<-0.04)ship.mesh.rotation.y-=turn*0.85;
-        ship.mesh.rotation.y+=ns._strafeSign*turn*0.55;
-        ship.applyThrust(dt*0.7*fStyle.thrustMul);
+        const strafeMul=fStyle.tactic==='flank'?0.95:fStyle.tactic==='kite'?0.4:0.55;
+        ship.mesh.rotation.y+=ns._strafeSign*turn*strafeMul;
+        const thrustClose=fStyle.tactic==='charge'?1.15:fStyle.tactic==='kite'?0.35:0.7;
+        ship.applyThrust(dt*thrustClose*fStyle.thrustMul);
       }else{
         if(cY>0.06)ship.mesh.rotation.y+=turn;
         else if(cY<-0.06)ship.mesh.rotation.y-=turn;
-        const thrustMult=(type==='pirate'||ns.angry?1.18:1.05)*fStyle.thrustMul;
+        if(fStyle.tactic==='flank'){
+          // Approccio laterale: mix avanti + strafe
+          ship.mesh.rotation.y+=ns._strafeSign*turn*0.35;
+        }
+        const thrustMult=(type==='pirate'||ns.angry?1.18:1.05)*fStyle.thrustMul*(fStyle.tactic==='charge'?1.25:1);
         if(dist>950&&dot>-0.14)ship.applyThrust(dt*thrustMult);
       }
       let fireDot=(type==='pirate'||ns.angry)?0.7:fStyle.fireDot-0.04;
       let fireDist=(type==='pirate'||ns.angry)?4200:fStyle.fireDist;
       if(playerShip.alive&&PS.jammer&&dist<2800){fireDot+=0.08;fireDist*=0.88;}
-      if(faction==='savigno'&&dist<1200&&dot>.45){ship.mesh.rotation.y+=(Math.random()<.5?-1:1)*ship.turnSpeed*dt*1.4;}
+      if((faction==='savigno'||fStyle.tactic==='jink')&&dist<1200&&dot>.45){ship.mesh.rotation.y+=(Math.random()<.5?-1:1)*ship.turnSpeed*dt*1.4;}
       if(dot>fireDot&&dist<fireDist)ship.fire();
     }
   }else{
@@ -5269,6 +5417,17 @@ document.getElementById('btnhail').addEventListener('click',()=>{const n=getNpcF
 // ─────────────────────────────────────────────────
 function startLanding(){
   if(!GAME.nearSt||GAME.state!=='flying')return;
+  const sd=GAME.nearSt.sd;
+  if(typeof GameplayPolish!=='undefined'&&GameplayPolish.dockAccessCheck){
+    const gate=GameplayPolish.dockAccessCheck(sd,rep,ECON);
+    if(!gate.ok){notify(gate.msg||'Hangar chiuso.',2800);return;}
+    if(gate.toll&&gate.toll>0){
+      if(PS.credits<gate.toll){notify((gate.msg||'Pedaggio')+': servono '+fmt(gate.toll)+'.',2600);return;}
+      PS.credits-=gate.toll;
+      notify((gate.msg||'Pedaggio hangar')+': −'+fmt(gate.toll),2000);
+    }
+    GAME._dockRepairMult=gate.discountRepair||1;
+  }else GAME._dockRepairMult=1;
   GAME.dockedSt=GAME.nearSt;
   GAME.state='landing';
   GAME.landTimer=0;
@@ -5349,6 +5508,7 @@ function completeLanding(){
   document.getElementById('hud').style.display='none';
   document.getElementById('radar').style.display='none';
   document.getElementById('mtick').style.display='none';
+  document.body.classList.add('docked-ui');
   if(typeof saveGame==='function')saveGame(true);
   if(typeof playCombatSfx==='function')playCombatSfx('dock');
   tryShowTutorialDock();
@@ -5359,9 +5519,11 @@ function startLaunch(){
   setPausedReason('docked',false);
   GAME.launchTimer=0;
   const dst=GAME.dockedSt;
+  document.body.classList.remove('docked-ui');
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
   document.getElementById('radar').style.display='block';
+  if(typeof saveGame==='function')saveGame(true);
   const panoEl=document.getElementById('land-pano');
   if(panoEl){panoEl.classList.remove('show');panoEl.style.opacity='0';panoEl.style.backgroundImage='';document.body.classList.remove('landing-pano');}
   // Start with black overlay, fade it out quickly so player sees the launch
@@ -5421,6 +5583,7 @@ function toggleRepPanel(){
 }
 
 let nTmr=null;
+let _flyAutosaveT=0;
 function notify(msg,dur){dur=dur||2400;playChime('notify');const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
 function showStatus(html){playChime('success');const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
 
@@ -5567,6 +5730,40 @@ const DLG_TREES={
         {label:'[OK]',next:null}
       ]}
     }
+  },
+  calcara:{
+    start:'c1',
+    nodes:{
+      c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità. In quest\'ordine.',choices:[
+        {label:'[AFFARI] "Cerco un contratto discreto."',next:'c2',fx:{rep:2}},
+        {label:'[PRESSIONE] "So dei vostri appalti."',next:'c3',fx:{rep:-3}},
+        {label:'[CHIUDI]',next:null}
+      ]},
+      c2:{text:'Discreto costa. Ma paga. Due navi crespellanesi di troppo sul corridoio — e un bonus se nessuno parla.',choices:[
+        {label:'[ACCETTA]',next:null,fx:{mission:'dlg_calc_contract',rep:3,credits:50}},
+        {label:'[DOPO]',next:null}
+      ]},
+      c3:{text:'Allora sai anche che la carta vince sul laser. Porta documenti a Prime e smettila di fare il detective.',choices:[
+        {label:'[OK]',next:null,fx:{mission:'dlg_tip_calc'}}
+      ]}
+    }
+  },
+  savigno:{
+    start:'s1',
+    nodes:{
+      s1:{text:'Codice tartufo? Altrimenti sei solo un turista con i motori caldi.',choices:[
+        {label:'[RISPETTO] "Rispetto il fungo e il silenzio."',next:'s2',fx:{rep:5}},
+        {label:'[COMMERCIO] "Compro. Non tratto."',next:'s3',fx:{rep:2}},
+        {label:'[CHIUDI]',next:null}
+      ]},
+      s2:{text:'Bene. Allora ascolta: qualcuno a Bazzano paga i tartufi in indizi. Porta un carico — e apri orecchie.',choices:[
+        {label:'[ACCETTA PISTA]',next:null,fx:{mission:'dlg_sav_truffle',rep:4}},
+        {label:'[DOPO]',next:null}
+      ]},
+      s3:{text:'420. Sempre. Se torni con meno, non tornare.',choices:[
+        {label:'[OK]',next:null,fx:{credits:-20}}
+      ]}
+    }
   }
 };
 
@@ -5584,7 +5781,9 @@ function grantDlgMission(key,ns){
     dlg_tip_bazz:{id:'dlg_tip_bazz',type:'delivery',title:'[VOCE] Pista Sirena',desc:'Porta modulistica a Sirena: qualcuno parla troppo.',targetSid:'sirena',cargo:{type:'documenti',qty:1},reward:320,repGain:{bazzano:8},sid:near.sd.id},
     dlg_tip_calc:{id:'dlg_tip_calc',type:'delivery',title:'[VOCE] Carte a Calcara',desc:'Consegna documenti a Calcara e osserva chi suda.',targetSid:'calcara',cargo:{type:'documenti',qty:1},reward:280,repGain:{calcara:6,bazzano:4},sid:'calcara'},
     dlg_pirate_job:{id:'dlg_pirate_job',type:'combat',title:'[VOCE] Lavoro sporco',desc:'Abbatti 2 navi di Calcara. I pirati pagano in silenzio.',killFaction:'calcara',killsNeeded:2,killsDone:0,reward:520,repGain:{pirate:10,calcara:-12},sid:'castelletto'},
-    dlg_order_duel:{id:'dlg_order_duel',type:'combat',title:'[ORDINE] Prova d\'armi',desc:'Abbatti 3 navi ostili all\'Ordine (Calcara o pirati).',killFaction:'pirate',killsNeeded:3,killsDone:0,reward:680,repGain:{monteveglio:14},sid:'monteveglio',altFactions:['calcara','pirate']}
+    dlg_order_duel:{id:'dlg_order_duel',type:'combat',title:'[ORDINE] Prova d\'armi',desc:'Abbatti 3 navi ostili all\'Ordine (Calcara o pirati).',killFaction:'pirate',killsNeeded:3,killsDone:0,reward:680,repGain:{monteveglio:14},sid:'monteveglio',altFactions:['calcara','pirate']},
+    dlg_calc_contract:{id:'dlg_calc_contract',type:'combat',title:'[CALCARA] Corridoio pulito',desc:'Elimina 2 navi crespellanesi sul corridoio mercantile.',killFaction:'crespellano',killsNeeded:2,killsDone:0,reward:560,repGain:{calcara:12,crespellano:-14},sid:'calcara'},
+    dlg_sav_truffle:{id:'dlg_sav_truffle',type:'delivery',title:'[SAVIGNO] Aroma e orecchie',desc:'Consegna tartufi a Bazzano e ascolta chi paga troppo.',targetSid:'bazzano',cargo:{type:'tartufi',qty:1},reward:480,repGain:{savigno:12,bazzano:4},sid:'savigno'}
   };
   const proto=catalog[key];if(!proto)return;
   if(near.missionsList.some(m=>m.id===proto.id)||PS.activeMissions.some(m=>m.id===proto.id)){
@@ -7829,7 +8028,21 @@ function leaveBoarding(opts){
       const lootId=pickWeighted(BOARDING.lootTable||BOARDING_LOOT_SHIP);
       if(cargoCnt()<PS.cargoMax){PS.cargo[lootId]=(PS.cargo[lootId]||0)+1;lootName=GOODS[lootId]?.name||lootId;}
     }
-    notify(`Bottino: +${fmt(credAdd)}${lootName?' · '+lootName:''}${repeatHulk?' (relitto già messo a segno)':''}`,2400);
+    let extraNote='';
+    if(typeof GameplayPolish!=='undefined'&&GameplayPolish.rollBoardingExtraLoot&&(!repeatHulk||Math.random()>.55)){
+      const extra=GameplayPolish.rollBoardingExtraLoot(BOARDING.kind);
+      if(extra){
+        if(extra.type==='bp_mod'&&extra.id){
+          if(typeof bpInvRestore==='function')bpInvRestore(extra.id,1);
+          const lab=(BP_MODULES.find(x=>x.id===extra.id)||{}).label||extra.id;
+          extraNote=' · pezzo cantiere: '+lab;
+        }else if(extra.type==='cargo'&&extra.id&&cargoCnt()<PS.cargoMax){
+          PS.cargo[extra.id]=(PS.cargo[extra.id]||0)+(extra.qty||1);
+          extraNote=' · '+(GOODS[extra.id]?.name||extra.id);
+        }
+      }
+    }
+    notify(`Bottino: +${fmt(credAdd)}${lootName?' · '+lootName:''}${extraNote}${repeatHulk?' (relitto già messo a segno)':''}`,2600);
     if(typeof playChime==='function')playChime('success');
     // Se fonte = NPC: ora muore per davvero.
     if(BOARDING.sourceNpc){
@@ -9808,20 +10021,25 @@ function removeModule(mid){
 
 function tRepair(pnl,st){
   const maxHp=Math.round(playerShip.maxHealth||100);
-  const hp=Math.round(playerShip.health),miss=Math.max(0,maxHp-hp),cost=Math.floor(miss*4.5*(ECON.repairMult||1));
+  const repDisc=GAME._dockRepairMult||1;
+  const hp=Math.round(playerShip.health),miss=Math.max(0,maxHp-hp),cost=Math.floor(miss*4.5*(ECON.repairMult||1)*repDisc);
   const sMax=PS.shieldMax|0,sHp=PS.shieldHp|0,sMiss=Math.max(0,sMax-sHp);
-  const sCost=Math.floor(sMiss*3.2*(ECON.rechargeMult||1));
-  pnl.innerHTML='<div class="stt">MANUTENZIONE</div>'
+  const sCost=Math.floor(sMiss*3.2*(ECON.rechargeMult||1)*repDisc);
+  const discNote=repDisc<1?' <span style="color:#66ddaa">(sconto alleato ×'+repDisc.toFixed(2)+')</span>':'';
+  pnl.innerHTML='<div class="stt">MANUTENZIONE'+discNote+'</div>'
   +'<div class="dock-save-row"><button type="button" onclick="saveGame()">SALVA PARTITA</button><button type="button" onclick="loadGame()">CARICA</button><button type="button" onclick="newGameConfirm()" style="border-color:rgba(200,60,40,.4);color:#ffaa99">NUOVA PARTITA</button></div>'
   +'<div class="ic"><div class="in2"><div class="nm">Riparazione Scafo</div><div class="dc">HP: '+hp+'/'+maxHp+' &bull; Costo: '+fmt(cost)+'</div></div><button class="db rp2" onclick="doRepair('+cost+','+miss+')" '+(miss===0||PS.credits<cost?'disabled':'')+'>RIPARA</button></div>'
-  +'<div class="ic"><div class="in2"><div class="nm">Ricarica Energia</div><div class="dc">Ripristino completo &bull; Costo: '+fmt(Math.round(80*(ECON.rechargeMult||1)))+'</div></div><button class="db rp2" onclick="doRecharge()" '+(PS.credits<Math.round(80*(ECON.rechargeMult||1))?'disabled':'')+'>RICARICA</button></div>'
+  +'<div class="ic"><div class="in2"><div class="nm">Ricarica Energia</div><div class="dc">Ripristino completo &bull; Costo: '+fmt(Math.round(80*(ECON.rechargeMult||1)*repDisc))+'</div></div><button class="db rp2" onclick="doRecharge()" '+(PS.credits<Math.round(80*(ECON.rechargeMult||1)*repDisc)?'disabled':'')+'>RICARICA</button></div>'
   +(sMax>0
     ?('<div class="ic" style="border-color:rgba(60,200,180,.35)"><div class="in2"><div class="nm" style="color:#66e0d0">Ricarica Scudo</div><div class="dc">Scudo: '+Math.round(sHp)+'/'+sMax+' &bull; Costo: '+fmt(sCost)+'</div></div><button class="db rp2" onclick="doRechargeShield('+sCost+','+sMiss+')" '+(sMiss===0||PS.credits<sCost?'disabled':'')+'>RICARICA SCUDO</button></div>')
-    :'<div class="ic" style="opacity:.7"><div class="in2"><div class="nm">Scudo</div><div class="dc">Nessun modulo scudo sul blueprint. Aggiungi «Scudo» in cantiere.</div></div></div>')
+    :'<div class="ic" style="opacity:.7"><div class="in2"><div class="nm">Scudo</div><div class="dc">Nessun modulo scudo sul blueprint. Aggiungi «Scudo» in cantiere · oppure Scudo Energetico Mk in officina.</div></div></div>')
   +'<div class="ic" style="border-color:rgba(255,160,0,.3)"><div class="in2"><div class="nm" style="color:#ffcc66">Cantiere Navale — Blueprint</div><div class="dc">Modifica la struttura, aggiungi moduli. Silhouette laterale live. [P] da fuori.</div></div><button class="db" style="background:rgba(255,120,0,.12);color:#ffaa44;border:1px solid rgba(255,120,0,.3)" onclick="openBlueprintModal()">APRI BLUEPRINT</button></div>';
 }
 function doRepair(c,m){if(PS.credits<c||m===0)return;PS.credits-=c;playerShip.health=playerShip.maxHealth||100;notify('Scafo al 100%!');buildDock(GAME.dockedSt);}
-function doRecharge(){const c=Math.round(80*(ECON.rechargeMult||1));if(PS.credits<c)return;PS.credits-=c;playerShip.energy=100;notify('Energia al massimo!');buildDock(GAME.dockedSt);}
+function doRecharge(){
+  const c=Math.round(80*(ECON.rechargeMult||1)*(GAME._dockRepairMult||1));
+  if(PS.credits<c)return;PS.credits-=c;playerShip.energy=100;notify('Energia al massimo!');buildDock(GAME.dockedSt);
+}
 function doRechargeShield(c,m){
   if(!PS.shieldMax||m===0||PS.credits<c)return;
   PS.credits-=c;PS.shieldHp=PS.shieldMax;
@@ -9842,12 +10060,14 @@ function tTrade(pnl,st){
   const moodLbl=mood>1.04?'<span style="color:#ffbb66">domanda ALTA (+'+Math.round((mood-1)*100)+'%)</span>':mood<.96?'<span style="color:#88ddff">offerta in eccesso ('+Math.round((mood-1)*100)+'%)</span>':'<span style="color:#88aacc">mercato stabile</span>';
   const hub=stationHub(st.sd);
   const hubLine=hub?' · <span style="color:'+HUB_COLOR[hub]+'">'+HUB_LABEL[hub]+'</span>':'';
-  pnl.innerHTML+='<div style="font-size:10px;font-family:var(--FM);color:#557799;margin:-4px 0 10px">Umore mercato: '+moodLbl+hubLine+'</div>';
+  const repMul=(typeof GameplayPolish!=='undefined')?GameplayPolish.repPriceMult(st.sd.faction,rep):1;
+  const repLbl=repMul<0.99?' · <span style="color:#66ddaa">sconto rep ×'+repMul.toFixed(2)+'</span>':repMul>1.01?' · <span style="color:#ff8866">rincaro rep ×'+repMul.toFixed(2)+'</span>':'';
+  pnl.innerHTML+='<div style="font-size:10px;font-family:var(--FM);color:#557799;margin:-4px 0 10px">Umore mercato: '+moodLbl+hubLine+repLbl+'</div>';
   const mBuy=hubPriceMod(st.sd,'buy'), mSell=hubPriceMod(st.sd,'sell');
   Object.entries(gs).forEach(([gk,gv])=>{
     const gi=GOODS[gk];if(!gi)return;
-    const bp=Math.max(1,Math.round(gv.b*(PS.tradeBonus||1)*mood*mBuy*tartufiStoryDiscount(st.sd.id,gk)));
-    const sp=Math.max(1,Math.round(gv.sl*mSell*(mood>1?1+(mood-1)*.6:1-(1-mood)*.4)));
+    const bp=Math.max(1,Math.round(gv.b*(PS.tradeBonus||1)*mood*mBuy*repMul*tartufiStoryDiscount(st.sd.id,gk)));
+    const sp=Math.max(1,Math.round(gv.sl*mSell*(mood>1?1+(mood-1)*.6:1-(1-mood)*.4)/Math.max(0.85,repMul)));
     const inc=PS.cargo[gk]||0;
     pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+gi.name+'</div><div class="dc">Stock: '+gv.s+' '+gi.unit+' &bull; Stiva: '+inc+'/'+PS.cargoMax+'</div></div>'
     +'<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end">'
@@ -9991,6 +10211,36 @@ function tTavern(pnl,st){
   pool.forEach(g=>{pnl.innerHTML+='<div class="tv"><span class="tvs">'+g.s+':</span> '+g.t+'</div>';});
   const uni=[{s:'Mercante di passaggio',t:'"Ho visto Calcara inaugurare tre hangar in una settimana mentre Crespellano aspetta ancora il semaforo del 2003. E Calcara orbita intorno a Crespellano. E\' la cosa piu\' comica del sistema."'},{s:'Pilota senza nome',t:'"Il Patto del Molino... dicono che qualcuno l\'abbia rubato. Senza il patto le fazioni si stanno sgretolando. Qualcuno sta soffiando sul fuoco. E io so chi, ma non lo dico per niente meno di 500 crediti."'}];
   pnl.innerHTML+='<div class="tv"><span class="tvs">'+pick(uni).s+':</span> '+pick(uni).t+'</div>';
+  const clueKey=st.sd.faction||'castelletto';
+  const clue=(typeof GameplayPolish!=='undefined')?GameplayPolish.pickTavernClue(clueKey):null;
+  if(clue){
+    const cost=clue.cost||80;
+    pnl.innerHTML+='<div class="stt" style="margin-top:12px;color:#d4b070">INDIZIO A PAGAMENTO</div>';
+    pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+clue.title+'</div><div class="dc">'+clue.desc+'</div><div class="mr">Costo: '+fmt(cost)+' · diventa missione nello slot stazione</div></div>'
+      +'<button class="db hi2" onclick="buyTavernClue(\''+clue.id+'\',\''+st.sd.id+'\')" '+(PS.credits<cost?'disabled':'')+'>PAGA E ASCOLTA</button></div>';
+  }
+}
+function buyTavernClue(clueId,stId){
+  if(typeof GameplayPolish==='undefined')return;
+  const st=stations.find(s=>s.sd&&s.sd.id===stId)||GAME.dockedSt;
+  if(!st||!st.missionsList)return;
+  let clue=null;
+  Object.values(GameplayPolish.TAVERN_CLUES||{}).forEach(arr=>{
+    const hit=(arr||[]).find(c=>c.id===clueId);if(hit)clue=hit;
+  });
+  if(!clue){notify('Indizio già raffreddato.',1400);return;}
+  const cost=clue.cost||80;
+  if(PS.credits<cost){notify('Crediti insufficienti.',1400);return;}
+  if(st.missionsList.some(m=>m.id===clue.id)||PS.activeMissions.some(m=>m.id===clue.id)){
+    notify('Conosci già questa pista.',1600);return;
+  }
+  PS.credits-=cost;
+  const m=Object.assign({done:false,active:false,sid:st.sd.id},clue);
+  delete m.cost;
+  st.missionsList.push(m);
+  notify('Indizio comprato: '+m.title+' — vedi Missioni.',2400);
+  if(typeof playChime==='function')playChime('success');
+  buildDock(GAME.dockedSt);
 }
 
 function completeMission(m){
@@ -10445,31 +10695,44 @@ function drawTargetAssist(){
   const aimOk=targetLeadState.status==='MIRINO OK';
   const bad=!aimOk;
   const q=cl(targetLeadState.q||0,0,1);
+  const mobile=!!(window.matchMedia&&(window.matchMedia('(max-width:700px)').matches||window.matchMedia('(pointer:coarse)').matches));
+  const ringR=(mobile?18:11)+q*(mobile?5:3);
+  const cross=mobile?11:7;
   const targetNow=targetNpc.ship.mesh.position.clone().project(cam);
   if(targetNow.z>-1&&targetNow.z<1){
     const tx=(targetNow.x*.5+.5)*cv.width;
     const ty=(-.5*targetNow.y+.5)*cv.height;
     ctx.strokeStyle='rgba(170,210,255,.35)';
-    ctx.lineWidth=1;
+    ctx.lineWidth=mobile?2:1;
     ctx.setLineDash([4,4]);
     ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(sx,sy);ctx.stroke();
     ctx.setLineDash([]);
   }
   const col=bad?`rgba(255,82,90,${lock})`:`rgba(255,160,90,${lock+.1})`;
   ctx.strokeStyle=col;
-  ctx.lineWidth=1.8;
-  ctx.beginPath();ctx.arc(sx,sy,11+q*3,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='rgba(255,255,255,.34)';
-  ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(sx-7,sy);ctx.lineTo(sx+7,sy);ctx.moveTo(sx,sy-7);ctx.lineTo(sx,sy+7);ctx.stroke();
+  ctx.lineWidth=mobile?2.6:1.8;
+  ctx.beginPath();ctx.arc(sx,sy,ringR,0,Math.PI*2);ctx.stroke();
+  if(mobile){
+    ctx.beginPath();ctx.arc(sx,sy,ringR+6,0,Math.PI*2);ctx.globalAlpha=.35;ctx.stroke();ctx.globalAlpha=1;
+  }
+  ctx.strokeStyle='rgba(255,255,255,.45)';
+  ctx.lineWidth=mobile?1.6:1;
+  ctx.beginPath();ctx.moveTo(sx-cross,sy);ctx.lineTo(sx+cross,sy);ctx.moveTo(sx,sy-cross);ctx.lineTo(sx,sy+cross);ctx.stroke();
   const fcol=FACTIONS[targetLeadState.faction||'']?.color||'#a8c7ff';
   ctx.fillStyle=bad?'#ff6677':'#ffbb88';
-  ctx.font='bold 10px Rajdhani';
+  ctx.font=mobile?'bold 12px Rajdhani':'bold 10px Rajdhani';
   ctx.textAlign='center';
-  ctx.fillText(`${targetLeadState.status} · ${Math.round(targetLeadState.dist)} m · fuoco ${(q*100|0)}%`,sx,sy-23);
-  ctx.fillStyle=fcol;
-  ctx.font='bold 9px Share Tech Mono';
-  ctx.fillText(`${(targetLeadState.name||'TARGET').toUpperCase()} · HP ${Math.round(targetLeadState.hp||0)}`,sx,sy-33);
+  const labelY=sy-(mobile?30:23);
+  ctx.fillText(mobile?`${targetLeadState.status} · ${(q*100|0)}%`:`${targetLeadState.status} · ${Math.round(targetLeadState.dist)} m · fuoco ${(q*100|0)}%`,sx,labelY);
+  if(!mobile){
+    ctx.fillStyle=fcol;
+    ctx.font='bold 9px Share Tech Mono';
+    ctx.fillText(`${(targetLeadState.name||'TARGET').toUpperCase()} · HP ${Math.round(targetLeadState.hp||0)}`,sx,sy-33);
+  }else{
+    ctx.fillStyle=fcol;
+    ctx.font='bold 10px Share Tech Mono';
+    ctx.fillText(`${Math.round(targetLeadState.dist)} m`,sx,sy+ringR+16);
+  }
 }
 function drawLockedShipTarget(){
   if(!targetNpc||!targetNpc.ship||!targetNpc.ship.alive||GAME.state!=='flying'||!playerShip.alive)return;
@@ -11650,6 +11913,13 @@ function animate(){
         if(Math.random()<.07)playTone(95+Math.random()*35,.022,.018,'triangle');
       }
       RUN_STATS.distance+=playerShip.velocity.length()*dt;
+      // Autosave periodico in volo (ogni ~90s)
+      if(!_flyAutosaveT)_flyAutosaveT=0;
+      _flyAutosaveT+=dt;
+      if(_flyAutosaveT>90){
+        _flyAutosaveT=0;
+        if(typeof saveGame==='function')saveGame(true);
+      }
       updateNavRisk(dt);
       if(INP.thrust&&NAV_EFFECT.inCorridor){
         playerShip.applyThrust(dt,Math.max(1.02,NAV_EFFECT.bonusSpeed||1));

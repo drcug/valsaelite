@@ -99,6 +99,7 @@
   }
 
   function factionColor(factionId) {
+    if (factionId === 'pirate') return '#ff5533';
     const f = global.FACTIONS && global.FACTIONS[factionId];
     return f ? f.color : '#3ecfbb';
   }
@@ -179,12 +180,22 @@
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
+    // Faction tint plate (stronger identity)
+    const tint = ctx.createLinearGradient(0, 0, W, H);
+    tint.addColorStop(0, fCol + '28');
+    tint.addColorStop(0.55, 'transparent');
+    tint.addColorStop(1, fCol + '40');
+    ctx.fillStyle = tint;
+    ctx.fillRect(0, 0, W, H);
     // Faction tint strip at bottom
-    const strip = ctx.createLinearGradient(0, H * 0.78, 0, H);
+    const strip = ctx.createLinearGradient(0, H * 0.72, 0, H);
     strip.addColorStop(0, 'transparent');
-    strip.addColorStop(1, fCol + '55');
+    strip.addColorStop(1, fCol + '77');
     ctx.fillStyle = strip;
-    ctx.fillRect(0, H * 0.78, W, H * 0.22);
+    ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    // Side accent bar
+    ctx.fillStyle = fCol + 'aa';
+    ctx.fillRect(0, 0, Math.max(3, W * 0.035), H);
     return fCol;
   }
 

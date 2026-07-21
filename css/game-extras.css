@@ -32,7 +32,11 @@ body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
   #hud{z-index:20;}
   .hb,.flight-primary,.cb-row-extra,.cb{z-index:22;}
   #boarding-prompt{z-index:36!important;bottom:max(148px,22vh)!important;}
-  #dprompt{z-index:35!important;}
+  #dprompt{z-index:35!important;bottom:max(148px,24vh)!important;}
+  #dlg{bottom:max(160px,27vh)!important;z-index:30!important;max-height:min(26vh,200px)!important;}
+  #notif{bottom:max(152px,25vh)!important;z-index:28!important;max-width:min(92vw,380px)!important;}
+  #smsg{bottom:max(195px,31vh)!important;z-index:29!important;}
+  #mtick{top:max(8px,env(safe-area-inset-top))!important;left:max(6px,env(safe-area-inset-left))!important;transform:none!important;max-width:min(40vw,170px)!important;}
   /* Extra bottom inset so controls sit above home indicator, not under chrome */
   #hud{padding-bottom:max(14px,env(safe-area-inset-bottom))!important;}
 }
