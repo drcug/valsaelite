@@ -1,7 +1,8 @@
 'use strict';
 /**
- * Layout ritratti — busti COMPLETI (faccia+capelli già uniti), chromakey #00C878.
- * Nessun overlay capelli separato.
+ * Layout ritratti — busti COMPLETI (faccia+capelli già uniti).
+ * Chromakey sorgente: #5B8FC4 (blu soft, non magenta; non usato in pelle/teal/rame).
+ * PNG già processati con alpha posteriore soft.
  */
 window.PORTRAIT_LAYOUT = {
   cols: 4,
@@ -10,9 +11,9 @@ window.PORTRAIT_LAYOUT = {
   cellH: 160,
   atlasPath: 'sprites/portraits.png',
   view: {
-    pad: 0.02,
-    centerYFrac: 0.52,
-    scaleMul: 1.0
+    pad: 0.01,
+    centerYFrac: 0.50,
+    scaleMul: 1.12
   },
   overlay: {
     hairScale: 1,
@@ -29,7 +30,6 @@ window.PORTRAIT_LAYOUT = {
     complete: true
   },
   parts: {
-    // Busti completi (capelli già attaccati)
     heads: Array.from({ length: 12 }, (_, i) =>
       'sprites/faces/busts/bust_' + String(i).padStart(2, '0') + '.png'),
     hair: [null],

@@ -96,8 +96,15 @@ body.suborbit-active #a11y-strip{display:none !important;}
 }
 #tutorial-modal.show{display:flex !important;}
 #bp-preview-wrap{margin:0 0 6px;border-radius:8px;overflow:hidden;border:1px solid rgba(60,140,220,.38);
-  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:200px;position:relative;}
-#bp-preview-wrap canvas{display:block;width:100%;height:200px}
+  background:radial-gradient(ellipse at 50% 30%,#0a1a32,#02060c);min-height:240px;position:relative;touch-action:none;cursor:grab;}
+#bp-preview-wrap:active{cursor:grabbing}
+#bp-preview-wrap canvas{display:block;width:100%;height:240px}
+#bp-grid-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+#bp-toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.bp-tool{padding:6px 12px;border-radius:4px;border:1px solid rgba(70,180,160,.45);background:rgba(20,60,70,.55);
+  color:#c8efe6;font:700 10px var(--FD);letter-spacing:.1em;cursor:pointer}
+.bp-tool:hover{background:rgba(40,120,110,.55);border-color:#7fdcc8}
+.bp-tool.ghost{opacity:.75;border-style:dashed}
 
 /* ─ Abbordaggio / Space hulk ─ */
 #boarding{display:none;position:fixed;inset:0;z-index:90;background:
@@ -236,11 +243,14 @@ body.boarding-active #boarding-hud{display:block}
   background:rgba(3,10,28,.9);border:1.5px solid rgba(60,200,170,.55);
   touch-action:none;-webkit-user-select:none;user-select:none}
 .throttle-wrap .th-lbl{font:700 9px var(--FD);letter-spacing:.1em;color:#7fdcc8}
-.throttle{writing-mode:bt-lr;-webkit-appearance:slider-vertical;appearance:slider-vertical;
-  width:28px;height:88px;padding:0;margin:0;background:transparent;cursor:pointer}
-.throttle::-webkit-slider-runnable-track{width:8px;background:rgba(255,255,255,.12);border-radius:4px}
+.throttle{width:88px;height:28px;transform:rotate(-90deg);transform-origin:center center;
+  margin:30px 0;padding:0;background:transparent;cursor:pointer;-webkit-appearance:none;appearance:none}
+.throttle::-webkit-slider-runnable-track{height:8px;background:rgba(255,255,255,.12);border-radius:4px}
 .throttle::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6;margin-left:-7px}
+  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6;margin-top:-7px}
+.throttle::-moz-range-track{height:8px;background:rgba(255,255,255,.12);border-radius:4px;border:none}
+.throttle::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(180deg,#3ecfbb,#1a7a6a);border:2px solid #e8fff6}
 @media (hover:hover) and (pointer:fine){
   .throttle-wrap{display:none}
   .throttle-fallback{display:flex!important}
@@ -707,7 +717,7 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <!-- pilot portrait + name -->
     <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:14px">
       <div style="flex-shrink:0">
-        <canvas id="pilot-portrait" width="128" height="128" style="border-radius:10px;border:1px solid rgba(44,100,190,.35);display:block"></canvas>
+        <canvas id="pilot-portrait" width="144" height="180" style="width:144px;height:180px;border-radius:8px;border:1px solid rgba(70,180,160,.45);display:block;background:#354858"></canvas>
       </div>
       <div style="flex:1;min-width:0">
         <div id="idlg-name" style="font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.08em"></div>
@@ -844,13 +854,20 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
   <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">Scegli un modulo a destra → clicca sulla griglia · tasto destro rimuove · anteprima 3D live · CONFERMA per applicare</div>
+  <div id="bp-subtitle">1) Scegli un modulo · 2) Clicca sulla griglia per piazzarlo · 3) Tasto destro / UNDO per togliere · L’anteprima 3D si aggiorna subito · CONFERMA applica in volo</div>
   <div id="bp-wrap">
-    <canvas id="bp-cv"></canvas>
+    <div id="bp-grid-col">
+      <canvas id="bp-cv"></canvas>
+      <div id="bp-toolbar">
+        <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo piazzamento">UNDO</button>
+        <button type="button" class="bp-tool" id="bp-sym" title="Copia simmetrica sull’asse">SIMMETRIA</button>
+        <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona modulo">DESELEZIONA</button>
+      </div>
+    </div>
     <div id="bp-panel">
-      <div class="bp-section-title">ANTEPRIMA 3D</div>
+      <div class="bp-section-title">ANTEPRIMA 3D · RUOTA CON IL DRAG</div>
       <div id="bp-preview-wrap"><!-- canvas da JS --></div>
-      <div class="bp-section-title" style="margin-top:2px">MODULI DISPONIBILI</div>
+      <div class="bp-section-title" style="margin-top:2px">MODULI · clicca poi piazza</div>
       <div class="bp-module-list" id="bp-module-list"></div>
       <div id="bp-stats-hull-row">
         <div>
@@ -929,13 +946,13 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
-    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o tasto <kbd>ACCEL</kbd> · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>BOOST</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
+    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>throttle</kbd> su mobile · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>BOOST</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> target · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> hail</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
     <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
     <div class="help-grid"><span>Salvataggio</span><span>Auto-save all'attracco · Salva/Carica nel tab Riparazione</span></div>
-    <div class="help-grid"><span>Schermo</span><span><kbd>ACCEL</kbd> = motori (sempre visibile) · <kbd>BOOST</kbd> = afterburner · SX/DX su touch</span></div>
+    <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>throttle</kbd> verticale per i motori · <kbd>BOOST</kbd> = afterburner · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
   </div>
 </div>
@@ -2011,6 +2028,43 @@ const defaultBlueprint=[
 let bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
 let bpSelected=null; // module id selected in palette
 let bpDragFrom=null;
+const BP_UNDO=[]; // stack di snapshot griglia+inv per UNDO
+const BP_UNDO_MAX=24;
+
+function bpCloneGrid(){
+  return bpGrid.map(row=>row.slice());
+}
+function bpPushUndo(){
+  BP_UNDO.push({
+    grid:bpCloneGrid(),
+    inv:Object.assign({},PS.bpInv||{})
+  });
+  if(BP_UNDO.length>BP_UNDO_MAX)BP_UNDO.shift();
+}
+function bpUndo(){
+  const snap=BP_UNDO.pop();
+  if(!snap){notify('Niente da annullare.',1200);return;}
+  bpGrid=snap.grid.map(row=>row.slice());
+  PS.bpInv=Object.assign({},snap.inv);
+  buildBpPalette();drawBlueprint();
+  notify('Blueprint: annullato.',1200);
+}
+function bpMirrorSymmetry(){
+  // Copia metà sinistra → destra (esclusa colonna centrale se dispari)
+  bpPushUndo();
+  const mid=Math.floor(BP_COLS/2);
+  for(let r=0;r<BP_ROWS;r++){
+    for(let c=0;c<mid;c++){
+      const id=bpGrid[r][c];
+      const mirrorC=BP_COLS-1-c;
+      if(id==='wing_l')bpGrid[r][mirrorC]='wing_r';
+      else if(id==='wing_r')bpGrid[r][mirrorC]='wing_l';
+      else bpGrid[r][mirrorC]=id;
+    }
+  }
+  buildBpPalette();drawBlueprint();
+  notify('Simmetria applicata sull’asse.',1400);
+}
 
 function initBlueprintGrid(){
   bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
@@ -2369,6 +2423,12 @@ let bpEventsSetup=false;
 function setupBpEvents(){
   if(bpEventsSetup)return;bpEventsSetup=true;
   const cv=document.getElementById('bp-cv');if(!cv)return;
+  const undoBtn=document.getElementById('bp-undo');
+  const symBtn=document.getElementById('bp-sym');
+  const clearSel=document.getElementById('bp-clear-sel');
+  if(undoBtn)undoBtn.addEventListener('click',()=>bpUndo());
+  if(symBtn)symBtn.addEventListener('click',()=>bpMirrorSymmetry());
+  if(clearSel)clearSel.addEventListener('click',()=>{bpSelected=null;buildBpPalette();drawBlueprint();});
   function getCellAt(e){
     const rect=cv.getBoundingClientRect();
     const sx=cv.width/Math.max(rect.width,1),sy=cv.height/Math.max(rect.height,1);
@@ -2389,9 +2449,10 @@ function setupBpEvents(){
         while(c0>0&&bpGrid[r][c0-1]===id)c0--;
         while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
         if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
+        bpPushUndo();
         bpClearRect(r0,c0,m.w,m.h);
         bpInvRestore(id,1);
-      }else bpGrid[r][c]=null;
+      }else{bpPushUndo();bpGrid[r][c]=null;}
       buildBpPalette();drawBlueprint();return;
     }
     if(bpSelected){
@@ -2428,6 +2489,7 @@ function setupBpEvents(){
       for(const t of toClear){
         if(!bpCanRemoveModule(t.id,t.rr,t.cc,t.w,t.h))return;
       }
+      bpPushUndo();
       for(const t of toClear){
         bpClearRect(t.rr,t.cc,t.w,t.h);
         bpInvRestore(t.id,1);
@@ -2459,8 +2521,9 @@ function setupBpEvents(){
     const m=BP_MODULES.find(x=>x.id===id);
     if(m){let r0=r,c0=c;while(c0>0&&bpGrid[r][c0-1]===id)c0--;while(r0>0&&bpGrid[r0-1][c0]===id)r0--;
       if(!bpCanRemoveModule(id,r0,c0,m.w,m.h))return;
+      bpPushUndo();
       bpClearRect(r0,c0,m.w,m.h);bpInvRestore(id,1);}
-    else bpGrid[r][c]=null;
+    else{bpPushUndo();bpGrid[r][c]=null;}
     buildBpPalette();drawBlueprint();});
 }
 
@@ -2632,26 +2695,43 @@ function rebuildPlayerMesh(){
   const st=spec.struct;
   const he=bpShipHullCellHalfExtents(spec);
 
-  // ── Scafo: voxel arrotondati (box sovrapposti + capsule) per silhouette meno "minecraft" ─
+  // ── Scafo: fusoliera continua + voxel soft (silhouette meno "lego") ─
   let bx0=1e9,bx1=-1e9,by0=1e9,by1=-1e9,bz0=1e9,bz1=-1e9;
   let hullVox=0;
-  const hullGeo=new THREE.BoxGeometry(he.hx*2.18,he.hy*2.12,he.hz*2.22);
-  const hullRound=new THREE.SphereGeometry(Math.min(he.hx,he.hy,he.hz)*1.05,10,8);
+  const hullPts=[];
   for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
-    if(bpGrid[r][c]!=='hull')continue;
+    if(bpGrid[r][c]!=='hull'&&bpGrid[r][c]!=='cockpit')continue;
     const p=bpShipLocalFromAnchor(r,c,spec);
-    const cell=new THREE.Mesh(hullGeo,hm);
-    cell.position.set(p.x,p.y,p.z);
-    playerShip.mesh.add(cell);
-    // Soften corners
-    const bead=new THREE.Mesh(hullRound,hm2);
-    bead.position.set(p.x,p.y,p.z);
-    bead.scale.set(1.15,0.95,1.2);
-    playerShip.mesh.add(bead);
-    hullVox++;
+    hullPts.push(p);
     bx0=Math.min(bx0,p.x-he.hx);bx1=Math.max(bx1,p.x+he.hx);
     by0=Math.min(by0,p.y-he.hy);by1=Math.max(by1,p.y+he.hy);
     bz0=Math.min(bz0,p.z-he.hz);bz1=Math.max(bz1,p.z+he.hz);
+    hullVox++;
+  }
+  if(hullPts.length){
+    const fw=Math.max(fuselageW*0.92,(bx1-bx0)*0.92);
+    const fh=Math.max(fuselageH*0.85,(by1-by0)*0.9);
+    const fd=Math.max(fuselageLen*0.95,(bz1-bz0)*1.05);
+    const cx=(bx0+bx1)*0.5, cy=(by0+by1)*0.5, cz=(bz0+bz1)*0.5;
+    // Core tapered body
+    const body=new THREE.Mesh(new THREE.BoxGeometry(fw*0.72,fh*0.78,fd*0.88),hm);
+    body.position.set(cx,cy,cz);
+    playerShip.mesh.add(body);
+    const bellyR=Math.min(fw,fh)*0.22;
+    const belly=new THREE.Mesh(new THREE.CylinderGeometry(bellyR,bellyR*0.92,fd*0.62,12),hmd);
+    belly.rotation.x=Math.PI/2;
+    belly.position.set(cx,cy-fh*0.12,cz);
+    playerShip.mesh.add(belly);
+    // Soft hull beads only on hull cells (detail without full minecraft look)
+    const hullRound=new THREE.SphereGeometry(Math.min(he.hx,he.hy,he.hz)*0.95,8,6);
+    for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+      if(bpGrid[r][c]!=='hull')continue;
+      const p=bpShipLocalFromAnchor(r,c,spec);
+      const bead=new THREE.Mesh(hullRound,hm2);
+      bead.position.set(p.x,p.y,p.z);
+      bead.scale.set(1.05,0.88,1.12);
+      playerShip.mesh.add(bead);
+    }
   }
   // Volume di raccordo se pochi scafi ma cabina presente (evita mesh “vuota”)
   if(hullVox===0&&cockpitPlaced&&st.n>0){
@@ -3947,10 +4027,29 @@ function ensureBpPreview3d(){
     r.setClearColor(0x040a14,1);
     r.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
     const w=Math.max(200,wrap.clientWidth||400);
-    r.setSize(w,200);
-    BP_PV.cam.aspect=w/200;BP_PV.cam.updateProjectionMatrix();
+    const h=240;
+    r.setSize(w,h);
+    BP_PV.cam.aspect=w/h;BP_PV.cam.updateProjectionMatrix();
     wrap.innerHTML='';
     wrap.appendChild(r.domElement);
+    // Drag to rotate preview
+    let drag=false,lx=0,ly=0;
+    const onDown=(e)=>{drag=true;lx=e.clientX||(e.touches&&e.touches[0].clientX)||0;ly=e.clientY||(e.touches&&e.touches[0].clientY)||0;};
+    const onUp=()=>{drag=false;};
+    const onMove=(e)=>{
+      if(!drag||!BP_PV.mesh)return;
+      const x=e.clientX||(e.touches&&e.touches[0].clientX)||0;
+      const y=e.clientY||(e.touches&&e.touches[0].clientY)||0;
+      BP_PV.mesh.rotation.y+=(x-lx)*0.01;
+      BP_PV.mesh.rotation.x=cl(BP_PV.mesh.rotation.x+(y-ly)*0.008,-0.8,0.8);
+      lx=x;ly=y;BP_PV._userSpin=true;
+    };
+    wrap.addEventListener('mousedown',onDown);
+    wrap.addEventListener('touchstart',onDown,{passive:true});
+    window.addEventListener('mouseup',onUp);
+    window.addEventListener('touchend',onUp);
+    window.addEventListener('mousemove',onMove);
+    window.addEventListener('touchmove',onMove,{passive:true});
   }
   syncBpPreview3d();
 }
@@ -3978,11 +4077,12 @@ function syncBpPreview3d(){
   const target=34;
   m.scale.setScalar(target/maxD);
   const w=Math.max(200,wrap.clientWidth||400);
-  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==200){
-    BP_PV.renderer.setSize(w,200);
-    BP_PV.cam.aspect=w/200;BP_PV.cam.updateProjectionMatrix();
+  const h=240;
+  if(BP_PV.renderer.domElement.width!==Math.floor(w)||BP_PV.renderer.domElement.height!==h){
+    BP_PV.renderer.setSize(w,h);
+    BP_PV.cam.aspect=w/h;BP_PV.cam.updateProjectionMatrix();
   }
-  BP_PV.mesh.rotation.y=0;
+  if(!BP_PV._userSpin)BP_PV.mesh.rotation.y=0;
   BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
 }
 function scheduleBpPreviewSync(){
@@ -3993,7 +4093,7 @@ function tickBpPreview3dFrame(){
   if(!BP_PV||!BP_PV.mesh||!BP_PV.renderer)return;
   const modal=document.getElementById('blueprint-modal');
   if(!modal||!modal.classList.contains('show'))return;
-  BP_PV.mesh.rotation.y+=0.014;
+  if(!BP_PV._userSpin)BP_PV.mesh.rotation.y+=0.012;
   BP_PV.renderer.render(BP_PV.scene,BP_PV.cam);
 }
 
@@ -4351,7 +4451,8 @@ function updateProjs(dt){
     let hit=false;
     if(pr.owner!=='player'&&playerShip.alive){
       if(pr.mesh.position.distanceToSquared(playerShip.mesh.position)<playerShip.radius*playerShip.radius){
-        playerShip.takeDamage(7+Math.round(rnd(0,6)));hit=true;
+        const threat=(typeof StorySys!=='undefined')?StorySys.hostileDmgMul():1;
+        playerShip.takeDamage(Math.round((7+Math.round(rnd(0,6)))*threat));hit=true;
       }
     }
     if(!hit&&pr.owner==='player'){
@@ -4468,7 +4569,7 @@ const FLEET=[
   ['bazzano','bazzano','courier'],['savigno','savigno','courier'],
   ['calcara','calcara','courier'],['monteveglio','monteveglio','courier'],
 ];
-const EXTRA_FLEET_MULT=4;
+const EXTRA_FLEET_MULT=7;
 for(let k=0;k<EXTRA_FLEET_MULT;k++)FLEET.push(
   ['bazzano','bazzano','patrol'],['bazzano','sirena','merchant'],['bazzano','lavino','freighter'],
   ['crespellano','crespellano','patrol'],['crespellano','pragatto','pirate'],['calcara','bazzano','freighter'],
@@ -4476,9 +4577,11 @@ for(let k=0;k<EXTRA_FLEET_MULT;k++)FLEET.push(
   ['monteveglio','oliveto','merchant'],['monteveglio','oliveto','freighter'],['savigno','savigno','patrol'],
   ['savigno','zappolino','escort'],['savigno','zappolino','freighter'],['pirate','castelletto','pirate'],
   ['pirate','castelletto','pirate'],['pirate','serravalle','pirate'],['pirate','castelletto','pirate'],
-  ['calcara','calcara','escort'],['pirate','castelletto','pirate']
+  ['calcara','calcara','escort'],['pirate','castelletto','pirate'],
+  ['pirate','castelletto','pirate'],['pirate','serravalle','pirate'],['calcara','calcara','escort'],
+  ['monteveglio','montebudello','patrol'],['bazzano','bazzano','escort'],['crespellano','crespellano','courier']
 );
-const DYNAMIC_NPC_SPAWN={timer:28,interval:34,max:160};
+const DYNAMIC_NPC_SPAWN={timer:22,interval:28,max:200};
 function refreshDynamicSpawnTuning(){
   if(typeof StorySys==='undefined')return;
   DYNAMIC_NPC_SPAWN.interval=StorySys.npcSpawnInterval();
@@ -8822,6 +8925,10 @@ function spawnHulks(){
     {x:-14800,z:19800,  arch:'military'},
     {x:19600, z:-21000, arch:'xeno'},
     {x:-22000,z:-8000,  arch:'hospital'},
+    {x:32000, z:4000,   arch:'military'},
+    {x:-30000,z:16000,  arch:'cargo'},
+    {x:8000,  z:-30000, arch:'xeno'},
+    {x:-8000, z:32000,  arch:'hospital'},
   ];
   positions.forEach((p,i)=>{
     const seed=((i+1)*104729 + p.x*31 + p.z*17)|0;
@@ -10500,11 +10607,14 @@ function triggerVictory(){
 
 const FINALE_SLIDES=[
   {chap:'FINALE · I',title:'Il Mulino Acceso',
-    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Imperium resta in coda — tu resti a casa.',
+    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Il Patto non e\' un foglio: e\' una scelta rinnovata.',
     art:'sprites/story/finale_seq.jpg'},
-  {chap:'FINALE · II',title:'Zvan Marìa',
-    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Il Patto e\' vivo non perche\' lo dice un bollo — perche\' qualcuno ha deciso di restare.',
-    art:'sprites/story/finale.jpg'}
+  {chap:'FINALE · II',title:'Rapporto a Imperium',
+    text:'Il bollettino parte verso Imperium: "Situazione stabilizzata. Funzionario Marìa resta in loco." Qualcuno in alto non applaude — ma firma lo stesso.',
+    art:'sprites/story/finale.jpg'},
+  {chap:'FINALE · III',title:'Zvan Marìa',
+    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Dopo vent\'anni il ritorno non e\' una missione chiusa: e\' una casa riaperta. Il mulino gira.',
+    art:'sprites/story/finale_seq.jpg'}
 ];
 function playFinaleSequence(){
   // Riusa lo slideshow intro con slide finali, poi vittoria

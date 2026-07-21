@@ -190,11 +190,12 @@ body:not(.landing-pano) #land-pano{display:none!important;opacity:0!important;}
   border-radius:6px!important;
 }
 #pilot-portrait{
-  border-radius:4px!important;
-  border:1px solid rgba(70,180,160,.4)!important;
-  box-shadow:0 0 0 1px rgba(196,137,58,.2),inset 0 0 12px rgba(0,20,20,.2)!important;
-  background:linear-gradient(180deg,#2a4050,#1a303c)!important;
-  filter:brightness(1.05) contrast(1.06) saturate(1.08);
+  width:144px!important;height:180px!important;
+  border-radius:6px!important;
+  border:1px solid rgba(70,180,160,.45)!important;
+  box-shadow:0 0 0 1px rgba(196,137,58,.25),0 8px 20px rgba(0,0,0,.35)!important;
+  background:linear-gradient(180deg,#4a6578,#2a4050)!important;
+  filter:none;
 }
 .throttle-wrap{
   border-color:rgba(62,207,187,.55)!important;

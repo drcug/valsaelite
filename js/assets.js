@@ -15,6 +15,7 @@
     8: 'sprites/story/ch08.jpg',
     stamp: 'sprites/story/ch03.jpg',
     finale: 'sprites/story/finale.jpg',
+    finaleSeq: 'sprites/story/finale_seq.jpg',
     intro1: 'sprites/story/intro/intro_01.jpg',
     intro2: 'sprites/story/intro/intro_02.jpg',
     intro3: 'sprites/story/intro/intro_03.jpg',
