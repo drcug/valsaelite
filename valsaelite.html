@@ -2323,7 +2323,10 @@ function drawBlueprint(){
   // Hover/selected highlight for palette
   if(bpSelected){
     ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(77,170,255,.7)';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText('['+bpSelected+'] → clicca griglia',4,H-11);
+    ctx.fillText(bpSelected==='__erase'?'[CANCELLA] → tocca un pezzo':'['+bpSelected+'] → tocca griglia (tocca pezzo = rimuovi)',4,H-11);
+  }else{
+    ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(255,140,100,.75)';ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.fillText('Tocca un pezzo per rimuoverlo · oppure scegli un modulo',4,H-11);
   }
   ctx.textAlign='left';ctx.textBaseline='alphabetic';
 
@@ -2658,7 +2661,9 @@ function buildBpPalette(){
   // Erase button
   const erase=document.createElement('div');erase.className='bp-mod-btn'+(bpSelected==='__erase'?' selected':'');
   erase.innerHTML='<span class="bp-mod-icon">🗑</span><span class="bp-mod-name">Cancella</span><span class="bp-mod-cnt" style="color:#886633">torna in inv.</span>';
-  erase.addEventListener('click',()=>{bpSelected=bpSelected==='__erase'?null:'__erase';buildBpPalette();drawBlueprint();});
+  erase.addEventListener('click',()=>{bpSelected=bpSelected==='__erase'?null:'__erase';buildBpPalette();drawBlueprint();
+    const b=document.getElementById('bp-erase');if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
+  });
   el.appendChild(erase);
   // Barra crediti, così l'utente vede budget senza uscire dal modale.
   const info=document.createElement('div');
@@ -2804,48 +2809,75 @@ function setupBpEvents(){
     }
     drawBlueprint();
   }
-  // Long-press → cancella sempre il pezzo sotto il dito
-  let _bpLongTmr=0,_bpLongCell=null,_bpLongFired=false;
+  // Long-press su cella occupata → cancella (anche con un modulo selezionato)
+  let _bpLongTmr=0,_bpLongCell=null,_bpLongFired=false,_bpPendingPlace=null;
   function clearBpLong(){if(_bpLongTmr){clearTimeout(_bpLongTmr);_bpLongTmr=0;}_bpLongCell=null;}
   function armBpLong(r,c){
     clearBpLong();_bpLongFired=false;_bpLongCell={r,c};
     _bpLongTmr=setTimeout(()=>{
-      _bpLongTmr=0;_bpLongFired=true;
+      _bpLongTmr=0;_bpLongFired=true;_bpPendingPlace=null;
       if(_bpLongCell)eraseAt(_bpLongCell.r,_bpLongCell.c);
       bpDragFrom=null;
-    },380);
+    },400);
   }
-  cv.addEventListener('mousedown',e=>{
-    if(e.button!==0)return;
+  function pointerDown(e){
     const {r,c}=getCellAt(e);
-    armBpLong(r,c);
-    placeAt(r,c);bpDragFrom={r,c};
-  });
-  cv.addEventListener('mousemove',e=>{
-    if(!bpDragFrom||e.buttons!==1)return;
-    const {r,c}=getCellAt(e);
-    if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c))clearBpLong();
-    if(_bpLongFired)return;
-    if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}
-  });
-  cv.addEventListener('mouseup',()=>{clearBpLong();bpDragFrom=null;});
-  cv.addEventListener('mouseleave',()=>{clearBpLong();bpDragFrom=null;});
-  cv.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    const t=e.touches[0];const {r,c}=getCellAt(t);
-    armBpLong(r,c);
-    placeAt(r,c);bpDragFrom={r,c};
-  },{passive:false});
-  cv.addEventListener('touchmove',e=>{
-    e.preventDefault();
+    const occupied=!!(bpGrid[r]&&bpGrid[r][c]);
+    _bpPendingPlace=null;_bpLongFired=false;
+    // Senza selezione / modalità CANCELLA: tocca = elimina subito
+    if(!bpSelected||bpSelected==='__erase'){
+      if(occupied)eraseAt(r,c);
+      bpDragFrom={r,c,eraseDrag:true};
+      return;
+    }
+    // Modulo selezionato + cella occupata: long-press cancella, tap breve sovrascrive/piazza
+    if(occupied){
+      armBpLong(r,c);
+      _bpPendingPlace={r,c};
+      bpDragFrom={r,c};
+      return;
+    }
+    // Cella vuota: piazza subito
+    placeAt(r,c);
+    bpDragFrom={r,c};
+  }
+  function pointerMove(e){
     if(!bpDragFrom)return;
-    const t=e.touches[0];const {r,c}=getCellAt(t);
-    if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c))clearBpLong();
+    const {r,c}=getCellAt(e);
+    if(_bpLongCell&&(r!==_bpLongCell.r||c!==_bpLongCell.c)){
+      clearBpLong();
+      // Se si muove prima del long-press, esegui il piazzamento pendente
+      if(_bpPendingPlace&&!_bpLongFired){
+        placeAt(_bpPendingPlace.r,_bpPendingPlace.c);
+        _bpPendingPlace=null;
+      }
+    }
     if(_bpLongFired)return;
-    if(r!==bpDragFrom.r||c!==bpDragFrom.c){placeAt(r,c);bpDragFrom={r,c};}
-  },{passive:false});
-  cv.addEventListener('touchend',()=>{clearBpLong();bpDragFrom=null;});
-  cv.addEventListener('touchcancel',()=>{clearBpLong();bpDragFrom=null;});
+    if(r!==bpDragFrom.r||c!==bpDragFrom.c){
+      if(bpDragFrom.eraseDrag||!bpSelected||bpSelected==='__erase'){
+        if(bpGrid[r]&&bpGrid[r][c])eraseAt(r,c);
+      }else{
+        placeAt(r,c);
+      }
+      bpDragFrom={r,c,eraseDrag:bpDragFrom.eraseDrag};
+    }
+  }
+  function pointerUp(){
+    if(_bpPendingPlace&&!_bpLongFired){
+      placeAt(_bpPendingPlace.r,_bpPendingPlace.c);
+    }
+    _bpPendingPlace=null;
+    clearBpLong();
+    bpDragFrom=null;
+  }
+  cv.addEventListener('mousedown',e=>{if(e.button!==0)return;pointerDown(e);});
+  cv.addEventListener('mousemove',e=>{if(e.buttons!==1)return;pointerMove(e);});
+  cv.addEventListener('mouseup',pointerUp);
+  cv.addEventListener('mouseleave',pointerUp);
+  cv.addEventListener('touchstart',e=>{e.preventDefault();pointerDown(e.touches[0]);},{passive:false});
+  cv.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches[0])pointerMove(e.touches[0]);},{passive:false});
+  cv.addEventListener('touchend',pointerUp);
+  cv.addEventListener('touchcancel',pointerUp);
   cv.addEventListener('contextmenu',e=>{
     e.preventDefault();
     const {r,c}=getCellAt(e);
