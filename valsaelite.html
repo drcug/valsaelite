@@ -162,6 +162,39 @@ body.boarding-active #boarding-hud{display:block}
 #fadeov{position:fixed;inset:0;z-index:95;background:#000;opacity:0;pointer-events:none;transition:opacity .0s}
 @keyframes boarding-swirl{from{transform:rotate(0deg) scale(1.08)}to{transform:rotate(360deg) scale(1.08)}}
 @keyframes boarding-in{from{opacity:0;transform:scale(1.02)}to{opacity:1;transform:scale(1)}}
+body.boarding-hulk #boarding{background:
+  radial-gradient(120% 110% at 50% 40%,#1a0608 0%,#0a0304 42%,#020101 100%)}
+body.boarding-hulk #boarding:before{
+  background:radial-gradient(circle at 40% 30%,rgba(180,20,30,.16) 0%,rgba(40,120,40,.08) 40%,rgba(120,0,40,.1) 100%);
+  animation:boarding-swirl 18s linear infinite}
+body.boarding-hulk #boarding-hud{
+  background:linear-gradient(180deg,rgba(28,6,8,.92),rgba(10,2,4,.82));
+  border-color:rgba(180,40,40,.55);color:#ffd8c8;
+  box-shadow:0 0 28px rgba(160,20,20,.28),inset 0 0 20px rgba(80,0,0,.18)}
+body.boarding-hulk #boarding-hud .bh-title{color:#ffe8d8;letter-spacing:.2em}
+body.boarding-hulk #boarding-hud .bh-obj{color:#ff9a6a}
+body.boarding-hulk #boarding-hud .bh-hint{color:#8a6060}
+body.boarding-hulk .btouch-pad button{
+  border-color:rgba(180,60,50,.5);background:rgba(28,6,8,.86);color:#ffd0c0}
+body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba(60,10,8,.88)}
+
+/* Cinematic Space Hulk (tuta / fuga / vittoria) */
+#hulk-cine{display:none;position:fixed;inset:0;z-index:205;background:rgba(2,0,0,.92);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));
+  pointer-events:auto}
+#hulk-cine.show{display:flex !important}
+#hulk-cine .hc-panel{width:min(720px,96vw);max-height:min(92vh,900px);overflow:auto;border:1px solid rgba(180,70,50,.55);
+  border-radius:10px;background:linear-gradient(180deg,rgba(28,8,6,.96),rgba(8,2,2,.94));
+  box-shadow:0 0 40px rgba(120,20,10,.35),inset 0 0 40px rgba(80,0,0,.15);padding:0 0 16px}
+#hulk-cine .hc-art{display:block;width:100%;max-height:min(48vh,420px);object-fit:cover;border-bottom:1px solid rgba(180,70,50,.4);
+  background:#120404}
+#hulk-cine .hc-body{padding:14px 18px 0;font-family:var(--FM)}
+#hulk-cine .hc-label{font:700 10px var(--FD);letter-spacing:.22em;color:#c86840;margin-bottom:6px}
+#hulk-cine .hc-title{font:700 20px/1.2 var(--FD);letter-spacing:.12em;color:#ffe8d8;margin-bottom:8px}
+#hulk-cine .hc-text{font-size:13px;line-height:1.65;color:#c9a090;margin-bottom:14px}
+#hulk-cine .hc-ok{display:block;width:calc(100% - 36px);margin:0 18px;padding:12px;font-family:var(--FD);font-weight:700;
+  letter-spacing:.16em;background:linear-gradient(180deg,#a04828,#702818);color:#fff;border:none;border-radius:8px;cursor:pointer}
+#hulk-cine .hc-ok:hover{filter:brightness(1.08)}
 
 /* ─ Landing title ─ */
 #land-title{
@@ -893,6 +926,17 @@ body.suborbit-active #smsg{
     <button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button>
   </div>
 </div>
+<div id="hulk-cine" aria-modal="true" role="dialog" aria-labelledby="hulk-cine-title">
+  <div class="hc-panel">
+    <img id="hulk-cine-art" class="hc-art" alt="" decoding="async"/>
+    <div class="hc-body">
+      <div class="hc-label" id="hulk-cine-label">SPACE HULK</div>
+      <div class="hc-title" id="hulk-cine-title">Preparazione</div>
+      <div class="hc-text" id="hulk-cine-text"></div>
+      <button type="button" class="hc-ok" id="hulk-cine-ok">CONTINUA</button>
+    </div>
+  </div>
+</div>
 
 <div id="dprompt">
   <div class="dn" id="dpnm"></div>
@@ -1307,6 +1351,7 @@ function hideMainMenu(){
   if(opts)opts.hidden=true;
 }
 function startNewGameFromMenu(){
+  window._gameplaySessionStarted=true;
   hideMainMenu();
   if(typeof clearSaveGame==='function')clearSaveGame();
   const skip=document.getElementById('mm-opt-skipintro');
@@ -1322,6 +1367,7 @@ function startNewGameFromMenu(){
 }
 function loadGameFromMenu(){
   if(typeof hasSaveGame!=='function'||!hasSaveGame()){notify('Nessun salvataggio.',1600);return;}
+  window._gameplaySessionStarted=true;
   hideMainMenu();
   setPausedReason('story',false);
   if(typeof loadGame==='function')loadGame(true);
@@ -1758,6 +1804,70 @@ function showStoryBanner(label,title,body,_holdMsIgnored){
     hideStoryBanner();
   });
   // Non chiudere cliccando fuori o con tastiera — solo il pulsante CONTINUA
+})();
+
+const HULK_CINE={
+  suit:{
+    label:'SPACE HULK · PREPARAZIONE',
+    title:'Tuta e casco',
+    text:'Zvan Marìa sigilla la tuta da abbordaggio. Il casco chiude con un click sordo: dentro c\'è solo il respiro e il rumore del relitto. Macguffinium, mutazioni, corridoi che non dovrebbero esistere. Entra. Non restare.',
+    art:'sprites/story/hulk/hulk-suit-up.jpg',
+    ok:'ABBORDA'
+  },
+  escape:{
+    label:'SPACE HULK · ESTRAZIONE',
+    title:'Modulo di fuga',
+    text:'Troppi danni. Il corridoio vomita fuoco e carne sbagliata. Zvan strappa il modulo di fuga: una capsula cieca che sputa verso la nave. Torna vivo. Il hulk resta affamato.',
+    art:'sprites/story/hulk/hulk-escape-pod.jpg',
+    ok:'RIENTRO'
+  },
+  victory:{
+    label:'SPACE HULK · ESTRAZIONE RIUSCITA',
+    title:'Fuori dal ventre',
+    text:'Il bottino è a bordo. La tuta puzza di ferro e anomalia. Dietro, il hulk chiude le fauci. Zvan Marìa è ancora Funzionario VII — e ancora intero.',
+    art:'sprites/story/hulk/hulk-victory.jpg',
+    ok:'CONTINUA'
+  },
+  _onDone:null,
+  open:false
+};
+function showHulkCine(kind,onDone){
+  const cfg=HULK_CINE[kind]||HULK_CINE.suit;
+  const el=document.getElementById('hulk-cine');
+  if(!el){if(typeof onDone==='function')onDone();return;}
+  const art=document.getElementById('hulk-cine-art');
+  const lab=document.getElementById('hulk-cine-label');
+  const tit=document.getElementById('hulk-cine-title');
+  const txt=document.getElementById('hulk-cine-text');
+  const ok=document.getElementById('hulk-cine-ok');
+  if(art){art.src=cfg.art;art.alt=cfg.title;}
+  if(lab)lab.textContent=cfg.label;
+  if(tit)tit.textContent=cfg.title;
+  if(txt)txt.textContent=cfg.text;
+  if(ok)ok.textContent=cfg.ok||'CONTINUA';
+  HULK_CINE._onDone=typeof onDone==='function'?onDone:null;
+  HULK_CINE.open=true;
+  el.classList.add('show');
+  if(typeof setPausedReason==='function')setPausedReason('story',true);
+  document.body.classList.add('story-open');
+}
+function hideHulkCine(){
+  const el=document.getElementById('hulk-cine');
+  if(el)el.classList.remove('show');
+  HULK_CINE.open=false;
+  document.body.classList.remove('story-open');
+  if(typeof setPausedReason==='function')setPausedReason('story',false);
+  const cb=HULK_CINE._onDone;
+  HULK_CINE._onDone=null;
+  if(typeof cb==='function')cb();
+}
+(function setupHulkCineUi(){
+  const ok=document.getElementById('hulk-cine-ok');
+  if(!ok)return;
+  ok.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    hideHulkCine();
+  });
 })();
 
 function advanceStory(ch){
@@ -4545,8 +4655,25 @@ function tryShowTutorialFlight(){
     '<p><strong>ACCEL</strong> / <strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>BOOST</strong> / <strong>S</strong> / <strong>Shift/B</strong> afterburner. <strong>FUE</strong> / <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p>Le <strong>linee ciano</strong> tra i pianeti sono <strong>corridoi spaziali</strong> (corsie): resta sopra con i motori per <strong>spinta extra</strong>. Non confonderli con i corridoi di suborbita. Apri la mappa <strong>M</strong> per i nomi.</p><p style="opacity:.85;margin-top:8px;font-size:11px">I tasti ACCEL, FUE e BOOST restano sempre a schermo.</p>');
 }
 function tryShowTutorialCorridor(){
+  if(typeof navCorridorFeedbackAllowed==='function'&&!navCorridorFeedbackAllowed())return false;
   return showTutorialOnce('valsaelite_tut_corridor','Corridoi spaziali',
     '<p>Hai entrato in una <strong>corsia commerciale</strong>: è una linea ciano tra due pianeti nello spazio aperto.</p><p>Con i <strong>motori accesi</strong> sulla corsia ottieni <strong>spinta extra</strong>. Fuori torni a velocità normale. Non è il corridoio di suborbita sotto l\'atmosfera.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Mappa <strong>M</strong> = nomi delle corsie. Anomalie (anelli colorati) = rischio e bottino, non corsie.</p>');
+}
+function navCorridorFeedbackAllowed(){
+  if(GAME.state!=='flying')return false;
+  if(!playerShip||!playerShip.alive)return false;
+  if(!window._gameplaySessionStarted)return false;
+  if(typeof gameplayPaused==='function'&&gameplayPaused())return false;
+  if(document.body.classList.contains('menu-open'))return false;
+  if(document.body.classList.contains('booting'))return false;
+  if(document.body.classList.contains('story-open'))return false;
+  const mm=document.getElementById('main-menu');
+  if(mm&&mm.classList.contains('show'))return false;
+  const intro=document.getElementById('intro-slideshow');
+  if(intro&&(intro.classList.contains('show')||intro.style.display==='flex'))return false;
+  const tut=document.getElementById('tutorial-modal');
+  if(tut&&tut.classList.contains('show'))return false;
+  return true;
 }
 function tryShowTutorialDock(){
   return showTutorialOnce('valsaelite_tut_dock','Attracco e missioni',
@@ -4593,6 +4720,7 @@ function formatRunStats(){
 }
 function continueSandbox(){
   document.getElementById('go').classList.remove('show');
+  window._gameplaySessionStarted=true;
   PS.sandboxMode=true;
   GAME.state='flying';
   playerShip.alive=true;
@@ -5513,7 +5641,9 @@ function setPausedReason(reason,on){if(GAME.pausedReasons[reason]!==undefined)GA
 function gameplayPaused(){return Object.values(GAME.pausedReasons).some(Boolean);}
 function storyBannerOpen(){
   const b=document.getElementById('story-banner');
-  return !!(b&&b.style.display==='block');
+  if(b&&b.style.display==='block')return true;
+  if(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)return true;
+  return false;
 }
 const fadeEl=document.getElementById('fadeov');
 const ltEl=document.getElementById('land-title');
@@ -6890,8 +7020,22 @@ function applySuborbitBiome(sm){
       });
     }
   }
-  for(const h of SUBORBIT.hazards){if(h.mesh&&h.mesh.material){h.mesh.material.color.setHex(b.hazard);h.mesh.material.emissive.setHex(b.hazard);h.mesh.material.emissiveIntensity=.55;}}
-  for(const p of SUBORBIT.pickups){if(p.mesh&&p.mesh.material){p.mesh.material.color.setHex(b.pickup);p.mesh.material.emissive.setHex(b.pickup);p.mesh.material.emissiveIntensity=.78;}}
+  for(const h of SUBORBIT.hazards){
+    if(!h.mesh)continue;
+    h.mesh.traverse(ch=>{
+      if(ch.material&&ch.material.color&&ch.material.type==='MeshStandardMaterial'){
+        ch.material.color.setHex(b.hazard);ch.material.emissive.setHex(b.hazard);ch.material.emissiveIntensity=.55;
+      }
+    });
+  }
+  for(const p of SUBORBIT.pickups){
+    if(!p.mesh)continue;
+    p.mesh.traverse(ch=>{
+      if(ch.material&&ch.material.color&&ch.material.type==='MeshStandardMaterial'){
+        ch.material.color.setHex(b.pickup);ch.material.emissive.setHex(b.pickup);ch.material.emissiveIntensity=.78;
+      }
+    });
+  }
 }
 function setSuborbitSkyPano(sm){
   const url=(typeof planetPano==='function'&&sm&&sm.sd)?planetPano(sm.sd.id):null;
@@ -7084,21 +7228,35 @@ function ensureSuborbitTerrain(){
     SUBORBIT.enemies.push({mesh:g,active:false,wx:0,wz:0,hp:2,lane:0,spdMul:1,kind:'swarm'});
   }
   for(let i=0;i<SUBORBIT.pickupCap;i++){
-    const m=new THREE.Mesh(new THREE.SphereGeometry(8,10,10),new THREE.MeshStandardMaterial({color:0x44ddee,emissive:0x113344,emissiveIntensity:.7}));
-    m.visible=false;scene.add(m);SUBORBIT.pickups.push({mesh:m,active:false,wx:0,wz:0,kind:'loot',magnet:.05});
+    const g=new THREE.Group();
+    g.visible=false;scene.add(g);
+    SUBORBIT.pickups.push({mesh:g,active:false,wx:0,wz:0,kind:'loot',magnet:.05});
   }
   for(let i=0;i<SUBORBIT.hazardCap;i++){
-    const m=new THREE.Mesh(new THREE.TorusKnotGeometry(9,2.8,36,6),new THREE.MeshStandardMaterial({color:0xaa33ff,emissive:0x2a0044,emissiveIntensity:.45}));
-    m.visible=false;scene.add(m);SUBORBIT.hazards.push({mesh:m,active:false,wx:0,wz:0});
+    const g=new THREE.Group();
+    g.visible=false;scene.add(g);
+    SUBORBIT.hazards.push({mesh:g,active:false,wx:0,wz:0});
   }
   if(!SUBORBIT.boss){
+    const bg=new THREE.Group();
     const bm=new THREE.Mesh(
-      new THREE.DodecahedronGeometry(24,0),
-      new THREE.MeshStandardMaterial({color:0xff7744,emissive:0x662200,emissiveIntensity:.65,roughness:.45,metalness:.55})
+      new THREE.DodecahedronGeometry(22,0),
+      new THREE.MeshStandardMaterial({color:0xff7744,emissive:0x662200,emissiveIntensity:.7,roughness:.4,metalness:.6})
     );
-    bm.visible=false;
-    scene.add(bm);
-    SUBORBIT.boss={mesh:bm,active:false,wx:0,wz:0,hp:0};
+    bg.add(bm);
+    const crown=new THREE.Mesh(
+      new THREE.TorusGeometry(18,1.2,8,28),
+      new THREE.MeshBasicMaterial({color:0xffaa66,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    crown.rotation.x=Math.PI/2;bg.add(crown);
+    const aura=new THREE.Mesh(
+      new THREE.SphereGeometry(30,14,12),
+      new THREE.MeshBasicMaterial({color:0xff5522,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    bg.add(aura);
+    bg.visible=false;
+    scene.add(bg);
+    SUBORBIT.boss={mesh:bg,active:false,wx:0,wz:0,hp:0};
   }
 }
 function resetSuborbitActors(){
@@ -7190,6 +7348,96 @@ function suborbitSMat(col,em,ei,r,m){
   return new THREE.MeshStandardMaterial({
     color:col,emissive:em||0,emissiveIntensity:ei??0,roughness:r??.44,metalness:m??.64
   });
+}
+function suborbitImpactSparks(pos,baseCol){
+  const c0=baseCol!=null?baseCol:0xff7744;
+  const shipPos=playerShip&&playerShip.mesh?playerShip.mesh.position:pos;
+  for(let k=0;k<28;k++){
+    const sp=getP();if(!sp)break;
+    const ang=Math.random()*Math.PI*2;
+    const spd=55+Math.random()*110;
+    const col=k%4===0?0xfff2c8:(k%3===0?0xffcc55:(k%2?0xff6622:c0));
+    const origin=pos.clone().lerp(shipPos,.35).add(new THREE.Vector3((Math.random()-.5)*10,(Math.random()-.5)*8,(Math.random()-.5)*10));
+    sp.spawn(origin,new THREE.Vector3(Math.cos(ang)*spd,(Math.random()-.25)*spd*.9,Math.sin(ang)*spd*.55-18),col,.1+Math.random()*.22,1.1+Math.random()*2.4);
+  }
+  for(let k=0;k<8;k++){
+    const sp=getP();if(!sp)break;
+    sp.spawn(
+      shipPos.clone().add(new THREE.Vector3((Math.random()-.5)*14,4+Math.random()*10,(Math.random()-.5)*10)),
+      new THREE.Vector3((Math.random()-.5)*40,20+Math.random()*50,(Math.random()-.5)*30),
+      0xffeebb,.16,2.2
+    );
+  }
+  SUBORBIT.flashHit=typeof suborbitReduceMotion==='function'&&suborbitReduceMotion()?.1:.32;
+  if(typeof playTone==='function'){playTone(140,.09,.055,'sawtooth');setTimeout(()=>playTone(90,.07,.04,'square'),40);}
+  if(typeof tryVibrate==='function')tryVibrate(40);
+}
+function suborbitDisposeGroupVisual(root){
+  if(!root)return;
+  while(root.children&&root.children.length){
+    const ch=root.children[0];
+    root.remove(ch);
+    ch.traverse(obj=>{
+      if(obj.geometry)obj.geometry.dispose();
+      if(obj.material){
+        const ms=Array.isArray(obj.material)?obj.material:[obj.material];
+        ms.forEach(mt=>{if(mt.map)mt.map.dispose();if(typeof mt.dispose==='function')mt.dispose();});
+      }
+    });
+  }
+  if(root.isMesh&&root.geometry){root.geometry.dispose();root.geometry=null;}
+}
+function suborbitBuildPickupVisual(p,geoId,kind){
+  if(!p||!p.mesh)return;
+  const root=p.mesh;
+  suborbitDisposeGroupVisual(root);
+  const power=kind==='power'||p.kind==='power';
+  const coreCol=power?0xffe082:0x66e8ff;
+  const emCol=power?0xffaa33:0x2288aa;
+  let core;
+  if(geoId==='crate')core=new THREE.Mesh(new THREE.BoxGeometry(12,10,12),suborbitSMat(0x8a6a3a,emCol,.55,.48,.35));
+  else if(geoId==='capsule')core=new THREE.Mesh(new THREE.CylinderGeometry(5.2,5.2,16,12),suborbitSMat(coreCol,emCol,.7,.32,.55));
+  else core=new THREE.Mesh(new THREE.IcosahedronGeometry(7.2,1),suborbitSMat(coreCol,emCol,.85,.28,.62));
+  core.userData.role='core';root.add(core);
+  const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(power?12:10,.55,8,28),
+    new THREE.MeshBasicMaterial({color:power?0xffcc66:0x77ffff,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  ring.rotation.x=Math.PI/2;root.add(ring);
+  const ring2=ring.clone();ring2.scale.setScalar(1.35);ring2.material=ring.material.clone();ring2.material.opacity=.35;root.add(ring2);
+  const gem=new THREE.Mesh(
+    new THREE.OctahedronGeometry(power?3.2:2.4,0),
+    new THREE.MeshBasicMaterial({color:power?0xfff0a8:0xb8ffff,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  gem.position.y=power?2:1;root.add(gem);
+  if(power){
+    const flare=new THREE.Mesh(
+      new THREE.SphereGeometry(11,12,10),
+      new THREE.MeshBasicMaterial({color:0xffaa44,transparent:true,opacity:.14,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    root.add(flare);
+  }
+}
+function suborbitBuildHazardVisual(h,geoId){
+  if(!h||!h.mesh)return;
+  const root=h.mesh;
+  suborbitDisposeGroupVisual(root);
+  let core;
+  if(geoId==='mine')core=new THREE.Mesh(new THREE.IcosahedronGeometry(9,0),suborbitSMat(0xaa44ff,0x440066,.55,.4,.7));
+  else if(geoId==='spike')core=new THREE.Mesh(new THREE.ConeGeometry(8,20,8),suborbitSMat(0xcc6688,0x661133,.45,.5,.55));
+  else core=new THREE.Mesh(new THREE.TorusKnotGeometry(7.5,2.2,48,8),suborbitSMat(0xaa44ff,0x440066,.5,.42,.65));
+  root.add(core);
+  for(let i=0;i<6;i++){
+    const spike=new THREE.Mesh(new THREE.ConeGeometry(1.1,6.5,5),suborbitSMat(0xdd88ff,0x8800aa,.7,.35,.4));
+    const a=i*Math.PI/3;
+    spike.position.set(Math.cos(a)*8,Math.sin(a*1.3)*3,Math.sin(a)*8);
+    spike.lookAt(0,0,0);
+    root.add(spike);
+  }
+  root.add(new THREE.Mesh(
+    new THREE.SphereGeometry(14,12,10),
+    new THREE.MeshBasicMaterial({color:0xaa44ff,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false})
+  ));
 }
 function suborbitFillDroneGroup(group,geoId,kind){
   const hullM=suborbitSMat(0x5a6578,0x101820,.12,.48,.72);
@@ -7285,6 +7533,20 @@ function applySuborbitGeometrySet(pool,kind,geoId){
     for(const it of pool){
       if(!it.mesh)continue;
       suborbitBuildEnemyVisual(it,geoId,it.active?it.kind:'swarm');
+    }
+    return;
+  }
+  if(kind==='pickup'){
+    for(const it of pool){
+      if(!it.mesh)continue;
+      suborbitBuildPickupVisual(it,geoId,it.kind||'loot');
+    }
+    return;
+  }
+  if(kind==='hazard'){
+    for(const it of pool){
+      if(!it.mesh)continue;
+      suborbitBuildHazardVisual(it,geoId);
     }
     return;
   }
@@ -7428,6 +7690,10 @@ function spawnSuborbitActor(pool,kind){
   if(kind==='pickup'){
     a.kind=Math.random()<.2?'power':'loot';
     a.magnet=a.kind==='power'?.08:.05;
+    suborbitBuildPickupVisual(a,pf.pickupGeo||'orb',a.kind);
+  }
+  if(kind==='hazard'){
+    suborbitBuildHazardVisual(a,pf.hazardGeo||'knot');
   }
   a.mesh.visible=true;
 }
@@ -7633,12 +7899,10 @@ function updateSuborbitActors(dt){
     if(Math.abs(e.wx-SUBORBIT.x)<36&&Math.abs(dz-40)<46){
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
       playerShip.takeDamage(pf.enemyHitDmg||10);
-      // Feedback impatto nemico più chiaro.
-      for(let k=0;k<8;k++){
-        const sp=getP();if(!sp)break;
-        sp.spawn(e.mesh.position.clone(),new THREE.Vector3((Math.random()-.5)*25,(Math.random()-.5)*20,(Math.random()-.5)*25),pf.enemy||0xff7744,.16,2.4);
-      }
+      suborbitImpactSparks(e.mesh.position.clone(),pf.enemy||0xff7744);
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('IMPATTO','#ff8866');
       e.active=false;e.mesh.visible=false;
+      if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
     }
   }
   for(const p of SUBORBIT.pickups){
@@ -7653,8 +7917,8 @@ function updateSuborbitActors(dt){
     const g=suborbitHeight(SUBORBIT.seed,p.wx,p.wz);
     const bob=Math.sin(SUBORBIT.time*(p.kind==='power'?5.1:3.2)+p.wz*.01)*(p.kind==='power'?11:6);
     p.mesh.position.set(SUBORBIT.anchor.x+p.wx,SUBORBIT.anchor.y+g+26+bob,SUBORBIT.anchor.z+dz);
-    if(p.mesh&&p.mesh.material)p.mesh.material.emissiveIntensity=(tractPick===p&&SUBORBIT.tractoring)?1.05:(p.kind==='power'?.95:.78);
     p.mesh.rotation.y+=dt*(p.kind==='power'?3.4:1.8);
+    p.mesh.rotation.z=Math.sin(SUBORBIT.time*2.1+p.wz*.008)*.12;
     if(p.kind==='power'&&Math.random()<.25*dt*60){
       const sp=getP();
       if(sp)sp.spawn(p.mesh.position.clone(),new THREE.Vector3((Math.random()-.5)*6,6+(Math.random()*5),(Math.random()-.5)*6),pf.pickup||0x66eeff,.18,1.9);
@@ -7688,8 +7952,13 @@ function updateSuborbitActors(dt){
     }
     if(dz<-120){h.active=false;h.mesh.visible=false;continue;}
     if(Math.abs(h.wx-SUBORBIT.x)<34&&Math.abs(dz-40)<44){
-      if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
-      playerShip.takeDamage(pf.hazardHitDmg||14);h.active=false;h.mesh.visible=false;
+      // Ostacolo: scintille di avviso, niente danno (solo i nemici feriscono).
+      for(let k=0;k<10;k++){
+        const sp=getP();if(!sp)break;
+        sp.spawn(h.mesh.position.clone(),new THREE.Vector3((Math.random()-.5)*30,8+Math.random()*20,(Math.random()-.5)*20),pf.hazard||0xaa44ff,.14,1.8);
+      }
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('OSTACOLO','#cc99ff');
+      h.active=false;h.mesh.visible=false;
     }
   }
   if(SUBORBIT.boss&&SUBORBIT.boss.active){
@@ -7709,6 +7978,9 @@ function updateSuborbitActors(dt){
     if(Math.abs(b.wx-SUBORBIT.x)<44&&Math.abs(dz-40)<64){
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
       playerShip.takeDamage((pf.enemyHitDmg||10)+8);
+      suborbitImpactSparks(b.mesh.position.clone(),pf.bossColor||0xff7744);
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('ELITE!','#ff6644');
+      if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
     }
   }
   updateSuborbitTractorBeam(tractPick);
@@ -8025,20 +8297,15 @@ function updatePlanetSkim(dt){
     if(skimT>1.1&&SUBORBIT.y<g+12&&SUBORBIT.groundHitCd<=0){
       SUBORBIT.groundHitCd=.65;
       SUBORBIT.vy=Math.max(SUBORBIT.vy,220);
-      if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
-      playerShip.takeDamage(22);
-      if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
-      if(typeof suborbitPushFloat==='function')suborbitPushFloat('SUOLO!','#ff8866');
+      // Solo rimbalzo: niente danno da suolo.
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('SUOLO','#88ccff');
     }
     if(Math.abs(SUBORBIT.x)>SUBORBIT.corridorHalf-8&&SUBORBIT.edgeHitCd<=0){
       SUBORBIT.edgeHitCd=.85;
       SUBORBIT.vx*=-0.35;
       SUBORBIT.x=cl(SUBORBIT.x,-SUBORBIT.corridorHalf+22,SUBORBIT.corridorHalf-22);
-      if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
-      // Danno ridotto: il bordo è un warning, non una trappola.
-      playerShip.takeDamage(7);
-      if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
-      if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO CORRIDOIO','#ffcc88');
+      // Solo rimbalzo: niente danno da bordo corridoio.
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO','#aaddff');
     }
     if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
     if(lbl){
@@ -8423,17 +8690,18 @@ function buildBoardingMap(kind){
   // Ambient props (barili, casse, tubi) — decorativi, su pavimento raggiungibile.
   BOARDING.props=[];
   const propN=big?10:6;
-  const propKinds=big?['barrel','pipe','bone','crate','debris']:['crate','console','pipe','barrel'];
+  const propKinds=big?['barrel','pipe','bone','crate','debris','bone','barrel']:['crate','console','pipe','barrel'];
   for(let i=0;i<propN;i++){
     const cell=boardingPickFromReach(reach,rnd,used,0);
     BOARDING.props.push({x:cell.x,y:cell.y,kind:propKinds[Math.floor(rnd()*propKinds.length)],rot:rnd()*Math.PI*2,ph:rnd()*Math.PI*2});
   }
   // Decals (macchie di sangue/bruciature) seedate.
   BOARDING.decals=[];
-  const decN=big?7:3;
+  const decN=big?14:3;
   for(let i=0;i<decN;i++){
     const cell=boardingPickFromReach(reach,rnd,[],0);
-    BOARDING.decals.push({x:cell.x+rnd(),y:cell.y+rnd(),r:.25+rnd()*.35,kind:big?'scorch':'blood',hue:Math.floor(rnd()*40)});
+    const kind=big?(rnd()<.62?'blood':'scorch'):'blood';
+    BOARDING.decals.push({x:cell.x+rnd(),y:cell.y+rnd(),r:.25+rnd()*.4,kind,hue:Math.floor(rnd()*40)});
   }
   // Corpses (0 all'inizio, crescono con i kill).
   BOARDING.corpses=[];
@@ -8480,6 +8748,7 @@ function enterBoarding(opts){
   BOARDING.flashT=.22;
   GAME.state='boarding';
   document.body.classList.add('boarding-active');
+  document.body.classList.toggle('boarding-hulk',BOARDING.kind==='hulk');
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='block';
   notify(BOARDING.kind==='hulk'
     ?'Abbordaggio HULK: corridoi contaminati. I mostri? Mutazioni da macguffinium nelle anomalie.'
@@ -8489,18 +8758,20 @@ function enterBoarding(opts){
 }
 function leaveBoarding(opts){
   opts=opts||{};
-  triggerSeqTransition('boarding-out',0.5,BOARDING.kind==='hulk'?'#ff9b66':'#8ec6ff');
+  const wasHulk=BOARDING.kind==='hulk';
+  triggerSeqTransition('boarding-out',0.5,wasHulk?'#ff9b66':'#8ec6ff');
   BOARDING.active=false;
   INP.left=INP.right=INP.thrust=INP.boost=INP.fire=false;
   BOARDING._ptrActive=false;
   BOARDING.selectTarget=null;
   document.body.classList.remove('boarding-active');
+  document.body.classList.remove('boarding-hulk');
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='none';
   if(opts.success){
     RUN_STATS.boardings++;
     if(typeof StorySys!=='undefined')StorySys.markBoarding(BOARDING.kind);
     const sh=BOARDING.sourceHulk;
-    const repeatHulk=BOARDING.kind==='hulk'&&sh&&sh.looted;
+    const repeatHulk=wasHulk&&sh&&sh.looted;
     const rewMul=repeatHulk?0.42:1;
     const credAdd=Math.round(BOARDING.reward*rewMul);
     PS.credits+=credAdd;
@@ -8551,13 +8822,17 @@ function leaveBoarding(opts){
     playerShip.takeDamage(40);
     notify('Abbordaggio fallito: feriti a bordo.',2200);
   } else {
-    notify('Ritiro dall\'abbordaggio.',1500);
+    notify(wasHulk?'Modulo di fuga attivato.':'Ritiro dall\'abbordaggio.',1500);
   }
   BOARDING.sourceNpc=null;BOARDING.sourceHulk=null;
   GAME.state='flying';
   fadeEl.style.transition='opacity .46s ease';
   fadeEl.style.opacity='.72';
   setTimeout(()=>{fadeEl.style.opacity='0';},180);
+  if(wasHulk){
+    const cineKind=opts.success?'victory':'escape';
+    setTimeout(()=>{if(typeof showHulkCine==='function')showHulkCine(cineKind,null);},320);
+  }
 }
 /** Collisione continua: il centro del PG è in (sx+0.5, sy+0.5) in coordinate cella. */
 function boardingWalkBlocked(sx,sy){
@@ -9290,14 +9565,27 @@ function drawIsoFloor(ctx,gx,gy,iso,isHulk,lit){
   ctx.lineTo(top.x-tw*0.5,top.y+th*0.5);
   ctx.closePath();
   if(isHulk){
-    ctx.fillStyle=`rgba(${26+lit*110|0},${20+lit*70|0},${15+lit*48|0},1)`;
+    const rust=((gx*17+gy*31)&7);
+    ctx.fillStyle=`rgba(${18+lit*70+rust*4|0},${8+lit*28|0},${6+lit*18|0},1)`;
   }else{
     ctx.fillStyle=`rgba(${14+lit*85|0},${24+lit*110|0},${38+lit*140|0},1)`;
   }
   ctx.fill();
-  ctx.strokeStyle='rgba(180,230,255,.05)';ctx.lineWidth=1;ctx.stroke();
+  ctx.strokeStyle=isHulk?'rgba(80,10,10,.18)':'rgba(180,230,255,.05)';ctx.lineWidth=1;ctx.stroke();
+  if(isHulk&&((gx*3+gy*5)%7)===0){
+    // Macchia di sangue / olio corroso
+    ctx.fillStyle='rgba(90,8,8,.35)';
+    ctx.beginPath();ctx.ellipse(top.x,top.y+th*.55,tw*.18,th*.12,0,0,Math.PI*2);ctx.fill();
+  }
+  if(isHulk&&((gx+gy*2)%9)===0){
+    // Vene warp verdastre
+    ctx.strokeStyle='rgba(60,180,40,.22)';ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.moveTo(top.x-tw*.2,top.y+th*.35);ctx.lineTo(top.x+tw*.15,top.y+th*.7);
+    ctx.stroke();
+  }
   if(((gx+gy)%4)===0){
-    ctx.strokeStyle=isHulk?'rgba(255,180,80,.07)':'rgba(120,200,255,.12)';
+    ctx.strokeStyle=isHulk?'rgba(200,40,30,.12)':'rgba(120,200,255,.12)';
     ctx.beginPath();
     ctx.moveTo(top.x,top.y+th*0.25);ctx.lineTo(top.x,top.y+th*0.75);
     ctx.stroke();
@@ -9325,22 +9613,36 @@ function drawIsoWall(ctx,gx,gy,iso,isHulk,map){
   // Facciata verso +gx (bordo iso a sud-est): condivisa col vicino est → nascondi se wallE
   if(!wallE&&!hideEastFace){
     const gR=ctx.createLinearGradient(right.x,right.y,right.x,right.y+up);
-    if(isHulk){gR.addColorStop(0,'#8a5e3e');gR.addColorStop(1,'#2c1a10');}
+    if(isHulk){gR.addColorStop(0,'#5a2218');gR.addColorStop(.45,'#2a0e0a');gR.addColorStop(1,'#0c0403');}
     else{gR.addColorStop(0,'#567ab0');gR.addColorStop(1,'#1c2a48');}
     ctx.fillStyle=gR;
     ctx.beginPath();
     ctx.moveTo(right.x,right.y);ctx.lineTo(bot.x,bot.y);
     ctx.lineTo(tBot.x,tBot.y);ctx.lineTo(tRight.x,tRight.y);
     ctx.closePath();ctx.fill();
-    ctx.fillStyle=isHulk?'rgba(255,190,90,.5)':'rgba(160,210,255,.38)';
-    const rx=(right.x+bot.x)*0.5, ry=(right.y+bot.y)*0.5;
-    ctx.beginPath();ctx.arc(rx,ry+up*0.35,1.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(rx,ry+up*0.7,1.5,0,Math.PI*2);ctx.fill();
+    if(isHulk){
+      // Rivetti gotici
+      ctx.fillStyle='rgba(180,120,60,.35)';
+      const rx=(right.x+bot.x)*0.5, ry=(right.y+bot.y)*0.5;
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(rx,ry+up*(.25+i*.22),1.3,0,Math.PI*2);ctx.fill();}
+      // Sigillo / teschio stilizzato
+      if(((gx+gy)&3)===0){
+        ctx.strokeStyle='rgba(200,40,30,.45)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.arc(rx,ry+up*.55,2.8,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='rgba(40,180,50,.25)';
+        ctx.fillRect(rx-1.2,ry+up*.7,2.4,3.5);
+      }
+    }else{
+      ctx.fillStyle='rgba(160,210,255,.38)';
+      const rx=(right.x+bot.x)*0.5, ry=(right.y+bot.y)*0.5;
+      ctx.beginPath();ctx.arc(rx,ry+up*0.35,1.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(rx,ry+up*0.7,1.5,0,Math.PI*2);ctx.fill();
+    }
   }
   // Facciata verso +gy (bordo iso a sud-ovest): condivisa col vicino sud → nascondi se wallS
   if(!wallS&&!hideSouthFace){
     const gL=ctx.createLinearGradient(left.x,left.y,left.x,left.y+up);
-    if(isHulk){gL.addColorStop(0,'#4a3020');gL.addColorStop(1,'#140a06');}
+    if(isHulk){gL.addColorStop(0,'#2a100c');gL.addColorStop(1,'#080202');}
     else{gL.addColorStop(0,'#2a3d60');gL.addColorStop(1,'#0c1424');}
     ctx.fillStyle=gL;
     ctx.beginPath();
@@ -9351,14 +9653,14 @@ function drawIsoWall(ctx,gx,gy,iso,isHulk,map){
   // Copertura superiore (tetto) — omessa sul bordo “verso l’esterno” (stessa logica delle facciate est/sud).
   if(!hideOuterRoof){
     const gT=ctx.createLinearGradient(tTop.x,tTop.y,tBot.x,tBot.y);
-    if(isHulk){gT.addColorStop(0,'#a57850');gT.addColorStop(1,'#6b4a30');}
+    if(isHulk){gT.addColorStop(0,'#3a1810');gT.addColorStop(1,'#1a0806');}
     else{gT.addColorStop(0,'#6282b8');gT.addColorStop(1,'#3f547e');}
     ctx.fillStyle=gT;
     ctx.beginPath();
     ctx.moveTo(tTop.x,tTop.y);ctx.lineTo(tRight.x,tRight.y);
     ctx.lineTo(tBot.x,tBot.y);ctx.lineTo(tLeft.x,tLeft.y);
     ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle=isHulk?'rgba(120,20,15,.35)':'rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.stroke();
   }
 }
 function drawIsoDecal(ctx,d,iso){
@@ -9502,14 +9804,29 @@ function drawBoarding(){
   ctx.translate(sxk,syk);
   // Background nebula + scan flow.
   const gbg=ctx.createRadialGradient(W*.5,H*.5,20,W*.5,H*.5,Math.max(W,H)*.78);
-  gbg.addColorStop(0,BOARDING.kind==='hulk'?'#1d120b':'#0c1a2c');
-  gbg.addColorStop(.55,BOARDING.kind==='hulk'?'#120a08':'#070d17');
-  gbg.addColorStop(1,'#020306');
+  gbg.addColorStop(0,BOARDING.kind==='hulk'?'#2a0808':'#0c1a2c');
+  gbg.addColorStop(.45,BOARDING.kind==='hulk'?'#120304':'#070d17');
+  gbg.addColorStop(1,BOARDING.kind==='hulk'?'#050101':'#020306');
   ctx.fillStyle=gbg;ctx.fillRect(0,0,W,H);
-  for(let i=0;i<34;i++){
-    const yy=(i*31+t*36)%H;
-    ctx.fillStyle=`rgba(120,180,255,${0.015+(i%4)*0.004})`;
-    ctx.fillRect(0,yy,W,1);
+  if(BOARDING.kind==='hulk'){
+    // Polvere / spore warp
+    for(let i=0;i<48;i++){
+      const px=(Math.sin(i*12.1+t*.31)*.5+.5)*W;
+      const py=(Math.cos(i*9.7+t*.19)*.5+.5)*H;
+      ctx.fillStyle=i%3===0?`rgba(40,160,50,${.04+(i%5)*.01})`:`rgba(160,20,20,${.03+(i%4)*.01})`;
+      ctx.fillRect(px,py,1.5,1.5);
+    }
+    for(let i=0;i<22;i++){
+      const yy=(i*47+t*22)%H;
+      ctx.fillStyle=`rgba(120,10,10,${0.03+(i%3)*0.01})`;
+      ctx.fillRect(0,yy,W,1);
+    }
+  }else{
+    for(let i=0;i<34;i++){
+      const yy=(i*31+t*36)%H;
+      ctx.fillStyle=`rgba(120,180,255,${0.015+(i%4)*0.004})`;
+      ctx.fillRect(0,yy,W,1);
+    }
   }
   const isHulk=BOARDING.kind==='hulk';
   // 1) Floors (all at once, below everything).
@@ -9593,12 +9910,19 @@ function drawBoarding(){
       const c=isoPt(h.x+.5,h.y+.5,iso);
       const hx=c.x, hy=c.y+th*.5;
       const hg=ctx.createRadialGradient(hx,hy,2,hx,hy,tw*.55);
-      hg.addColorStop(0,`rgba(255,250,200,${.65+flick*.3})`);
-      hg.addColorStop(.4,`rgba(255,140,48,${.55+flick*.3})`);
-      hg.addColorStop(1,'rgba(255,60,20,0)');
+      if(isHulk){
+        hg.addColorStop(0,`rgba(180,255,120,${.55+flick*.3})`);
+        hg.addColorStop(.35,`rgba(80,200,40,${.45+flick*.25})`);
+        hg.addColorStop(.7,`rgba(160,20,40,${.35+flick*.2})`);
+        hg.addColorStop(1,'rgba(40,0,10,0)');
+      }else{
+        hg.addColorStop(0,`rgba(255,250,200,${.65+flick*.3})`);
+        hg.addColorStop(.4,`rgba(255,140,48,${.55+flick*.3})`);
+        hg.addColorStop(1,'rgba(255,60,20,0)');
+      }
       ctx.fillStyle=hg;
       ctx.beginPath();ctx.ellipse(hx,hy,tw*.5,th*.5,0,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle=`rgba(255,200,100,${.7+flick*.2})`;
+      ctx.fillStyle=isHulk?`rgba(140,255,90,${.65+flick*.25})`:`rgba(255,200,100,${.7+flick*.2})`;
       for(let i=0;i<5;i++){
         const ang=h.ph*.8+i*1.25;
         const r1=tw*(.12+flick*.04);
@@ -9610,7 +9934,7 @@ function drawBoarding(){
         ctx.closePath();ctx.fill();
       }
       if(Math.random()<.4){
-        BOARDING.particles.push({x:h.x+.5+(Math.random()-.5)*.4,y:h.y+.5,vx:(Math.random()-.5)*1.2,vy:-1-Math.random()*1.5,t:.8,max:.8,g:-.4,col:'#ffbf60',sz:1.5});
+        BOARDING.particles.push({x:h.x+.5+(Math.random()-.5)*.4,y:h.y+.5,vx:(Math.random()-.5)*1.2,vy:-1-Math.random()*1.5,t:.8,max:.8,g:-.4,col:isHulk?'#88ff55':'#ffbf60',sz:1.5});
       }
     }else if(op.type==='pickup'){
       const k=op.data;
@@ -10270,7 +10594,11 @@ function tryBoardingTrigger(){
   if(!hulk)hulk=findNearHulk(1400);
   if(hulk){
     BOARDING._promptHulk=null;
-    enterBoarding({kind:'hulk',hulk});
+    if(typeof showHulkCine==='function'){
+      showHulkCine('suit',()=>enterBoarding({kind:'hulk',hulk}));
+    }else{
+      enterBoarding({kind:'hulk',hulk});
+    }
     return true;
   }
   const ns=BOARDING._promptNpc||findBoardingTarget();
@@ -11081,17 +11409,21 @@ function updateNavRisk(dt){
   }
   const activeCorId=NAV_EFFECT.inCorridor?NAV_EFFECT.inCorridor.id:null;
   if(activeCorId!==NAV_EFFECT.prevCorridorId){
-    if(activeCorId){
-      const c=NAV_EFFECT.inCorridor;
-      const pct=Math.max(1,Math.round(((c.speed||1)-1)*100));
-      playTone(260,.07,.028,'sine');
-      playTone(390,.06,.02,'triangle');
-      notify(`Corsia: ${c.name} — motori +${pct}% (resta sulla linea ciano)`,2600);
-      if(typeof tryShowTutorialCorridor==='function')tryShowTutorialCorridor();
-    }else if(NAV_EFFECT.prevCorridorId){
-      playTone(210,.05,.018,'sine');
-      notify('Fuori corsia — spinta normale',1300);
+    const canFx=typeof navCorridorFeedbackAllowed==='function'&&navCorridorFeedbackAllowed();
+    if(canFx){
+      if(activeCorId){
+        const c=NAV_EFFECT.inCorridor;
+        const pct=Math.max(1,Math.round(((c.speed||1)-1)*100));
+        playTone(260,.07,.028,'sine');
+        playTone(390,.06,.02,'triangle');
+        notify(`Corsia: ${c.name} — motori +${pct}% (resta sulla linea ciano)`,2600);
+        if(typeof tryShowTutorialCorridor==='function')tryShowTutorialCorridor();
+      }else if(NAV_EFFECT.prevCorridorId){
+        playTone(210,.05,.018,'sine');
+        notify('Fuori corsia — spinta normale',1300);
+      }
     }
+    // Anche a menu/boot: sincronizza senza toast, così non sparano all'ingresso in partita.
     NAV_EFFECT.prevCorridorId=activeCorId;
   }
   const activeAnId=NAV_EFFECT.inAnomaly?NAV_EFFECT.inAnomaly.id:null;
