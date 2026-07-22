@@ -135,11 +135,25 @@ body.boarding-active #boarding-touch{display:flex}
   border:1px solid rgba(110,190,255,.45);border-radius:11px;padding:9px 13px;letter-spacing:.11em;
   max-width:400px;width:66vw;box-shadow:0 0 28px rgba(70,170,255,.2),inset 0 0 20px rgba(140,220,255,.08)}
 body.boarding-active #boarding-hud{display:block}
-#boarding-hud .bh-title{font-family:var(--FD);font-size:13px;font-weight:700;color:#f8fdff;letter-spacing:.17em;margin-bottom:4px}
-#boarding-hud .bh-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:4px}
+#boarding-hud .bh-title{font-family:var(--FD);font-size:13px;font-weight:700;color:#f8fdff;letter-spacing:.17em;margin-bottom:2px}
+#boarding-hud .bh-phase{font-size:9px;letter-spacing:.14em;color:#7ec8ff;margin-bottom:6px;font-weight:700}
+#boarding-hud .bh-phase.exit{color:#88ffaa}
+#boarding-hud .bh-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:3px}
 #boarding-hud .bh-bar>div{height:100%;background:linear-gradient(90deg,#ff4430,#ffb838 46%,#fff3a0);transition:width .15s}
-#boarding-hud .bh-obj{color:#9ee2ff;margin-top:6px}
-#boarding-hud .bh-hint{color:#6786a6;margin-top:7px;font-size:9px}
+#boarding-hud .bh-bar.o2>div{background:linear-gradient(90deg,#2266aa,#55ddff 55%,#a8f0ff)}
+#boarding-hud .bh-bar.o2.low>div{background:linear-gradient(90deg,#aa2200,#ff6644)}
+#boarding-hud .bh-row{display:flex;justify-content:space-between;gap:8px;font-size:10px;margin-top:5px}
+#boarding-hud .bh-obj{color:#9ee2ff;margin-top:7px;font-size:11px;line-height:1.35}
+#boarding-hud .bh-hint{color:#6786a6;margin-top:7px;font-size:9px;line-height:1.4}
+#autosave-cue{display:none;position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:40;
+  font:700 9px var(--FD);letter-spacing:.16em;color:#88e0c8;padding:6px 10px;border-radius:4px;
+  background:rgba(4,24,28,.88);border:1px solid rgba(62,207,187,.45);pointer-events:none;opacity:0;
+  transition:opacity .25s ease}
+#autosave-cue.show{display:block;opacity:1;animation:autosavePulse 1.5s ease-out}
+@keyframes autosavePulse{0%{opacity:0;transform:translateY(-4px)}12%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0}}
+body.reduced-motion #autosave-cue.show{animation:none;opacity:1}
+.dktab .tab-badge{display:inline-block;margin-left:4px;padding:0 5px;border-radius:8px;font-size:8px;letter-spacing:.06em;
+  background:rgba(62,207,187,.22);border:1px solid rgba(62,207,187,.45);color:#9eefd8;vertical-align:middle}
 #boarding-prompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);z-index:36;
   background:var(--panel);border:1px solid rgba(255,160,80,.55);border-radius:8px;
   padding:10px 18px;text-align:center;font-family:var(--FM);font-size:11px;pointer-events:auto;
@@ -889,15 +903,15 @@ body.suborbit-active #smsg{
         <div class="cg flight-primary">
           <button type="button" id="btnth" class="cb th throttle-fallback" title="Accelerazione / Motori [W]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5M5 12l7-7 7 7"/></svg><span class="lbl">ACCEL</span></button>
           <button id="btnfi" class="cb fi" title="Fuoco [Spazio]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-width="2.5" d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg><span class="lbl">FUE</span></button>
-          <button id="btnboost" class="cb boost" title="Boost afterburner [S/Shift/B]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="lbl">BOOST</span></button>
-          <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)" title="Hail [T/H]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="lbl">HAIL</span></button>
+          <button id="btnboost" class="cb boost" title="Postbruciatore / spinta [S/Shift/B]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="lbl">SPINTA</span></button>
+          <button id="btnhail" class="cb" style="font-size:9px;border-color:rgba(255,200,50,.4)" title="Radio [T/H]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="lbl">RADIO</span></button>
         </div>
         <div class="cg cb-row-extra">
           <button id="btn-diary" class="cb" style="font-size:9px;border-color:rgba(180,140,255,.35)" title="Diario trama [J]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-width="2" d="M8 4h9a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"/><path stroke-linecap="round" stroke-width="1.5" d="M9 8h6M9 11h5"/></svg><span class="lbl">DIARIO</span></button>
           <button id="btnmap" class="cb" style="font-size:9px" title="Mappa [M]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/><line x1="12" y1="3" x2="12" y2="7" stroke-width="2"/><line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/><line x1="3" y1="12" x2="7" y2="12" stroke-width="2"/><line x1="17" y1="12" x2="21" y2="12" stroke-width="2"/></svg><span class="lbl">MAPPA</span></button>
           <button id="btnmiss" class="cb" style="border-color:rgba(255,120,60,.45)" title="Missile [Q]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-width="2" d="M12 3v7M8 8l4-4 4 4"/><path stroke-linecap="round" stroke-width="2" d="M6 14h12l-2 7H8l-2-7z"/></svg><span class="lbl">MSL</span></button>
-          <button id="btntgt" class="cb" style="border-color:rgba(120,200,255,.4)" title="Target lock [R]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="7" stroke-width="2"/><circle cx="12" cy="12" r="2" stroke-width="2"/></svg><span class="lbl">TGT</span></button>
-          <button id="btnboard" class="cb" style="border-color:rgba(255,180,100,.45);display:none" title="Abbordaggio [G]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-width="2" d="M4 16l4-6 4 4 4-8 4 10"/></svg><span class="lbl">BRD</span></button>
+          <button id="btntgt" class="cb" style="border-color:rgba(120,200,255,.4)" title="Blocco bersaglio [R]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="7" stroke-width="2"/><circle cx="12" cy="12" r="2" stroke-width="2"/></svg><span class="lbl">MIRA</span></button>
+          <button id="btnboard" class="cb" style="border-color:rgba(255,180,100,.45);display:none" title="Abbordaggio [G]"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-width="2" d="M4 16l4-6 4 4 4-8 4 10"/></svg><span class="lbl">ABBO</span></button>
         </div>
       </div>
     </div>
@@ -905,7 +919,7 @@ body.suborbit-active #smsg{
 </div>
 
 <!-- Throttle laterale (mobile): non invade la fila comandi -->
-<div id="throttle-rail" title="Motori / Throttle" aria-label="Throttle motori">
+<div id="throttle-rail" title="Motori / manetta" aria-label="Manetta motori">
   <span class="th-top">MAX</span>
   <div class="th-track" id="th-track">
     <div class="th-fill" id="th-fill"></div>
@@ -1060,7 +1074,8 @@ body.suborbit-active #smsg{
   </div>
 </div>
 
-<div id="notif"></div>
+<div id="notif" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="autosave-cue" aria-hidden="true">SALVATAGGIO…</div>
 <div id="smsg"></div>
 <div id="heat-lbl">SURRISCALDAMENTO</div>
 <div id="heat-bar"><div id="heat-fill" style="width:0%"></div></div>
@@ -1077,7 +1092,7 @@ body.suborbit-active #smsg{
   <div class="a11y-panel" id="a11y-panel">
     <button type="button" id="a11y-hc" title="Alto contrasto HUD">Contrasto: normale</button>
     <button type="button" id="a11y-scale" title="Scala interfaccia">UI: 100%</button>
-    <button type="button" id="a11y-sfx" title="Audio SFX/ambiente">Audio: ON</button>
+    <button type="button" id="a11y-sfx" title="Audio SFX/ambiente">Audio: ATTIVO</button>
     <button type="button" id="a11y-help" title="Aiuto controlli [?]">Aiuto [?]</button>
   </div>
 </div>
@@ -1133,21 +1148,21 @@ body.suborbit-active #smsg{
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
   <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Tocca un pezzo per rimuoverlo · Scegli un modulo e tocca per piazzarlo · UNDO / CANCELLA</div>
+  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Tocca un pezzo per rimuoverlo · Scegli un modulo e tocca per piazzarlo · ANNULLA / CANCELLA</div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
       <canvas id="bp-cv"></canvas>
       <div id="bp-toolbar">
-        <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo piazzamento">UNDO</button>
+        <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo piazzamento">ANNULLA</button>
         <button type="button" class="bp-tool" id="bp-erase" title="Modalità cancella: tocca i pezzi da rimuovere">CANCELLA</button>
         <button type="button" class="bp-tool" id="bp-sym" title="Copia simmetrica sull’asse">SIMMETRIA</button>
         <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona modulo">DESELEZIONA</button>
-        <button type="button" class="bp-tool" id="bp-reset" title="Ripristina layout starter">STARTER</button>
+        <button type="button" class="bp-tool" id="bp-reset" title="Ripristina layout iniziale">INIZIALE</button>
       </div>
       <div id="bp-presets" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;justify-content:center">
-        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset cargo">KIT CARGO</button>
-        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento">KIT COMBAT</button>
-        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione">KIT SCOUT</button>
+        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset stiva">KIT STIVA</button>
+        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento">KIT COMBATTIMENTO</button>
+        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione">KIT ESPLORAZIONE</button>
       </div>
     </div>
     <div id="bp-panel">
@@ -1237,15 +1252,15 @@ body.suborbit-active #smsg{
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
-    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>throttle</kbd> su mobile · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>BOOST</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
+    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>manetta</kbd> su mobile · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>SPINTA</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
-    <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> target · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> hail</span></div>
+    <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>WASD</kbd> (e diagonali: due tasti) = <kbd>8 direzioni</kbd> · <kbd>Spazio</kbd> fuoco · pad 3×3 su mobile · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
     <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
-    <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium (ritratto + dialetto bazzanese)</span></div>
-    <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>throttle</kbd> verticale per i motori · <kbd>BOOST</kbd> = afterburner · tap/drag per virare · SX/DX</span></div>
+    <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
+    <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
   </div>
 </div>
@@ -1280,6 +1295,17 @@ const v3   = (x,y,z) => new THREE.Vector3(x,y,z);
 const lerp = (a,b,t) => a+(b-a)*t;
 const BOOT_MODE='fast'; // fast | quality
 const BOOT_FAST=BOOT_MODE==='fast';
+/** Dispositivi deboli / mobile: meno props, particelle e dettagli. */
+const PERF_LOW=(function(){
+  try{
+    const cores=navigator.hardwareConcurrency||4;
+    const mem=navigator.deviceMemory||8;
+    const touch=('ontouchstart' in window)||((navigator.maxTouchPoints||0)>1);
+    const saveData=navigator.connection&&navigator.connection.saveData;
+    const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return !!(saveData||reduce||mem<=2||(touch&&cores<=4));
+  }catch(_){return false;}
+})();
 const BOOT_CFG=BOOT_FAST
   ?{initPixelRatio:1.0,finalPixelRatio:1.6,upscaleDelayMs:5600,starA:6800,starB:2400,starC:1100,asteroids:170}
   :{initPixelRatio:1.3,finalPixelRatio:2.0,upscaleDelayMs:4200,starA:9000,starB:3400,starC:1500,asteroids:240};
@@ -1818,6 +1844,7 @@ function hideStoryBanner(){
   STORY_BANNER.open=false;
   STORY_BANNER._showing=null;
   document.body.classList.remove('story-open');
+  releaseFocusTrap();
   if(typeof setPausedReason==='function')setPausedReason('story',false);
   // Dopo il prologo, sblocca automaticamente il capitolo 1
   if(wasPrologue&&STORY.chapter<1&&!STORY.won){
@@ -1848,6 +1875,9 @@ function _presentStoryBanner(label,title,body){
   document.body.classList.add('story-open');
   if(typeof setPausedReason==='function')setPausedReason('story',true);
   if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
+  const cont=document.getElementById('sbdismiss');
+  if(cont)setTimeout(()=>{try{cont.focus({preventScroll:true});}catch(_){}},60);
+  trapFocus(b);
 }
 function showStoryBanner(label,title,body,_holdMsIgnored){
   // Se un banner è già aperto, accoda — non sostituire e non auto-chiudere.
@@ -2041,9 +2071,15 @@ function renderDiaryContent(){
     html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso. Epilogo e missioni sandbox disponibili.</p></div>'+html;
   }
   // Note RADICI
+  if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
+    const pending=RootDialogues.stationsWithAvailable();
+    if(pending.length){
+      html+='<div class="diary-ch active"><h3>Radici · disponibili</h3><p class="dm">Qualcuno ti aspetta: '+pending.map(r=>r.name+(r.count>1?' (×'+r.count+')':'')).join(', ')+'.</p><div class="dst">Attracca e apri la tab RADICI. In mappa: badge R.</div></div>';
+    }
+  }
   if(PS.rootSeen&&Object.keys(PS.rootSeen).filter(k=>k.indexOf('prompted_')!==0&&k.indexOf('root_')===0).length){
     const n=Object.keys(PS.rootSeen).filter(k=>k.indexOf('root_')===0).length;
-    html+='<div class="diary-ch done"><h3>Radici</h3><p class="dm">Hai riascoltato voci di chi ti conosceva prima di Imperium. Incontri vissuti: '+n+'.</p><div class="dst">Tab RADICI nelle stazioni.</div></div>';
+    html+='<div class="diary-ch done"><h3>Radici · vissute</h3><p class="dm">Hai riascoltato voci di chi ti conosceva prima di Imperium. Incontri vissuti: '+n+'.</p><div class="dst">Tab RADICI nelle stazioni.</div></div>';
   }
   if(PS.loreFlags&&Object.keys(PS.loreFlags).length){
     const bits=[];
@@ -4723,11 +4759,11 @@ function tryShowTutorialBlueprint(){
     '<p><strong>Tocca un pezzo</strong> per rimuoverlo (senza selezione). Con un modulo scelto: <strong>tap</strong> piazza, <strong>long-press</strong> cancella.</p>'
     +'<p>Il <strong>riquadro</strong> e il <strong>ghost</strong> mostrano la cella/ingombro reali. Ai bordi: snap automatico.</p>'
     +'<p><strong>KIT CARGO / COMBAT / SCOUT</strong> e <strong>STARTER</strong> nella toolbar. Celle rosse = scafo spezzato (CONFERMA bloccata).</p>'
-    +'<p style="opacity:.85;margin-top:8px;font-size:11px">UNDO · CANCELLA · SIMMETRIA · vernice fusoliera. La silhouette laterale si aggiorna mentre editi.</p>');
+    +'<p style="opacity:.85;margin-top:8px;font-size:11px">ANNULLA · CANCELLA · SIMMETRIA · vernice fusoliera. La silhouette laterale si aggiorna mentre editi.</p>');
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
-    '<p><strong>ACCEL</strong> / <strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>BOOST</strong> / <strong>S</strong> / <strong>Shift/B</strong> afterburner. <strong>FUE</strong> / <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p>Le <strong>linee ciano</strong> tra i pianeti sono <strong>corridoi spaziali</strong> (corsie): resta sopra con i motori per <strong>spinta extra</strong>. Non confonderli con i corridoi di suborbita. Apri la mappa <strong>M</strong> per i nomi.</p><p style="opacity:.85;margin-top:8px;font-size:11px">I tasti ACCEL, FUE e BOOST restano sempre a schermo.</p>');
+    '<p><strong>ACCEL</strong> / <strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>SPINTA</strong> / <strong>S</strong> / <strong>Shift/B</strong> postbruciatore. <strong>FUE</strong> / <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> radio · <strong>G</strong> abbordaggio nave disabilitata.</p><p>Le <strong>linee ciano</strong> tra i pianeti sono <strong>corridoi spaziali</strong> (corsie): resta sopra con i motori per <strong>spinta extra</strong>. Non confonderli con i corridoi di suborbita. Apri la mappa <strong>M</strong> per i nomi.</p><p style="opacity:.85;margin-top:8px;font-size:11px">I tasti ACCEL, FUE e SPINTA restano sempre a schermo.</p>');
 }
 function tryShowTutorialCorridor(){
   if(typeof navCorridorFeedbackAllowed==='function'&&!navCorridorFeedbackAllowed())return false;
@@ -4762,9 +4798,11 @@ function openHelpModal(){
   if(typeof closeOverlappingModals==='function')closeOverlappingModals('help');
   const m=document.getElementById('help-modal');if(m)m.classList.add('show');
   setPausedReason('dialogue',true);
+  if(m)trapFocus(m);
 }
 function closeHelpModal(){
   const m=document.getElementById('help-modal');if(m)m.classList.remove('show');
+  releaseFocusTrap();
   if(GAME.state!=='dialogue')setPausedReason('dialogue',false);
   if(window._helpFromMenu){
     window._helpFromMenu=false;
@@ -4781,6 +4819,39 @@ function tryShowTutorialChain(){
 function showResumePromptIfNeeded(){
   // Dopo il preloader: menu principale (PARTI / CARICA / INTRO / OPZIONI).
   showMainMenu();
+}
+
+/** Focus trap per modal accessibili (Tab ciclico). */
+const FOCUS_TRAP={el:null,prev:null,handler:null};
+function trapFocus(container){
+  releaseFocusTrap();
+  if(!container)return;
+  FOCUS_TRAP.el=container;
+  FOCUS_TRAP.prev=document.activeElement;
+  const sel='button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  const nodes=()=>[...container.querySelectorAll(sel)].filter(n=>{
+    const s=getComputedStyle(n);return s.visibility!=='hidden'&&s.display!=='none'&&!n.disabled;
+  });
+  const first=nodes()[0];
+  if(first)try{first.focus({preventScroll:true});}catch(_){try{first.focus();}catch(__){}}
+  FOCUS_TRAP.handler=e=>{
+    if(e.key!=='Tab'||!FOCUS_TRAP.el)return;
+    const list=nodes();
+    if(!list.length)return;
+    const i=list.indexOf(document.activeElement);
+    if(e.shiftKey){
+      if(i<=0){e.preventDefault();list[list.length-1].focus();}
+    }else{
+      if(i<0||i>=list.length-1){e.preventDefault();list[0].focus();}
+    }
+  };
+  document.addEventListener('keydown',FOCUS_TRAP.handler,true);
+}
+function releaseFocusTrap(){
+  if(FOCUS_TRAP.handler)document.removeEventListener('keydown',FOCUS_TRAP.handler,true);
+  FOCUS_TRAP.handler=null;FOCUS_TRAP.el=null;
+  const prev=FOCUS_TRAP.prev;FOCUS_TRAP.prev=null;
+  if(prev&&typeof prev.focus==='function')try{prev.focus({preventScroll:true});}catch(_){}
 }
 
 /** Conferma in-game (niente alert/confirm del browser). */
@@ -4806,11 +4877,13 @@ function uiConfirm(opts){
   UIC.open=true;
   el.classList.add('show');
   if(typeof setPausedReason==='function')setPausedReason('dialogue',true);
+  trapFocus(el);
 }
 function uiConfirmClose(accepted){
   const el=document.getElementById('ui-confirm');
   if(el)el.classList.remove('show');
   UIC.open=false;
+  releaseFocusTrap();
   const okCb=UIC._onOk,cancelCb=UIC._onCancel;
   UIC._onOk=UIC._onCancel=null;
   if(typeof setPausedReason==='function'){
@@ -4833,9 +4906,9 @@ function uiConfirmClose(accepted){
   });
   window.addEventListener('keydown',e=>{
     if(!UIC.open)return;
-    if(e.code==='Escape'){e.preventDefault();uiConfirmClose(false);}
-    if(e.code==='Enter'){e.preventDefault();uiConfirmClose(true);}
-  });
+    if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();uiConfirmClose(false);}
+    if(e.code==='Enter'){e.preventDefault();e.stopImmediatePropagation();uiConfirmClose(true);}
+  },true);
 })();
 
 function formatRunStats(){
@@ -6250,6 +6323,16 @@ function toggleRepPanel(){
 
 let nTmr=null;
 let _flyAutosaveT=0;
+function flashAutosaveCue(){
+  const el=document.getElementById('autosave-cue');
+  if(!el)return;
+  el.classList.remove('show');
+  // retrigger animation
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(flashAutosaveCue._t);
+  flashAutosaveCue._t=setTimeout(()=>el.classList.remove('show'),1700);
+}
 function notify(msg,dur){
   dur=dur||2400;
   // In suborbita: coda breve invece di scartare i messaggi critici
@@ -7092,6 +7175,20 @@ function getSuborbitProfile(sm){
     profile.bossTriggerKills=(profile.bossTriggerKills||6)+T.bossKillsAdd;
     profile.bossHp=Math.max(6,Math.round((profile.bossHp||8)*T.bossHpMul));
   }
+  // Difficoltà legata al capitolo: più avanti = densità e danni più alti (moltiplicatori spawn <1 = più traffico).
+  const chDiff=Math.min(8,Math.max(0,(typeof STORY!=='undefined'?(STORY.chapter|0):0)));
+  const densMul=Math.max(0.58,1-chDiff*0.048);
+  const dmgCh=1+chDiff*0.06+(STORY&&STORY.won?0.08:0);
+  profile.spawnEnemyBase*=densMul;
+  profile.spawnHazardBase*=Math.max(0.62,1-chDiff*0.04);
+  profile.enemyHitDmg=Math.max(6,Math.round(profile.enemyHitDmg*dmgCh));
+  profile.hazardHitDmg=Math.max(8,Math.round(profile.hazardHitDmg*dmgCh));
+  if(profile.boss){
+    profile.bossHp=Math.max(6,Math.round(profile.bossHp*(1+chDiff*0.045)));
+  }
+  profile.chapterDiff=chDiff;
+  const diffLbl=chDiff<=1?'FACILE':chDiff<=3?'STANDARD':chDiff<=5?'IMPEGNATIVO':chDiff<=7?'DURO':'ESTREMO';
+  profile.tag=(profile.tag||'SUBORBITALE')+' · CAP.'+chDiff+' '+diffLbl;
   return profile;
 }
 function getSuborbitTerrainMap(pType){
@@ -8729,6 +8826,11 @@ const BOARDING={
 };
 const BOARDING_LOOT_SHIP=[['documenti',.32],['materiali',.26],['carburante',.22],['vino',.1],['armi_vere',.1]];
 const BOARDING_LOOT_HULK=[['frammento',.08],['armi_vere',.22],['materiali',.28],['cristalli',.3],['tartufi',.12]];
+function boardingPushParticle(p){
+  const cap=PERF_LOW?22:72;
+  BOARDING.particles.push(p);
+  while(BOARDING.particles.length>cap)BOARDING.particles.shift();
+}
 function boardingGridXY(cv){
   const W=cv.clientWidth||cv.width, H=cv.clientHeight||cv.height;
   const tile=Math.max(20,Math.min(48,Math.floor(Math.min(W/BOARDING.cols,H/BOARDING.rows))));
@@ -8972,7 +9074,7 @@ function buildBoardingMap(kind){
   }
   // Ambient props (barili, casse, tubi) — decorativi, su pavimento raggiungibile.
   BOARDING.props=[];
-  const propN=big?10:6;
+  const propN=PERF_LOW?(big?5:3):(big?10:6);
   const propKinds=big?['barrel','pipe','bone','crate','debris','bone','barrel']:['crate','console','pipe','barrel'];
   for(let i=0;i<propN;i++){
     const cell=boardingPickFromReach(reach,rnd,used,0);
@@ -8980,7 +9082,7 @@ function buildBoardingMap(kind){
   }
   // Decals (macchie di sangue/bruciature) seedate.
   BOARDING.decals=[];
-  const decN=big?14:3;
+  const decN=PERF_LOW?(big?6:2):(big?14:3);
   for(let i=0;i<decN;i++){
     const cell=boardingPickFromReach(reach,rnd,[],0);
     const kind=big?(rnd()<.62?'blood':'scorch'):'blood';
@@ -9393,7 +9495,7 @@ function updateBoarding(dt){
     const cx=Math.floor(s.x), cy=Math.floor(s.y);
     if(cx<=0||cy<=0||cx>=BOARDING.cols-1||cy>=BOARDING.rows-1||BOARDING.map[cy]?.[cx]===1){
       for(let k=0;k<2;k++){
-        BOARDING.particles.push({x:s.x,y:s.y,vx:(Math.random()-.5)*1.6-s.dx*.8,vy:(Math.random()-.5)*1.6-s.dy*.8,t:.18,max:.2,g:0,col:s.own==='p'?'#dffcff':'#ffe8c8',sz:1.35});
+        boardingPushParticle({x:s.x,y:s.y,vx:(Math.random()-.5)*1.6-s.dx*.8,vy:(Math.random()-.5)*1.6-s.dy*.8,t:.18,max:.2,g:0,col:s.own==='p'?'#dffcff':'#ffe8c8',sz:1.35});
       }
       BOARDING.shots.splice(i,1);continue;
     }
@@ -9405,7 +9507,7 @@ function updateBoarding(dt){
         if(distCell<0.58||(e.x===cx&&e.y===cy)){
           e.hp--;e.hit=1;
           for(let k=0;k<7;k++){
-            BOARDING.particles.push({x:s.x,y:s.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,t:.35+Math.random()*.2,max:.55,g:0,col:BOARDING.kind==='hulk'?'#8aff6a':'#ff6a5a',sz:1.8});
+            boardingPushParticle({x:s.x,y:s.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,t:.35+Math.random()*.2,max:.55,g:0,col:BOARDING.kind==='hulk'?'#8aff6a':'#ff6a5a',sz:1.8});
           }
           if(e.hp<=0){
             e.alive=false;
@@ -9415,7 +9517,7 @@ function updateBoarding(dt){
             });
             BOARDING.decals.push({x:e.sx+.5,y:e.sy+.5,r:.45+Math.random()*.2,kind:BOARDING.kind==='hulk'?'scorch':'blood',hue:0});
             for(let k=0;k<14;k++){
-              BOARDING.particles.push({x:e.sx+.5,y:e.sy+.5,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,t:.5+Math.random()*.4,max:.9,g:.6,col:BOARDING.kind==='hulk'?'#9eff7a':'#ff5040',sz:2.2});
+              boardingPushParticle({x:e.sx+.5,y:e.sy+.5,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,t:.5+Math.random()*.4,max:.9,g:.6,col:BOARDING.kind==='hulk'?'#9eff7a':'#ff5040',sz:2.2});
             }
             if(typeof playTone==='function')playTone(720,.05,.05,'square');
           }
@@ -9431,7 +9533,7 @@ function updateBoarding(dt){
         p.hit=1;
         BOARDING.flashT=Math.max(BOARDING.flashT,.18);
         for(let k=0;k<8;k++){
-          BOARDING.particles.push({x:s.x,y:s.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,t:.4,max:.4,g:.4,col:'#ff6644',sz:2});
+          boardingPushParticle({x:s.x,y:s.y,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,t:.4,max:.4,g:.4,col:'#ff6644',sz:2});
         }
         BOARDING.shots.splice(i,1);
         if(typeof playTone==='function')playTone(160,.08,.05,'sawtooth');
@@ -9473,19 +9575,28 @@ function updateBoarding(dt){
   const hud=document.getElementById('boarding-hud');
   if(hud){
     hud.style.display='block';
-    const title=BOARDING.kind==='hulk'?'SPACE HULK':'ABBORDAGGIO NEMICO';
+    const title=BOARDING.kind==='hulk'?'RELIQUIA · SPACE HULK':'ABBORDAGGIO NEMICO';
     const hpw=Math.max(0,Math.round(p.hp));
     const o2w=Math.max(0,Math.round(p.o2));
-    const obj=BOARDING.objective.collected>=BOARDING.objective.needed
-      ?'Esci dalla capsula (cella lampeggiante).'
-      :(BOARDING.objective.label||'Recupera l\'obiettivo (cassa dorata).')+(BOARDING.objective.needed>1?` (${BOARDING.objective.collected}/${BOARDING.objective.needed})`:'');
-    const o2Line=BOARDING.kind==='hulk'?`<div style="font-size:9px;color:${o2w<30?'#ff6644':'#88ddff'};margin-top:3px">O2 ${o2w}%</div>`:'';
+    const doneObj=BOARDING.objective.collected>=BOARDING.objective.needed;
+    const phase=doneObj?'FASE 2 · USCITA':'FASE 1 · OBIETTIVO';
+    const prog=BOARDING.objective.collected+'/'+BOARDING.objective.needed;
+    const obj=doneObj
+      ?'Raggiungi la <strong>cella lampeggiante</strong> (uscita / capsula).'
+      :((BOARDING.objective.label||'Recupera l\'obiettivo (cassa dorata).')+' <span style="color:#c8e8ff">['+prog+']</span>');
+    const o2Block=BOARDING.kind==='hulk'
+      ?('<div class="bh-row"><span>OSSIGENO</span><span style="color:'+(o2w<30?'#ff6644':'#88ddff')+'">'+o2w+'%</span></div>'
+        +'<div class="bh-bar o2'+(o2w<30?' low':'')+'"><div style="width:'+o2w+'%"></div></div>')
+      :'';
+    const enemiesLeft=BOARDING.enemies.filter(e=>e.hp>0).length;
     hud.innerHTML=
-      `<div class="bh-title">${title}</div>`
-      +`<div>HP ${hpw}/100</div><div class="bh-bar"><div style="width:${hpw}%"></div></div>`
-      +o2Line
-      +`<div class="bh-obj">OBIETTIVO: ${obj}</div>`
-      +`<div class="bh-hint"><strong>WASD</strong> = 8 direzioni (anche diagonali). <strong>Spazio</strong> fuoco · <strong>Tap</strong> / <strong>Tab</strong> auto-mira · mouse = mira. Raccolta e uscita a <strong>vicinanza</strong>. <strong>Esc</strong> ritiro.</div>`;
+      '<div class="bh-title">'+title+'</div>'
+      +'<div class="bh-phase'+(doneObj?' exit':'')+'">'+phase+'</div>'
+      +'<div class="bh-row"><span>VITA</span><span>'+hpw+'/100</span></div>'
+      +'<div class="bh-bar"><div style="width:'+hpw+'%"></div></div>'
+      +o2Block
+      +'<div class="bh-obj">'+obj+'</div>'
+      +'<div class="bh-hint">Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> 8 dir. · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · raccolta a contatto · <strong>Esc</strong> ritiro.</div>';
   }
 }
 // ---- Antropomorphic character renderer ----
@@ -10221,7 +10332,7 @@ function drawBoarding(){
         ctx.closePath();ctx.fill();
       }
       if(Math.random()<.4){
-        BOARDING.particles.push({x:h.x+.5+(Math.random()-.5)*.4,y:h.y+.5,vx:(Math.random()-.5)*1.2,vy:-1-Math.random()*1.5,t:.8,max:.8,g:-.4,col:isHulk?'#88ff55':'#ffbf60',sz:1.5});
+        boardingPushParticle({x:h.x+.5+(Math.random()-.5)*.4,y:h.y+.5,vx:(Math.random()-.5)*1.2,vy:-1-Math.random()*1.5,t:.8,max:.8,g:-.4,col:isHulk?'#88ff55':'#ffbf60',sz:1.5});
       }
     }else if(op.type==='pickup'){
       const k=op.data;
@@ -11066,7 +11177,14 @@ function buildDock(st){
   let first=null;
   TABS.forEach(td=>{
     if(!td.ok)return;if(!first)first=td.id;
-    const btn=document.createElement('button');btn.className='dktab';btn.textContent=td.lbl;btn.dataset.tab=td.id;btn.addEventListener('click',()=>switchTab(td.id,st));tabs.appendChild(btn);
+    const btn=document.createElement('button');btn.className='dktab';btn.dataset.tab=td.id;
+    let lbl=td.lbl;
+    if(td.id==='roots'&&typeof RootDialogues!=='undefined'){
+      const n=(RootDialogues.availableEncounters(sd.id)||[]).length;
+      if(n>0){lbl='RADICI';btn.innerHTML='RADICI <span class="tab-badge">'+n+'</span>';}
+      else btn.textContent=lbl;
+    }else btn.textContent=lbl;
+    btn.addEventListener('click',()=>switchTab(td.id,st));tabs.appendChild(btn);
     const div=document.createElement('div');div.className='dkp';div.id='dp_'+td.id;panels.appendChild(div);
   });
   let showTab=first;
@@ -11152,7 +11270,7 @@ function buyBpModuleFromDock(id){
 }
 function installModule(mid){
   const m=MODULES.find(x=>x.id===mid);if(!m)return;
-  if(PS.credits<m.cost)return;
+  if(PS.credits<m.cost){notify('Crediti insufficienti ('+fmt(m.cost)+' ₡) per '+m.name+'.',2000);return;}
   if(m.req&&!PS.modules.includes(m.req)){notify('Richiede: '+(MODULES.find(x=>x.id===m.req)?.name||m.req));return;}
   PS.credits-=m.cost;
   PS.modules.push(mid);
@@ -11192,13 +11310,20 @@ function tRepair(pnl,st){
     :'<div class="ic" style="opacity:.7"><div class="in2"><div class="nm">Scudo</div><div class="dc">Nessun modulo scudo sul blueprint. Aggiungi «Scudo» in cantiere · oppure Scudo Energetico Mk in officina.</div></div></div>')
   +'<div class="ic" style="border-color:rgba(255,160,0,.3)"><div class="in2"><div class="nm" style="color:#ffcc66">Cantiere Navale — Blueprint</div><div class="dc">Modifica la struttura, aggiungi moduli. Silhouette laterale live. [P] da fuori.</div></div><button class="db" style="background:rgba(255,120,0,.12);color:#ffaa44;border:1px solid rgba(255,120,0,.3)" onclick="openBlueprintModal()">APRI BLUEPRINT</button></div>';
 }
-function doRepair(c,m){if(PS.credits<c||m===0)return;PS.credits-=c;playerShip.health=playerShip.maxHealth||100;notify('Scafo al 100%!');buildDock(GAME.dockedSt);}
+function doRepair(c,m){
+  if(m===0){notify('Scafo già al massimo.',1400);return;}
+  if(PS.credits<c){notify('Crediti insufficienti per riparare ('+fmt(c)+' ₡).',2000);return;}
+  PS.credits-=c;playerShip.health=playerShip.maxHealth||100;notify('Scafo al 100%!');buildDock(GAME.dockedSt);
+}
 function doRecharge(){
   const c=Math.round(80*(ECON.rechargeMult||1)*(GAME._dockRepairMult||1));
-  if(PS.credits<c)return;PS.credits-=c;playerShip.energy=100;notify('Energia al massimo!');buildDock(GAME.dockedSt);
+  if(PS.credits<c){notify('Crediti insufficienti per ricaricare energia ('+fmt(c)+' ₡).',2000);return;}
+  PS.credits-=c;playerShip.energy=100;notify('Energia al massimo!');buildDock(GAME.dockedSt);
 }
 function doRechargeShield(c,m){
-  if(!PS.shieldMax||m===0||PS.credits<c)return;
+  if(!PS.shieldMax){notify('Nessun scudo installato.',1600);return;}
+  if(m===0){notify('Scudo già al massimo.',1400);return;}
+  if(PS.credits<c){notify('Crediti insufficienti per lo scudo ('+fmt(c)+' ₡).',2000);return;}
   PS.credits-=c;PS.shieldHp=PS.shieldMax;
   notify('Scudo al massimo ('+PS.shieldMax+')!',1800);
   buildDock(GAME.dockedSt);
@@ -11251,7 +11376,8 @@ function tTrade(pnl,st){
   bindDockActionButtons(pnl);
 }
 function doBuy(gk,p,stId){
-  if(PS.credits<p||cargoCnt()>=PS.cargoMax)return;
+  if(cargoCnt()>=PS.cargoMax){notify('Stiva piena — libera spazio prima di comprare.',2000);return;}
+  if(PS.credits<p){notify('Crediti insufficienti ('+fmt(p)+' ₡) per '+(GOODS[gk]?.name||gk)+'.',2000);return;}
   PS.credits-=p;PS.cargo[gk]=(PS.cargo[gk]||0)+1;
   if(stId)bumpMarketMood(stId,+.035);
   notify('Acquistato: '+(GOODS[gk]?.name||gk));
@@ -11329,7 +11455,12 @@ function tRecruit(pnl,st){
     });
   }
 }
-function doHire(id){const c=CREW_POOL.find(x=>x.id===id);if(!c||c.hired)return;if(PS.crew.length>=4||(c.cost>0&&PS.credits<c.cost))return;PS.credits-=c.cost;c.hired=true;PS.crew.push(id);if(c.fn)c.fn(PS);playerShip.energyRegen=PS.energyRegen;playerShip.maxSpeed=PS.maxSpeed;playerShip.dmgBonus=PS.dmgBonus;notify(c.name+' a bordo!');buildDock(GAME.dockedSt);}
+function doHire(id){
+  const c=CREW_POOL.find(x=>x.id===id);if(!c||c.hired)return;
+  if(PS.crew.length>=4){notify('Equipaggio al completo (max 4).',1800);return;}
+  if(c.cost>0&&PS.credits<c.cost){notify('Crediti insufficienti per ingaggiare '+c.name+' ('+fmt(c.cost)+' ₡).',2200);return;}
+  PS.credits-=c.cost;c.hired=true;PS.crew.push(id);if(c.fn)c.fn(PS);playerShip.energyRegen=PS.energyRegen;playerShip.maxSpeed=PS.maxSpeed;playerShip.dmgBonus=PS.dmgBonus;notify(c.name+' a bordo!');buildDock(GAME.dockedSt);
+}
 function doFire(id){const idx=PS.crew.indexOf(id);if(idx<0)return;const c=CREW_POOL.find(x=>x.id===id);if(c)c.hired=false;PS.crew.splice(idx,1);notify((c?.name||id)+' ha lasciato la nave.');buildDock(GAME.dockedSt);}
 
 function tMissions(pnl,st){
@@ -12346,6 +12477,14 @@ function drawMap(){
       const rc=rv>20?'#33dd77':rv>0?'#88ccff':rv<-20?'#ff4433':'#ffbb44';
       ctx.fillStyle=rc;ctx.font=`${Math.round(fontSize*.8)}px Share Tech Mono`;
       ctx.fillText((rv>0?'+':'')+rv,x,y+r+fontSize);
+      if(typeof RootDialogues!=='undefined'){
+        const av=(RootDialogues.availableEncounters(sm.sd.id)||[]).length;
+        if(av>0){
+          ctx.fillStyle='#3ecfbb';
+          ctx.font=`bold ${Math.round(fontSize*.85)}px Rajdhani`;
+          ctx.fillText('R'+(av>1?av:''),x+r+Math.max(6,8*MAP.zoom),y-r*0.2);
+        }
+      }
     }
   });
 
@@ -12682,7 +12821,7 @@ function updateHUD(){
   })():'';
   const misReady=PS.missileInstalled&&(MISSILE.cooldown>0||PS.missiles>0);
   const mis=PS.missileInstalled
-    ?(MISSILE.cooldown>0?`MISSILE ${MISSILE.cooldown.toFixed(1)}s · ${PS.missiles}/${PS.missileMax}`:`MISSILE READY [Q] · ${PS.missiles}/${PS.missileMax}`)
+    ?(MISSILE.cooldown>0?`MISSILE ${MISSILE.cooldown.toFixed(1)}s · ${PS.missiles}/${PS.missileMax}`:`MISSILE PRONTO [Q] · ${PS.missiles}/${PS.missileMax}`)
     :'';
   const navFx=NAV_EFFECT.inAnomaly
     ?`ANOMALIA: ${NAV_EFFECT.inAnomaly.name}`
@@ -12693,6 +12832,13 @@ function updateHUD(){
   if(mTxt)tickParts.push(mTxt);
   if(misReady&&mis)tickParts.push(mis);
   if(navFx)tickParts.push(navFx);
+  if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
+    const roots=RootDialogues.stationsWithAvailable();
+    if(roots.length){
+      const names=roots.slice(0,2).map(r=>r.name);
+      tickParts.push('RADICI: '+names.join(', ')+(roots.length>2?'…':''));
+    }
+  }
   mt.textContent=tickParts.join(' · ');
   const showTick=tickParts.length>0&&!(GAME.state==='suborbit'&&SUBORBIT.active);
   mt.style.display=showTick?'block':'none';
@@ -13202,7 +13348,9 @@ function animate(){
       _flyAutosaveT+=dt;
       if(_flyAutosaveT>90){
         _flyAutosaveT=0;
-        if(typeof saveGame==='function')saveGame(true);
+        if(typeof saveGame==='function'&&saveGame(true)){
+          if(typeof flashAutosaveCue==='function')flashAutosaveCue();
+        }
       }
       updateNavRisk(dt);
       if(INP.thrust&&NAV_EFFECT.inCorridor){
@@ -13220,7 +13368,8 @@ function animate(){
         playerShip.applyThrust(dt,BOOST.THRUST_MULT);
         // Orange/red particles
         const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
-        for(let i=0;i<3;i++){const p=getP();if(!p)break;
+        const boostSparks=PERF_LOW?1:3;
+        for(let i=0;i<boostSparks;i++){const p=getP();if(!p)break;
           const v=fwd.clone().multiplyScalar(-(80+Math.random()*60)).add(playerShip.velocity);
           v.x+=(Math.random()-.5)*20;v.y+=(Math.random()-.5)*12;v.z+=(Math.random()-.5)*20;
           p.spawn(playerShip.mesh.position.clone().addScaledVector(fwd,-8),v,0xff4400,.25+Math.random()*.3,3+Math.random()*4);}

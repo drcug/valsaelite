@@ -408,6 +408,28 @@
     });
   }
 
+  /** Stazioni con almeno un incontro Radici ancora disponibile. */
+  function stationsWithAvailable() {
+    const out = [];
+    const seen = new Set();
+    const ids = [
+      'bazzano', 'sirena', 'lavino', 'crespellano', 'pragatto',
+      'monteveglio', 'oliveto', 'savigno', 'zappolino', 'castelletto'
+    ];
+    // Usa anche le stazioni vive se presenti
+    const live = (global.stations || []).map((s) => s && s.sd && s.sd.id).filter(Boolean);
+    live.concat(ids).forEach((id) => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      const avail = availableEncounters(id);
+      if (!avail.length) return;
+      const sd = (global.SDATA || []).find((s) => s.id === id);
+      const name = (sd && sd.name) || id;
+      out.push({ id, name, count: avail.length, npc: avail[0].npcName });
+    });
+    return out;
+  }
+
   function applyFx(fx) {
     if (!fx) return;
     const PS = global.PS;
@@ -562,6 +584,11 @@
       if (typeof global.notify === 'function') {
         global.notify('Qualcuno ti riconosce: tab «RADICI» — ' + avail[0].npcName, 3200);
       }
+      // Hint anche sul ticker HUD (prossimo updateHUD in volo dopo decollo).
+      try {
+        if (!global.PS.rootHints) global.PS.rootHints = {};
+        global.PS.rootHints[st.sd.id] = avail[0].npcName;
+      } catch (_) { /* ignore */ }
     }, 900);
   }
 
@@ -606,6 +633,7 @@
     ROOT_ENCOUNTERS,
     availableEncounters,
     encountersForStation,
+    stationsWithAvailable,
     openRootDialogue,
     closeRootDialogue,
     offerOnDock,

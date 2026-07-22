@@ -18,7 +18,7 @@
     if(!on&&ambGain)ambGain.gain.value=0;
     else if(on&&ambStarted&&ambGain)ambGain.gain.value=AUDIO.ambVol;
     const btn=document.getElementById('a11y-sfx');
-    if(btn)btn.textContent='Audio: '+(on?'ON':'OFF');
+    if(btn)btn.textContent='Audio: '+(on?'ATTIVO':'SPENTO');
   };
 
   global.startAmbientDrone=function(){

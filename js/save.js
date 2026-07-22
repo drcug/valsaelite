@@ -220,7 +220,7 @@
       }
       localStorage.setItem(KEY,JSON.stringify(p));
       if(!silent&&typeof global.notify==='function')global.notify('Partita salvata.',1800);
-      if(typeof global.playChime==='function')global.playChime('success');
+      if(typeof global.playChime==='function'&&!silent)global.playChime('success');
       return true;
     }catch(_){
       if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non riuscito (memoria piena o bloccata).',2600);
