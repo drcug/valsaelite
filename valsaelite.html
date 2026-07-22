@@ -4917,10 +4917,10 @@ function uiConfirmClose(accepted){
   const okCb=UIC._onOk,cancelCb=UIC._onCancel;
   UIC._onOk=UIC._onCancel=null;
   if(typeof setPausedReason==='function'){
-    // Ripristina pause dock/story se erano attive
+    // Sempre togli la pausa del modal conferma, poi ripristina solo quella davvero attiva.
+    setPausedReason('dialogue',false);
     if(typeof storyBannerOpen==='function'&&storyBannerOpen())setPausedReason('story',true);
     else if(GAME&&GAME.state==='docked')setPausedReason('docked',true);
-    else if(GAME&&GAME.state!=='dialogue')setPausedReason('dialogue',false);
   }
   if(accepted){if(okCb)try{okCb();}catch(_){}}
   else{if(cancelCb)try{cancelCb();}catch(_){}}
@@ -6262,6 +6262,7 @@ function startSuborbit(){
   const sm=getSM(GAME.dockedSt.sd.id);
   if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
   setPausedReason('docked',false);
+  setPausedReason('dialogue',false);
   document.body.classList.remove('docked-ui');
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
@@ -6308,7 +6309,10 @@ function completeLanding(){
 
 function startLaunch(){
   GAME.state='launching';
-  setPausedReason('docked',false);
+  // Pulisci tutte le pause UI residue (es. modal conferma lasciava dialogue=true).
+  if(GAME.pausedReasons){
+    Object.keys(GAME.pausedReasons).forEach(k=>{GAME.pausedReasons[k]=false;});
+  }
   GAME.launchTimer=0;
   const dst=GAME.dockedSt;
   document.body.classList.remove('docked-ui');
@@ -6338,9 +6342,11 @@ function startLaunch(){
   cam.lookAt(playerShip.mesh.position);
   GAME.dockedSt=null;
 }
-
 function completeLaunch(){
   GAME.state='flying';
+  if(GAME.pausedReasons){
+    Object.keys(GAME.pausedReasons).forEach(k=>{GAME.pausedReasons[k]=false;});
+  }
   fadeEl.style.transition='opacity 0s';fadeEl.style.opacity='0';
 }
 
