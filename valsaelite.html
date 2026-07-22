@@ -340,8 +340,9 @@ body.boarding-active #boarding-hud{display:block}
   background:var(--panel);border:1px solid var(--acc);border-radius:8px;padding:12px 22px;
   font-family:var(--FM);font-size:12px;color:var(--bright);z-index:29;text-align:center;
   box-shadow:0 0 26px rgba(34,119,238,.35);max-width:min(92vw,440px);pointer-events:none}
-body.docked-ui #notif,body.menu-open #notif{top:78px;bottom:auto}
-body.docked-ui #smsg,body.menu-open #smsg{top:50%;bottom:auto;transform:translate(-50%,-50%)}
+/* Sopra #dkscr (z=50): altrimenti CONSEGNA / missioni sembrano non fare nulla in stazione */
+body.docked-ui #notif,body.menu-open #notif{top:78px;bottom:auto;z-index:70}
+body.docked-ui #smsg,body.menu-open #smsg{top:18%;bottom:auto;transform:translate(-50%,0);z-index:71}
 
 /* Game over */
 #go{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.94);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;font-family:var(--FD);text-align:center;padding:20px}
@@ -10162,20 +10163,63 @@ function checkNear(){
 // ─────────────────────────────────────────────────
 // DELIVERY CHECK ON DOCK
 // ─────────────────────────────────────────────────
+function missionCargoNeed(m){
+  return Math.max(1,(m&&m.cargo&&(m.cargo.qty|0))||1);
+}
+function missionCargoHave(m){
+  const ct=m&&m.cargo&&m.cargo.type;
+  if(!ct)return 0;
+  return (PS.cargo[ct]|0)||0;
+}
+function canDeliverMission(m,stId){
+  if(!m||m.done||m.type!=='delivery')return false;
+  if(stId&&m.targetSid!==stId)return false;
+  const ct=m.cargo&&m.cargo.type;
+  if(!ct)return false;
+  return missionCargoHave(m)>=missionCargoNeed(m);
+}
+/** Consuma carico e completa. Ritorna {ok,msg}. */
+function tryDeliverMission(mId,opts){
+  opts=opts||{};
+  const silent=!!opts.silent;
+  const m=PS.activeMissions.find(x=>x.id===mId);
+  if(!m||m.done){
+    if(!silent)notify('Missione non trovata o già completata.',1800);
+    return{ok:false,msg:'missing'};
+  }
+  if(m.type!=='delivery'){
+    if(!silent)notify('Questa missione non è una consegna.',1800);
+    return{ok:false,msg:'type'};
+  }
+  const stId=(GAME.dockedSt&&GAME.dockedSt.sd&&GAME.dockedSt.sd.id)||opts.stId||null;
+  if(!stId||m.targetSid!==stId){
+    if(!silent)notify('Attracca alla destinazione per consegnare.',2000);
+    return{ok:false,msg:'dest'};
+  }
+  const ct=m.cargo&&m.cargo.type;
+  const need=missionCargoNeed(m);
+  const have=missionCargoHave(m);
+  if(!ct||have<need){
+    if(!silent)notify('Ti manca il carico richiesto ('+(ct||'?')+' ×'+need+', hai '+have+').',2400);
+    return{ok:false,msg:'cargo'};
+  }
+  if(typeof StorySys!=='undefined'){
+    if(!StorySys.consumeCargo(m)){
+      if(!silent)notify('Consegna non riuscita: carico insufficiente.',1800);
+      return{ok:false,msg:'consume'};
+    }
+  }else{
+    PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
+  }
+  completeMission(m);
+  if(GAME.dockedSt)buildDock(GAME.dockedSt);
+  return{ok:true,msg:'ok'};
+}
 function checkDeliveryOnDock(stId){
   for(let i=PS.activeMissions.length-1;i>=0;i--){
     const m=PS.activeMissions[i];
-    if(m.done||m.type!=='delivery'||m.targetSid!==stId)continue;
-    const ct=m.cargo&&m.cargo.type;
-    if(!ct)continue;
-    const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
-    if((PS.cargo[ct]||0)<need)continue;
-    if(typeof StorySys!=='undefined'){
-      if(!StorySys.consumeCargo(m))continue;
-    }else{
-      PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
-    }
-    completeMission(m);
+    if(!canDeliverMission(m,stId))continue;
+    tryDeliverMission(m.id,{silent:true,stId});
   }
 }
 
@@ -10369,10 +10413,13 @@ function tTrade(pnl,st){
   const gs=SG[st.sd.id]||{};
   pnl.innerHTML='<div class="stt">MERCATO — '+st.sd.name.toUpperCase()+'</div>';
   if(!Object.keys(gs).length){pnl.innerHTML+='<div style="color:#446688;font-family:var(--FM);font-size:11px;padding:12px">Nessuna merce disponibile.</div>';return;}
-  const pending=PS.activeMissions.filter(m=>!m.done&&m.type==='delivery'&&m.targetSid===st.sd.id&&m.cargo&&(PS.cargo[m.cargo.type]||0)>0);
+  const pending=PS.activeMissions.filter(m=>canDeliverMission(m,st.sd.id));
   if(pending.length){
     pnl.innerHTML+='<div class="stt" style="color:#44ee88">CONSEGNE IN SOSPESO</div>';
-    pending.forEach(m=>{pnl.innerHTML+='<div class="ic hi"><div class="in2"><div class="nm">'+m.title+'</div><div class="dc">Merce pronta &bull; Ricompensa: '+fmt(m.reward)+'</div></div><button class="db dl" onclick="doDeliver(\''+m.id+'\')">CONSEGNA</button></div>';});
+    pending.forEach(m=>{
+      const need=missionCargoNeed(m);
+      pnl.innerHTML+='<div class="ic hi"><div class="in2"><div class="nm">'+m.title+'</div><div class="dc">Merce pronta ('+(m.cargo&&m.cargo.type||'?')+' ×'+need+') &bull; Ricompensa: '+fmt(m.reward)+'</div></div><button type="button" class="db dl" data-deliver="'+m.id+'">CONSEGNA</button></div>';
+    });
   }
   const mood=getMarketMood(st.sd.id);
   const moodLbl=mood>1.04?'<span style="color:#ffbb66">domanda ALTA (+'+Math.round((mood-1)*100)+'%)</span>':mood<.96?'<span style="color:#88ddff">offerta in eccesso ('+Math.round((mood-1)*100)+'%)</span>':'<span style="color:#88aacc">mercato stabile</span>';
@@ -10401,9 +10448,12 @@ function tTrade(pnl,st){
       const local=(gs[gk]&&gs[gk].sl)?gs[gk].sl:null;
       const fallback=Math.round((Object.entries(SG).find(([,v])=>v[gk])?.[1][gk]?.sl)||15);
       const price=local||fallback;
-      pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+gi.name+'</div><div class="dc">In stiva: '+qty+' '+gi.unit+' · Prezzo unità: '+fmt(price)+(local?'':' (mercato esterno)')+'</div></div><button class="db sl" onclick="doSellCargoAtStation(\''+gk+'\',\''+st.sd.id+'\')">VENDI 1</button></div>';
+      const locked=isMissionProtectedCargo(gk);
+      pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+gi.name+(locked?' <span style="color:#88c8b0">· missione</span>':'')+'</div><div class="dc">In stiva: '+qty+' '+gi.unit+' · Prezzo unità: '+fmt(price)+(local?'':' (mercato esterno)')+'</div></div>'
+        +(locked?'<div class="px" style="color:#66aa88">PROTETTO</div>':'<button class="db sl" onclick="doSellCargoAtStation(\''+gk+'\',\''+st.sd.id+'\')">VENDI 1</button>')+'</div>';
     });
   }
+  bindDockActionButtons(pnl);
 }
 function doBuy(gk,p,stId){
   if(PS.credits<p||cargoCnt()>=PS.cargoMax)return;
@@ -10419,9 +10469,14 @@ function tartufiStoryDiscount(stId,gk){
   if(sd.faction==='savigno'||stId==='zappolino'||stId==='san_chierlo')return 0.82;
   return 1;
 }
-function doSell(gk,p,stId){if(!(PS.cargo[gk]>0))return;PS.credits+=p;PS.cargo[gk]--;if(!PS.cargo[gk])delete PS.cargo[gk];if(stId)bumpMarketMood(stId,-.03);notify('Venduto per '+fmt(p));buildDock(GAME.dockedSt);}
+function doSell(gk,p,stId){
+  if(!(PS.cargo[gk]>0))return;
+  if(isMissionProtectedCargo(gk)){notify('Carico di missione protetto: non vendibile.',1800);return;}
+  PS.credits+=p;PS.cargo[gk]--;if(!PS.cargo[gk])delete PS.cargo[gk];if(stId)bumpMarketMood(stId,-.03);notify('Venduto per '+fmt(p));buildDock(GAME.dockedSt);
+}
 function doSellCargoAtStation(gk,stId){
   if(!(PS.cargo[gk]>0))return;
+  if(isMissionProtectedCargo(gk)){notify('Carico di missione protetto: non vendibile.',1800);return;}
   const sg=SG[stId]||{};
   const local=sg[gk]?.sl||null;
   const fallback=Math.round((Object.entries(SG).find(([,v])=>v[gk])?.[1][gk]?.sl)||15);
@@ -10432,24 +10487,15 @@ function doSellCargoAtStation(gk,stId){
   notify('Venduto '+(GOODS[gk]?.name||gk)+' per '+fmt(price));
   buildDock(GAME.dockedSt);
 }
-function doDeliver(mId){
-  const m=PS.activeMissions.find(x=>x.id===mId);if(!m||m.done)return;
-  if(typeof StorySys!=='undefined'){
-    if(!StorySys.consumeCargo(m)){notify('Carico insufficiente per la consegna.',1800);return;}
-  }else{
-    const ct=m.cargo&&m.cargo.type;const need=(m.cargo&&m.cargo.qty)||1;
-    if(!ct||(PS.cargo[ct]||0)<need)return;
-    PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
-  }
-  completeMission(m);buildDock(GAME.dockedSt);
+function isMissionProtectedCargo(gk){
+  if(gk==='frammento')return true;
+  return PS.activeMissions.some(m=>m&&!m.done&&m.cargo&&m.cargo.type===gk);
 }
+function doDeliver(mId){return tryDeliverMission(mId);}
 function doSellAll(stId){
   let e=0;const sg=SG[stId]||{};
-  const protectedTypes=new Set(['frammento']);
-  // Non vendere carico di missioni storia attive
-  PS.activeMissions.forEach(m=>{if(m&&m.cargo&&m.cargo.type)protectedTypes.add(m.cargo.type);});
   Object.entries(PS.cargo).forEach(([gk,qty])=>{
-    if(protectedTypes.has(gk))return;
+    if(isMissionProtectedCargo(gk))return;
     const sp=sg[gk]?.sl||Math.round((Object.entries(SG).find(([,v])=>v[gk])?.[1][gk]?.sl)||15);
     e+=sp*qty;delete PS.cargo[gk];
   });
@@ -10500,7 +10546,7 @@ function tMissions(pnl,st){
     const tag=m.type==='delivery'?'<span class="mtg md">CONSEGNA</span>':m.type==='combat'?'<span class="mtg mc">COMBATTIMENTO</span>':'<span class="mtg ms2">SPECIALE</span>';
     const rt=Object.entries(m.repGain||{}).map(([f,v])=>(FACTIONS[f]?.short||f)+': '+(v>0?'+':'')+v).join(' · ');
     const dest=m.targetSid?(' &rarr; '+(SDATA.find(s=>s.id===m.targetSid)?.name||m.targetSid)):'';
-    pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+m.title+' '+tag+'</div><div class="dc">'+m.desc+'</div><div class="mr">+'+fmt(m.reward)+dest+(rt?' &bull; '+rt:'')+'</div></div><button class="db ms" onclick="doAccept(\''+m.id+'\',\''+st.sd.id+'\')">ACCETTA</button></div>';
+    pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+m.title+' '+tag+'</div><div class="dc">'+m.desc+'</div><div class="mr">+'+fmt(m.reward)+dest+(rt?' &bull; '+rt:'')+'</div></div><button type="button" class="db ms" data-accept="'+m.id+'" data-st="'+st.sd.id+'">ACCETTA</button></div>';
   });
   if(PS.activeMissions.length>0){
     pnl.innerHTML+='<div class="stt" style="margin-top:14px">MISSIONI ATTIVE</div>';
@@ -10514,12 +10560,12 @@ function tMissions(pnl,st){
       let btn='';
       if(m.type==='delivery'){
         const ct=m.cargo&&m.cargo.type;
-        const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
-        const have=ct?(PS.cargo[ct]||0):0;
+        const need=missionCargoNeed(m);
+        const have=missionCargoHave(m);
         const here=m.targetSid===st.sd.id;
         how=' · carico '+(ct||'?')+': '+have+'/'+need+(here?' · sei a destinazione':' · vai a destinazione e attracca');
-        if(here&&have>=need){
-          btn='<button class="db hi2" onclick="doDeliverMission(\''+m.id+'\')">CONSEGNA</button>';
+        if(canDeliverMission(m,st.sd.id)){
+          btn='<button type="button" class="db hi2" data-deliver="'+m.id+'">CONSEGNA</button>';
         }
       }else if(m.type==='combat'){
         how=' · abbattine abbastanza in volo: la missione si chiude da sola';
@@ -10527,25 +10573,32 @@ function tMissions(pnl,st){
       pnl.innerHTML+='<div class="ic ma"><div class="in2"><div class="nm" style="color:#bb77ff">'+m.title+prog+'</div><div class="dc">'+m.desc+(m.namedTarget?' · BERSAGLIO: '+m.namedTarget:'')+how+'</div></div>'+btn+'</div>';
     });
   }
+  bindDockActionButtons(pnl);
 }
-function doDeliverMission(mId){
-  const m=PS.activeMissions.find(x=>x.id===mId);
-  if(!m||m.done||m.type!=='delivery')return;
-  if(!GAME.dockedSt||m.targetSid!==GAME.dockedSt.sd.id){
-    notify('Attracca alla destinazione per consegnare.',2000);return;
-  }
-  const ct=m.cargo&&m.cargo.type;
-  const need=Math.max(1,(m.cargo&&m.cargo.qty)||1);
-  if(!ct||(PS.cargo[ct]||0)<need){
-    notify('Ti manca il carico richiesto ('+(ct||'?')+' ×'+need+').',2200);return;
-  }
-  if(typeof StorySys!=='undefined'){
-    if(!StorySys.consumeCargo(m)){notify('Consegna non riuscita.',1800);return;}
-  }else{
-    PS.cargo[ct]-=need;if(PS.cargo[ct]<=0)delete PS.cargo[ct];
-  }
-  completeMission(m);
-  buildDock(GAME.dockedSt);
+function bindDockActionButtons(pnl){
+  if(!pnl||pnl.dataset.deliverBound)return;
+  pnl.dataset.deliverBound='1';
+  pnl.addEventListener('click',e=>{
+    const t=e.target&&e.target.closest?e.target.closest('[data-deliver],[data-accept]'):null;
+    if(!t||!pnl.contains(t))return;
+    e.preventDefault();
+    if(t.dataset.deliver){
+      doDeliverMission(t.dataset.deliver);
+      return;
+    }
+    if(t.dataset.accept){
+      doAccept(t.dataset.accept,t.dataset.st||(GAME.dockedSt&&GAME.dockedSt.sd&&GAME.dockedSt.sd.id));
+    }
+  });
+}
+function doDeliverMission(mId){return tryDeliverMission(mId);}
+function syncStoryMissionFlags(m){
+  if(!m||!m.id||!m.id.startsWith('story_')||typeof STORY==='undefined')return;
+  const ch=(STORY.chapters||[]).find(c=>c.mission&&c.mission.id===m.id);
+  if(!ch||!ch.mission)return;
+  ch.mission.done=!!m.done;
+  ch.mission.active=!!m.active;
+  if(m.killsDone!=null)ch.mission.killsDone=m.killsDone|0;
 }
 function doAccept(mId,stId){
   const st=stations.find(s=>s.sd.id===stId);if(!st)return;
@@ -10556,6 +10609,7 @@ function doAccept(mId,stId){
     if(!gate.ok){notify(gate.msg||'Requisiti missione non soddisfatti.',2600);return;}
   }
   m.active=true;PS.activeMissions.push(m);
+  syncStoryMissionFlags(m);
   if(typeof StorySys!=='undefined')StorySys.grantMissionCargo(m);
   if(m.type==='combat'&&(m.waves||m.namedTarget)){
     m.wavesDone=0;m.killsDone=0;
@@ -10563,6 +10617,11 @@ function doAccept(mId,stId){
     notify(m.namedTarget?('Bersaglio segnalato: '+m.namedTarget):'Prima ondata in avvicinamento!',2200);
   }
   notify('Missione accettata: '+m.title);
+  // Stessa stazione + carico già pronto: completa subito (evita "CONSEGNA morto")
+  if(m.type==='delivery'&&GAME.dockedSt&&m.targetSid===GAME.dockedSt.sd.id&&canDeliverMission(m,GAME.dockedSt.sd.id)){
+    tryDeliverMission(m.id);
+    return;
+  }
   buildDock(GAME.dockedSt);
 }
 
@@ -10606,6 +10665,7 @@ function buyTavernClue(clueId,stId){
 
 function completeMission(m){
   if(m.done)return;m.done=true;m.active=false;
+  syncStoryMissionFlags(m);
   const idx=PS.activeMissions.indexOf(m);if(idx>=0)PS.activeMissions.splice(idx,1);
   PS.credits+=m.reward;
   RUN_STATS.missionsDone++;

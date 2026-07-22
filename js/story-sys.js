@@ -53,8 +53,8 @@
       const PS = global.PS;
       if (!PS) return;
       const t = m.cargo.type;
-      const need = Math.max(1, m.cargo.qty || 1);
-      const have = PS.cargo[t] || 0;
+      const need = Math.max(1, (m.cargo.qty | 0) || 1);
+      const have = (PS.cargo[t] | 0) || 0;
       const add = Math.max(0, need - have);
       if (add <= 0) {
         if (typeof global.notify === 'function') {
@@ -89,9 +89,10 @@
       const PS = global.PS;
       if (!PS || !m || !m.cargo) return false;
       const t = m.cargo.type;
-      const need = Math.max(1, m.cargo.qty || 1);
-      if ((PS.cargo[t] || 0) < need) return false;
-      PS.cargo[t] -= need;
+      const need = Math.max(1, (m.cargo.qty | 0) || 1);
+      const have = (PS.cargo[t] | 0) || 0;
+      if (have < need) return false;
+      PS.cargo[t] = have - need;
       if (PS.cargo[t] <= 0) delete PS.cargo[t];
       return true;
     }

@@ -170,6 +170,7 @@
         document.getElementById('hud').style.display='none';
         document.getElementById('radar').style.display='none';
         document.getElementById('mtick').style.display='none';
+        document.body.classList.add('docked-ui');
         if(g.dockActiveTab)global.GAME.dockActiveTab=g.dockActiveTab;
         if(typeof global.buildDock==='function')global.buildDock(st);
       }
@@ -177,6 +178,7 @@
       global.GAME.state='flying';
       global.setPausedReason('docked',false);
       ship.mesh.visible=true;
+      document.body.classList.remove('docked-ui');
       document.getElementById('dkscr').style.display='none';
       document.getElementById('hud').style.display='flex';
       document.getElementById('radar').style.display='block';
