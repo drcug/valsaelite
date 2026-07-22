@@ -11,25 +11,26 @@
         id: 'root_bazz_osteria',
         minChapter: 1,
         title: 'Osteria del Mulino',
-        npcName: 'Mirco "Tavò" Baldi',
-        npcTitle: 'COMPAGNO DI SCUOLA · BAZZANO',
-        npcSeed: 4401,
+        npcName: 'Morosina',
+        npcTitle: 'ASILO · SUORE · BAZZANO',
+        npcSeed: 4417,
         faction: 'bazzano',
-        blurb: 'Uno che ti chiamava Zvanino prima che partissi.',
+        gender: 'f',
+        blurb: 'La tua Morosina di quando andavi all\'asilo dalle suore. Ti chiamava ancora Zvanino.',
         start: 'n1',
         nodes: {
           n1: {
             speaker: 'npc',
-            text: 'Zvanino? Csa fet qui, tavò. Pensavo fossi rimasto a firmare bollettini fino alla pensione. Siediti: bsoa una bottiglia, e lascia l’uniforme sul gancio.',
+            text: 'Zvanino? Csa fet qui, tavò. L\'ultima volta ti tenevo per la manina nel cortile delle suore, e adesso sbuchi in uniforme. Siediti: bsoa una bottiglia, e lascia quel distintivo sul gancio.',
             choices: [
               { label: '[PROVI] "Taproblem… sto bene."', next: 'n2a' },
               { label: '[UFFICIALE] "Funzionario Marìa. Missione di servizio."', next: 'n2b' },
-              { label: '[SILENZIO] Gli stringi la mano.', next: 'n2c' }
+              { label: '[SILENZIO] Le stringi la mano.', next: 'n2c' }
             ]
           },
           n2a: {
             speaker: 'npc',
-            text: 'Hai detto taproblem come chi legge il dizionario. Va bene lo stesso. Qui nichita ha dimenticato il tuo nome. Io no. Tu, a momenti, sì: ti guardi intorno come un ospite.',
+            text: 'Hai detto taproblem come chi legge il dizionario. Va bene lo stesso. All\'asilo nichita ti chiamava «il bambino del Mulino». Io no: eri Zvanino, punto. Tu, a momenti, ti guardi intorno come un ospite.',
             choices: [
               { label: '[ZVAN] "Ho paura di non capire più casa."', next: 'n3' },
               { label: '[ZVAN] "Ho avuto fretta di sembrare importante."', next: 'n3b' }
@@ -37,33 +38,33 @@
           },
           n2b: {
             speaker: 'npc',
-            text: 'Com’è l’idea della pressa? «Funzionario Marìa». Una volta scendevi a priori dai compiti. Adesso parli da ufficio. Taebol, Zvanino.',
+            text: 'Com\'è l\'idea della pressa? «Funzionario Marìa». Una volta scendevi a priori dai compiti di catechismo. Adesso parli da ufficio. Taebol, Zvanino. Le suore riderebbero.',
             choices: [
               { label: '[ZVAN] "Forse il titolo mi è restato addosso."', next: 'n3' },
-              { label: '[ZVAN] "Sotto l’armatura ho ancora sete di vino."', next: 'n3' }
+              { label: '[ZVAN] "Sotto l\'armatura ho ancora sete di vino."', next: 'n3' }
             ]
           },
           n2c: {
             speaker: 'npc',
-            text: 'Tacivecìssent, eh? Come quando ti chiedevano della ragazza e restavi lì muto. Qui il silenzio è onesto. Laggiù, a Imperium, è un protocollo.',
+            text: 'Tacivecìssent, eh? Come quando suor Geltrude ti chiedeva della merenda e restavi lì muto. Qui il silenzio è onesto. Laggiù, a Imperium, è un protocollo.',
             choices: [{ label: '[ZVAN] "Il protocollo mi ha tenuto in piedi. Qui mi fa male."', next: 'n3' }]
           },
           n3: {
             speaker: 'zvan',
-            text: 'Mirco, a Imperium ogni corridoio aveva un numero. Qui ogni odore ha un nome. Ricordo meglio i numeri. Tornare significa scoprire di avere ancora la chiave di casa e non sapere più dove mettere i piedi.',
+            text: 'Morosina, a Imperium ogni corridoio aveva un numero. Qui ogni odore ha un nome. Ricordo meglio i numeri. Tornare significa scoprire di avere ancora la chiave di casa e non sapere più dove mettere i piedi — come quando ci perdevamo dietro la cappella.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n3b: {
             speaker: 'zvan',
-            text: 'Ho detto «fretta» e mi è venuto il senso di colpa. Casa non era un ritardo: ero io che volevo sembrare qualcuno nei corridoi di marmo.',
+            text: 'Ho detto «fretta» e mi è venuto il senso di colpa. Casa non era un ritardo: ero io che volevo sembrare qualcuno nei corridoi di marmo. Tu restavi qui. Io no.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n4: {
             speaker: 'npc',
-            text: 'Allora ascolta il tavò vero: non ti chiedo di tornare ragazzo. Ti chiedo di non fare il satellite dopo nove ore di burocrazia. Siediti. Bevi. Se tarenz’la psiche, pazienza. Bsoa tempo, non bollettini. E stai attento: da Imperium arrivano voci di casate che si azzannano. Qui siamo periferia. Per ora.',
+            text: 'Allora ascolta la Morosina vera: non ti chiedo di tornare bambino. Ti chiedo di non fare il satellite dopo nove ore di burocrazia. Siediti. Bevi. Se tarenz\'la psiche, pazienza. Bsoa tempo, non bollettini. E stai attento: da Imperium arrivano voci di casate che si azzannano. Qui siamo periferia. Per ora.',
             choices: [
-              { label: '[RESTA] Bevi in silenzio. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Hai lasciato l’armatura sul bancone, per una sera.', lore: 'casate_rumore' } },
-              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: 'Mirco scuote la testa: «Toronto. Sei ancora in orbita.»' } }
+              { label: '[RESTA] Bevi in silenzio. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Hai lasciato l\'armatura sul bancone, per una sera. Morosina sorride come al cortile delle suore.', lore: 'casate_rumore' } },
+              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: 'Morosina scuote la testa: «Toronto. Sei ancora in orbita.»' } }
             ]
           }
         }

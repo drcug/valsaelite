@@ -40,7 +40,7 @@ window.PORTRAIT_LAYOUT = {
     pirate: [19, 20, 21, 22]
   },
   /** Nomi tipicamente femminili (IT / dialetto / titoli) → pool women */
-  feminineNameRe: /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b/i,
+  feminineNameRe: /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b|morosina\b/i,
   parts: {
     heads: Array.from({ length: 23 }, (_, i) =>
       'sprites/faces/busts/bust_' + String(i).padStart(2, '0') + '.png'),

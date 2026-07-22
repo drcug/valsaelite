@@ -49,7 +49,7 @@
 
   function looksFeminineName(name) {
     if (!name || typeof name !== 'string') return false;
-    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b/i;
+    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b|morosina\b/i;
     const s = String(name).trim();
     if (re.test(s)) return true;
     // Controlla primo token ("Marina del Porto", "Dottoressa Baldi")
