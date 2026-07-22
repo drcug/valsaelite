@@ -216,15 +216,17 @@ body.boarding-active #boarding-hud{display:block}
 
 /* Dialogue — sopra i controlli touch, sotto l’HUD alto */
 #dlg{display:none;position:fixed;left:50%;bottom:max(165px,27vh);transform:translateX(-50%);
-  z-index:30;width:min(480px,92vw);background:var(--panel);border:1px solid var(--border);
+  z-index:30;width:min(520px,94vw);background:var(--panel);border:1px solid var(--border);
   border-radius:10px;padding:13px 17px;backdrop-filter:blur(14px);
-  font-family:var(--FM);font-size:11px;line-height:1.65;max-height:min(28vh,220px);overflow:auto}
+  font-family:var(--FM);font-size:12px;line-height:1.7;max-height:min(34vh,280px);overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(62,207,187,.45) rgba(0,0,0,.2)}
 @keyframes su{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 #dlg{animation:su .2s ease}
 .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
 .dn2{font-family:var(--FD);font-weight:700;font-size:14px;color:var(--bright)}
 .df{font-size:9px;color:#446688;letter-spacing:.1em;margin-top:2px}
-.dt{color:#aabbcc;border-left:2px solid var(--acc);padding-left:10px;font-style:italic}
+.dt{color:#c8dce8;border-left:2px solid var(--acc);padding-left:10px;font-style:normal;white-space:pre-wrap}
 
 /* Mobile controls */
 .cg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
@@ -363,17 +365,40 @@ body.docked-ui #smsg,body.menu-open #smsg{top:18%;bottom:auto;transform:translat
 .choice-btn.trade{border-color:rgba(255,200,50,.3);color:#ffdd88;}
 .choice-btn.trade:hover{background:rgba(255,200,50,.1);}
 
-/* Dialoghi radio: testo intero in finestra scrollabile (niente typewriter) */
+/* Dialoghi radio in volo: testo intero, scrollabile, niente tagli */
+.idlg-panel{
+  width:min(600px,96vw);max-height:min(92vh,780px);
+  background:rgba(2,8,22,.98);border:1px solid rgba(44,100,190,.35);border-radius:12px;
+  padding:16px 16px 12px;font-family:var(--FD);position:relative;
+  display:flex;flex-direction:column;gap:0;overflow:hidden;
+  box-sizing:border-box;
+}
+.idlg-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;flex-shrink:0}
+.idlg-head canvas{
+  width:112px;height:140px;border-radius:8px;border:1px solid rgba(70,180,160,.45);
+  display:block;background:#354858;flex-shrink:0;
+}
+.idlg-meta{flex:1;min-width:0}
 .idlg-scroll{
-  font-size:13px;color:#b8d4e0;font-family:var(--FM);margin-top:10px;line-height:1.75;
-  border-left:2px solid rgba(62,207,187,.55);padding:4px 10px 8px 12px;font-style:normal;
-  max-height:min(38vh,280px);overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
+  font-size:13px;color:#b8d4e0;font-family:var(--FM);line-height:1.75;
+  border-left:2px solid rgba(62,207,187,.55);padding:6px 10px 10px 12px;font-style:normal;
+  max-height:min(40vh,300px);min-height:72px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;flex:1 1 auto;margin-bottom:10px;white-space:pre-wrap;
   scrollbar-width:thin;scrollbar-color:rgba(62,207,187,.55) rgba(0,0,0,.2);
 }
 .idlg-scroll::-webkit-scrollbar{width:8px}
 .idlg-scroll::-webkit-scrollbar-thumb{background:rgba(62,207,187,.5);border-radius:4px}
-#idlg > div{max-height:min(92vh,720px);overflow:auto}
+.idlg-choices{
+  display:flex;flex-direction:column;gap:6px;max-height:min(34vh,260px);
+  overflow-y:auto;padding-right:4px;flex-shrink:0;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.idlg-hint{margin-top:8px;font-size:9px;color:#334455;font-family:var(--FM);text-align:right;flex-shrink:0}
+@media(max-width:700px){
+  .idlg-head canvas{width:84px;height:105px}
+  .idlg-scroll{max-height:min(34vh,240px);font-size:12px}
+  .idlg-choices{max-height:min(38vh,280px)}
+}
 #rootdlg .rootdlg-panel{
   width:min(640px,96vw);max-height:min(92vh,720px);overflow:auto;
   background:linear-gradient(165deg,rgba(6,20,28,.98),rgba(2,8,16,.99));
@@ -598,17 +623,7 @@ body.docked-ui #smsg,body.menu-open #smsg{top:18%;bottom:auto;transform:translat
   #mtick{top:max(8px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));max-width:min(42vw,180px);font-size:9px;padding:3px 8px}
   #notif{bottom:max(148px,24vh);z-index:28}
   #smsg{bottom:max(190px,30vh);z-index:29}
-  #dlg{bottom:max(155px,26vh);max-height:min(26vh,200px)}
-  .hb{flex-direction:column;align-items:stretch;gap:8px}
-  .hb-left{flex:none;width:100%}
-  .hb-controls{flex:none;width:100%}
-  .cr-info{max-width:100%}
-  .cg{justify-content:center;gap:5px}
-  .cb{width:clamp(48px,13.5vw,56px);height:clamp(48px,13.5vw,56px);font-size:7px;gap:1px}
-  .cb svg{width:17px;height:17px}
-  #dprompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
-  #boarding-prompt{bottom:max(120px,18vh);max-width:94vw;padding:8px 12px}
-  #dlg{bottom:max(115px,17vh);max-width:94vw}
+  #dlg{bottom:max(115px,17vh);max-width:94vw;max-height:min(32vh,260px)}
   #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
   #heat-lbl{bottom:max(134px,20vh);font-size:8px}
   #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
@@ -894,28 +909,23 @@ body.suborbit-active #smsg{
 </div>
 
 <!-- ─ Interactive dialogue modal ─ -->
-<div id="idlg" style="position:fixed;inset:0;z-index:70;background:rgba(0,2,8,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center">
-  <div style="width:min(560px,96vw);background:rgba(2,8,22,.98);border:1px solid rgba(44,100,190,.35);border-radius:12px;padding:20px;font-family:var(--FD);position:relative">
-    <!-- pilot portrait + name -->
-    <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:14px">
-      <div style="flex-shrink:0">
-        <canvas id="pilot-portrait" width="144" height="180" style="width:144px;height:180px;border-radius:8px;border:1px solid rgba(70,180,160,.45);display:block;background:#354858"></canvas>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div id="idlg-name" style="font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.08em"></div>
+<div id="idlg" style="position:fixed;inset:0;z-index:70;background:rgba(0,2,8,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:10px;box-sizing:border-box">
+  <div class="idlg-panel">
+    <div class="idlg-head">
+      <canvas id="pilot-portrait" width="144" height="180"></canvas>
+      <div class="idlg-meta">
+        <div id="idlg-name" style="font-size:17px;font-weight:700;color:var(--bright);letter-spacing:.08em"></div>
         <div id="idlg-type" style="font-size:9px;color:#557799;font-family:var(--FM);margin-top:3px;letter-spacing:.12em"></div>
         <div id="idlg-mood" style="font-size:8px;color:#6a9a90;font-family:var(--FM);margin-top:4px;letter-spacing:.1em"></div>
-        <div id="idlg-text" class="idlg-scroll"></div>
       </div>
     </div>
-    <!-- trade offer (shown conditionally) -->
-    <div id="idlg-trade" style="display:none;background:rgba(255,255,255,.03);border:1px solid rgba(44,100,190,.2);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-family:var(--FM);font-size:11px">
+    <div id="idlg-text" class="idlg-scroll"></div>
+    <div id="idlg-trade" style="display:none;background:rgba(255,255,255,.03);border:1px solid rgba(44,100,190,.2);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-family:var(--FM);font-size:11px;flex-shrink:0">
       <div style="color:#557799;font-size:9px;letter-spacing:.15em;margin-bottom:6px">OFFERTA COMMERCIALE</div>
       <div id="idlg-trade-text" style="color:#aaccee"></div>
     </div>
-    <!-- choice buttons -->
-    <div id="idlg-choices" style="display:flex;flex-direction:column;gap:6px;max-height:210px;overflow-y:auto;padding-right:4px"></div>
-    <div style="margin-top:10px;font-size:9px;color:#334455;font-family:var(--FM);text-align:right">[ESC] chiudi</div>
+    <div id="idlg-choices" class="idlg-choices"></div>
+    <div class="idlg-hint">Scorri il testo se serve · [ESC] chiudi</div>
   </div>
 </div>
 
@@ -1902,36 +1912,96 @@ function storyEpilogueBody(){
 }
 
 // ─────────────────────────────────────────────────
-// INTERCEPT DIALOGUES (with Gergo del Tavo')
+// INTERCEPT DIALOGUES (italiano chiaro + gergo del tavò a spicchi)
 // ─────────────────────────────────────────────────
 const DIALOGUES = {
   bazzano:[
-    {name:'Pattuglia Bazzanese',    lines:['Tavo\'! Fermet! Csa fet in cul set? Identificati.','Se sei in regola taproblem — ma teniamo d\'occhio tutti. Anche te.','Sistema Bazzanese. Nichita entra senza permesso. Toronto i furbetti.','Le stelle non mentono: se il Patto torna, qualcuno a Prime smettera\' di dormire col comunicatore acceso.']},
-    {name:'Mercante Bazzanese',     lines:['Porto vino ai margini. Tagiov la canz dei dazi doganali pero\'.','Tamonei in bisaccia dopo l\'ultimo viaggio — ma il vino vale il rischio.','Ho visto navi partire per Crespellano con la speranza e tornare con la modulistica: stessa rotta, altra anima.']},
-    {name:'Courier di Bazzano',     lines:['Missione urgente da Bazzano Prime. Tavo\' fermarmi adesso, bsoa arrivare entro un\'ora.','Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante in orbita.']},
+    {name:'Pattuglia Bazzanese',    lines:[
+      'Tavò, fermet un attimo. Csa fet in cul set? Identificati, poi si parla.',
+      'Se sei in regola, taproblem. Contiamo le scie lo stesso: a Prime dormono poco, ultimamente.',
+      'Sistema bazzanese. Nichita entra senza dire chi è. I furbetti li toronto al primo controllo.',
+      'Se il Patto torna davvero, qualcuno a Prime smetterà di dormire col comunicatore acceso. Tieni a mente.'
+    ]},
+    {name:'Mercante Bazzanese',     lines:[
+      'Porto vino ai margini. Tagiov la canz sui dazi, se puoi: oggi i doganieri sono nervosi.',
+      'Tamonei in bisaccia dopo l\'ultimo viaggio, ma il vino vale il rischio. Tu dove vai?',
+      'Ho visto navi partire per Crespellano piene di speranza e tornare con la modulistica. Stessa rotta, altra faccia.'
+    ]},
+    {name:'Courier di Bazzano',     lines:[
+      'Missione urgente da Bazzano Prime. Tavò, non fermarmi: bsoa arrivare entro un\'ora.',
+      'Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante. E costa meno.'
+    ]},
   ],
   crespellano:[
-    {name:'Pattuglia Crespellanese',lines:['Siamo pirati perche\' Toronto i lavori a Crespellano!','Il nostro incrociatore e\' stato riparato coi pezzi della scuola rovescia. Funziona lo stesso.','Fermo! Stiamo ancora aspettando l\'autorizzazione per decollare dal 2019.','L\'archivio dice "niente" ma puzza di storia: chi entra senza permesso trova solo polvere... e ambizione.']},
-    {name:'Ribelle Crespellanese',  lines:['Vuoi comprare del "niente"? E\' il nostro unico prodotto. Almeno e\' autentico.','Quando fanno il semaforo? Toronto, ecco quando.','Se cerchi il Patto, non cercarlo nei discorsi: cercalo nei cassetti etichettati male.']},
-    {name:'Contrabbandiere locale', lines:['Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.','Tra una piadina e un frammento antico, a volte e\' la piadina a salvarti la pelle.']},
+    {name:'Pattuglia Crespellanese',lines:[
+      'Siamo pirati perché toronto i lavori a Crespellano. Non è poesia: è la lista paga.',
+      'L\'incrociatore l\'abbiamo riparato coi pezzi della scuola rovescia. Funziona. Più o meno.',
+      'Fermo. Stiamo ancora aspettando l\'autorizzazione al decollo dal 2019. Siediti, se vuoi: c\'è posto.',
+      'L\'archivio dice «niente», ma puzza di storia. Chi entra senza permesso trova polvere… e gente ambiziosa.'
+    ]},
+    {name:'Ribelle Crespellanese',  lines:[
+      'Vuoi comprare del «niente»? È il nostro unico prodotto. Almeno è autentico.',
+      'Il semaforo? Toronto. Quando lo fanno, se lo fanno, noi saremo già altrove.',
+      'Se cerchi il Patto, non ascoltare i discorsi. Guarda i cassetti etichettati male.'
+    ]},
+    {name:'Contrabbandiere locale', lines:[
+      'Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.',
+      'Tra una piadina e un frammento antico, a volte è la piadina che ti salva la pelle.'
+    ]},
   ],
   calcara:[
-    {name:'Guardia di Calcara',     lines:['Zona economica speciale di Calcara. C\'e\' un pedaggio.','Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.','Ogni appalto, ogni contratto: Calcara. E\' l\'ordine cosmico delle cose.','La verita\' qui ha timbro e IVA: se non e\' fatturata, non esiste.']},
-    {name:'Funzionario Calcarese',  lines:['Togliti, porto le pratiche per il quinto hangar.','Orbito attorno a Crespellano. I soldi orbitano attorno a me. Legge di gravitazione selettiva.','Autenticazione rapida, file sigillato, cliente soddisfatto — cosi\' funziona l\'universo, comandante.']},
-    {name:'Nave Scorta Calcara',    lines:['Trasporto ufficiale. Non avvicinarti o rispondo con le frecce — ehm, i laser.','Se porti roba "sensibile", abbassa i fari: non tutti vogliono vedere cosa timbriamo.']},
+    {name:'Guardia di Calcara',     lines:[
+      'Zona economica speciale di Calcara. C\'è un pedaggio. Firma o gira.',
+      'Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.',
+      'Qui la verità ha timbro e IVA. Se non è fatturata, per noi non esiste.'
+    ]},
+    {name:'Funzionario Calcarese',  lines:[
+      'Togliti: porto le pratiche per il quinto hangar.',
+      'Orbito attorno a Crespellano. I soldi orbitano attorno a me. Non è fisica: è amministrazione.',
+      'Autenticazione rapida, file sigillato, cliente contento. Così gira l\'universo, comandante.'
+    ]},
+    {name:'Nave Scorta Calcara',    lines:[
+      'Trasporto ufficiale. Non avvicinarti o rispondo coi laser. Le chiamavamo frecce, ma sono laser.',
+      'Se porti roba sensibile, abbassa i fari. Non tutti vogliono vedere cosa timbriamo.'
+    ]},
   ],
   monteveglio:[
-    {name:'Cavaliere dell\'Ordine', lines:['Alt, viandante! Per l\'onore della Rocca, identifica la tua nave.','Il Castellano ha indetto la sagra. Sei invitato — con armatura medievale, ovviamente.','Deponi le armi — le frecce di luce. Procedi in pace.','Il Patto non si riconquista con inchini: si riconquista con prove nel vuoto.']},
-    {name:'Paladino di Monteveglio',lines:['Ho partecipato al LARP per vent\'anni. E\' diventato reale. Non vedo la differenza.','La sola differenza tra il gioco di ruolo e il governo: le tasse. Nel LARP non c\'erano le tasse.','Quando Calcara dice "certificato", noi sentiamo "copia": la Rocca non ascolta i fogli, ascolta il sangue.']},
-    {name:'Mercante dell\'Ordine',  lines:['Armature fresche dalla fucina. Resistono anche ai laser — le chiamiamo frecce di luce ma son laser, tranquillo.','Compro storie solo se hanno un manico: il resto e\' politica orbitale.']},
+    {name:'Cavaliere dell\'Ordine', lines:[
+      'Alt, viandante. Per l\'onore della Rocca, di\' chi sei e dove vai.',
+      'Il Castellano ha indetto la sagra. Sei invitato, con armatura. Anche se è plastica: conta il gesto.',
+      'Il Patto non si riprende con gli inchini. Si riprende con prove nel vuoto.'
+    ]},
+    {name:'Paladino di Monteveglio',lines:[
+      'Ho fatto LARP per vent\'anni. Poi è diventato reale. La differenza? Le tasse.',
+      'Quando Calcara dice «certificato», noi sentiamo «copia». La Rocca ascolta il sangue, non i fogli.'
+    ]},
+    {name:'Mercante dell\'Ordine',  lines:[
+      'Armature fresche dalla fucina. Resistono anche ai laser. Le chiamiamo frecce di luce, ma sono laser, tavò.',
+      'Compro storie solo se hanno un manico. Il resto è politica orbitale.'
+    ]},
   ],
   savigno:[
-    {name:'Guardia Tartufera',      lines:['Fermo. Codice di autenticazione tartufo?','I tartufi spaziali valgono piu\' del tuo carburante. Rispettali.','Savigno non ha bisogno di alleati. Ha i tartufi. E\' sufficiente.','Il sigillo del Patto non si paga in slogan: si paga in aroma.']},
-    {name:'Mercante di Savigno',    lines:['Prezzo 420. Non scende. Toronto la trattativa.','Zantic lo spazio, caldo il tartufo.','Le stelle qui sono fredde apposta: cosi\' capisci cosa e\' davvero caldo.']},
-    {name:'Esploratore di Savigno', lines:['Vengo da Zappolino. Ho vinto la battaglia simulata. Il premio erano tartufi. Ovviamente.','Se torni da Bazzano con carta vecchia, portaci anche fame: la fame si traduce in accordi.']},
+    {name:'Guardia Tartufera',      lines:[
+      'Fermo. Codice di autenticazione tartufo? Senza quello sei un turista coi motori caldi.',
+      'I tartufi spaziali valgono più del tuo carburante. Rispettali.',
+      'Il sigillo del Patto non si paga a slogan. Si paga in aroma. E in silenzio.'
+    ]},
+    {name:'Mercante di Savigno',    lines:[
+      'Prezzo 420. Non scende. Toronto la trattativa.',
+      'Zantic lo spazio, caldo il tartufo. Se non capisci, gira.'
+    ]},
+    {name:'Esploratore di Savigno', lines:[
+      'Vengo da Zappolino. Ho vinto la battaglia simulata. Premio: tartufi. Ovvio.',
+      'Se torni da Bazzano con carta vecchia, porta anche fame. La fame apre gli accordi.'
+    ]},
   ],
   pirate:[
-    {name:'Pirata Spaziale',        lines:['Crediti o fuoco. Scegli.','Non sono di nessuna fazione. Sono di chi paga meglio.','Taproblem con il commercio onesto — per questo faccio il pirata.','Il Patto? Io lo vendo al peso — come tutto il resto.']},
+    {name:'Pirata Spaziale',        lines:[
+      'Crediti o fuoco. Scegli, e scegli in fretta.',
+      'Non sono di nessuna fazione. Sono di chi paga meglio.',
+      'Taproblem col commercio onesto: per questo faccio il pirata.',
+      'Il Patto? Lo vendo al peso, come tutto il resto.'
+    ]},
   ],
 };
 
@@ -5954,120 +6024,120 @@ function pickDlgOpening(ns){
   const lines=entry.lines||['...'];
   const idx=(ns.seed||0)%lines.length;
   const v=rep[ns.faction]||0;
-  if(ns.angry)return 'Hai già sparato. Non fingere cortesia — parla in fretta.';
-  if(typeof STORY!=='undefined'&&STORY.chapter>=4&&(ns.seed%3===0)){
+  if(ns.angry)return 'Hai già sparato. Non fare il cortese adesso: parla in fretta, o chiudi il canale.';
+  if(typeof STORY!=='undefined'&&STORY.chapter>=4&&((ns.seed||0)%3===0)){
     const storyBits={
-      bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie — e le casate maggiori ascoltano i rapporti.',
-      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar.',
-      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium a mezza voce.',
-      monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: Palazzo Beghelli. Cortesia di casata. Aiuto limitato.',
-      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato.',
-      pirate:'Il Patto? Lo vendo a pezzi. E se qualcuno cerca macguffinium, vendo anche le mappe — care.'
+      bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie, e che le casate maggiori ascoltino i rapporti. Io ascolto il vino.',
+      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar. Macguffinium, dicono. A mezza voce.',
+      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium come se fosse un codice IVA.',
+      monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: è il Palazzo Beghelli. Cortesia di casata, aiuto poco. Non aspettarti miracoli.',
+      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato. Non è tartufo.',
+      pirate:'Il Patto? Lo vendo a pezzi. E se qualcuno cerca macguffinium, vendo anche le mappe. Care, ovviamente.'
     };
     return storyBits[ns.faction]||lines[idx];
   }
-  if(v>35)return lines[Math.min(lines.length-1,idx)]+' (Ti riconoscono.)';
-  if(v<-20)return 'Non avvicinarti troppo. Parla, poi sparisci.';
+  if(v>35)return lines[idx]+'\n\n(Ti riconoscono. La voce si è ammorbidita.)';
+  if(v<-20)return 'Non avvicinarti troppo. Parla, poi sparisci. Qui la pazienza costa.';
   return lines[idx];
 }
 
-/** Alberi dialogo 2–3 battute con effetti (rep / missione / crediti). */
+/** Alberi dialogo: italiano chiaro, dialetto a spicchi, niente slogan forzati. */
 const DLG_TREES={
   bazzano:{
     start:'a1',
     nodes:{
-      a1:{text:'Canale aperto. Se hai carte in regola, parla. Altrimenti torci la rotta.',choices:[
+      a1:{text:'Canale aperto. Se hai le carte in regola, parla. Altrimenti gira la rotta: oggi i dazi sono nervosi.',choices:[
         {label:'[UFFICIALE] "Sono Zvan Marìa, Funzionario VII."',next:'a2',fx:{rep:4}},
-        {label:'[DISCRETO] "Solo di passaggio."',next:'a3'},
-        {label:'[DOMANDA] "Novità sul Patto?"',next:'a4'}
+        {label:'[DISCRETO] "Solo di passaggio, tavò."',next:'a3'},
+        {label:'[DOMANDA] "Novità sul Patto del Molino?"',next:'a4'}
       ]},
-      a2:{text:'Ricevuto, Funzionario. A Prime aspettano un rapporto. Non amano i ritardi. E Imperium, dietro le quinte, tiene d\'occhio le nostre anomalie.',choices:[
+      a2:{text:'Ricevuto, Funzionario. A Prime aspettano un rapporto e non amano i ritardi. Dietro le quinte Imperium tiene d\'occhio le nostre anomalie. Tu firma, noi contiamo le scie.',choices:[
         {label:'[OK] "Lo terrò a mente."',next:null,fx:{rep:2}},
-        {label:'[PRESSIONE] "Dimmi chi aspetta."',next:'a5',fx:{rep:-2}}
+        {label:'[PRESSIONE] "Dimmi chi aspetta davvero."',next:'a5',fx:{rep:-2}}
       ]},
-      a3:{text:'Passaggio libero. Le scie si contano lo stesso. Non fare il furbo vicino ai dazi.',choices:[
-        {label:'[CHIUDI] "Capito."',next:null}
+      a3:{text:'Passaggio libero. Le scie si contano lo stesso. Non fare il furbo vicino ai dazi, eh.',choices:[
+        {label:'[CHIUDI] "Capito. Taproblem."',next:null}
       ]},
-      a4:{text:'Sotto traccia: tre rotte, un archivio, un nome che non dicono. Ti do un appiglio, a costo di simpatia.',choices:[
-        {label:'[ACCETTA] "Parla."',next:'a6',fx:{rep:3,mission:'dlg_tip_bazz'}},
-        {label:'[RIFIUTA] "Troppo caro."',next:null}
+      a4:{text:'Sotto traccia: tre rotte, un archivio, un nome che a Prime non dicono ad alta voce. Ti do un appiglio, se ti fidi. Costa un po\' di simpatia.',choices:[
+        {label:'[ACCETTA] "Parla. Ascolto."',next:'a6',fx:{rep:3,mission:'dlg_tip_bazz'}},
+        {label:'[RIFIUTA] "Troppo caro per oggi."',next:null}
       ]},
-      a5:{text:'Non in radio. Se proprio vuoi sapere, porta documenti a Calcara e vedi chi suda. Le casate di Imperium hanno orecchie lunghe anche qui.',choices:[
-        {label:'[OK]',next:null,fx:{mission:'dlg_tip_calc'}}
+      a5:{text:'Non in radio, tavò. Se proprio vuoi sapere, porta documenti a Calcara e guarda chi suda. Le casate di Imperium hanno orecchie lunghe anche qui.',choices:[
+        {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
       ]},
-      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco.',choices:[
-        {label:'[GRAZIE]',next:null,fx:{credits:40}}
+      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco. E parla meno.',choices:[
+        {label:'[GRAZIE] "Ricevuto."',next:null,fx:{credits:40}}
       ]}
     }
   },
   pirate:{
     start:'p1',
     nodes:{
-      p1:{text:'Crediti o fuoco. Hai tre secondi per sembrare interessante.',choices:[
+      p1:{text:'Crediti o fuoco. Hai tre secondi per sembrare interessante. Poi sparo.',choices:[
         {label:'[CORRUZIONE] Offri 250 Cr',next:'p2',fx:{credits:-250,rep:6}},
         {label:'[BLUFF] "Ho amici a Calcara."',next:'p3',fx:{rep:-4}},
         {label:'[ATTACCA] Apri il fuoco',next:null,fx:{angry:true,rep:-20}}
       ]},
-      p2:{text:'Accettato. Questa volta. La prossima costa di più — magari una missione sporca.',choices:[
-        {label:'[OK]',next:null,fx:{mission:'dlg_pirate_job'}}
+      p2:{text:'Accettato. Questa volta. La prossima costa di più. Magari una missione sporca, se ti va di sporcarti.',choices:[
+        {label:'[OK] "Dimmi di più."',next:null,fx:{mission:'dlg_pirate_job'}}
       ]},
       p3:{text:'Calcara? Allora forse non sei solo carne da laser. Sparisci prima che cambi idea.',choices:[
-        {label:'[FUGGI]',next:null}
+        {label:'[FUGGI] Chiudi canale',next:null}
       ]}
     }
   },
   monteveglio:{
     start:'m1',
     nodes:{
-      m1:{text:'Per l\'onore della Rocca: parla a viso alto, o deponi le armi.',choices:[
+      m1:{text:'Per l\'onore della Rocca: parla a viso alto, o deponi le armi. Qui il gesto conta quanto la mira.',choices:[
         {label:'[ONORE] "Cerco prove, non scuse."',next:'m2',fx:{rep:5}},
         {label:'[TORNEO] "Come si entra nel torneo?"',next:'m3'},
         {label:'[BEGHELLI] "I Beghelli sono in sistema?"',next:'m4'},
-        {label:'[CHIUDI]',next:null}
+        {label:'[CHIUDI] "Un altro giorno."',next:null}
       ]},
-      m2:{text:'Allora ascolta: tre ostili all\'Ordine, o un regalo decente al Castellano. Funzionano entrambi.',choices:[
-        {label:'[ACCETTA SFIDA]',next:null,fx:{mission:'dlg_order_duel',rep:3}},
-        {label:'[DOPO]',next:null}
+      m2:{text:'Allora ascolta: tre ostili all\'Ordine, oppure un regalo decente al Castellano. Funzionano entrambi. Scegli.',choices:[
+        {label:'[ACCETTA SFIDA] "Prendo le armi."',next:null,fx:{mission:'dlg_order_duel',rep:3}},
+        {label:'[DOPO] "Ci penso."',next:null}
       ]},
-      m3:{text:'Iscriviti a Monteveglio Station. Porta armatura — anche se è plastica. Qui il gesto conta.',choices:[
-        {label:'[OK]',next:null,fx:{rep:2}}
+      m3:{text:'Iscriviti a Monteveglio Station. Porta un\'armatura, anche di plastica. Qui conta il gesto, non il metallo.',choices:[
+        {label:'[OK] "Ricevuto."',next:null,fx:{rep:2}}
       ]},
-      m4:{text:'Il Palazzo Beghelli è una nave-cattedrale. Dominavano Valsamoggio quando eravamo provincia vera. Ora sono casata minore: cortesia, pochi favori, poca forza. Se hai connessioni, chiedi. Non aspettarti miracoli.',choices:[
-        {label:'[CAPITO]',next:null,fx:{rep:1}}
+      m4:{text:'Il Palazzo Beghelli è una nave-cattedrale. Dominavano Valsamoggio quando eravamo provincia vera. Ora sono casata minore: cortesia, pochi favori, poca forza. Se hai connessioni, chiedi. Non aspettarti flotte.',choices:[
+        {label:'[CAPITO] "Grazie."',next:null,fx:{rep:1}}
       ]}
     }
   },
   calcara:{
     start:'c1',
     nodes:{
-      c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità. In quest\'ordine.',choices:[
+      c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità. In quest\'ordine. Cosa cerchi?',choices:[
         {label:'[AFFARI] "Cerco un contratto discreto."',next:'c2',fx:{rep:2}},
         {label:'[PRESSIONE] "So dei vostri appalti."',next:'c3',fx:{rep:-3}},
-        {label:'[CHIUDI]',next:null}
+        {label:'[CHIUDI] "Niente per ora."',next:null}
       ]},
-      c2:{text:'Discreto costa. Ma paga. Due navi crespellanesi di troppo sul corridoio — e un bonus se nessuno parla.',choices:[
-        {label:'[ACCETTA]',next:null,fx:{mission:'dlg_calc_contract',rep:3,credits:50}},
-        {label:'[DOPO]',next:null}
+      c2:{text:'Discreto costa. Ma paga. Due navi crespellanesi di troppo sul corridoio mercantile, e un bonus se nessuno parla. Ti interessa?',choices:[
+        {label:'[ACCETTA] "Accetto."',next:null,fx:{mission:'dlg_calc_contract',rep:3,credits:50}},
+        {label:'[DOPO] "Ci ripenso."',next:null}
       ]},
-      c3:{text:'Allora sai anche che la carta vince sul laser. Porta documenti a Prime e smettila di fare il detective.',choices:[
-        {label:'[OK]',next:null,fx:{mission:'dlg_tip_calc'}}
+      c3:{text:'Allora sai anche che la carta vince sul laser. Porta documenti a Prime e smettila di fare il detective a mezza voce.',choices:[
+        {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
       ]}
     }
   },
   savigno:{
     start:'s1',
     nodes:{
-      s1:{text:'Codice tartufo? Altrimenti sei solo un turista con i motori caldi.',choices:[
+      s1:{text:'Codice tartufo? Altrimenti sei solo un turista coi motori caldi. Parla.',choices:[
         {label:'[RISPETTO] "Rispetto il fungo e il silenzio."',next:'s2',fx:{rep:5}},
         {label:'[COMMERCIO] "Compro. Non tratto."',next:'s3',fx:{rep:2}},
-        {label:'[CHIUDI]',next:null}
+        {label:'[CHIUDI] "Giro."',next:null}
       ]},
-      s2:{text:'Bene. Allora ascolta: qualcuno a Bazzano paga i tartufi in indizi. Porta un carico — e apri orecchie.',choices:[
-        {label:'[ACCETTA PISTA]',next:null,fx:{mission:'dlg_sav_truffle',rep:4}},
-        {label:'[DOPO]',next:null}
+      s2:{text:'Bene. Allora ascolta: a Bazzano qualcuno paga i tartufi in indizi. Porta un carico e tieni le orecchie aperte. L\'aroma non mente; le voci sì.',choices:[
+        {label:'[ACCETTA PISTA] "Ci vado."',next:null,fx:{mission:'dlg_sav_truffle',rep:4}},
+        {label:'[DOPO] "Non oggi."',next:null}
       ]},
-      s3:{text:'420. Sempre. Se torni con meno, non tornare.',choices:[
-        {label:'[OK]',next:null,fx:{credits:-20}}
+      s3:{text:'420. Sempre. Se torni con meno, non tornare. Toronto la discussione.',choices:[
+        {label:'[OK] "Chiaro."',next:null,fx:{credits:-20}}
       ]}
     }
   }
@@ -6133,31 +6203,31 @@ function buildDlgChoices(ns){
   // ── Greeting
   choices.push({label:'[SALUTA] "Buon viaggio, comandante."',cls:'',fn:()=>{
     const greets={
-      bazzano:'Taproblem. Vola sicuro — ma non troppo lontano dalla nostra zona. A Prime qualcuno conta le scie.',
-      crespellano:'...sì. Vola. Qui le mappe mentono per abitudine, non per malizia.',
-      calcara:'Grazie. Abbiamo appena inaugurato un altro hangar. Se ti serve un contratto, parla chiaro.',
+      bazzano:'Taproblem. Vola sicuro, ma non troppo lontano dalla nostra zona. A Prime qualcuno conta le scie due volte.',
+      crespellano:'Sì. Vola. Qui le mappe mentono per abitudine, non per malizia. Toronto chi ci crede.',
+      calcara:'Grazie. Abbiamo appena inaugurato un altro hangar. Se ti serve un contratto, parla chiaro e firma.',
       monteveglio:'Per l\'onore della Rocca. Se cerchi prove, non portarci scuse.',
-      savigno:'Ricevuto. Attento ai tartufi contraffatti — e alle promesse di Calcara.',
+      savigno:'Ricevuto. Attento ai tartufi contraffatti e alle promesse di Calcara.',
       pirate:'Mmh. Non mi fido. Ma oggi non ho voglia di fare buchi nella tua carena.',
     };
     showIdlgLine(ns,greets[faction]||'Ricevuto.',()=>closeIdlg());
   }});
 
-  // ── Branched conversation (2–3 beats)
+  // ── Branched conversation (opzionale, non forzata)
   if(DLG_TREES[faction]){
-    choices.push({label:'[DIALOGO] Apri una conversazione...',cls:'',fn:()=>startDlgTree(ns,faction)});
+    choices.push({label:'[PARLA] Continua a chiacchierare…',cls:'',fn:()=>startDlgTree(ns,faction)});
   }
 
   // ── Press on the Pact / story
   choices.push({label:'[PATTO] "Sai qualcosa del Patto del Molino?"',cls:'',fn:()=>{
     const bits={
       bazzano:v=>{
-        if(v>20)return 'Sotto traccia: tre rotte, un archivio, e un nome che a Prime non dicono ad alta voce. Non sono io a dartelo gratis.';
-        return 'Il Patto? Carta vecchia e nervi nuovi. Se non sei inviato, fai il turista.';
+        if(v>20)return 'Sotto traccia: tre rotte, un archivio, e un nome che a Prime non dicono ad alta voce. Non te lo do gratis, eh.';
+        return 'Il Patto? Carta vecchia e nervi nuovi. Se non sei inviato, fai il turista e basta.';
       },
-      crespellano:()=>'Negli scaffali sbagliati c\'è più verità che nei comunicati. Porta pazienza — o una chiave.',
-      calcara:()=>'Se ha un prezzo, lo abbiamo già messo a budget. Se non ce l\'ha, non esiste.',
-      monteveglio:()=>'Il Patto non si compra: si merita. La Rocca ascolta chi torna con prove, non con rumor.',
+      crespellano:()=>'Negli scaffali sbagliati c\'è più verità che nei comunicati. Porta pazienza. O una chiave.',
+      calcara:()=>'Se ha un prezzo, lo abbiamo già messo a budget. Se non ce l\'ha, per noi non esiste.',
+      monteveglio:()=>'Il Patto non si compra: si merita. La Rocca ascolta chi torna con prove, non con voci di corridoio.',
       savigno:()=>'Si sente nell\'aria, come un tartufo vero. Il resto è propaganda orbitale.',
       pirate:()=>'Io vendo pezzi di storia al chilo. Tu hai crediti o solo domande?'
     };
@@ -6173,7 +6243,7 @@ function buildDlgChoices(ns){
       const pushBack={
         bazzano:'Hai appena perso punti a Prime. Parla ancora così e ti marchiamo.',
         crespellano:'Minacce? Almeno sei onesto. Meglio di un funzionario.',
-        calcara:'Registrato. La prossima fattura includerà "comportamento ostile".',
+        calcara:'Registrato. La prossima fattura includerà «comportamento ostile».',
         monteveglio:'Deporre le armi. O dimostrare di meritarle.',
         savigno:'420 Cr di multa morale. Paghi in silenzio.',
         pirate:'Ah. Finalmente. Preferisco chi grida a chi sorride.',
@@ -6192,32 +6262,32 @@ function buildDlgChoices(ns){
   choices.push({label:'[INFORMAZIONI] "Novità nel settore?"',cls:'',fn:()=>{
     const infos={
       bazzano:[
-        'Ho sentito che Calcara ha inaugurato il settimo hangar. Il Sindaco era a Crespellano — ironia della sorte.',
-        'Bazzano Prime ha aumentato le tasse di transito. Taebol chi si stupisce.',
-        'La sagra del vino dei colli è fra dieci giorni. Prezzi alle stelle, qualità eccellente.',
+        'Ho sentito che Calcara ha inaugurato il settimo hangar. Il Sindaco era a Crespellano. Taebol chi si stupisce.',
+        'Bazzano Prime ha aumentato le tasse di transito. Nichita sorpreso, davvero.',
+        'La sagra del vino dei colli è fra dieci giorni. Prezzi alle stelle, qualità mejon.',
       ],
       crespellano:[
-        'Niente da segnalare. E\' la nostra condizione permanente.',
-        'La domanda del semaforo è passata dalla fase A alla fase A-bis. Progressi enormi.',
+        'Niente da segnalare. È la nostra condizione permanente.',
+        'La domanda del semaforo è passata dalla fase A alla fase A-bis. Progressi enormi, dicono loro.',
         'La scuola rovescia ha aperto un museo. Si entra dal tetto, ovviamente.',
       ],
       calcara:[
-        'Il nuovo polo industriale espande la produzione di materiali edili. Contratti disponibili.',
-        'Il Sindaco sta progettando un ottavo hangar. Inaugurazione prevista per giovedì.',
-        'Abbiamo abbassato i prezzi dei materiali del 2%. E\' una rivoluzione nel settore.',
+        'Il nuovo polo industriale espande la produzione di materiali edili. Contratti disponibili. Firma qui.',
+        'Il Sindaco sta progettando un ottavo hangar. Inaugurazione prevista per giovedì. Come sempre.',
+        'Abbiamo abbassato i prezzi dei materiali del 2%. Una rivoluzione, a sentire il comunicato.',
       ],
       monteveglio:[
         'Il torneo del Castellano è aperto alle candidature. Armatura obbligatoria.',
-        'L\'Ordine ha adottato ufficialmente le "frecce laser" come termine tecnico.',
-        'Oliveto Alta ha ampliato la biblioteca. Nuova sezione: "Armature per lo spazio profondo".',
+        'L\'Ordine ha adottato ufficialmente le «frecce laser» come termine tecnico. Sono laser. Lo sappiamo.',
+        'Oliveto Alta ha ampliato la biblioteca. Nuova sezione: armature per lo spazio profondo.',
       ],
       savigno:[
         'Il prezzo del tartufo è rimasto invariato. Come sempre. Come sempre sarà.',
         'Zappolino ha respinto un\'incursione pirata. Nessuna perdita. Molti tartufi consumati in celebrazione.',
-        'Un commerciante di fuori sistema ha provato a vendere tartufi "autentici". Non era autentico. Non sta più bene.',
+        'Un commerciante di fuori sistema ha provato a vendere tartufi «autentici». Non erano autentici. Non sta più bene.',
       ],
       pirate:[
-        'Le pattuglie di Calcara sono aumentate nel settore intermedio. Aggiornate le rotte.',
+        'Le pattuglie di Calcara sono aumentate nel settore intermedio. Aggiornate le rotte, se sapete farlo.',
         'C\'è un mercato nero a Castelletto. Parola d\'ordine: piadina.',
         'Qualcuno sta comprando armi vere in grandi quantità. Non so chi. Non voglio saperlo.',
       ],
@@ -6229,18 +6299,17 @@ function buildDlgChoices(ns){
   // ── Bribe / passage (hostile)
   if(hostile){
     choices.push({label:'[CORRUZIONE] Offri 400 Cr per passare libero.',cls:'trade',fn:()=>{
-      if(PS.credits<400){showIdlgLine(ns,'Tamonei in bisaccia? Me ne vado — ma torno.',()=>closeIdlg());return;}
+      if(PS.credits<400){showIdlgLine(ns,'Tamonei in bisaccia? Me ne vado, ma torno.',()=>closeIdlg());return;}
       PS.credits-=400;changeRep(faction,6);
-      showIdlgLine(ns,'...accettato. Questa volta. La prossima costa di più.',()=>closeIdlg());
+      showIdlgLine(ns,'Accettato. Questa volta. La prossima costa di più.',()=>closeIdlg());
     }});
     if(type==='pirate'){
       choices.push({label:'[RISCATTO] "Prendete la metà della mia stiva e lasciatemi."',cls:'trade',fn:()=>{
         const keys=Object.keys(PS.cargo);
         if(!keys.length){showIdlgLine(ns,'Stiva vuota? Non c\'è accordo.',()=>closeIdlg());return;}
-        // remove half cargo
         keys.forEach(k=>{PS.cargo[k]=Math.ceil(PS.cargo[k]/2);if(!PS.cargo[k])delete PS.cargo[k];});
         changeRep('pirate',10);
-        showIdlgLine(ns,'Accordo. Sei fortunato — oggi accettiamo anche le piadine.',()=>closeIdlg());
+        showIdlgLine(ns,'Accordo. Sei fortunato: oggi accettiamo anche le piadine.',()=>closeIdlg());
       }});
     }
     choices.push({label:'[ATTACCA] Apri il fuoco!',cls:'hostile',fn:()=>{
@@ -6257,14 +6326,14 @@ function buildDlgChoices(ns){
       if(PS.credits<500){showIdlgLine(ns,'Non hai abbastanza crediti per il servizio.',()=>closeIdlg());return;}
       PS.credits-=500;changeRep(faction,5);
       ns.escorting=true;ns.escortTimer=45;
-      showIdlgLine(ns,'Concordato. Vi seguiremo per il prossimo tratto. Non allontanarti troppo.',()=>closeIdlg());
+      showIdlgLine(ns,'Concordato. Ti seguiamo per un tratto. Non allontanarti troppo.',()=>closeIdlg());
     }});
   }
 
   // ── Faction-specific dialogue
   if(faction==='calcara'&&(rep.calcara||0)>-10){
     choices.push({label:'[CONTRATTO] "Hai un appalto per me?"',cls:'trade',fn:()=>{
-      showIdlgLine(ns,'Certamente. Porta materiali edili a Calcara Station. Compenso 450 Cr. Ovviamente costruiremo a Calcara.',()=>{
+      showIdlgLine(ns,'Certamente. Porta materiali edili a Calcara Station. Compenso 450 Cr. Ovviamente costruiremo a Calcara: dove sennò?',()=>{
         const stC=getST('calcara');
         if(stC&&!stC.missionsList.find(m=>m.id==='inline_mat')){
           stC.missionsList.push({id:'inline_mat',type:'delivery',sid:'calcara',targetSid:'calcara',title:'Forniture Calcara',desc:'Porta materiali a Calcara Station.',reward:450,repGain:{calcara:8},cargo:{type:'materiali',qty:2},done:false,active:false});
@@ -6276,32 +6345,33 @@ function buildDlgChoices(ns){
   }
   if(faction==='monteveglio'&&(rep.monteveglio||0)>5){
     choices.push({label:'[TORNEO] "Come ci si qualifica per il torneo?"',cls:'',fn:()=>{
-      showIdlgLine(ns,'Devi abbattere almeno tre navi di fazioni ostili all\'Ordine in meno di cinque minuti. O portare un regalo decente al Castellano. Funzionano entrambi.',()=>closeIdlg());
+      showIdlgLine(ns,'Devi abbattere almeno tre navi di fazioni ostili all\'Ordine in meno di cinque minuti. Oppure portare un regalo decente al Castellano. Funzionano entrambi.',()=>closeIdlg());
     }});
   }
 
   // ── Rumor (reputation-gated)
   if((rep[faction]||0)>30){
-    choices.push({label:'[VOCE RISERVATA] "Qualcosa che non devo sapere?"',cls:'',fn:()=>{
+    choices.push({label:'[VOCE RISERVATA] "Qualcosa che non dovrei sapere?"',cls:'',fn:()=>{
       const secrets={
-        bazzano:'Il Patto del Molino... dicono che qualcuno lo stia cercando attivamente. Non solo tu.',
-        crespellano:'Ho sentito che Calcara ha un accordo segreto con Bazzano. Crespellano — come sempre — non è stato invitato.',
+        bazzano:'Il Patto del Molino… dicono che qualcuno lo stia cercando davvero. Non solo tu. Tagiov la canz, eh.',
+        crespellano:'Ho sentito che Calcara ha un accordo segreto con Bazzano. Crespellano, come sempre, non è stato invitato.',
         calcara:'L\'Oligarchia sta finanziando i pirati di Castelletto. Non dirlo a nessuno. Ti pago per il silenzio.',
         monteveglio:'Il Castellano sa dove si trova il terzo frammento del Patto. Ma vuole qualcosa in cambio.',
         savigno:'C\'è un deposito nascosto di tartufi da qualche parte nell\'anello asteroidale. Non cercarlo. È mio.',
-        pirate:'Stiamo pianificando qualcosa di grosso contro Calcara. Interessa partecipare? 30% del bottino.',
+        pirate:'Stiamo pianificando qualcosa di grosso contro Calcara. Ti interessa? 30% del bottino.',
       };
       showIdlgLine(ns,secrets[faction]||'...',()=>closeIdlg());
     }});
   }
 
-  // ── Mission info
+  // ── Mission info (titolo intero, niente taglio)
   if(PS.activeMissions.length>0&&(rep[faction]||0)>-10){
     const m=PS.activeMissions[0];
-    choices.push({label:`[MISSIONE] Info su: "${m.title.slice(0,24)}..."`,cls:'',fn:()=>{
+    const mTitle=m.title||'missione';
+    choices.push({label:'[MISSIONE] Info su: «'+mTitle+'»',cls:'',fn:()=>{
       const lines={
-        bazzano:'A Bazzano sanno tutto. Ma non lo dicono gratis. Hai già pagato abbastanza però — ecco: cerca nell\'orbita esterna.',
-        crespellano:'Non sappiamo niente. Conoscendoci, probabilmente l\'abbiamo archiviato come "niente".',
+        bazzano:'A Bazzano sanno tutto, ma non lo dicono gratis. Hai già pagato abbastanza, però: cerca nell\'orbita esterna.',
+        crespellano:'Non sappiamo niente. Conoscendoci, probabilmente l\'abbiamo archiviato come «niente».',
         calcara:'Potremmo aiutare. Costruiamo un piccolo ufficio informazioni. A Calcara, naturalmente. Costa 600 Cr.',
         monteveglio:'L\'Ordine ha questa informazione. Portaci in cambio una cassa di vino bazzanese.',
         savigno:'420 Cr per l\'informazione. Il nostro unico prezzo per qualsiasi cosa.',
@@ -6386,16 +6456,9 @@ function openIdlg(ns){
     kind:(type==='pirate'||faction==='pirate')?'pirate':undefined
   });
   document.getElementById('idlg-choices').innerHTML='';
-  const hostile=(rep[faction]||0)<=-15||type==='pirate'||!!ns.angry;
+  // Apertura naturale: testo completo + menu libero (niente albero forzato)
   typeIdlgText(pickDlgOpening(ns),()=>{
-    // Auto-avvia albero per fazioni con dialogo ramificato (una volta su due)
-    if(DLG_TREES[faction]&&((ns.seed||0)%2===0)&&!hostile){
-      const el=document.getElementById('idlg-choices');el.innerHTML='';
-      const b1=document.createElement('button');b1.className='choice-btn';b1.textContent='[DIALOGO] Continua la conversazione...';
-      b1.addEventListener('click',()=>startDlgTree(ns,faction));el.appendChild(b1);
-      const b2=document.createElement('button');b2.className='choice-btn';b2.textContent='[MENU] Altre opzioni';
-      b2.addEventListener('click',()=>renderIdlgChoices(buildDlgChoices(ns)));el.appendChild(b2);
-    }else renderIdlgChoices(buildDlgChoices(ns));
+    renderIdlgChoices(buildDlgChoices(ns));
   });
   document.getElementById('idlg').style.display='flex';
 }
