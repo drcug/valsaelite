@@ -26,13 +26,15 @@ window.PORTRAIT_LAYOUT = {
     accScale: 1,
     accY: 0
   },
-  hairTints: ['#100808'],
+  hairTints: ['#e8e6e2'],
   player: {
     head: 'sprites/faces/player/zvan_complete.png',
-    hair: null,
-    hairTint: '#c8c8c8',
+    hair: 'sprites/faces/player/zvan_hair.png',
+    hairTint: '#f0eeea',
     name: 'Zvan Marìa',
-    complete: true
+    complete: true,
+    // Capelli bianchi/argento come in sprites/story/intro/intro_03.jpg
+    hairColor: '#e8e6e2'
   },
   pools: {
     men: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],

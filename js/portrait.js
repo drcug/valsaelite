@@ -319,13 +319,15 @@
     return true;
   }
 
-  function drawProcedural(ctx, W, H, seed, factionId) {
+  function drawProcedural(ctx, W, H, seed, factionId, opt) {
+    opt = opt || {};
+    const isPlayer = !!opt.player;
     const fCol = drawPortraitBg(ctx, W, H, factionId);
     const cx = W / 2, headY = H * 0.42, hw = W * 0.28, hh = H * 0.28;
     const skins = ['#f0d2b0', '#e8c4a0', '#c9956c', '#8d5a3c'];
-    const sk = skins[seed % skins.length];
+    const sk = isPlayer ? '#e8c8a8' : skins[seed % skins.length];
     // shoulders
-    ctx.fillStyle = fCol;
+    ctx.fillStyle = isPlayer ? '#1a3a3a' : fCol;
     ctx.beginPath();
     ctx.moveTo(W * 0.08, H);
     ctx.quadraticCurveTo(W * 0.5, H * 0.62, W * 0.92, H);
@@ -339,8 +341,8 @@
     ctx.beginPath();
     ctx.ellipse(cx, headY, hw, hh, 0, 0, Math.PI * 2);
     ctx.fill();
-    // hair attached
-    ctx.fillStyle = ['#1a1008', '#3a2810', '#c8c8c8', '#7a2010', '#0a0a0a', '#4a3020'][seed % 6];
+    // hair: Zvan = bianco/argento (intro_03); NPC = varietà
+    ctx.fillStyle = isPlayer ? '#e8e6e2' : ['#1a1008', '#3a2810', '#c8c8c8', '#7a2010', '#0a0a0a', '#4a3020'][seed % 6];
     ctx.beginPath();
     ctx.ellipse(cx, headY - hh * 0.45, hw * 1.08, hh * 0.62, 0, Math.PI, 0);
     ctx.fill();
@@ -348,6 +350,16 @@
     ctx.ellipse(cx - hw * 0.85, headY - hh * 0.05, hw * 0.28, hh * 0.45, -0.3, 0, Math.PI * 2);
     ctx.ellipse(cx + hw * 0.85, headY - hh * 0.05, hw * 0.28, hh * 0.45, 0.3, 0, Math.PI * 2);
     ctx.fill();
+    if (isPlayer) {
+      // volume laterale / ciuffo argento come intro_03
+      ctx.fillStyle = '#f4f2ee';
+      ctx.beginPath();
+      ctx.ellipse(cx - hw * 0.15, headY - hh * 0.72, hw * 0.55, hh * 0.28, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1a1210';
+      ctx.fillRect(cx - hw * 0.42, headY - hh * 0.28, hw * 0.28, hh * 0.07);
+      ctx.fillRect(cx + hw * 0.14, headY - hh * 0.28, hw * 0.28, hh * 0.07);
+    }
     // eyes
     ctx.fillStyle = '#1a1210';
     ctx.beginPath();
@@ -397,7 +409,7 @@
       const seed = opt.seed != null ? opt.seed : 1;
       const factionId = opt.factionId || 'bazzano';
       const ok = drawBust(ctx, W, H, seed, factionId, opt);
-      if (!ok) drawProcedural(ctx, W, H, seed, factionId);
+      if (!ok) drawProcedural(ctx, W, H, seed, factionId, opt);
       if (!partsState.ready && !partsState.loading) {
         PortraitParts.load().then(() => redrawAllVisiblePortraits());
       }
@@ -421,7 +433,8 @@
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
   global.resolvePortraitPool = resolvePortraitPool;
-  global.portraitHairTint = function () { return '#222'; };
+  /** Capelli Zvan: argento/bianco come in sprites/story/intro/intro_03.jpg */
+  global.portraitHairTint = function () { return '#e8e6e2'; };
   global.PortraitAtlas = PortraitAtlas;
   global.PortraitHeads = PortraitParts;
   global.PortraitParts = PortraitParts;
