@@ -358,6 +358,7 @@ body.docked-ui #smsg,body.menu-open #smsg{top:18%;bottom:auto;transform:translat
   width:100%;padding:9px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(44,100,190,.25);
   border-radius:6px;color:var(--txt);font-family:var(--FD);font-weight:600;font-size:12px;
   text-align:left;cursor:pointer;transition:all .14s;letter-spacing:.04em;
+  white-space:normal;line-height:1.35;word-break:break-word;
 }
 .choice-btn:hover{background:rgba(34,119,238,.14);border-color:var(--acc);color:var(--bright);}
 .choice-btn.hostile{border-color:rgba(200,50,20,.35);color:#ff8866;}
@@ -1780,7 +1781,9 @@ const STORY_INTERLUDES=[
   {id:'la_rocca',after:3,minRep:{monteveglio:20},title:'La Rocca Ti Riconosce',
     body:'Il Castellano incide il tuo nome sulla Tavola del Torneo: «Frecce di luce, sangue cosmico, verità intera. Ti aspettiamo alla prossima giostra.» Qualcuno mormora che i Beghelli stanno rientrando in sistema.'},
   {id:'anomalie_voce',after:3,minRep:{},title:'Voci dalle anomalie',
-    body:'Un pilota ubriaco a Castelletto: «Nelle pieghe dello spazio qualcosa luccica storto. Dicono macguffinium — materia a nove dimensioni. Se è vero, le casate di Imperium smetteranno di fingere che Valsamoggio non conti.»'},
+    body:'Un pilota ubriaco a Castelletto: «Nelle pieghe dello spazio qualcosa luccica storto. Dicono macguffinium — materia a nove dimensioni. Se è vero, le casate di Imperium smetteranno di fingere che Valsamoggio non conti. E gli space hulk? Pieni di mostri perché quella roba muta chi resta a bordo. Non sono alieni da manifesto: sono equipaggi andati a male.»'},
+  {id:'hulk_mutazioni',after:5,minRep:{},title:'Corridoi che camminano',
+    body:'Un reduce di abbordaggio, voce rotta: «Dentro lo hulk non c\'era silenzio. C\'erano cose che un tempo avevano nome. Il macguffinium delle anomalie non uccide subito: riscrive. Se cerchi prove del Patto là dentro, porta armi — e pietà.»'},
   {id:'la_pressione',after:3,minRep:{calcara:-40},title:'Pressione Calcarese',
     body:'Un comunicato pirata intercettato: «Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto.»'},
   {id:'il_palato',after:4,minRep:{savigno:25},title:'Il Palato del Consiglio',
@@ -1859,6 +1862,7 @@ function renderDiaryContent(){
     const bits=[];
     if(PS.loreFlags.casate_rumore||PS.loreFlags.periferia)bits.push('A Imperium le grandi casate si combattono; Valsamoggio resta periferia finché il Mulino gira.');
     if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)bits.push('Nelle anomalie si parla di macguffinium: materia a nove dimensioni, il materiale più prezioso dell\'universo.');
+    if(PS.loreFlags.hulk_mutazioni)bits.push('Gli space hulk sono pieni di mostri perché il macguffinium muta equipaggi e carne nei corridoi contaminati.');
     if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
     if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli — un tempo dominante, ora minore — può offrire un aiuto limitato dal Palazzo.');
     if(bits.length){
@@ -2042,6 +2046,7 @@ const TAVERN = {
     {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
     {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
     {s:'Osservatore radar',        t:'"Hai visto quella firma enorme? Più grossa di uno hulk. Palazzo Beghelli. Casata minore, un tempo padroni. Chiamali in radio se ti senti coraggioso — o connesso."'},
+    {s:'Reduce di abbordaggio',    t:'"Gli space hulk? Dentro cammina gente che non è più gente. Macguffinium delle anomalie: muta tutto. Io sono uscito. Loro no."'},
   ],
 };
 
@@ -2241,9 +2246,9 @@ const SUBORBIT_TUNING={
 function suborbitTuning(){return SUBORBIT_TUNING[SUBORBIT_BALANCE_PRESET]||SUBORBIT_TUNING.narrative;}
 let SUBORBIT_CONTROL_PRESET='assisted'; // assisted | arcade | sim
 const SUBORBIT_CONTROL={
-  assisted:{targetVx:410,targetVy:330,sx:10.8,sy:9.6,dx:.91,dy:.92,edgeAssistStart:.76,edgeAssistMin:130,edgeAssistMax:340,speedThrust:195,speedBrake:110,edgeSpeedTax:78},
-  arcade:{targetVx:470,targetVy:380,sx:12.4,sy:11.2,dx:.88,dy:.89,edgeAssistStart:.82,edgeAssistMin:90,edgeAssistMax:250,speedThrust:215,speedBrake:118,edgeSpeedTax:62},
-  sim:{targetVx:350,targetVy:280,sx:7.8,sy:7.2,dx:.94,dy:.95,edgeAssistStart:.7,edgeAssistMin:140,edgeAssistMax:380,speedThrust:168,speedBrake:96,edgeSpeedTax:105}
+  assisted:{targetVx:410,targetVy:330,sx:10.8,sy:9.6,dx:.91,dy:.92,edgeAssistStart:.72,edgeAssistMin:150,edgeAssistMax:380,speedThrust:195,speedBrake:110,edgeSpeedTax:68},
+  arcade:{targetVx:470,targetVy:380,sx:12.4,sy:11.2,dx:.88,dy:.89,edgeAssistStart:.78,edgeAssistMin:110,edgeAssistMax:280,speedThrust:215,speedBrake:118,edgeSpeedTax:55},
+  sim:{targetVx:350,targetVy:280,sx:7.8,sy:7.2,dx:.94,dy:.95,edgeAssistStart:.68,edgeAssistMin:160,edgeAssistMax:400,speedThrust:168,speedBrake:96,edgeSpeedTax:92}
 };
 const SUBORBIT_CONTROL_LABEL={assisted:'ASSISTITO',arcade:'ARCADE',sim:'SIM'};
 function suborbitControl(){return SUBORBIT_CONTROL[SUBORBIT_CONTROL_PRESET]||SUBORBIT_CONTROL.assisted;}
@@ -6027,12 +6032,12 @@ function pickDlgOpening(ns){
   if(ns.angry)return 'Hai già sparato. Non fare il cortese adesso: parla in fretta, o chiudi il canale.';
   if(typeof STORY!=='undefined'&&STORY.chapter>=4&&((ns.seed||0)%3===0)){
     const storyBits={
-      bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie, e che le casate maggiori ascoltino i rapporti. Io ascolto il vino.',
-      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar. Macguffinium, dicono. A mezza voce.',
-      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium come se fosse un codice IVA.',
-      monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: è il Palazzo Beghelli. Cortesia di casata, aiuto poco. Non aspettarti miracoli.',
-      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato. Non è tartufo.',
-      pirate:'Il Patto? Lo vendo a pezzi. E se qualcuno cerca macguffinium, vendo anche le mappe. Care, ovviamente.'
+      bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie, e che le casate maggiori ascoltino i rapporti. Io ascolto il vino. E se vedi uno space hulk: dentro non c\'è solo ruggine. Il macguffinium muta ciò che tocca.',
+      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar. Macguffinium, dicono. A mezza voce. Gli hulk? Sono pieni di cose che un tempo erano gente.',
+      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium come se fosse un codice IVA. I relitti? Contaminati. Mutazioni. Non mettere in bilancio la carne.',
+      monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: è il Palazzo Beghelli. Cortesia di casata, aiuto poco. Gli hulk veri, quelli spezzati nelle anomalie, ospitano mostri: il macguffinium non perdona.',
+      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato. Non è tartufo: è macguffinium. E dentro gli hulk... cose che non dovrebbero camminare.',
+      pirate:'Il Patto? Lo vendo a pezzi. Le mappe degli hulk? Care. Dentro ci sono mostri perché il macguffinium li ha fatti così. Non è poesia: è biologia sporca.'
     };
     return storyBits[ns.faction]||lines[idx];
   }
@@ -6049,7 +6054,8 @@ const DLG_TREES={
       a1:{text:'Canale aperto. Se hai le carte in regola, parla. Altrimenti gira la rotta: oggi i dazi sono nervosi.',choices:[
         {label:'[UFFICIALE] "Sono Zvan Marìa, Funzionario VII."',next:'a2',fx:{rep:4}},
         {label:'[DISCRETO] "Solo di passaggio, tavò."',next:'a3'},
-        {label:'[DOMANDA] "Novità sul Patto del Molino?"',next:'a4'}
+        {label:'[DOMANDA] "Novità sul Patto del Molino?"',next:'a4'},
+        {label:'[HULK] "Perché gli space hulk sono pieni di mostri?"',next:'a7'}
       ]},
       a2:{text:'Ricevuto, Funzionario. A Prime aspettano un rapporto e non amano i ritardi. Dietro le quinte Imperium tiene d\'occhio le nostre anomalie. Tu firma, noi contiamo le scie.',choices:[
         {label:'[OK] "Lo terrò a mente."',next:null,fx:{rep:2}},
@@ -6067,6 +6073,9 @@ const DLG_TREES={
       ]},
       a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco. E parla meno.',choices:[
         {label:'[GRAZIE] "Ricevuto."',next:null,fx:{credits:40}}
+      ]},
+      a7:{text:'Perché nelle anomalie c\'è macguffinium: materia a nove dimensioni. Contamina scafi, carne, memoria. Gli hulk non sono cimiteri: sono incubatrici. Chi ci restava dentro non è più quello che era. Abborda se ti serve un pezzo del Patto, ma non restare a chiacchierare coi mostri.',choices:[
+        {label:'[CAPITO] "Grazie per l\'avviso."',next:null,fx:{rep:1}}
       ]}
     }
   },
@@ -6076,6 +6085,7 @@ const DLG_TREES={
       p1:{text:'Crediti o fuoco. Hai tre secondi per sembrare interessante. Poi sparo.',choices:[
         {label:'[CORRUZIONE] Offri 250 Cr',next:'p2',fx:{credits:-250,rep:6}},
         {label:'[BLUFF] "Ho amici a Calcara."',next:'p3',fx:{rep:-4}},
+        {label:'[HULK] "Cosa so sugli space hulk?"',next:'p4'},
         {label:'[ATTACCA] Apri il fuoco',next:null,fx:{angry:true,rep:-20}}
       ]},
       p2:{text:'Accettato. Questa volta. La prossima costa di più. Magari una missione sporca, se ti va di sporcarti.',choices:[
@@ -6083,6 +6093,9 @@ const DLG_TREES={
       ]},
       p3:{text:'Calcara? Allora forse non sei solo carne da laser. Sparisci prima che cambi idea.',choices:[
         {label:'[FUGGI] Chiudi canale',next:null}
+      ]},
+      p4:{text:'Gli hulk driftano dalle anomalie. Dentro c\'è macguffinium: muta tutto. Uomini, topi, scafi. Quelli che vedi camminare non sono xenomorfi da manifesto: sono equipaggi che hanno respirato troppo a lungo. Io vendo le mappe. Tu porta un\'arma.',choices:[
+        {label:'[OK] "Chiaro."',next:null}
       ]}
     }
   },
@@ -6093,6 +6106,7 @@ const DLG_TREES={
         {label:'[ONORE] "Cerco prove, non scuse."',next:'m2',fx:{rep:5}},
         {label:'[TORNEO] "Come si entra nel torneo?"',next:'m3'},
         {label:'[BEGHELLI] "I Beghelli sono in sistema?"',next:'m4'},
+        {label:'[HULK] "Gli hulk e i mostri…"',next:'m5'},
         {label:'[CHIUDI] "Un altro giorno."',next:null}
       ]},
       m2:{text:'Allora ascolta: tre ostili all\'Ordine, oppure un regalo decente al Castellano. Funzionano entrambi. Scegli.',choices:[
@@ -6104,6 +6118,9 @@ const DLG_TREES={
       ]},
       m4:{text:'Il Palazzo Beghelli è una nave-cattedrale. Dominavano Valsamoggio quando eravamo provincia vera. Ora sono casata minore: cortesia, pochi favori, poca forza. Se hai connessioni, chiedi. Non aspettarti flotte.',choices:[
         {label:'[CAPITO] "Grazie."',next:null,fx:{rep:1}}
+      ]},
+      m5:{text:'Gli space hulk non sono castelli abbandonati: sono ferite dell\'anomalia. Il macguffinium muta la carne. I mostri che trovi nei corridoi erano equipaggi, prigionieri, topi di stiva. La Rocca li chiama prove. Io li chiamo peccati da non ripetere.',choices:[
+        {label:'[CAPITO] "Non entrerò a cuor leggero."',next:null,fx:{rep:2}}
       ]}
     }
   },
@@ -6113,6 +6130,7 @@ const DLG_TREES={
       c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità. In quest\'ordine. Cosa cerchi?',choices:[
         {label:'[AFFARI] "Cerco un contratto discreto."',next:'c2',fx:{rep:2}},
         {label:'[PRESSIONE] "So dei vostri appalti."',next:'c3',fx:{rep:-3}},
+        {label:'[HULK] "Gli hulk contano nel bilancio?"',next:'c4'},
         {label:'[CHIUDI] "Niente per ora."',next:null}
       ]},
       c2:{text:'Discreto costa. Ma paga. Due navi crespellanesi di troppo sul corridoio mercantile, e un bonus se nessuno parla. Ti interessa?',choices:[
@@ -6121,6 +6139,9 @@ const DLG_TREES={
       ]},
       c3:{text:'Allora sai anche che la carta vince sul laser. Porta documenti a Prime e smettila di fare il detective a mezza voce.',choices:[
         {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
+      ]},
+      c4:{text:'Contano come rischio. Il macguffinium nelle anomalie muta ciò che resta a bordo: scafi, ratti, uomini. Noi non lo mettiamo a bilancio come «mostro»: lo chiamiamo contaminazione. Se abbordi, porta un filtro. E non firmare ricevute con sangue.',choices:[
+        {label:'[OK] "Ricevuto."',next:null}
       ]}
     }
   },
@@ -6130,6 +6151,7 @@ const DLG_TREES={
       s1:{text:'Codice tartufo? Altrimenti sei solo un turista coi motori caldi. Parla.',choices:[
         {label:'[RISPETTO] "Rispetto il fungo e il silenzio."',next:'s2',fx:{rep:5}},
         {label:'[COMMERCIO] "Compro. Non tratto."',next:'s3',fx:{rep:2}},
+        {label:'[HULK] "Conosci gli space hulk?"',next:'s4'},
         {label:'[CHIUDI] "Giro."',next:null}
       ]},
       s2:{text:'Bene. Allora ascolta: a Bazzano qualcuno paga i tartufi in indizi. Porta un carico e tieni le orecchie aperte. L\'aroma non mente; le voci sì.',choices:[
@@ -6138,6 +6160,9 @@ const DLG_TREES={
       ]},
       s3:{text:'420. Sempre. Se torni con meno, non tornare. Toronto la discussione.',choices:[
         {label:'[OK] "Chiaro."',next:null,fx:{credits:-20}}
+      ]},
+      s4:{text:'Gli hulk puzzano di metallo sbagliato, non di terra. È macguffinium: muta ciò che mangia. I mostri nei corridoi erano gente, una volta. Noi a Savigno teniamo l\'aroma pulito. Loro, lassù, tengono le fauci aperte.',choices:[
+        {label:'[CAPITO] "Restiamo sui tartufi."',next:null,fx:{rep:1}}
       ]}
     }
   }
@@ -6234,6 +6259,20 @@ function buildDlgChoices(ns){
     const fn=bits[faction];
     const line=typeof fn==='function'?fn(rep[faction]||0):(fn||'...');
     showIdlgLine(ns,line,()=>closeIdlg());
+  }});
+
+  // ── Space Hulk / macguffinium mutations
+  choices.push({label:'[HULK] "Perché gli space hulk sono pieni di mostri?"',cls:'',fn:()=>{
+    const bits={
+      bazzano:'Perché nelle anomalie c\'è macguffinium. Materia a nove dimensioni: muta scafi e carne. Gli hulk non sono cimiteri, sono incubatrici. Chi ci restava… non è più quello che era.',
+      crespellano:'In archivio lo chiamano «contaminazione anomala». In pratica: macguffinium. I mostri erano gente. Noi archiviamo. Loro camminano ancora.',
+      calcara:'Contaminazione. Mutazione. Non è un capitolo di horror: è un rischio da bilancio. Il macguffinium nelle anomalie fa questo. Porta un filtro, non una poesia.',
+      monteveglio:'Ferite dell\'anomalia. Il macguffinium muta la carne. I mostri nei corridoi erano equipaggi. La Rocca li chiama prove; io li chiamo peccati.',
+      savigno:'Puzzano di metallo sbagliato, non di terra. Macguffinium. I mostri erano gente, una volta. Noi teniamo l\'aroma; loro, le fauci.',
+      pirate:'Macguffinium. Muta tutto. Io vendo le mappe degli hulk. Tu porta un\'arma e non fare amicizia con ciò che trovi dentro.'
+    };
+    if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.macguffinium_voce=1;PS.loreFlags.hulk_mutazioni=1;}
+    showIdlgLine(ns,bits[faction]||bits.pirate,()=>closeIdlg());
   }});
 
   // ── Threaten / bluff
@@ -7078,7 +7117,7 @@ function resetSuborbitActors(){
   let finalG;
   if(pfGoal.runGoal!=null)finalG=pfGoal.runGoal;
   else finalG=Math.round(procBase*gMult);
-  SUBORBIT.runGoal=Math.max(14000,finalG);
+  SUBORBIT.runGoal=Math.max(12000,Math.round(finalG*0.92));
   applySuborbitActorLook();
 }
 function trackSideObjectiveKill(kind){
@@ -7737,7 +7776,8 @@ function enterSuborbit(sm){
   SUBORBIT.active=true;SUBORBIT.planet=sm;SUBORBIT.seed=((sm.sd.orbitR+sm.sd.pR*13)|0);
   SUBORBIT.profile=getSuborbitProfile(sm);
   SUBORBIT.time=0;SUBORBIT.intro=0;SUBORBIT.offset=0;SUBORBIT.speed=SUBORBIT.speedBase;
-  SUBORBIT.corridorHalf=630;
+  // Corridoio più largo e leggibile: meno rimbalzi a bordo, più spazio di manovra.
+  SUBORBIT.corridorHalf=720;
   SUBORBIT.x=0;SUBORBIT.y=190;SUBORBIT.vx=0;SUBORBIT.vy=0;SUBORBIT.roll=0;SUBORBIT.pitch=0;
   SUBORBIT.edgeHitCd=0;SUBORBIT.groundHitCd=0;
   SUBORBIT.throttle=0;SUBORBIT.terrainWarn=0;
@@ -7772,7 +7812,7 @@ function leaveSuborbit(opts){
   suborbitTelemetry('leave',sum);
   triggerSeqTransition('suborbit-out',0.48,'#a9d5ff');
   SUBORBIT.active=false;SUBORBIT.planet=null;
-  SUBORBIT.corridorHalf=760;
+  SUBORBIT.corridorHalf=720;
   SUBORBIT.autoExitRemaining=null;
   SUBORBIT.profile=null;
   SUBORBIT.terrain.chunks.forEach(ch=>ch.mesh.visible=false);
@@ -7914,8 +7954,13 @@ function updatePlanetSkim(dt){
       SUBORBIT.vx+=pull*lerp(C.edgeAssistMin,C.edgeAssistMax,cl(edgeFrac,0,1))*sdt;
     }
     // Vicino al bordo riduci un po' la spinta laterale dell'input per evitare "ping pong".
-    if(edgeFrac>.84&&Math.sign(ax)===Math.sign(SUBORBIT.x)){
-      SUBORBIT.vx*=0.985;
+    if(edgeFrac>.78&&Math.sign(ax)===Math.sign(SUBORBIT.x)){
+      SUBORBIT.vx*=0.97;
+    }
+    if(edgeFrac>.9){
+      // Soft clamp: non lasciare che la velocità spinga fuori dal corridoio.
+      const pullIn=Math.sign(SUBORBIT.x)*-1;
+      SUBORBIT.vx+=pullIn*220*sdt;
     }
     // Assist anti-suolo predittivo: con speed alta aumenta il margine.
     const safeAlt=cl(gAhead+34+SUBORBIT.speed*0.055,SUBORBIT.minAlt+16,SUBORBIT.maxAlt-12);
@@ -7965,14 +8010,14 @@ function updatePlanetSkim(dt){
       if(typeof suborbitPushFloat==='function')suborbitPushFloat('SUOLO!','#ff8866');
     }
     if(Math.abs(SUBORBIT.x)>SUBORBIT.corridorHalf-8&&SUBORBIT.edgeHitCd<=0){
-      SUBORBIT.edgeHitCd=.7;
-      SUBORBIT.vx*=-0.55;
-      SUBORBIT.x=cl(SUBORBIT.x,-SUBORBIT.corridorHalf+18,SUBORBIT.corridorHalf-18);
+      SUBORBIT.edgeHitCd=.85;
+      SUBORBIT.vx*=-0.35;
+      SUBORBIT.x=cl(SUBORBIT.x,-SUBORBIT.corridorHalf+22,SUBORBIT.corridorHalf-22);
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
-      playerShip.takeDamage(14);
+      // Danno ridotto: il bordo è un warning, non una trappola.
+      playerShip.takeDamage(7);
       if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
-      if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO!','#ffaa88');
-      // niente toast: su mobile occupano lo schermo
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO CORRIDOIO','#ffcc88');
     }
     if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
     if(lbl){
@@ -8146,17 +8191,68 @@ function boardingReachableFrom(grid,C,R,sx,sy){
   }
   return out;
 }
+/** Scava un corridoio a L (sempre raggiungibile). */
+function boardingCarveTunnel(grid,x0,y0,x1,y1){
+  let x=x0|0,y=y0|0;
+  const tx=x1|0,ty=y1|0;
+  while(x!==tx){if(grid[y])grid[y][x]=0;x+=Math.sign(tx-x);}
+  while(y!==ty){if(grid[y])grid[y][x]=0;y+=Math.sign(ty-y);}
+  if(grid[ty])grid[ty][tx]=0;
+}
+/** Apre celle isolate collegandole al pavimento raggiungibile dall'uscita. */
+function boardingEnsureConnectivity(grid,C,R,ex,ey){
+  let reach=boardingReachableFrom(grid,C,R,ex,ey);
+  if(!reach.length){
+    grid[ey][ex]=0;
+    boardingCarveTunnel(grid,1,1,ex,ey);
+    reach=boardingReachableFrom(grid,C,R,ex,ey);
+  }
+  const isReach=new Set(reach.map(c=>c.x+','+c.y));
+  const nearest=(x,y)=>{
+    let best=reach[0],bd=1e9;
+    for(const c of reach){
+      const d=Math.abs(c.x-x)+Math.abs(c.y-y);
+      if(d<bd){bd=d;best=c;}
+    }
+    return best;
+  };
+  for(let y=1;y<R-1;y++){
+    for(let x=1;x<C-1;x++){
+      if(grid[y][x]!==0)continue;
+      if(isReach.has(x+','+y))continue;
+      const n=nearest(x,y);
+      if(n)boardingCarveTunnel(grid,x,y,n.x,n.y);
+      reach=boardingReachableFrom(grid,C,R,ex,ey);
+      isReach.clear();
+      reach.forEach(c=>isReach.add(c.x+','+c.y));
+    }
+  }
+  return boardingReachableFrom(grid,C,R,ex,ey);
+}
+function boardingPickFromReach(reach,rnd,avoid,minDist){
+  avoid=avoid||[];
+  minDist=minDist||0;
+  const ok=reach.filter(c=>{
+    for(const a of avoid){
+      if(Math.abs(a.x-c.x)+Math.abs(a.y-c.y)<minDist)return false;
+    }
+    return true;
+  });
+  const pool=ok.length?ok:reach;
+  if(!pool.length)return{x:1,y:1};
+  return pool[Math.floor(rnd()*pool.length)];
+}
 /** Spawn lontano dai muri: preferisce celle con ≥2 vicini liberi, sempre nella componente dell'uscita. */
-function pickBoardingSpawnCell(grid,C,R,rnd){
+function pickBoardingSpawnCell(grid,C,R,rnd,reachIn){
   const ex=C-2, ey=R-2;
-  const reach=boardingReachableFrom(grid,C,R,ex,ey);
+  const reach=reachIn||boardingReachableFrom(grid,C,R,ex,ey);
   const nfree=(x,y)=>{
     let n=0;
     if(grid[y][x+1]===0)n++;if(grid[y][x-1]===0)n++;
     if(grid[y+1][x]===0)n++;if(grid[y-1][x]===0)n++;
     return n;
   };
-  let pool=reach.filter(c=>nfree(c.x,c.y)>=2);
+  let pool=reach.filter(c=>nfree(c.x,c.y)>=2&&(Math.abs(c.x-ex)+Math.abs(c.y-ey))>3);
   if(pool.length<4)pool=reach.filter(c=>nfree(c.x,c.y)>=1);
   if(!pool.length)pool=reach.length?reach:[{x:1,y:1}];
   return pool[Math.floor(rnd()*pool.length)];
@@ -8200,59 +8296,74 @@ function buildBoardingMap(kind){
   BOARDING.rows=big?13:9;
   const C=BOARDING.cols, R=BOARDING.rows;
   const grid=[];
+  // Parte da muri pieni (corridoi scavati dopo): evita stanze isolate.
   for(let y=0;y<R;y++){
     const row=[];
-    for(let x=0;x<C;x++){
-      const border=(x===0||y===0||x===C-1||y===R-1);
-      row.push(border?1:0);
-    }
+    for(let x=0;x<C;x++)row.push(1);
     grid.push(row);
   }
   const rnd=boardingSeedRnd();
-  // Genera 3–5 "stanze" con muri interni casuali.
-  const rooms=big?5:3;
-  for(let i=0;i<rooms;i++){
-    const rw=2+Math.floor(rnd()*3);
-    const rh=2+Math.floor(rnd()*2);
-    const rx=2+Math.floor(rnd()*(C-rw-3));
-    const ry=2+Math.floor(rnd()*(R-rh-3));
-    for(let x=rx;x<rx+rw;x++){grid[ry][x]=1;grid[ry+rh-1][x]=1;}
-    for(let y=ry;y<ry+rh;y++){grid[y][rx]=1;grid[y][rx+rw-1]=1;}
-    // Apri una porta su un lato a caso.
-    const side=Math.floor(rnd()*4);
-    if(side===0)grid[ry][rx+Math.floor(rw/2)]=0;
-    else if(side===1)grid[ry+rh-1][rx+Math.floor(rw/2)]=0;
-    else if(side===2)grid[ry+Math.floor(rh/2)][rx]=0;
-    else grid[ry+Math.floor(rh/2)][rx+rw-1]=0;
+  const rooms=[];
+  const roomN=big?5:3;
+  for(let i=0;i<roomN;i++){
+    const rw=3+Math.floor(rnd()*3);
+    const rh=3+Math.floor(rnd()*2);
+    const rx=1+Math.floor(rnd()*Math.max(1,C-rw-2));
+    const ry=1+Math.floor(rnd()*Math.max(1,R-rh-2));
+    for(let y=ry;y<ry+rh&&y<R-1;y++){
+      for(let x=rx;x<rx+rw&&x<C-1;x++){
+        if(x>=1&&y>=1)grid[y][x]=0;
+      }
+    }
+    rooms.push({x:rx+Math.floor(rw/2),y:ry+Math.floor(rh/2),rx,ry,rw,rh});
   }
-  // Exit cell — angolo basso-dx.
-  grid[R-2][C-2]=0;grid[R-2][C-3]=0;grid[R-3][C-2]=0;
+  // Uscita e atrio di partenza sempre aperti.
+  const ex=C-2, ey=R-2;
+  grid[ey][ex]=0;grid[ey][ex-1]=0;grid[ey-1][ex]=0;
+  grid[1][1]=0;grid[1][2]=0;grid[2][1]=0;
+  // Collega stanze in catena + collegamento a uscita e atrio.
+  const hubs=[{x:1,y:1},...rooms.map(r=>({x:r.x,y:r.y})),{x:ex,y:ey}];
+  for(let i=0;i<hubs.length-1;i++){
+    boardingCarveTunnel(grid,hubs[i].x,hubs[i].y,hubs[i+1].x,hubs[i+1].y);
+  }
+  // Qualche corridoio extra (drunkard) per varietà, senza chiudere percorsi.
+  let wx=hubs[1+(Math.floor(rnd()*(hubs.length-2))|0)]||{x:Math.floor(C/2),y:Math.floor(R/2)};
+  const steps=big?48:28;
+  for(let s=0;s<steps;s++){
+    const dir=[[0,1],[0,-1],[1,0],[-1,0]][Math.floor(rnd()*4)];
+    const nx=cl(wx.x+dir[0],1,C-2),ny=cl(wx.y+dir[1],1,R-2);
+    grid[ny][nx]=0;
+    wx={x:nx,y:ny};
+  }
+  // Bordo esterno sempre muro.
+  for(let x=0;x<C;x++){grid[0][x]=1;grid[R-1][x]=1;}
+  for(let y=0;y<R;y++){grid[y][0]=1;grid[y][C-1]=1;}
+  grid[ey][ex]=0;grid[ey][ex-1]=0;grid[ey-1][ex]=0;
+  grid[1][1]=0;grid[1][2]=0;grid[2][1]=0;
+  // Garantisce che ogni cella pavimento sia raggiungibile dall'uscita.
+  const reach=boardingEnsureConnectivity(grid,C,R,ex,ey);
   BOARDING.map=grid;
-  BOARDING.exitCell={x:C-2,y:R-2};
-  const sp=pickBoardingSpawnCell(grid,C,R,rnd);
+  BOARDING.exitCell={x:ex,y:ey};
+  const sp=pickBoardingSpawnCell(grid,C,R,rnd,reach);
   BOARDING.player.x=sp.x;BOARDING.player.y=sp.y;
   BOARDING.player.sx=sp.x;BOARDING.player.sy=sp.y;
   BOARDING.player._aimX=1;BOARDING.player._aimY=0;
   BOARDING.player._aimTx=1;BOARDING.player._aimTy=0;
   BOARDING.player.walk=0;BOARDING.player.bob=0;BOARDING.player.hit=0;
   BOARDING.enemies.length=0;BOARDING.pickups.length=0;BOARDING.hazards.length=0;BOARDING.shots.length=0;
-  // Enemies: 3 per ship, 5 per hulk. Posiziona in celle libere.
+  const used=[{x:sp.x,y:sp.y},{x:ex,y:ey}];
+  // Enemies: 3 per ship, 5 per hulk — solo su celle raggiungibili.
   const eN=big?5:3;
   for(let i=0;i<eN;i++){
-    let tries=40,ex=0,ey=0;
-    while(tries-- > 0){
-      ex=3+Math.floor(rnd()*(C-5));
-      ey=3+Math.floor(rnd()*(R-5));
-      if(grid[ey][ex]===0)break;
-    }
-    // Specie antropomorfe — diverse per HULK vs NAVE.
+    const cell=boardingPickFromReach(reach,rnd,used,3);
+    used.push(cell);
     const speciesShip=['ursid','felid','lupus','avian','reptil'];
     const speciesHulk=['ghoul','xeno','wraith','brute','mutant'];
     const species=(big?speciesHulk:speciesShip)[Math.floor(rnd()*5)];
     const weaponKinds=['blaster','rifle','cleaver','claw'];
     const weapon=weaponKinds[Math.floor(rnd()*weaponKinds.length)];
     BOARDING.enemies.push({
-      x:ex,y:ey,sx:ex,sy:ey,hp:2,cd:.4+rnd()*.8,mv:rnd()*2,
+      x:cell.x,y:cell.y,sx:cell.x,sy:cell.y,hp:2,cd:.4+rnd()*.8,mv:rnd()*2,
       dir:Math.floor(rnd()*4),face:1,alive:true,
       kind:big?'ghoul':'guard',species,weapon,
       size:.9+rnd()*.35, walk:rnd()*Math.PI*2, bob:rnd()*Math.PI*2,
@@ -8276,65 +8387,42 @@ function buildBoardingMap(kind){
       BOARDING.reward=Math.round(ECON.hulkBase*1.08);
     }
   }
-  // Loot: obiettivo principale + minor.
+  // Loot obiettivo + minor: solo celle raggiungibili.
   const mainN=(BOARDING.objective&&BOARDING.objective.needed)||1;
   for(let mi=0;mi<mainN;mi++){
-    let tries=30,mx=C-3,my=R-3;
-    while(tries-- >0){
-      mx=3+Math.floor(rnd()*(C-6));
-      my=3+Math.floor(rnd()*(R-6));
-      if(grid[my][mx]===0)break;
-    }
-    BOARDING.pickups.push({x:mx,y:my,kind:'main',wob:rnd()*Math.PI*2});
+    const cell=boardingPickFromReach(reach,rnd,used,2);
+    used.push(cell);
+    BOARDING.pickups.push({x:cell.x,y:cell.y,kind:'main',wob:rnd()*Math.PI*2});
   }
   for(let i=0;i<2;i++){
-    let tries=20,px=0,py=0;
-    while(tries-- > 0){
-      px=3+Math.floor(rnd()*(C-6));
-      py=3+Math.floor(rnd()*(R-6));
-      if(grid[py][px]===0)break;
-    }
-    BOARDING.pickups.push({x:px,y:py,kind:'minor',wob:rnd()*Math.PI*2});
+    const cell=boardingPickFromReach(reach,rnd,used,1);
+    used.push(cell);
+    BOARDING.pickups.push({x:cell.x,y:cell.y,kind:'minor',wob:rnd()*Math.PI*2});
   }
-  // Ambient props (barili, casse, tubi) nelle celle libere — solo decorativi.
+  // Ambient props (barili, casse, tubi) — decorativi, su pavimento raggiungibile.
   BOARDING.props=[];
   const propN=big?10:6;
   const propKinds=big?['barrel','pipe','bone','crate','debris']:['crate','console','pipe','barrel'];
   for(let i=0;i<propN;i++){
-    let tries=30,fx=0,fy=0;
-    while(tries-- > 0){
-      fx=2+Math.floor(rnd()*(C-4));
-      fy=2+Math.floor(rnd()*(R-4));
-      if(grid[fy][fx]===0&&!(fx===1&&fy===1)&&!(fx===C-2&&fy===R-2))break;
-    }
-    BOARDING.props.push({x:fx,y:fy,kind:propKinds[Math.floor(rnd()*propKinds.length)],rot:rnd()*Math.PI*2,ph:rnd()*Math.PI*2});
+    const cell=boardingPickFromReach(reach,rnd,used,0);
+    BOARDING.props.push({x:cell.x,y:cell.y,kind:propKinds[Math.floor(rnd()*propKinds.length)],rot:rnd()*Math.PI*2,ph:rnd()*Math.PI*2});
   }
   // Decals (macchie di sangue/bruciature) seedate.
   BOARDING.decals=[];
   const decN=big?7:3;
   for(let i=0;i<decN;i++){
-    let tries=20,dx=0,dy=0;
-    while(tries-- > 0){
-      dx=2+Math.floor(rnd()*(C-4));
-      dy=2+Math.floor(rnd()*(R-4));
-      if(grid[dy][dx]===0)break;
-    }
-    BOARDING.decals.push({x:dx+rnd(),y:dy+rnd(),r:.25+rnd()*.35,kind:big?'scorch':'blood',hue:Math.floor(rnd()*40)});
+    const cell=boardingPickFromReach(reach,rnd,[],0);
+    BOARDING.decals.push({x:cell.x+rnd(),y:cell.y+rnd(),r:.25+rnd()*.35,kind:big?'scorch':'blood',hue:Math.floor(rnd()*40)});
   }
   // Corpses (0 all'inizio, crescono con i kill).
   BOARDING.corpses=[];
   // Muzzle flashes temporanei.
   BOARDING.flashes=[];
-  // Hazards (solo hulk): celle "fuoco" che fanno danno.
+  // Hazards (solo hulk): celle "fuoco" raggiungibili, lontano dallo spawn.
   if(big){
     for(let i=0;i<3;i++){
-      let tries=20,hx=0,hy=0;
-      while(tries-- > 0){
-        hx=3+Math.floor(rnd()*(C-6));
-        hy=3+Math.floor(rnd()*(R-6));
-        if(grid[hy][hx]===0)break;
-      }
-      BOARDING.hazards.push({x:hx,y:hy,ph:rnd()*Math.PI*2});
+      const cell=boardingPickFromReach(reach,rnd,[{x:sp.x,y:sp.y},{x:ex,y:ey}],3);
+      BOARDING.hazards.push({x:cell.x,y:cell.y,ph:rnd()*Math.PI*2});
     }
   }
   BOARDING.player.hp=100;
@@ -8372,7 +8460,9 @@ function enterBoarding(opts){
   GAME.state='boarding';
   document.body.classList.add('boarding-active');
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='block';
-  notify(BOARDING.kind==='hulk'?'Abbordaggio HULK: attento ai fuochi.':'Abbordaggio nave nemica.',1800);
+  notify(BOARDING.kind==='hulk'
+    ?'Abbordaggio HULK: corridoi contaminati. I mostri? Mutazioni da macguffinium nelle anomalie.'
+    :'Abbordaggio nave nemica.',2200);
   initBoardingPointer();
   if(typeof PortraitAtlas!=='undefined')PortraitAtlas.load();
 }
@@ -8425,6 +8515,7 @@ function leaveBoarding(opts){
       const hulk=BOARDING.sourceHulk;
       const first=!hulk.looted;
       hulk.looted=true;
+      if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.hulk_mutazioni=1;PS.loreFlags.macguffinium_voce=1;}
       const g=hulk.mesh;
       if(first&&g){
         g.traverse(o=>{
@@ -12664,15 +12755,15 @@ function openBeghelliDialogue(){
   const pc=document.getElementById('pilot-portrait');
   drawPilotPortrait(pc,12001,'bazzano',{name:'Beghelli',kind:'men'});
   const score=beghelliConnectionScore();
-  let opening='Canale del Palazzo Beghelli. Siamo una casata minore. Un tempo Valsamoggio era nostro cortile; oggi Imperium ci lascia lo spazio di una firma. Parla, Funzionario.';
-  if(score>=5)opening='Canale privilegiato. Le tue connessioni sono… adeguate. Non aspettarti flotte: possiamo spostare una pratica, una scorta leggera, un favore. Poi torni solo.';
-  else if(score>=3)opening='Ti abbiamo in archivio. Cortesia sì. Forza no. Chiedi qualcosa di piccolo.';
+  let opening='Canale del Palazzo Beghelli. Siamo una casata minore. Un tempo Valsamoggio era il nostro cortile; oggi Imperium ci lascia lo spazio di una firma. Parla, Funzionario.';
+  if(score>=5)opening='Canale privilegiato. Le tue connessioni sono adeguate. Non aspettarti flotte: possiamo spostare una pratica, una scorta leggera, un favore. Poi torni solo.';
+  else if(score>=3)opening='Ti abbiamo in archivio. Cortesia sì, forza no. Chiedi qualcosa di piccolo.';
   typeIdlgText(opening,()=>{
     const choices=[];
     choices.push({label:'[LORE] "Perché Imperium tiene al Patto?"',cls:'',fn:()=>{
-      typeIdlgText('Perché Valsamoggio è periferia finché il Mulino gira. Se si spezza, le anomalie diventano campo aperto. Se c\'è macguffinium — materia a nove dimensioni — le casate maggiori scendono qui. L\'Impero potrebbe non sopravvivere a quella guerra. Il Patto è diga, non nostalgia.',()=>{
+      typeIdlgText('Perché Valsamoggio è periferia finché il Mulino gira. Se si spezza, le anomalie diventano campo aperto. Se c\'è macguffinium — materia a nove dimensioni — le casate maggiori scendono qui. L\'Impero potrebbe non sopravvivere a quella guerra. Il Patto è una diga, non nostalgia.',()=>{
         if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.macguffinium_voce=1;PS.loreFlags.patto_perche=1;}
-        renderIdlgChoices([{label:'[INDIETRO]',fn:()=>openBeghelliDialogue()}]);
+        renderIdlgChoices([{label:'[INDIETRO] Torna al canale',fn:()=>openBeghelliDialogue()}]);
       });
     }});
     choices.push({label:'[AIUTO] "Mi serve supporto."',cls:'trade',fn:()=>{
@@ -12683,7 +12774,7 @@ function openBeghelliDialogue(){
         return;
       }
       if(score<3){
-        typeIdlgText('Le tue connessioni non bastano. Porta reputazione a Bazzano o Monteveglio, o parla con chi ancora ricorda i Beghelli. Poi richiama.',()=>{
+        typeIdlgText('Le tue connessioni non bastano. Porta reputazione a Bazzano o Monteveglio, oppure parla con chi ancora ricorda i Beghelli. Poi richiama.',()=>{
           renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
         });
         return;
@@ -12700,12 +12791,12 @@ function openBeghelliDialogue(){
         });
       }else if(roll<0.4){
         PS.credits+=80;
-        typeIdlgText('Otteniamo un anticipo di viaggio. Ottanta crediti. Non di più. Le casate maggiori stanno già ascoltando.',()=>{
+        typeIdlgText('Otteniamo un anticipo di viaggio. Ottanta crediti, non di più. Le casate maggiori stanno già ascoltando.',()=>{
           notify('Beghelli: +80 Cr (favore magro).',2200);
           renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);
         });
       }else{
-        typeIdlgText('Abbiamo chiamato tre uffici. Due non rispondono. Il terzo manda i saluti. Supporto: nullo. Ma ora sanno il tuo nome — nel bene e nel male.',()=>{
+        typeIdlgText('Abbiamo chiamato tre uffici. Due non rispondono. Il terzo manda i saluti. Supporto: nullo. Ma ora sanno il tuo nome, nel bene e nel male.',()=>{
           notify('Beghelli: cortesia senza risultati.',2200);
           changeRep('calcara',-1);
           renderIdlgChoices([{label:'[CHIUDI]',fn:()=>closeIdlg()}]);

@@ -41,6 +41,11 @@
         beghelliAidUsed:ps.beghelliAidUsed|0
       },
       STORY:{chapter:global.STORY.chapter,won:!!global.STORY.won},
+      storyFlags:global.StorySys&&global.StorySys.flags?{
+        suborbitDone:!!global.StorySys.flags.suborbitDone,
+        hulkBoarded:!!global.StorySys.flags.hulkBoarded,
+        boardingsTotal:global.StorySys.flags.boardingsTotal|0
+      }:null,
       storyMissions:storyMissionSnap(global.STORY),
       rep:{...global.rep},
       bpGrid:global.bpGrid.map(row=>[...row]),
@@ -112,6 +117,11 @@
     });
     global.STORY.chapter=data.STORY.chapter|0;
     global.STORY.won=!!data.STORY.won;
+    if(global.StorySys&&global.StorySys.flags&&data.storyFlags){
+      global.StorySys.flags.suborbitDone=!!data.storyFlags.suborbitDone;
+      global.StorySys.flags.hulkBoarded=!!data.storyFlags.hulkBoarded;
+      global.StorySys.flags.boardingsTotal=data.storyFlags.boardingsTotal|0;
+    }
     Object.assign(global.rep,data.rep||{});
     if(data.bpGrid)global.bpGrid=data.bpGrid.map(row=>[...row]);
     global.CREW_POOL.forEach(c=>{c.hired=(data.crewHired||[]).includes(c.id);});
