@@ -214,7 +214,7 @@
       return { ok: true, toll: toll + Math.max(0, Math.floor(-v * 1.5)), msg: 'Pedaggio Calcara' };
     }
     if (v < -35) {
-      return { ok: true, toll: 40, msg: 'Surcharge hangar ostile' };
+      return { ok: true, toll: 40, msg: 'Sovrapprezzo hangar ostile' };
     }
     if (v > 40) return { ok: true, discountRepair: 0.85 };
     return { ok: true };

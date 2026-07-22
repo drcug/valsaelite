@@ -214,24 +214,39 @@
   global.saveGame=function(silent){
     try{
       const p=global.buildSavePayload();
-      if(!p)return false;
+      if(!p){
+        if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non riuscito: stato incompleto.',2200);
+        return false;
+      }
       localStorage.setItem(KEY,JSON.stringify(p));
       if(!silent&&typeof global.notify==='function')global.notify('Partita salvata.',1800);
       if(typeof global.playChime==='function')global.playChime('success');
       return true;
-    }catch(_){return false;}
+    }catch(_){
+      if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non riuscito (memoria piena o bloccata).',2600);
+      return false;
+    }
   };
 
   global.loadGame=function(silent){
     try{
       const raw=localStorage.getItem(KEY);
-      if(!raw)return false;
+      if(!raw){
+        if(!silent&&typeof global.notify==='function')global.notify('Nessun salvataggio trovato.',1800);
+        return false;
+      }
       const data=JSON.parse(raw);
-      if(!global.applySavePayload(data))return false;
+      if(!global.applySavePayload(data)){
+        if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non valido o incompatibile.',2400);
+        return false;
+      }
       if(!silent&&typeof global.notify==='function')global.notify('Partita caricata.',2000);
       if(typeof global.playChime==='function')global.playChime('success');
       return true;
-    }catch(_){return false;}
+    }catch(_){
+      if(!silent&&typeof global.notify==='function')global.notify('Errore nel caricamento del salvataggio.',2400);
+      return false;
+    }
   };
 
   global.hasSaveGame=function(){
@@ -243,9 +258,24 @@
   };
 
   global.newGameConfirm=function(){
-    if(confirm('Iniziare una nuova partita? Il salvataggio attuale verrà cancellato.')){
+    const run=function(){
       global.clearSaveGame();
       location.reload();
+    };
+    if(typeof global.uiConfirm==='function'){
+      global.uiConfirm({
+        title:'NUOVA PARTITA',
+        body:global.hasSaveGame()
+          ?'Iniziare una nuova partita?\nIl salvataggio attuale verrà cancellato.'
+          :'Iniziare una nuova partita da zero?',
+        ok:'NUOVA PARTITA',
+        cancel:'ANNULLA',
+        danger:true,
+        onOk:run
+      });
+      return;
     }
+    // Fallback senza modal: non cancellare alla cieca
+    if(typeof global.notify==='function')global.notify('Conferma non disponibile.',1800);
   };
 })(window);

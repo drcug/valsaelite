@@ -1190,13 +1190,13 @@ body.suborbit-active #smsg{
     <button type="button" id="diary-close" onclick="closeDiary()">CHIUDI</button>
   </div>
 </div>
-<div id="resume-prompt" aria-modal="true" role="dialog">
-  <div id="resume-box">
-    <div class="rt">PARTITA SALVATA</div>
-    <div class="rs">Hai un salvataggio in corso. Vuoi continuare da dove eri rimasto?</div>
-    <div>
-      <button type="button" id="resume-continue">CONTINUA</button>
-      <button type="button" id="resume-new">NUOVA PARTITA</button>
+<div id="ui-confirm" aria-modal="true" role="dialog" aria-labelledby="uic-title">
+  <div id="uic-box">
+    <div class="rt" id="uic-title">CONFERMA</div>
+    <div class="rs" id="uic-body"></div>
+    <div class="uic-actions">
+      <button type="button" id="uic-ok">CONFERMA</button>
+      <button type="button" id="uic-cancel">ANNULLA</button>
     </div>
   </div>
 </div>
@@ -1253,7 +1253,7 @@ body.suborbit-active #smsg{
   <div id="got"></div><div id="gos"></div>
   <div id="go-stats"></div>
   <div id="go-actions">
-    <button id="gor-sandbox" style="display:none" onclick="continueSandbox()">CONTINUA SANDBOX</button>
+    <button id="gor-sandbox" style="display:none" onclick="continueSandbox()">CONTINUA IN LIBERA</button>
     <button id="gor-load" style="display:none" onclick="loadGameFromGameOver()">CARICA SALVATAGGIO</button>
     <button id="gor" onclick="newGameConfirm()">NUOVA PARTITA</button>
   </div>
@@ -4782,6 +4782,62 @@ function showResumePromptIfNeeded(){
   // Dopo il preloader: menu principale (PARTI / CARICA / INTRO / OPZIONI).
   showMainMenu();
 }
+
+/** Conferma in-game (niente alert/confirm del browser). */
+const UIC={open:false,_onOk:null,_onCancel:null,_prevPause:null};
+function uiConfirm(opts){
+  opts=opts||{};
+  const el=document.getElementById('ui-confirm');
+  const tit=document.getElementById('uic-title');
+  const body=document.getElementById('uic-body');
+  const ok=document.getElementById('uic-ok');
+  const cancel=document.getElementById('uic-cancel');
+  if(!el||!tit||!body||!ok||!cancel){
+    if(typeof opts.onOk==='function')opts.onOk();
+    return;
+  }
+  tit.textContent=opts.title||'CONFERMA';
+  body.textContent=opts.body||'';
+  ok.textContent=opts.ok||'CONFERMA';
+  cancel.textContent=opts.cancel||'ANNULLA';
+  ok.classList.toggle('danger',!!opts.danger);
+  UIC._onOk=typeof opts.onOk==='function'?opts.onOk:null;
+  UIC._onCancel=typeof opts.onCancel==='function'?opts.onCancel:null;
+  UIC.open=true;
+  el.classList.add('show');
+  if(typeof setPausedReason==='function')setPausedReason('dialogue',true);
+}
+function uiConfirmClose(accepted){
+  const el=document.getElementById('ui-confirm');
+  if(el)el.classList.remove('show');
+  UIC.open=false;
+  const okCb=UIC._onOk,cancelCb=UIC._onCancel;
+  UIC._onOk=UIC._onCancel=null;
+  if(typeof setPausedReason==='function'){
+    // Ripristina pause dock/story se erano attive
+    if(typeof storyBannerOpen==='function'&&storyBannerOpen())setPausedReason('story',true);
+    else if(GAME&&GAME.state==='docked')setPausedReason('docked',true);
+    else if(GAME&&GAME.state!=='dialogue')setPausedReason('dialogue',false);
+  }
+  if(accepted){if(okCb)try{okCb();}catch(_){}}
+  else{if(cancelCb)try{cancelCb();}catch(_){}}
+}
+(function setupUiConfirm(){
+  const ok=document.getElementById('uic-ok');
+  const cancel=document.getElementById('uic-cancel');
+  const el=document.getElementById('ui-confirm');
+  if(ok)ok.addEventListener('click',e=>{e.preventDefault();uiConfirmClose(true);});
+  if(cancel)cancel.addEventListener('click',e=>{e.preventDefault();uiConfirmClose(false);});
+  if(el)el.addEventListener('click',e=>{
+    if(e.target===el){e.preventDefault();uiConfirmClose(false);}
+  });
+  window.addEventListener('keydown',e=>{
+    if(!UIC.open)return;
+    if(e.code==='Escape'){e.preventDefault();uiConfirmClose(false);}
+    if(e.code==='Enter'){e.preventDefault();uiConfirmClose(true);}
+  });
+})();
+
 function formatRunStats(){
   const mins=Math.floor((Date.now()-RUN_STATS.startTime)/60000);
   const cred=PS.credits-(RUN_STATS.creditsAtStart||0);
@@ -4811,12 +4867,14 @@ function continueSandbox(){
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
   document.getElementById('radar').style.display='block';
-  notify('Modalità sandbox: missioni procedurali e epilogo disponibili.',2600);
+  notify('Modalità libera: missioni procedurali e epilogo disponibili.',2600);
 }
 function loadGameFromGameOver(){
   if(typeof loadGame==='function'&&loadGame()){
     document.getElementById('go').classList.remove('show');
     GAME.state=GAME.dockedSt?'docked':'flying';
+  }else{
+    notify('Caricamento non riuscito.',2000);
   }
 }
 function updateBoardingButtonVisibility(){
@@ -5727,6 +5785,11 @@ window.addEventListener('keydown',e=>{
     if(e.code==='Escape'&&e.target&&e.target.blur)e.target.blur();
     return;
   }
+  if(typeof UIC!=='undefined'&&UIC.open){
+    // Gestito da setupUiConfirm (Enter/Esc)
+    e.preventDefault();
+    return;
+  }
   if(typeof storyBannerOpen==='function'&&storyBannerOpen()){
     // Solo CONTINUA chiude il modal storia — blocca input di gioco
     e.preventDefault();
@@ -6059,10 +6122,14 @@ function requestSuborbit(){
   if(!GAME.dockedSt||GAME.state!=='docked')return;
   const sm=getSM(GAME.dockedSt.sd.id);
   if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
-  // Conferma esplicita: evita avvii accidentali dal tasto vicino a DECOLLA
   const name=sm.sd.name||'pianeta';
-  if(!window.confirm('Avviare il volo SUBORBITALE su '+name+'?\n(Potrai uscire con ESCI o ESC)'))return;
-  startSuborbit();
+  uiConfirm({
+    title:'VOLO SUBORBITALE',
+    body:'Avviare il corridoio su '+name+'?\nPotrai uscire con ESCI o ESC.',
+    ok:'AVVIA',
+    cancel:'RESTA IN STAZIONE',
+    onOk:()=>startSuborbit()
+  });
 }
 function startSuborbit(){
   if(!GAME.dockedSt||GAME.state!=='docked')return;
@@ -6185,10 +6252,22 @@ let nTmr=null;
 let _flyAutosaveT=0;
 function notify(msg,dur){
   dur=dur||2400;
-  // In suborbita: toast piccoli in alto, rate-limit per non coprire il gioco su mobile
+  // In suborbita: coda breve invece di scartare i messaggi critici
   if(typeof SUBORBIT!=='undefined'&&SUBORBIT.active){
     const now=performance.now();
-    if(notify._subLast&&now-notify._subLast<1100)return;
+    if(notify._subLast&&now-notify._subLast<900){
+      if(!notify._subQ)notify._subQ=[];
+      if(notify._subQ.length<4)notify._subQ.push({msg:String(msg),dur:Math.min(dur,1200)});
+      if(!notify._subDrain){
+        notify._subDrain=setTimeout(function drain(){
+          notify._subDrain=null;
+          const n=notify._subQ&&notify._subQ.shift();
+          if(n)notify(n.msg,n.dur);
+          if(notify._subQ&&notify._subQ.length)notify._subDrain=setTimeout(drain,950);
+        },950);
+      }
+      return;
+    }
     notify._subLast=now;
     dur=Math.min(dur,1200);
   }
@@ -10337,7 +10416,7 @@ function findBoardingTarget(){
 const HULKS=[];
 const HULK_ARCHETYPES={
   cargo:{
-    label:'Cargo Abbandonato',
+    label:'Carico Abbandonato',
     primary:0x3a2e22, secondary:0x28201a, accent:0x6a5a3c, trim:0x55402a,
     emissive:0x1a0f06, emissiveI:.18,
     portholeCol:0xffa646, portholeDensity:.9,
@@ -12574,7 +12653,7 @@ function updateHUD(){
   const tgtPanel=document.getElementById('tgt-panel');
   if(tgt&&td<48000){
     if(tgtPanel)tgtPanel.style.display='';
-    const f=FACTIONS[tgt.faction];const locked=targetNpc&&targetNpc===tgt;const mir=locked&&targetLeadState.status==='MIRINO OK';document.getElementById('tnm').textContent=(mir?'MIRINO · ':locked?'TARGET · ':'')+(f?.short||tgt.faction||'PIRATA').toUpperCase();document.getElementById('tnm').style.color=locked?'#ff9966':(f?f.color:(tgt.faction==='pirate'?'#ff4422':'#aabbcc'));
+    const f=FACTIONS[tgt.faction];const locked=targetNpc&&targetNpc===tgt;const mir=locked&&targetLeadState.status==='MIRINO OK';document.getElementById('tnm').textContent=(mir?'MIRINO · ':locked?'BERSAGLIO · ':'')+(f?.short||tgt.faction||'PIRATA').toUpperCase();document.getElementById('tnm').style.color=locked?'#ff9966':(f?f.color:(tgt.faction==='pirate'?'#ff4422':'#aabbcc'));
     const distF=tgt.ship.mesh.position.distanceTo(playerShip.mesh.position);
     const hailHint=distF<12000?' · [T] radio':'';
     const aimNote=locked&&targetLeadState?` · ${targetLeadState.status}`:'';
@@ -13470,6 +13549,7 @@ function exposeGameState(){
   g.buildDock=buildDock;
   g.updateHUD=updateHUD;
   g.notify=notify;
+  g.uiConfirm=uiConfirm;
   if(typeof ensureBeghelliPalace==='function')g.ensureBeghelliPalace=ensureBeghelliPalace;
 }
 
