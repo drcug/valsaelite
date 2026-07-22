@@ -649,8 +649,32 @@ body.suborbit-active #heat-lbl{display:none !important;}
 body.suborbit-active #fx-toggle{display:none !important;}
 body.suborbit-active #navarrow{display:none !important;}
 body.suborbit-active #skim-lbl{display:none !important;}
-body.suborbit-active #notif{z-index:6250 !important;}
-body.suborbit-active #smsg{z-index:6260 !important;}
+body.suborbit-active #notif{
+  z-index:6250 !important;
+  top:max(8px,env(safe-area-inset-top)) !important;
+  bottom:auto !important;
+  left:50%;transform:translateX(-50%);
+  max-width:min(88vw,320px);padding:6px 10px;font-size:10px;line-height:1.35;
+  border-radius:8px;pointer-events:none;
+}
+body.suborbit-active #smsg{
+  z-index:6260 !important;
+  top:max(52px,calc(env(safe-area-inset-top) + 44px)) !important;
+  bottom:auto !important;
+  left:50%;transform:translateX(-50%);
+  max-width:min(88vw,300px);padding:8px 12px;font-size:11px;line-height:1.35;
+  pointer-events:none;
+}
+#suborbit-ui .sbtn.sbtn-exit{
+  width:auto;min-width:72px;height:48px;padding:0 14px;border-radius:10px;
+  border-color:rgba(255,140,100,.6);background:rgba(70,18,12,.92);color:#ffd8c8;
+  letter-spacing:.12em;font-size:11px;
+}
+@media(max-width:700px){
+  body.suborbit-active #notif{max-width:78vw;font-size:9px;padding:5px 8px}
+  body.suborbit-active #smsg{max-width:78vw;font-size:10px;padding:6px 9px}
+  #suborbit-ui .sbtn.sbtn-exit{min-width:64px;height:44px;font-size:10px}
+}
 /* Suborbit: feedback schermo fine run */
 #suborbit-screen-fx{position:fixed;inset:0;z-index:6050;pointer-events:none;opacity:0;transition:opacity .08s ease-out;background:transparent}
 #suborbit-float-layer{position:fixed;inset:0;z-index:6078;pointer-events:none}
@@ -965,9 +989,9 @@ body.suborbit-active #smsg{z-index:6260 !important;}
     <div id="dktbs" class="dktabs"></div>
     <div id="dkpns"></div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:center;padding:0 0 10px">
-    <button id="ldck" onclick="startLaunch()">DECOLLA</button>
-    <button id="ldck-suborbit" onclick="startSuborbit()" style="display:none;background:#124466">VOLO SUBORBITALE</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 0 12px">
+    <button type="button" id="ldck" onclick="startLaunch()">DECOLLA</button>
+    <button type="button" id="ldck-suborbit" onclick="requestSuborbit()" style="display:none;background:#124466;font-size:12px;padding:9px 22px;letter-spacing:.1em;box-shadow:none">VOLO SUBORBITALE</button>
   </div>
 </div>
 
@@ -1021,16 +1045,17 @@ body.suborbit-active #smsg{z-index:6260 !important;}
 </div>
 <div id="suborbit-ui">
   <div class="srow">
-    <button id="sob-fire" class="sbtn fire">FUOCO</button>
+    <button type="button" id="sob-exit" class="sbtn sbtn-exit" aria-label="Esci dal volo suborbitale">ESCI</button>
+    <button type="button" id="sob-fire" class="sbtn fire">FUOCO</button>
   </div>
   <div class="srow">
-    <button id="sob-left" class="sbtn">SX</button>
-    <button id="sob-up" class="sbtn sbtn-thrust" aria-label="Motori quota">MOT</button>
-    <button id="sob-right" class="sbtn">DX</button>
+    <button type="button" id="sob-left" class="sbtn">SX</button>
+    <button type="button" id="sob-up" class="sbtn sbtn-thrust" aria-label="Motori quota">MOT</button>
+    <button type="button" id="sob-right" class="sbtn">DX</button>
   </div>
   <div class="srow">
-    <button id="sob-tr" class="sbtn">TRAZ.</button>
-    <button id="sob-down" class="sbtn">GIU</button>
+    <button type="button" id="sob-tr" class="sbtn">TRAZ.</button>
+    <button type="button" id="sob-down" class="sbtn">GIU</button>
   </div>
 </div>
 
@@ -4115,9 +4140,28 @@ function buildStationMesh(sd){
   const dr=new THREE.Mesh(new THREE.TorusGeometry(sd.dR,.8,6,48),new THREE.MeshBasicMaterial({color:0x2277ee,transparent:true,opacity:.18,blending:THREE.AdditiveBlending}));
   dr.rotation.x=Math.PI/2;mesh.add(dr);mesh._dr=dr;
   scene.add(mesh);
-  const initA=Math.random()*Math.PI*2;
+  const initA=fixedOrbitAngle(sd);
   if(!sd.sat)mesh.position.set(Math.cos(initA)*sd.orbitR,0,Math.sin(initA)*sd.orbitR);
-  return {mesh,sd,angle:initA,satAngle:Math.random()*Math.PI*2};
+  return {mesh,sd,angle:initA,satAngle:fixedSatAngle(sd)};
+}
+
+/** Angoli orbitali deterministici: stessa mappa a ogni nuova partita. */
+function fixedOrbitAngle(sd){
+  if(sd.orbitPhase!=null)return sd.orbitPhase;
+  const table={
+    bazzano:0.42,crespellano:2.05,monteveglio:3.55,savigno:5.10,castelletto:4.25,serravalle:1.15
+  };
+  if(table[sd.id]!=null)return table[sd.id];
+  // hash stabile da id
+  let h=0;const s=String(sd.id||'');
+  for(let i=0;i<s.length;i++)h=(h*33+s.charCodeAt(i))>>>0;
+  return (h%6283)/1000;
+}
+function fixedSatAngle(sd){
+  if(sd.satPhase!=null)return sd.satPhase;
+  let h=7;const s=String(sd.id||'');
+  for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;
+  return (h%6283)/1000;
 }
 
 SDATA.forEach(sd=>{
@@ -5102,6 +5146,16 @@ function spawnCombatWave(m){
 // ─────────────────────────────────────────────────
 const playerShip=new Ship({isPlayer:true,faction:'bazzano',baseColor:'#0a1e55',stripeColor:'#99ccff',accentHex:0x44aaff});
 playerShip.mesh.position.set(0,0,8700);
+(function placePlayerNearBazzano(){
+  const baz=typeof getSM==='function'?getSM('bazzano'):null;
+  if(!baz||!baz.mesh)return;
+  const outward=baz.mesh.position.clone().normalize();
+  if(outward.lengthSq()<1e-6)outward.set(0,0,1);
+  playerShip.mesh.position.copy(baz.mesh.position).addScaledVector(outward,baz.sd.pR+1100);
+  playerShip.mesh.position.y=0;
+  playerShip.mesh.rotation.set(0,Math.atan2(-outward.x,-outward.z),0);
+  playerShip.velocity.set(0,0,0);
+})();
 playerShip.mesh.visible=true;
 applyModules();
 rebuildPlayerMesh();
@@ -5590,6 +5644,21 @@ const FLY_STEER={active:false,nx:0};
 const _repToggle=document.getElementById('rep-toggle');
 if(_repToggle)_repToggle.addEventListener('click',(e)=>{e.preventDefault();toggleRepPanel();});
 touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');touch('sob-down','boost');touch('sob-fire','fire');touch('sob-tr','tractor');
+(function setupSuborbitExitBtn(){
+  const b=document.getElementById('sob-exit');
+  if(!b)return;
+  const exit=e=>{
+    if(e){e.preventDefault();e.stopPropagation();}
+    if(!(typeof SUBORBIT!=='undefined'&&SUBORBIT.active&&GAME.state==='suborbit'))return;
+    skimSt=null;skimT=0;
+    leaveSuborbit({toDock:true});
+    const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
+    if(bar)bar.style.display='none';
+    if(lbl)lbl.style.display='none';
+  };
+  b.addEventListener('click',exit);
+  b.addEventListener('touchend',exit,{passive:false});
+})();
 (function initBoardingTouchPad(){
   const bind=(el,inp)=>{
     if(!el)return;
@@ -5673,11 +5742,21 @@ function startLanding(){
   requestAnimationFrame(animFade);
 }
 
+function requestSuborbit(){
+  if(!GAME.dockedSt||GAME.state!=='docked')return;
+  const sm=getSM(GAME.dockedSt.sd.id);
+  if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
+  // Conferma esplicita: evita avvii accidentali dal tasto vicino a DECOLLA
+  const name=sm.sd.name||'pianeta';
+  if(!window.confirm('Avviare il volo SUBORBITALE su '+name+'?\n(Potrai uscire con ESCI o ESC)'))return;
+  startSuborbit();
+}
 function startSuborbit(){
   if(!GAME.dockedSt||GAME.state!=='docked')return;
   const sm=getSM(GAME.dockedSt.sd.id);
   if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
   setPausedReason('docked',false);
+  document.body.classList.remove('docked-ui');
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
   document.getElementById('radar').style.display='block';
@@ -5791,8 +5870,31 @@ function toggleRepPanel(){
 
 let nTmr=null;
 let _flyAutosaveT=0;
-function notify(msg,dur){dur=dur||2400;playChime('notify');const el=document.getElementById('notif');el.textContent=msg;el.style.display='block';clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);}
-function showStatus(html){playChime('success');const el=document.getElementById('smsg');el.innerHTML=html;el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
+function notify(msg,dur){
+  dur=dur||2400;
+  // In suborbita: toast piccoli in alto, rate-limit per non coprire il gioco su mobile
+  if(typeof SUBORBIT!=='undefined'&&SUBORBIT.active){
+    const now=performance.now();
+    if(notify._subLast&&now-notify._subLast<1100)return;
+    notify._subLast=now;
+    dur=Math.min(dur,1200);
+  }
+  playChime('notify');
+  const el=document.getElementById('notif');
+  el.textContent=msg;el.style.display='block';
+  clearTimeout(nTmr);nTmr=setTimeout(()=>{el.style.display='none';},dur);
+}
+function showStatus(html){
+  // Evita overlay grandi durante suborbita
+  if(typeof SUBORBIT!=='undefined'&&SUBORBIT.active){
+    notify(String(html).replace(/<[^>]+>/g,' '),1400);
+    return;
+  }
+  playChime('success');
+  const el=document.getElementById('smsg');
+  el.innerHTML=html;el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},3000);
+}
 
 // ─────────────────────────────────────────────────
 // PILOT PORTRAIT GENERATOR (delega a js/portrait.js — procedurale + atlas opzionale)
@@ -7341,7 +7443,7 @@ function updateSuborbitActors(dt){
         suborbitSfxHit(dead);
         if(SUBORBIT.runStats)SUBORBIT.runStats.hits=(SUBORBIT.runStats.hits||0)+1;
         SUBORBIT.flashHit=suborbitReduceMotion()?.08:.26;
-        if(dead){e.active=false;e.mesh.visible=false;SUBORBIT.kills++;trackSideObjectiveKill(e.kind);const kr=suborbitTuning().killReward;PS.credits+=kr;suborbitPushFloat('+'+kr,'#aaf7ff');notify('Bersaglio abbattuto +'+kr);}
+        if(dead){e.active=false;e.mesh.visible=false;SUBORBIT.kills++;trackSideObjectiveKill(e.kind);const kr=suborbitTuning().killReward;PS.credits+=kr;suborbitPushFloat('+'+kr,'#aaf7ff');}
         break;
       }
     }
@@ -7796,7 +7898,7 @@ function updatePlanetSkim(dt){
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
       playerShip.takeDamage(22);
       if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
-      notify('Allarme impatto suolo!',850);
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('SUOLO!','#ff8866');
     }
     if(Math.abs(SUBORBIT.x)>SUBORBIT.corridorHalf-8&&SUBORBIT.edgeHitCd<=0){
       SUBORBIT.edgeHitCd=.7;
@@ -7805,7 +7907,8 @@ function updatePlanetSkim(dt){
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
       playerShip.takeDamage(14);
       if(playerShip.health<=0){leaveSuborbit({skipDebrief:true});triggerGameOver();return;}
-      notify('Urto bordo corridoio!',800);
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO!','#ffaa88');
+      // niente toast: su mobile occupano lo schermo
     }
     if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
     if(lbl){
