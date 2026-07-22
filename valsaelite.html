@@ -402,6 +402,18 @@ body.docked-ui #smsg,body.menu-open #smsg{top:18%;bottom:auto;transform:translat
 /* Game over */
 #go{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.94);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;font-family:var(--FD);text-align:center;padding:20px}
 #go.show{display:flex}
+/* Conferma in-game: CSS critico inline (non dipendere solo da game-extras.css) */
+#ui-confirm{display:none;position:fixed;inset:0;z-index:240;background:rgba(0,6,10,.88);align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);pointer-events:auto}
+#ui-confirm.show{display:flex}
+#uic-box{background:linear-gradient(165deg,rgba(6,22,30,.98),rgba(3,12,18,.99));border:1px solid rgba(70,180,160,.45);border-radius:6px;padding:22px 26px;text-align:center;max-width:min(400px,92vw);box-shadow:0 0 0 1px rgba(196,137,58,.15),0 24px 60px rgba(0,0,0,.55);pointer-events:auto}
+#uic-box .rt{font-family:var(--FD);font-size:18px;color:var(--bright);letter-spacing:.1em;margin-bottom:8px}
+#uic-box .rs{font:11px var(--FM);color:#88a8a0;margin-bottom:16px;line-height:1.55;white-space:pre-line}
+#uic-box .uic-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#uic-box button{margin:0;padding:10px 22px;border-radius:4px;font-family:var(--FD);font-weight:700;cursor:pointer;border:none;letter-spacing:.1em}
+#uic-ok{background:var(--acc);color:#fff}
+#uic-ok.danger{background:#8a2820;border:1px solid rgba(220,80,60,.55)}
+#uic-cancel{background:rgba(255,255,255,.06);color:#88a8a0;border:1px solid rgba(70,160,150,.35)!important}
+body.go-open #notif{z-index:250;top:18%;bottom:auto}
 #got{font-size:clamp(36px,6vw,64px);font-weight:700;letter-spacing:.15em;margin-bottom:8px}
 #gos{color:#446688;font-family:var(--FM);font-size:12px;margin-bottom:28px;max-width:440px;line-height:1.65}
 #gor{padding:11px 38px;background:var(--acc);color:#fff;border:none;border-radius:7px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.18em;cursor:pointer}
@@ -4829,11 +4841,22 @@ function trapFocus(container){
   FOCUS_TRAP.el=container;
   FOCUS_TRAP.prev=document.activeElement;
   const sel='button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-  const nodes=()=>[...container.querySelectorAll(sel)].filter(n=>{
-    const s=getComputedStyle(n);return s.visibility!=='hidden'&&s.display!=='none'&&!n.disabled;
-  });
-  const first=nodes()[0];
-  if(first)try{first.focus({preventScroll:true});}catch(_){try{first.focus();}catch(__){}}
+  const nodes=()=>{
+    try{
+      return [...container.querySelectorAll(sel)].filter(n=>{
+        try{
+          const s=getComputedStyle(n);
+          return s.visibility!=='hidden'&&s.display!=='none'&&!n.disabled;
+        }catch(_){return true;}
+      });
+    }catch(_){return [];}
+  };
+  // Focus dopo un frame: evita che il tap/click che ha aperto il modal colpisca subito OK/ANNULLA.
+  setTimeout(()=>{
+    if(FOCUS_TRAP.el!==container)return;
+    const first=nodes()[0];
+    if(first)try{first.focus({preventScroll:true});}catch(_){try{first.focus();}catch(__){}}
+  },80);
   FOCUS_TRAP.handler=e=>{
     if(e.key!=='Tab'||!FOCUS_TRAP.el)return;
     const list=nodes();
@@ -4855,7 +4878,7 @@ function releaseFocusTrap(){
 }
 
 /** Conferma in-game (niente alert/confirm del browser). */
-const UIC={open:false,_onOk:null,_onCancel:null,_prevPause:null};
+const UIC={open:false,_onOk:null,_onCancel:null,_prevPause:null,readyAt:0};
 function uiConfirm(opts){
   opts=opts||{};
   const el=document.getElementById('ui-confirm');
@@ -4875,14 +4898,21 @@ function uiConfirm(opts){
   UIC._onOk=typeof opts.onOk==='function'?opts.onOk:null;
   UIC._onCancel=typeof opts.onCancel==='function'?opts.onCancel:null;
   UIC.open=true;
+  // Blocca chiusure fantasma dal tap/click che ha aperto il modal (~0.5s).
+  UIC.readyAt=performance.now()+520;
   el.classList.add('show');
   if(typeof setPausedReason==='function')setPausedReason('dialogue',true);
   trapFocus(el);
 }
 function uiConfirmClose(accepted){
+  if(UIC.open&&performance.now()<UIC.readyAt&&!accepted){
+    // Annulla/Esc/backdrop troppo presto: ignora (ghost click).
+    return;
+  }
   const el=document.getElementById('ui-confirm');
   if(el)el.classList.remove('show');
   UIC.open=false;
+  UIC.readyAt=0;
   releaseFocusTrap();
   const okCb=UIC._onOk,cancelCb=UIC._onCancel;
   UIC._onOk=UIC._onCancel=null;
@@ -4899,15 +4929,28 @@ function uiConfirmClose(accepted){
   const ok=document.getElementById('uic-ok');
   const cancel=document.getElementById('uic-cancel');
   const el=document.getElementById('ui-confirm');
-  if(ok)ok.addEventListener('click',e=>{e.preventDefault();uiConfirmClose(true);});
-  if(cancel)cancel.addEventListener('click',e=>{e.preventDefault();uiConfirmClose(false);});
+  if(ok)ok.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    if(performance.now()<UIC.readyAt)return;
+    uiConfirmClose(true);
+  });
+  if(cancel)cancel.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    uiConfirmClose(false);
+  });
   if(el)el.addEventListener('click',e=>{
-    if(e.target===el){e.preventDefault();uiConfirmClose(false);}
+    // Solo backdrop (non la box): e solo dopo il guard anti-ghost-click.
+    if(e.target!==el)return;
+    e.preventDefault();
+    uiConfirmClose(false);
   });
   window.addEventListener('keydown',e=>{
     if(!UIC.open)return;
     if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();uiConfirmClose(false);}
-    if(e.code==='Enter'){e.preventDefault();e.stopImmediatePropagation();uiConfirmClose(true);}
+    if(e.code==='Enter'){
+      if(performance.now()<UIC.readyAt){e.preventDefault();e.stopImmediatePropagation();return;}
+      e.preventDefault();e.stopImmediatePropagation();uiConfirmClose(true);
+    }
   },true);
 })();
 
@@ -4924,6 +4967,7 @@ function formatRunStats(){
 }
 function continueSandbox(){
   document.getElementById('go').classList.remove('show');
+  document.body.classList.remove('go-open');
   window._gameplaySessionStarted=true;
   PS.sandboxMode=true;
   // Sblocca eventuali pause rimaste dal finale / menu / dock.
@@ -4943,11 +4987,20 @@ function continueSandbox(){
   notify('Modalità libera: missioni procedurali e epilogo disponibili.',2600);
 }
 function loadGameFromGameOver(){
+  document.body.classList.add('go-open');
+  if(typeof hasSaveGame==='function'&&!hasSaveGame()){
+    notify('Nessun salvataggio trovato.',2200);
+    return;
+  }
   if(typeof loadGame==='function'&&loadGame()){
-    document.getElementById('go').classList.remove('show');
-    GAME.state=GAME.dockedSt?'docked':'flying';
+    const go=document.getElementById('go');
+    if(go)go.classList.remove('show');
+    document.body.classList.remove('go-open');
+    // applySavePayload già imposta docked/flying; non forzare gameover.
+    if(GAME.state==='gameover')GAME.state=GAME.dockedSt?'docked':'flying';
+    if(typeof updateHUD==='function')updateHUD();
   }else{
-    notify('Caricamento non riuscito.',2000);
+    notify('Caricamento non riuscito.',2200);
   }
 }
 function updateBoardingButtonVisibility(){
@@ -12858,6 +12911,7 @@ function updateHUD(){
 // ─────────────────────────────────────────────────
 function triggerGameOver(){
   GAME.state='gameover';
+  document.body.classList.add('go-open');
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='SCONFITTO';document.getElementById('got').style.color='#ff4433';
   document.getElementById('gos').innerHTML='La tua nave e\' andata persa tra le orbite del sistema Valsamoggio.<br>Crespellano ti piange. Tavalvol apr — ma il tuo motore si.';
@@ -12869,6 +12923,7 @@ function triggerVictory(){
   STORY.won=true;
   PS.sandboxMode=true;
   GAME.state='gameover';
+  document.body.classList.add('go-open');
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
   const epilogue=storyEpilogueBody();
