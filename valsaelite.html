@@ -115,19 +115,20 @@ body.suborbit-active #a11y-strip{display:none !important;}
   mix-blend-mode:screen;filter:blur(24px);animation:boarding-swirl 11s linear infinite}
 body.boarding-active #boarding{display:block;animation:boarding-in .28s ease-out}
 #boarding-cv{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:auto;touch-action:none}
-/* Controlli touch abbordaggio (iso = 4 direzioni diagonali griglia) */
+/* Controlli touch abbordaggio (iso = 8 direzioni: 4 assi + 4 diagonali) */
 #boarding-touch{display:none;position:fixed;left:0;right:0;bottom:0;z-index:96;padding:max(8px,env(safe-area-inset-bottom)) 10px 12px;
   justify-content:center;align-items:flex-end;gap:10px;pointer-events:none}
 body.boarding-active #boarding-touch{display:flex}
 .btouch-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto}
-.btouch-pad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;width:min(46vw,200px)}
+.btouch-pad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:5px;width:min(52vw,228px)}
 .btouch-pad button,.btouch-fire{
   border-radius:12px;border:1px solid rgba(120,200,255,.45);
-  background:rgba(8,24,48,.82);color:#d8eeff;font:700 11px var(--FD);letter-spacing:.08em;
-  min-height:48px;touch-action:manipulation;-webkit-user-select:none;user-select:none
+  background:rgba(8,24,48,.82);color:#d8eeff;font:700 13px var(--FD);letter-spacing:.04em;
+  min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none;padding:0
 }
 .btouch-pad button:active,.btouch-fire:active{background:rgba(34,90,160,.55);transform:scale(.97)}
-.btouch-fire{min-width:120px;padding:12px 18px;border-color:rgba(255,140,90,.55);background:rgba(48,12,8,.78);color:#ffd0c0}
+.btouch-pad .btouch-gap{visibility:hidden;pointer-events:none;min-height:44px}
+.btouch-fire{min-width:120px;padding:12px 18px;border-color:rgba(255,140,90,.55);background:rgba(48,12,8,.78);color:#ffd0c0;font-size:11px;letter-spacing:.08em}
 .btouch-hint{font:9px var(--FM);color:#6688aa;letter-spacing:.06em;text-align:center;max-width:min(92vw,420px);margin-bottom:2px}
 #boarding-hud{display:none;position:fixed;left:10px;top:10px;z-index:92;font-family:var(--FM);font-size:11px;color:#d7ebff;
   background:linear-gradient(180deg,rgba(5,16,34,.88),rgba(4,10,20,.74));
@@ -1039,12 +1040,17 @@ body.suborbit-active #smsg{
 <div id="boarding"><canvas id="boarding-cv"></canvas></div>
 <div id="boarding-touch" aria-hidden="true">
   <div class="btouch-wrap">
-    <div class="btouch-hint">Movimento · mirino sul campo · fuoco</div>
+    <div class="btouch-hint">8 direzioni · mirino sul campo · fuoco</div>
     <div class="btouch-pad">
-      <button type="button" class="bb-th" data-inp="thrust" aria-label="Su">▴</button>
-      <button type="button" class="bb-ri" data-inp="right" aria-label="Destra">▸</button>
-      <button type="button" class="bb-le" data-inp="left" aria-label="Sinistra">◂</button>
-      <button type="button" class="bb-bo" data-inp="boost" aria-label="Giù">▾</button>
+      <button type="button" data-inp="thrust,left" aria-label="Nord-ovest">↖</button>
+      <button type="button" data-inp="thrust" aria-label="Nord">▲</button>
+      <button type="button" data-inp="thrust,right" aria-label="Nord-est">↗</button>
+      <button type="button" data-inp="left" aria-label="Ovest">◀</button>
+      <div class="btouch-gap" aria-hidden="true"></div>
+      <button type="button" data-inp="right" aria-label="Est">▶</button>
+      <button type="button" data-inp="boost,left" aria-label="Sud-ovest">↙</button>
+      <button type="button" data-inp="boost" aria-label="Sud">▼</button>
+      <button type="button" data-inp="boost,right" aria-label="Sud-est">↘</button>
     </div>
     <button type="button" class="btouch-fire" id="boarding-fire-mob" aria-label="Fuoco">FUOCO</button>
   </div>
@@ -1181,7 +1187,9 @@ body.suborbit-active #smsg{
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
     <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>throttle</kbd> su mobile · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>BOOST</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
+    <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> target · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> hail</span></div>
+    <div class="help-grid"><span>Abbordaggio</span><span><kbd>WASD</kbd> (e diagonali: due tasti) = <kbd>8 direzioni</kbd> · <kbd>Spazio</kbd> fuoco · pad 3×3 su mobile · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
     <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium (ritratto + dialetto bazzanese)</span></div>
@@ -4534,7 +4542,11 @@ function tryShowTutorialBlueprint(){
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
-    '<p><strong>ACCEL</strong> / <strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>BOOST</strong> / <strong>S</strong> / <strong>Shift/B</strong> afterburner. <strong>FUE</strong> / <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p style="opacity:.85;margin-top:8px;font-size:11px">I tasti ACCEL, FUE e BOOST restano sempre a schermo.</p>');
+    '<p><strong>ACCEL</strong> / <strong>W/↑</strong> motori · <strong>A/D</strong> virata · <strong>BOOST</strong> / <strong>S</strong> / <strong>Shift/B</strong> afterburner. <strong>FUE</strong> / <strong>Spazio</strong> spara.</p><p><strong>E</strong> attracca vicino a una stazione · <strong>T/H</strong> hail · <strong>G</strong> abbordaggio nave disabilitata.</p><p>Le <strong>linee ciano</strong> tra i pianeti sono <strong>corridoi spaziali</strong> (corsie): resta sopra con i motori per <strong>spinta extra</strong>. Non confonderli con i corridoi di suborbita. Apri la mappa <strong>M</strong> per i nomi.</p><p style="opacity:.85;margin-top:8px;font-size:11px">I tasti ACCEL, FUE e BOOST restano sempre a schermo.</p>');
+}
+function tryShowTutorialCorridor(){
+  return showTutorialOnce('valsaelite_tut_corridor','Corridoi spaziali',
+    '<p>Hai entrato in una <strong>corsia commerciale</strong>: è una linea ciano tra due pianeti nello spazio aperto.</p><p>Con i <strong>motori accesi</strong> sulla corsia ottieni <strong>spinta extra</strong>. Fuori torni a velocità normale. Non è il corridoio di suborbita sotto l\'atmosfera.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Mappa <strong>M</strong> = nomi delle corsie. Anomalie (anelli colorati) = rischio e bottino, non corsie.</p>');
 }
 function tryShowTutorialDock(){
   return showTutorialOnce('valsaelite_tut_dock','Attracco e missioni',
@@ -4542,7 +4554,7 @@ function tryShowTutorialDock(){
 }
 function tryShowTutorialMap(){
   return showTutorialOnce('valsaelite_tut_map','Mappa galattica',
-    '<p><strong>M</strong> apre la mappa. Clicca una stazione → <strong>NAVIGA QUI</strong> per la freccia di rotta.</p><p>Scroll zoom · drag pan · cerca per nome in alto a sinistra.</p>');
+    '<p><strong>M</strong> apre la mappa. Clicca una stazione → <strong>NAVIGA QUI</strong> per la freccia di rotta.</p><p>Le <strong>fasce ciano</strong> sono <strong>corridoi spaziali</strong> (corsie +spinta). Gli anelli colorati sono anomalie.</p><p>Scroll zoom · drag pan · cerca per nome in alto a sinistra.</p>');
 }
 function openHelpModal(){
   if(typeof closeOverlappingModals==='function')closeOverlappingModals('help');
@@ -5736,15 +5748,16 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
   b.addEventListener('touchend',exit,{passive:false});
 })();
 (function initBoardingTouchPad(){
-  const bind=(el,inp)=>{
-    if(!el)return;
+  const bindKeys=(el,keys)=>{
+    if(!el||!keys.length)return;
     const down=e=>{
       if(GAME.state!=='boarding'||!BOARDING.active)return;
-      e.preventDefault();INP[inp]=true;
+      e.preventDefault();
+      for(const k of keys)INP[k]=true;
     };
     const up=e=>{
       if(e)e.preventDefault();
-      INP[inp]=false;
+      for(const k of keys)INP[k]=false;
     };
     el.addEventListener('touchstart',down,{passive:false});
     el.addEventListener('touchend',up,{passive:false});
@@ -5753,8 +5766,11 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
     el.addEventListener('mouseup',up);
     el.addEventListener('mouseleave',up);
   };
-  document.querySelectorAll('.btouch-pad button[data-inp]').forEach(btn=>bind(btn,btn.dataset.inp));
-  bind(document.getElementById('boarding-fire-mob'),'fire');
+  document.querySelectorAll('.btouch-pad button[data-inp]').forEach(btn=>{
+    const keys=String(btn.dataset.inp||'').split(',').map(s=>s.trim()).filter(Boolean);
+    bindKeys(btn,keys);
+  });
+  bindKeys(document.getElementById('boarding-fire-mob'),['fire']);
 })();
 document.getElementById('btnmap').addEventListener('click',toggleMap);
 document.getElementById('btn-diary').addEventListener('click',()=>toggleDiary());
@@ -6075,7 +6091,7 @@ const DLG_TREES={
         {label:'[GRAZIE] "Ricevuto."',next:null,fx:{credits:40}}
       ]},
       a7:{text:'Perché nelle anomalie c\'è macguffinium: materia a nove dimensioni. Contamina scafi, carne, memoria. Gli hulk non sono cimiteri: sono incubatrici. Chi ci restava dentro non è più quello che era. Abborda se ti serve un pezzo del Patto, ma non restare a chiacchierare coi mostri.',choices:[
-        {label:'[CAPITO] "Grazie per l\'avviso."',next:null,fx:{rep:1}}
+        {label:'[CAPITO] "Grazie per l\'avviso."',next:null,fx:{rep:1,lore:'hulk_mutazioni'}}
       ]}
     }
   },
@@ -6095,7 +6111,7 @@ const DLG_TREES={
         {label:'[FUGGI] Chiudi canale',next:null}
       ]},
       p4:{text:'Gli hulk driftano dalle anomalie. Dentro c\'è macguffinium: muta tutto. Uomini, topi, scafi. Quelli che vedi camminare non sono xenomorfi da manifesto: sono equipaggi che hanno respirato troppo a lungo. Io vendo le mappe. Tu porta un\'arma.',choices:[
-        {label:'[OK] "Chiaro."',next:null}
+        {label:'[OK] "Chiaro."',next:null,fx:{lore:'hulk_mutazioni'}}
       ]}
     }
   },
@@ -6120,7 +6136,7 @@ const DLG_TREES={
         {label:'[CAPITO] "Grazie."',next:null,fx:{rep:1}}
       ]},
       m5:{text:'Gli space hulk non sono castelli abbandonati: sono ferite dell\'anomalia. Il macguffinium muta la carne. I mostri che trovi nei corridoi erano equipaggi, prigionieri, topi di stiva. La Rocca li chiama prove. Io li chiamo peccati da non ripetere.',choices:[
-        {label:'[CAPITO] "Non entrerò a cuor leggero."',next:null,fx:{rep:2}}
+        {label:'[CAPITO] "Non entrerò a cuor leggero."',next:null,fx:{rep:2,lore:'hulk_mutazioni'}}
       ]}
     }
   },
@@ -6141,7 +6157,7 @@ const DLG_TREES={
         {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
       ]},
       c4:{text:'Contano come rischio. Il macguffinium nelle anomalie muta ciò che resta a bordo: scafi, ratti, uomini. Noi non lo mettiamo a bilancio come «mostro»: lo chiamiamo contaminazione. Se abbordi, porta un filtro. E non firmare ricevute con sangue.',choices:[
-        {label:'[OK] "Ricevuto."',next:null}
+        {label:'[OK] "Ricevuto."',next:null,fx:{lore:'hulk_mutazioni'}}
       ]}
     }
   },
@@ -6162,7 +6178,7 @@ const DLG_TREES={
         {label:'[OK] "Chiaro."',next:null,fx:{credits:-20}}
       ]},
       s4:{text:'Gli hulk puzzano di metallo sbagliato, non di terra. È macguffinium: muta ciò che mangia. I mostri nei corridoi erano gente, una volta. Noi a Savigno teniamo l\'aroma pulito. Loro, lassù, tengono le fauci aperte.',choices:[
-        {label:'[CAPITO] "Restiamo sui tartufi."',next:null,fx:{rep:1}}
+        {label:'[CAPITO] "Restiamo sui tartufi."',next:null,fx:{rep:1,lore:'hulk_mutazioni'}}
       ]}
     }
   }
@@ -6174,6 +6190,11 @@ function applyDlgFx(ns,fx){
   if(fx.credits){PS.credits=Math.max(0,PS.credits+(fx.credits|0));if(fx.credits>0)notify('+'+fmt(fx.credits)+' (voce di corridoio)',1400);}
   if(fx.angry&&ns){ns.angry=true;}
   if(fx.mission)grantDlgMission(fx.mission,ns);
+  if(fx.lore&&PS){
+    if(!PS.loreFlags)PS.loreFlags={};
+    PS.loreFlags[fx.lore]=1;
+    if(fx.lore==='hulk_mutazioni')PS.loreFlags.macguffinium_voce=1;
+  }
 }
 function grantDlgMission(key,ns){
   const near=GAME.nearSt||stations.find(s=>s.sd&&s.sd.faction===(ns&&ns.faction))||stations[0];
@@ -8553,20 +8574,27 @@ function boardingWalkBlocked(sx,sy){
   }
   return false;
 }
-/** Movimento fluido (WASD iso) con scivolamento sui muri — niente salti a griglia. */
-function boardingMoveSmooth(dt){
-  const p=BOARDING.player;
-  const grid=BOARDING.map;if(!grid)return;
-  const C=BOARDING.cols,R=BOARDING.rows;
+/** Vettore movimento iso a 8 direzioni (WASD + diagonali da combo / pad 3×3). */
+function boardingReadMoveVec(){
   let mdx=0,mdy=0;
+  // Schermo: W=su, S=giù, A=sx, D=dx; combo = diagonali (8 vie).
   if(INP.thrust){mdx+=-1;mdy+=-1;}
   if(INP.boost){mdx+=1;mdy+=1;}
   if(INP.left){mdx+=-1;mdy+=1;}
   if(INP.right){mdx+=1;mdy+=-1;}
   const mlen=Math.hypot(mdx,mdy);
   if(mlen>.001){mdx/=mlen;mdy/=mlen;}
+  return{dx:mdx,dy:mdy,len:mlen};
+}
+/** Movimento fluido (WASD iso, 8 direzioni) con scivolamento sui muri — niente salti a griglia. */
+function boardingMoveSmooth(dt){
+  const p=BOARDING.player;
+  const grid=BOARDING.map;if(!grid)return;
+  const C=BOARDING.cols,R=BOARDING.rows;
+  const mv=boardingReadMoveVec();
+  let mdx=mv.dx,mdy=mv.dy;
   const spd=8.35;
-  if(mlen>.001){
+  if(mv.len>.001){
     const ndx=mdx*spd*dt, ndy=mdy*spd*dt;
     let nsx=p.sx+ndx, nsy=p.sy+ndy;
     nsx=cl(nsx,0.55,C-1.55);nsy=cl(nsy,0.55,R-1.55);
@@ -8663,15 +8691,10 @@ function updateBoarding(dt){
     p._aimX+=(p._aimTx-p._aimX)*aimSmPtr;
     p._aimY+=(p._aimTy-p._aimY)*aimSmPtr;
   }else{
-    // Aim da tastiera: vettore normalizzato nello spazio griglia iso (quasi istantaneo).
-    let adx=0,ady=0;
-    if(INP.thrust){adx+=-1;ady+=-1;}
-    if(INP.boost){adx+=1;ady+=1;}
-    if(INP.left){adx+=-1;ady+=1;}
-    if(INP.right){adx+=1;ady+=-1;}
-    if(adx||ady){
-      const nl=Math.hypot(adx,ady)||1;
-      p._aimTx=adx/nl;p._aimTy=ady/nl;
+    // Aim da tastiera/pad: 8 direzioni nello spazio griglia iso.
+    const mv=boardingReadMoveVec();
+    if(mv.len>.001){
+      p._aimTx=mv.dx;p._aimTy=mv.dy;
       const screenDx=(p._aimTx-p._aimTy);
       if(screenDx>.08)p.face=1;
       else if(screenDx<-.08)p.face=-1;
@@ -8706,12 +8729,7 @@ function updateBoarding(dt){
   nm=Math.hypot(p._aimTx,p._aimTy);
   if(nm>.001){p._aimTx/=nm;p._aimTy/=nm;}
   const osx=p.sx, osy=p.sy;
-  let inpMux=0,inpMuy=0;
-  if(INP.thrust){inpMux+=-1;inpMuy+=-1;}
-  if(INP.boost){inpMux+=1;inpMuy+=1;}
-  if(INP.left){inpMux+=-1;inpMuy+=1;}
-  if(INP.right){inpMux+=1;inpMuy+=-1;}
-  const wantMove=Math.hypot(inpMux,inpMuy)>.001;
+  const wantMove=boardingReadMoveVec().len>.001;
   boardingMoveSmooth(dt);
   const pMoving=Math.hypot(p.sx-osx,p.sy-osy)>.003||wantMove;
   p.walk+=dt*(pMoving?10:3);
@@ -8742,11 +8760,19 @@ function updateBoarding(dt){
       e.mv=.36+Math.random()*.52;
       const md=Math.abs(e.x-p.x)+Math.abs(e.y-p.y);
       let ex=e.x,ey=e.y;
+      const dirs8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
       if(md<5&&md>0){
-        const tx=p.x-e.x, ty=p.y-e.y;
-        if(Math.abs(tx)>Math.abs(ty))ex+=Math.sign(tx);else ey+=Math.sign(ty);
+        let best=null,bestScore=1e9;
+        for(const [dx,dy] of dirs8){
+          const nx=e.x+dx,ny=e.y+dy;
+          if(nx<=0||ny<=0||nx>=BOARDING.cols-1||ny>=BOARDING.rows-1)continue;
+          if(BOARDING.map[ny][nx]!==0||(nx===p.x&&ny===p.y))continue;
+          const score=Math.hypot(p.x-nx,p.y-ny)+(Math.abs(dx)+Math.abs(dy)>1?0.08:0);
+          if(score<bestScore){bestScore=score;best=[nx,ny];}
+        }
+        if(best){ex=best[0];ey=best[1];}
       }else{
-        const dir=[[1,0],[-1,0],[0,1],[0,-1]][(Math.random()*4)|0];
+        const dir=dirs8[(Math.random()*8)|0];
         ex+=dir[0];ey+=dir[1];
       }
       if(ex>0&&ey>0&&ex<BOARDING.cols-1&&ey<BOARDING.rows-1&&BOARDING.map[ey][ex]===0&&!(ex===p.x&&ey===p.y)){
@@ -8897,7 +8923,7 @@ function updateBoarding(dt){
       +`<div>HP ${hpw}/100</div><div class="bh-bar"><div style="width:${hpw}%"></div></div>`
       +o2Line
       +`<div class="bh-obj">OBIETTIVO: ${obj}</div>`
-      +`<div class="bh-hint"><strong>WASD</strong> movimento (iso). <strong>Spazio</strong> fuoco · <strong>Tap</strong> / <strong>Tab</strong> auto-mira · mouse = mira. Raccolta e uscita a <strong>vicinanza</strong> (non serve centrare perfettamente). <strong>Esc</strong> ritiro.</div>`;
+      +`<div class="bh-hint"><strong>WASD</strong> = 8 direzioni (anche diagonali). <strong>Spazio</strong> fuoco · <strong>Tap</strong> / <strong>Tab</strong> auto-mira · mouse = mira. Raccolta e uscita a <strong>vicinanza</strong>. <strong>Esc</strong> ritiro.</div>`;
   }
 }
 // ---- Antropomorphic character renderer ----
@@ -10865,9 +10891,9 @@ function triggerSeqTransition(mode,dur,color){
 }
 let SPACE_VIS={initialized:false,group:null,corridors:[],anomalies:[]};
 const ROUTE_CORRIDORS=[
-  {id:'core-trade',name:'Corridoio Mercantile Prime',a:'bazzano',b:'calcara',width:1800,safety:0.22,speed:1.08},
-  {id:'order-lane',name:'Corsia dell Ordine',a:'monteveglio',b:'savigno',width:1700,safety:0.12,speed:1.05},
-  {id:'frontier-run',name:'Run Frontiera',a:'castelletto',b:'serravalle',width:2200,safety:-0.08,speed:1.14}
+  {id:'core-trade',name:'Corridoio Mercantile Prime',a:'bazzano',b:'calcara',width:2400,safety:0.22,speed:1.08},
+  {id:'order-lane',name:'Corsia dell Ordine',a:'monteveglio',b:'savigno',width:2200,safety:0.12,speed:1.05},
+  {id:'frontier-run',name:'Run Frontiera',a:'castelletto',b:'serravalle',width:2800,safety:-0.08,speed:1.14}
 ];
 const SPACE_ANOMALIES=[
   {id:'rift-calcara',name:'Rift di Calcara',x:14200,z:9800,r:2200,risk:0.58,reward:210,color:'#ff6633',colorB:'#ffee88',colorC:'#9933ff',
@@ -10881,7 +10907,7 @@ const SPACE_ANOMALIES=[
   {id:'blue-gyre',name:'Vortice Cobalto',x:25100,z:-14200,r:2100,risk:0.46,reward:245,color:'#3388ff',colorB:'#88ffff',colorC:'#bb66ff',
     drift:34,hullStress:0.02,energyLeak:1.18,rewardMul:1.15,shake:0.1}
 ];
-let NAV_EFFECT={inCorridor:null,inAnomaly:null,prevAnomalyId:null,bonusSpeed:1,hazardMul:1,lastTick:0,ambienceT:0};
+let NAV_EFFECT={inCorridor:null,inAnomaly:null,prevAnomalyId:null,prevCorridorId:null,bonusSpeed:1,hazardMul:1,lastTick:0,ambienceT:0};
 function ensureSpaceLaneVisuals(){
   if(SPACE_VIS.initialized)return;
   const g=new THREE.Group();
@@ -10889,16 +10915,28 @@ function ensureSpaceLaneVisuals(){
   SPACE_VIS.group=g;
   ROUTE_CORRIDORS.forEach(rc=>{
     const a=getSM(rc.a),b=getSM(rc.b);if(!a||!b)return;
-    const pts=[a.mesh.position.clone(),b.mesh.position.clone()];
+    const p0=a.mesh.position.clone(),p1=b.mesh.position.clone();
+    p0.y=12;p1.y=12;
+    const pts=[p0,p1];
     const geo=new THREE.BufferGeometry().setFromPoints(pts);
-    const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x55d8ff,transparent:true,opacity:.22}));
+    const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x66eeff,transparent:true,opacity:.48,depthWrite:false}));
     g.add(line);
-    const beaconMat=new THREE.MeshBasicMaterial({color:0x66eeff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending});
-    const b0=new THREE.Mesh(new THREE.SphereGeometry(90,12,10),beaconMat.clone());
-    const b1=new THREE.Mesh(new THREE.SphereGeometry(90,12,10),beaconMat.clone());
-    b0.position.copy(a.mesh.position);b1.position.copy(b.mesh.position);
+    // Fascia laterale (corsia leggibile): due linee parallele.
+    const dx=p1.x-p0.x,dz=p1.z-p0.z,len=Math.hypot(dx,dz)||1;
+    const nx=(-dz/len)*(rc.width*.35),nz=(dx/len)*(rc.width*.35);
+    const sideA=[new THREE.Vector3(p0.x+nx,10,p0.z+nz),new THREE.Vector3(p1.x+nx,10,p1.z+nz)];
+    const sideB=[new THREE.Vector3(p0.x-nx,10,p0.z-nz),new THREE.Vector3(p1.x-nx,10,p1.z-nz)];
+    const sideMat=new THREE.LineBasicMaterial({color:0x44c8ff,transparent:true,opacity:.2,depthWrite:false});
+    const lineL=new THREE.Line(new THREE.BufferGeometry().setFromPoints(sideA),sideMat.clone());
+    const lineR=new THREE.Line(new THREE.BufferGeometry().setFromPoints(sideB),sideMat.clone());
+    g.add(lineL);g.add(lineR);
+    const beaconMat=new THREE.MeshBasicMaterial({color:0x88f0ff,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false});
+    const b0=new THREE.Mesh(new THREE.SphereGeometry(110,12,10),beaconMat.clone());
+    const b1=new THREE.Mesh(new THREE.SphereGeometry(110,12,10),beaconMat.clone());
+    b0.position.copy(a.mesh.position);b0.position.y=40;
+    b1.position.copy(b.mesh.position);b1.position.y=40;
     g.add(b0);g.add(b1);
-    SPACE_VIS.corridors.push({rc,line,b0,b1});
+    SPACE_VIS.corridors.push({rc,line,lineL,lineR,b0,b1});
   });
   SPACE_ANOMALIES.forEach(an=>{
     const colA=new THREE.Color(an.color),colB=new THREE.Color(an.colorB||an.color),colC=new THREE.Color(an.colorC||an.colorB||an.color);
@@ -10957,11 +10995,15 @@ function updateSpaceLaneVisuals(dt){
   if(!SPACE_VIS.initialized)ensureSpaceLaneVisuals();
   const t=performance.now()*.0014;
   for(const c of SPACE_VIS.corridors){
-    const p=.16+Math.sin(t*1.6)*.08;
+    const active=NAV_EFFECT.inCorridor&&NAV_EFFECT.inCorridor.id===c.rc.id;
+    const p=active?(.62+Math.sin(t*3.2)*.14):(.32+Math.sin(t*1.6)*.1);
     c.line.material.opacity=p;
-    const p0=.24+Math.sin(t*2.2)*.2;
+    const sideOp=active?.28:.16+Math.sin(t*1.3)*.05;
+    if(c.lineL)c.lineL.material.opacity=sideOp;
+    if(c.lineR)c.lineR.material.opacity=sideOp;
+    const p0=(active?.5:.32)+Math.sin(t*2.2)*.2;
     c.b0.material.opacity=p0;
-    c.b1.material.opacity=.24+Math.cos(t*2.2)*.2;
+    c.b1.material.opacity=(active?.5:.32)+Math.cos(t*2.2)*.2;
   }
   for(const a of SPACE_VIS.anomalies){
     a.ring.rotation.z+=dt*.32;
@@ -11024,7 +11066,10 @@ function pointSegDist(px,pz,ax,az,bx,bz){
 }
 function updateNavRisk(dt){
   NAV_EFFECT.inCorridor=null;NAV_EFFECT.inAnomaly=null;NAV_EFFECT.bonusSpeed=1;NAV_EFFECT.hazardMul=1;
-  if(!playerShip.alive||GAME.state!=='flying')return;
+  if(!playerShip.alive||GAME.state!=='flying'){
+    if(NAV_EFFECT.prevCorridorId)NAV_EFFECT.prevCorridorId=null;
+    return;
+  }
   for(const c of ROUTE_CORRIDORS){
     const a=getSM(c.a),b=getSM(c.b);if(!a||!b)continue;
     const d=pointSegDist(playerShip.mesh.position.x,playerShip.mesh.position.z,a.mesh.position.x,a.mesh.position.z,b.mesh.position.x,b.mesh.position.z);
@@ -11033,6 +11078,21 @@ function updateNavRisk(dt){
   for(const an of SPACE_ANOMALIES){
     const dx=playerShip.mesh.position.x-an.x,dz=playerShip.mesh.position.z-an.z;
     if(dx*dx+dz*dz<an.r*an.r){NAV_EFFECT.inAnomaly=an;NAV_EFFECT.hazardMul=1+(an.risk||0.4);break;}
+  }
+  const activeCorId=NAV_EFFECT.inCorridor?NAV_EFFECT.inCorridor.id:null;
+  if(activeCorId!==NAV_EFFECT.prevCorridorId){
+    if(activeCorId){
+      const c=NAV_EFFECT.inCorridor;
+      const pct=Math.max(1,Math.round(((c.speed||1)-1)*100));
+      playTone(260,.07,.028,'sine');
+      playTone(390,.06,.02,'triangle');
+      notify(`Corsia: ${c.name} — motori +${pct}% (resta sulla linea ciano)`,2600);
+      if(typeof tryShowTutorialCorridor==='function')tryShowTutorialCorridor();
+    }else if(NAV_EFFECT.prevCorridorId){
+      playTone(210,.05,.018,'sine');
+      notify('Fuori corsia — spinta normale',1300);
+    }
+    NAV_EFFECT.prevCorridorId=activeCorId;
   }
   const activeAnId=NAV_EFFECT.inAnomaly?NAV_EFFECT.inAnomaly.id:null;
   if(activeAnId!==NAV_EFFECT.prevAnomalyId){
@@ -11577,14 +11637,22 @@ function drawMap(){
   ROUTE_CORRIDORS.forEach(rc=>{
     const a=getSM(rc.a),b=getSM(rc.b);if(!a||!b)return;
     const ap=worldToMap(a.mesh.position.x,a.mesh.position.z),bp=worldToMap(b.mesh.position.x,b.mesh.position.z);
-    ctx.strokeStyle='rgba(80,220,255,.16)';
-    ctx.lineWidth=Math.max(2,rc.width*sc*0.12);
+    const active=NAV_EFFECT.inCorridor&&NAV_EFFECT.inCorridor.id===rc.id;
+    ctx.strokeStyle=active?'rgba(120,240,255,.42)':'rgba(80,220,255,.28)';
+    ctx.lineWidth=Math.max(3,rc.width*sc*0.16);
     ctx.beginPath();ctx.moveTo(ap.x,ap.y);ctx.lineTo(bp.x,bp.y);ctx.stroke();
-    if(MAP.zoom>.5){
-      ctx.fillStyle='rgba(120,230,255,.7)';
+    ctx.strokeStyle=active?'rgba(180,250,255,.85)':'rgba(140,235,255,.55)';
+    ctx.lineWidth=Math.max(1.2,1.6*MAP.zoom);
+    ctx.beginPath();ctx.moveTo(ap.x,ap.y);ctx.lineTo(bp.x,bp.y);ctx.stroke();
+    if(MAP.zoom>.45){
+      ctx.fillStyle=active?'rgba(200,255,255,.95)':'rgba(140,235,255,.8)';
       ctx.font=`${Math.round(9*MAP.zoom)}px Share Tech Mono`;
       ctx.textAlign='center';
       ctx.fillText(rc.name,(ap.x+bp.x)*.5,(ap.y+bp.y)*.5-6);
+      ctx.fillStyle='rgba(120,200,230,.65)';
+      ctx.font=`${Math.round(8*MAP.zoom)}px Share Tech Mono`;
+      const pct=Math.max(1,Math.round(((rc.speed||1)-1)*100));
+      ctx.fillText('corsia +'+pct+'%',(ap.x+bp.x)*.5,(ap.y+bp.y)*.5+8);
     }
   });
   // High-risk anomalies
@@ -11994,7 +12062,11 @@ function updateHUD(){
   const mis=PS.missileInstalled
     ?(MISSILE.cooldown>0?`MISSILE ${MISSILE.cooldown.toFixed(1)}s · ${PS.missiles}/${PS.missileMax}`:`MISSILE READY [Q] · ${PS.missiles}/${PS.missileMax}`)
     :'';
-  const navFx=NAV_EFFECT.inAnomaly?`ANOMALIA: ${NAV_EFFECT.inAnomaly.name}`:NAV_EFFECT.inCorridor?`CORRIDOIO: ${NAV_EFFECT.inCorridor.name}`:'';
+  const navFx=NAV_EFFECT.inAnomaly
+    ?`ANOMALIA: ${NAV_EFFECT.inAnomaly.name}`
+    :(NAV_EFFECT.inCorridor
+      ?(`CORSIA +${Math.max(1,Math.round(((NAV_EFFECT.bonusSpeed||1)-1)*100))}%: ${NAV_EFFECT.inCorridor.name}`)
+      :'');
   const tickParts=[];
   if(mTxt)tickParts.push(mTxt);
   if(misReady&&mis)tickParts.push(mis);
