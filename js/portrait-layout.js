@@ -33,7 +33,7 @@ window.PORTRAIT_LAYOUT = {
     hairTint: '#f0eeea',
     name: 'Zvan Marìa',
     complete: true,
-    // Capelli bianchi/argento come in sprites/story/intro/intro_03.jpg
+    // Capelli bianchi/argento come in sprites/story/intro/intro_03.jpg (ritratto RADICI)
     hairColor: '#e8e6e2'
   },
   pools: {
