@@ -232,8 +232,13 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
   white-space:normal;line-height:1.35;overflow:hidden;text-overflow:ellipsis;
   max-height:4.2em}
 
-/* Story chapter banner — layout base; stile completo in game-extras.css */
-#story-banner{display:none}
+/* Story chapter banner — fullscreen overlay; stile in game-extras.css */
+#story-banner{display:none;position:fixed;inset:0;z-index:125;align-items:center;justify-content:center;pointer-events:auto}
+#story-banner.show{display:flex !important}
+#story-banner .sb-backdrop{position:absolute;inset:0;background:rgba(0,4,10,.78);backdrop-filter:blur(5px);pointer-events:auto}
+#story-banner .sb-panel{position:relative;z-index:1;width:min(640px,94vw);max-height:min(92vh,720px);overflow:hidden;
+  background:linear-gradient(165deg,rgba(6,20,28,.97) 0%,rgba(3,10,16,.98) 100%);
+  border:1px solid rgba(70,180,160,.4);border-radius:6px;pointer-events:auto}
 
 /* Dock prompt */
 #dprompt{display:none;position:fixed;left:50%;bottom:155px;transform:translateX(-50%);
@@ -916,14 +921,17 @@ body.suborbit-active #smsg{
 <div id="navarrow" style="display:block;position:fixed;inset:0;z-index:9;pointer-events:none">
   <canvas id="navcv" style="width:100%;height:100%;display:block"></canvas>
 </div>
-<div id="story-banner">
-  <div class="sb-art-wrap"><img id="sbart" alt="" decoding="async"/></div>
-  <div class="sb-body">
-    <div class="sc" id="sc"></div>
-    <div class="st" id="stit"></div>
-    <div class="sd" id="sdesc"></div>
-    <div class="sb-foot" id="sbhint">Premi CONTINUA per chiudere</div>
-    <button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button>
+<div id="story-banner" aria-modal="true" role="dialog" aria-labelledby="stit">
+  <div class="sb-backdrop" id="sb-backdrop" aria-hidden="true"></div>
+  <div class="sb-panel">
+    <div class="sb-art-wrap"><img id="sbart" alt="" decoding="async"/></div>
+    <div class="sb-body">
+      <div class="sc" id="sc"></div>
+      <div class="st" id="stit"></div>
+      <div class="sd" id="sdesc"></div>
+      <div class="sb-foot" id="sbhint">Premi CONTINUA per chiudere</div>
+      <button type="button" class="sb-dismiss" id="sbdismiss">CONTINUA</button>
+    </div>
   </div>
 </div>
 <div id="hulk-cine" aria-modal="true" role="dialog" aria-labelledby="hulk-cine-title">
@@ -1762,23 +1770,63 @@ function hubPriceMod(sd,kind){
 
 function pushStoryLine(missionId){
   const line=STORY_LINES[missionId];if(!line)return;
-  setTimeout(()=>showDlg('Consiglio del Sistema','bazzano',line),2200);
+  // Non mostrare dialoghi auto mentre il banner storia è aperto (e non chiudere il banner).
+  const run=()=>showDlg('Consiglio del Sistema','bazzano',line);
+  if(typeof storyBannerOpen==='function'&&storyBannerOpen()){
+    STORY_BANNER._afterClose.push(run);
+    return;
+  }
+  setTimeout(run,400);
 }
 
 let storyBannerTimer=null;
+const STORY_BANNER={
+  queue:[],
+  open:false,
+  readyAt:0,
+  _afterClose:[],
+  _showing:null
+};
+function storyBannerOpen(){
+  const b=document.getElementById('story-banner');
+  if(b&&(b.classList.contains('show')||b.style.display==='flex'||b.style.display==='block'))return true;
+  if(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)return true;
+  return !!STORY_BANNER.open;
+}
+function _flushStoryBannerAfterClose(){
+  // Prima i banner in coda (uno alla volta); i callback restano per dopo.
+  if(STORY_BANNER.queue.length){
+    const next=STORY_BANNER.queue.shift();
+    _presentStoryBanner(next.label,next.title,next.body);
+    return;
+  }
+  const pending=STORY_BANNER._afterClose.splice(0);
+  pending.forEach(fn=>{try{fn();}catch(_){}});
+  // Un callback può aver messo un banner in coda o averne aperto uno.
+  if(!STORY_BANNER.open&&STORY_BANNER.queue.length){
+    const next=STORY_BANNER.queue.shift();
+    _presentStoryBanner(next.label,next.title,next.body);
+  }
+}
 function hideStoryBanner(){
   if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
+  // Ignora dismiss accidentali (click fantasma dopo CONSEGNA / touch residuale).
+  if(performance.now()<STORY_BANNER.readyAt)return;
   const b=document.getElementById('story-banner');
   const wasPrologue=document.getElementById('sc')&&/PROLOGO/i.test(document.getElementById('sc').textContent||'');
-  if(b)b.style.display='none';
+  if(b){b.classList.remove('show');b.style.display='none';}
+  STORY_BANNER.open=false;
+  STORY_BANNER._showing=null;
   document.body.classList.remove('story-open');
   if(typeof setPausedReason==='function')setPausedReason('story',false);
   // Dopo il prologo, sblocca automaticamente il capitolo 1
   if(wasPrologue&&STORY.chapter<1&&!STORY.won){
     setTimeout(()=>advanceStory(1),280);
+    return;
   }
+  _flushStoryBannerAfterClose();
 }
-function showStoryBanner(label,title,body,_holdMsIgnored){
+function _presentStoryBanner(label,title,body){
   document.getElementById('sc').textContent=label;
   document.getElementById('stit').textContent=title;
   document.getElementById('sdesc').textContent=body;
@@ -1789,21 +1837,37 @@ function showStoryBanner(label,title,body,_holdMsIgnored){
     else{art.removeAttribute('src');art.style.display='none';}
   }
   const hint=document.getElementById('sbhint');
-  if(hint)hint.textContent='Premi CONTINUA per chiudere';
+  if(hint)hint.textContent='Premi CONTINUA per chiudere — non si chiude da solo';
   const b=document.getElementById('story-banner');
-  b.style.display='block';
+  b.classList.add('show');
+  b.style.display='flex';
+  STORY_BANNER.open=true;
+  STORY_BANNER._showing={label,title,body};
+  // Blocca CONTINUA per ~0.55s: evita chiusura da click/touch residuo della missione.
+  STORY_BANNER.readyAt=performance.now()+550;
   document.body.classList.add('story-open');
   if(typeof setPausedReason==='function')setPausedReason('story',true);
-  // Nessun auto-dismiss: resta aperto finché non si preme CONTINUA
   if(storyBannerTimer){clearTimeout(storyBannerTimer);storyBannerTimer=null;}
 }
+function showStoryBanner(label,title,body,_holdMsIgnored){
+  // Se un banner è già aperto, accoda — non sostituire e non auto-chiudere.
+  if(STORY_BANNER.open||(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)){
+    STORY_BANNER.queue.push({label,title,body});
+    return;
+  }
+  _presentStoryBanner(label,title,body);
+}
 (function setupStoryBannerUi(){
-  const b=document.getElementById('story-banner');
-  document.getElementById('sbdismiss').addEventListener('click',e=>{
+  const btn=document.getElementById('sbdismiss');
+  if(btn)btn.addEventListener('click',e=>{
     e.preventDefault();e.stopPropagation();
     hideStoryBanner();
   });
-  // Non chiudere cliccando fuori o con tastiera — solo il pulsante CONTINUA
+  const bd=document.getElementById('sb-backdrop');
+  if(bd)bd.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    // Backdrop non chiude: solo CONTINUA.
+  });
 })();
 
 const HULK_CINE={
@@ -1884,8 +1948,13 @@ function advanceStory(ch){
       st.missionsList.unshift(m);
     }
   }
-  if(ch===1)setTimeout(()=>tryShowTutorialChain(),1200);
-  if(ch>=4&&typeof ensureBeghelliPalace==='function')setTimeout(()=>ensureBeghelliPalace(),1600);
+  if(ch===1){
+    STORY_BANNER._afterClose.push(()=>setTimeout(()=>tryShowTutorialChain(),400));
+  }
+  if(ch>=4&&typeof ensureBeghelliPalace==='function'){
+    // Spawn dopo chiusura banner — non rubare il modal capitolo
+    STORY_BANNER._afterClose.push(()=>ensureBeghelliPalace());
+  }
 }
 
 // Interludi intermedi: nodi narrativi non bloccanti, condizionati da rep/frammenti.
@@ -2019,7 +2088,8 @@ function checkStoryInterludes(){
       if(!ok)continue;
     }
     _shownInterludes.add(it.id);
-    setTimeout(()=>showStoryBanner('INTERLUDIO',it.title,it.body,7000),800);
+    // Accoda dietro il banner capitolo — l'utente chiude ogni modal a mano
+    showStoryBanner('INTERLUDIO',it.title,it.body);
     break;
   }
 }
@@ -5647,12 +5717,6 @@ const GAME={
 };
 function setPausedReason(reason,on){if(GAME.pausedReasons[reason]!==undefined)GAME.pausedReasons[reason]=!!on;}
 function gameplayPaused(){return Object.values(GAME.pausedReasons).some(Boolean);}
-function storyBannerOpen(){
-  const b=document.getElementById('story-banner');
-  if(b&&b.style.display==='block')return true;
-  if(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)return true;
-  return false;
-}
 const fadeEl=document.getElementById('fadeov');
 const ltEl=document.getElementById('land-title');
 
@@ -7067,34 +7131,94 @@ function applySuborbitBiome(sm){
     });
   }
 }
+function hexToRgb(hex){
+  const n=(hex>>>0)&0xffffff;
+  return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+/** Skybox atmosferica procedurale (non la foto del pianeta): cielo + bagliore + stelle. */
+function buildSuborbitSkyTexture(profile,seed){
+  const W=1024,H=512;
+  const cv=document.createElement('canvas');
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  const clear=hexToRgb((profile&&profile.clear)!=null?profile.clear:0x2a4a55);
+  const fog=hexToRgb((profile&&profile.fog)!=null?profile.fog:0x5a8a88);
+  const hor=hexToRgb((profile&&profile.horizon)!=null?profile.horizon:0x7ab0a0);
+  const acc=hexToRgb((profile&&profile.accent)!=null?profile.accent:0xd4a050);
+  // Zenith → orizzonte
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,`rgb(${Math.max(0,clear.r-30)},${Math.max(0,clear.g-20)},${Math.max(0,clear.b-10)})`);
+  g.addColorStop(.42,`rgb(${clear.r},${clear.g},${clear.b})`);
+  g.addColorStop(.72,`rgb(${fog.r},${fog.g},${fog.b})`);
+  g.addColorStop(1,`rgb(${Math.min(255,hor.r+20)},${Math.min(255,hor.g+10)},${Math.min(255,hor.b)})`);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // Fascia atmosfera / alba
+  const haze=ctx.createRadialGradient(W*.5,H*.92,10,W*.5,H*.78,W*.55);
+  haze.addColorStop(0,`rgba(${acc.r},${acc.g},${acc.b},.38)`);
+  haze.addColorStop(.45,`rgba(${hor.r},${hor.g},${hor.b},.22)`);
+  haze.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=haze;ctx.fillRect(0,0,W,H);
+  // Bande di nube sottili
+  const s=(seed|0)||1;
+  for(let i=0;i<9;i++){
+    const y=H*(.18+hashRand(s,i+2)*.55);
+    const a=.04+hashRand(s,i+20)*.07;
+    ctx.fillStyle=`rgba(${hor.r},${hor.g},${hor.b},${a})`;
+    ctx.beginPath();
+    ctx.ellipse(W*hashRand(s,i+40),y,W*(.18+hashRand(s,i+50)*.28),H*(.018+hashRand(s,i+60)*.03),0,0,Math.PI*2);
+    ctx.fill();
+  }
+  // Stelle (metà superiore)
+  for(let i=0;i<520;i++){
+    const x=hashRand(s,i+100)*W;
+    const y=hashRand(s,i+200)*H*.62;
+    const r=.4+hashRand(s,i+300)*1.4;
+    const a=.25+hashRand(s,i+400)*.7;
+    ctx.fillStyle=`rgba(220,240,255,${a})`;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  }
+  // Nebulosa leggera
+  for(let i=0;i<4;i++){
+    const nx=W*hashRand(s,i+700),ny=H*hashRand(s,i+710)*.5;
+    const nr=W*(.08+hashRand(s,i+720)*.12);
+    const ng=ctx.createRadialGradient(nx,ny,0,nx,ny,nr);
+    ng.addColorStop(0,`rgba(${acc.r},${acc.g},${Math.min(255,acc.b+40)},.14)`);
+    ng.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ng;ctx.fillRect(0,0,W,H);
+  }
+  const tex=new THREE.CanvasTexture(cv);
+  tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;
+  tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+  if(THREE.SRGBColorSpace!==undefined)tex.colorSpace=THREE.SRGBColorSpace;
+  else if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;
+  tex.needsUpdate=true;
+  return tex;
+}
 function setSuborbitSkyPano(sm){
-  const url=(typeof planetPano==='function'&&sm&&sm.sd)?planetPano(sm.sd.id):null;
-  if(!url){clearSuborbitSkyPano();return;}
-  const loader=new THREE.TextureLoader();
-  const tilt=(SUBORBIT.profile&&SUBORBIT.profile.skyTilt!=null)?SUBORBIT.profile.skyTilt:(SUBORBIT._skyTilt||.1);
+  const pf=SUBORBIT.profile||(sm?getSuborbitProfile(sm):null)||{};
+  const tilt=(pf.skyTilt!=null)?pf.skyTilt:(SUBORBIT._skyTilt||.1);
   SUBORBIT._skyTilt=tilt;
-  loader.load(url,(tex)=>{
-    tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;
-    if(THREE.SRGBColorSpace!==undefined)tex.colorSpace=THREE.SRGBColorSpace;
-    else if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;
-    if(!SUBORBIT.skyMesh){
-      const geo=new THREE.SphereGeometry(7600,48,28);
-      const mat=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,fog:false,depthWrite:false});
-      const mesh=new THREE.Mesh(geo,mat);
-      mesh.renderOrder=-20;
-      mesh.frustumCulled=false;
-      scene.add(mesh);
-      SUBORBIT.skyMesh=mesh;
-    }else{
-      if(SUBORBIT.skyTex)SUBORBIT.skyTex.dispose();
-      SUBORBIT.skyMesh.material.map=tex;
-      SUBORBIT.skyMesh.material.needsUpdate=true;
-      SUBORBIT.skyMesh.visible=true;
-    }
-    SUBORBIT.skyTex=tex;
-    SUBORBIT.skyMesh.rotation.x=tilt;
-    SUBORBIT.skyMesh.rotation.z=tilt*.35;
-  },undefined,()=>{/* silent */});
+  const seed=((sm&&sm.sd&&(sm.sd.orbitR+sm.sd.pR*13))|0)^(sm&&sm.sd&&sm.sd.id?sm.sd.id.length*97:0);
+  let tex;
+  try{tex=buildSuborbitSkyTexture(pf,seed);}catch(_){tex=null;}
+  if(!tex){clearSuborbitSkyPano();return;}
+  if(!SUBORBIT.skyMesh){
+    const geo=new THREE.SphereGeometry(7600,48,28);
+    const mat=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,fog:false,depthWrite:false});
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.renderOrder=-20;
+    mesh.frustumCulled=false;
+    scene.add(mesh);
+    SUBORBIT.skyMesh=mesh;
+  }else{
+    if(SUBORBIT.skyTex)SUBORBIT.skyTex.dispose();
+    SUBORBIT.skyMesh.material.map=tex;
+    SUBORBIT.skyMesh.material.needsUpdate=true;
+    SUBORBIT.skyMesh.visible=true;
+  }
+  SUBORBIT.skyTex=tex;
+  SUBORBIT.skyMesh.rotation.x=tilt;
+  SUBORBIT.skyMesh.rotation.z=tilt*.35;
 }
 function clearSuborbitSkyPano(){
   if(SUBORBIT.skyMesh)SUBORBIT.skyMesh.visible=false;
@@ -7470,41 +7594,48 @@ function suborbitBuildHazardVisual(h,geoId){
   ));
 }
 function suborbitFillDroneGroup(group,geoId,kind){
-  const hullM=suborbitSMat(0x5a6578,0x101820,.12,.48,.72);
-  const armM=suborbitSMat(0x3a4458,0x060a10,.08,.55,.78);
+  const hullM=suborbitSMat(0x5a6578,0x101820,.14,.42,.78);
+  const armM=suborbitSMat(0x3a4458,0x060a10,.1,.5,.82);
+  const plateM=suborbitSMat(0x7a8898,0x182028,.18,.35,.7);
   let body;
-  if(geoId==='cube'){
-    body=new THREE.Mesh(new THREE.BoxGeometry(15,9.5,20),hullM.clone());
-  }else if(geoId==='shard'){
-    body=new THREE.Mesh(new THREE.CylinderGeometry(4.8,8.5,22,8),hullM.clone());
-    body.rotation.x=.22;
-  }else if(geoId==='drone'){
-    body=new THREE.Mesh(new THREE.CylinderGeometry(7.5,6.5,13,12),hullM.clone());
-  }else{
-    body=new THREE.Mesh(new THREE.CylinderGeometry(5.8,6.8,19,12),hullM.clone());
-  }
+  if(geoId==='cube')body=new THREE.Mesh(new THREE.BoxGeometry(14,8,22),hullM.clone());
+  else if(geoId==='shard'){body=new THREE.Mesh(new THREE.CylinderGeometry(3.6,9.2,24,7),hullM.clone());body.rotation.x=.28;}
+  else if(geoId==='drone')body=new THREE.Mesh(new THREE.CylinderGeometry(8.2,6.8,12,14),hullM.clone());
+  else body=new THREE.Mesh(new THREE.CylinderGeometry(4.8,7.2,20,12),hullM.clone());
   body.userData.role='hull';group.add(body);
-  const dome=new THREE.Mesh(new THREE.SphereGeometry(3.4,10,8),suborbitSMat(0x1a3558,0x113355,.45,.22,.88));
-  dome.position.set(0,1.8,-8.5);dome.scale.set(1,.55,1);dome.userData.role='sensor';group.add(dome);
-  const br=10.5;
-  for(let i=0;i<4;i++){
-    const ang=i*Math.PI/2+.42;
-    const bx=Math.cos(ang),bz=Math.sin(ang);
-    const boom=new THREE.Mesh(new THREE.CylinderGeometry(.65,.55,br,7),armM.clone());
-    boom.rotation.z=Math.PI/2;boom.position.set(bx*7.8,0.8,bz*7.8);boom.userData.role='hull';group.add(boom);
-    const pod=new THREE.Mesh(new THREE.BoxGeometry(3.4,1.2,2.4),armM.clone());
-    pod.position.set(bx*(7.8+br*.48),0.8,bz*(7.8+br*.48));pod.userData.role='hull';group.add(pod);
-    const led=new THREE.Mesh(new THREE.SphereGeometry(.55,8,6),suborbitSMat(0x112233,0x00ddff,.9,.25,.55));
-    led.position.set(bx*(7.8+br*.52),2.1,bz*(7.8+br*.52));led.userData.role='sensor';group.add(led);
+  const nose=new THREE.Mesh(new THREE.ConeGeometry(geoId==='drone'?5.5:4.2,10,8),plateM.clone());
+  nose.rotation.x=Math.PI/2;nose.position.set(0,.2,-14);nose.userData.role='hull';group.add(nose);
+  const dome=new THREE.Mesh(new THREE.SphereGeometry(3.6,12,10),suborbitSMat(0x1a4060,0x1188cc,.55,.18,.92));
+  dome.position.set(0,2.4,-6.5);dome.scale.set(1.1,.55,1.25);dome.userData.role='sensor';group.add(dome);
+  const wing=new THREE.Mesh(new THREE.BoxGeometry(kind==='strafer'?34:22,1.15,9),armM.clone());
+  wing.position.set(0,-.6,1.2);wing.userData.role='hull';group.add(wing);
+  const fin=new THREE.Mesh(new THREE.BoxGeometry(1.1,7.5,6),armM.clone());
+  fin.position.set(0,4.2,3);fin.userData.role='hull';group.add(fin);
+  for(const sx of[-1,1]){
+    const boom=new THREE.Mesh(new THREE.CylinderGeometry(.7,.55,11,7),armM.clone());
+    boom.rotation.z=Math.PI/2;boom.position.set(sx*9.5,.4,4.5);boom.userData.role='hull';group.add(boom);
+    const nac=new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.6,6.5,10),hullM.clone());
+    nac.rotation.x=Math.PI/2;nac.position.set(sx*14.5,.3,4.5);nac.userData.role='hull';group.add(nac);
+    const glow=new THREE.Mesh(new THREE.CircleGeometry(2.1,12),new THREE.MeshBasicMaterial({
+      color:kind==='charger'?0xff5522:0x44ddff,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false
+    }));
+    glow.position.set(sx*14.5,.3,8);glow.userData.role='sensor';group.add(glow);
   }
   if(kind==='charger'){
-    const ram=new THREE.Mesh(new THREE.ConeGeometry(3.2,11,6),suborbitSMat(0x884433,0xff2200,.4,.35,.45));
-    ram.rotation.x=Math.PI/2;ram.position.set(0,0,-15.5);ram.userData.role='hull';group.add(ram);
+    const ram=new THREE.Mesh(new THREE.ConeGeometry(3.4,12,6),suborbitSMat(0x884433,0xff2200,.45,.32,.5));
+    ram.rotation.x=Math.PI/2;ram.position.set(0,0,-18);ram.userData.role='hull';group.add(ram);
   }
   if(kind==='strafer'){
-    const wing=new THREE.Mesh(new THREE.BoxGeometry(30,1.1,8.5),armM.clone());
-    wing.position.set(0,-.2,1.5);wing.userData.role='hull';group.add(wing);
+    for(const sx of[-1,1]){
+      const gun=new THREE.Mesh(new THREE.CylinderGeometry(.45,.35,8,6),armM.clone());
+      gun.rotation.x=Math.PI/2;gun.position.set(sx*8,-1.2,-8);gun.userData.role='hull';group.add(gun);
+    }
   }
+  const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(8.5,.35,8,28),
+    new THREE.MeshBasicMaterial({color:0x66eeff,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  ring.rotation.x=Math.PI/2;ring.position.z=2;group.add(ring);
 }
 function suborbitFillCreatureGroup(group,geoId){
   const skin=suborbitSMat(0x6a5088,0x281038,.42,.68,.28);
@@ -7519,8 +7650,12 @@ function suborbitFillCreatureGroup(group,geoId){
   }
   const core=new THREE.Mesh(coreG,skin.clone());
   core.userData.role='hull';group.add(core);
+  const skull=new THREE.Mesh(new THREE.SphereGeometry(5.2,12,10),skin.clone());
+  skull.position.set(0,2.2,-6.5);skull.scale.set(1.15,.8,1.25);skull.userData.role='hull';group.add(skull);
   const tail=new THREE.Mesh(new THREE.ConeGeometry(2.8,13,5),skin.clone());
   tail.rotation.x=Math.PI/2+2.35;tail.position.set(0,.8,10.5);tail.userData.role='hull';group.add(tail);
+  const aura=new THREE.Mesh(new THREE.SphereGeometry(13,12,10),new THREE.MeshBasicMaterial({color:0xaa44ff,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false}));
+  group.add(aura);
   for(let i=0;i<6;i++){
     const ang=(i/6)*Math.PI*2;
     const leg=new THREE.Mesh(new THREE.CylinderGeometry(.4,.28,11,6),limb.clone());
@@ -7750,27 +7885,59 @@ function spawnSuborbitBullet(wxBias){
   if(!slot)return false;
   slot.active=true;
   slot.life=(typeof PS!=='undefined'&&PS.bigShot)?2.72:2.38;
-  // Stessa quota orizzontale/verticale della mesh nave (smooth), non solo x/y raw — altrimenti il “laser” sembra staccato.
   const sx=SUBORBIT.smoothX!=null?SUBORBIT.smoothX:SUBORBIT.x;
   const sy=SUBORBIT.smoothY!=null?SUBORBIT.smoothY:SUBORBIT.y;
-  const muzzWx=sx+(wxBias||0)*0.42;
-  const muzzWz=SUBORBIT.offset+52;
+  // Spawn dalla punta dei cannoni (hardpoint), non dal centro/poppa della nave.
+  let muzzWx=sx+(wxBias||0)*0.55;
+  let muzzWz=SUBORBIT.offset+78;
+  let laneWorldY=SUBORBIT.anchor.y+SUBORBIT.smoothGy+sy;
+  if(playerShip&&playerShip.mesh&&playerShip._hardpoints&&playerShip._hardpoints.length){
+    playerShip.mesh.updateMatrixWorld(true);
+    const hps=playerShip._hardpoints;
+    let hp=hps[0];
+    if(hps.length>1){
+      // Scegli cannone più vicino al bias laterale richiesto
+      let best=null,bestScore=1e15;
+      for(const h of hps){
+        const score=Math.abs(h.x-(wxBias||0)*0.08);
+        if(score<bestScore){bestScore=score;best=h;}
+      }
+      hp=best||hps[0];
+    }
+    // Punta canna: hardpoint è già sulla punta locale −Z; in suborbita la nave ha rotY=π → avanti = +Z mondo
+    const tipLocal=hp.clone().add(new THREE.Vector3(0,0,-2.8));
+    const world=tipLocal.applyMatrix4(playerShip.mesh.matrixWorld);
+    muzzWx=world.x-SUBORBIT.anchor.x;
+    muzzWz=SUBORBIT.offset+(world.z-SUBORBIT.anchor.z);
+    // Garantisci che parta davanti alla nave (centro a offset+40)
+    if(muzzWz<SUBORBIT.offset+55)muzzWz=SUBORBIT.offset+72+(wxBias?Math.abs(wxBias)*0.15:0);
+    laneWorldY=world.y;
+  }
   const gyM=suborbitHeight(SUBORBIT.seed,muzzWx,muzzWz);
-  const cannonDy=sy-gyM+(wxBias||0)*0.06;
   slot.wx=muzzWx;
   slot.wz=muzzWz;
-  slot.cannonDy=cannonDy;
-  // Quota mondo fissa: se rileggessimo il terreno lungo wz il colpo seguirebbe le onde (effetto sinusoidale).
-  slot.laneWorldY=SUBORBIT.anchor.y+gyM+cannonDy;
+  slot.cannonDy=laneWorldY-(SUBORBIT.anchor.y+gyM);
+  slot.laneWorldY=laneWorldY;
   const fwdBoost=Math.min(200,Math.abs(SUBORBIT.vx)*0.28);
-  slot.vwz=SUBORBIT.speed+548+fwdBoost;
-  slot.vwx=SUBORBIT.vx*0.4+(wxBias||0)*0.45;
+  slot.vwz=SUBORBIT.speed+560+fwdBoost;
+  slot.vwx=SUBORBIT.vx*0.35+(wxBias||0)*0.5;
   const sc=(typeof PS!=='undefined'&&PS.bigShot)?1.42:1;
   slot.mesh.scale.setScalar(sc);
   slot._hitRx=(typeof PS!=='undefined'&&PS.bigShot)?48:38;
   slot._hitRz=(typeof PS!=='undefined'&&PS.bigShot)?54:44;
   slot.mesh.visible=true;
   slot.mesh.material.opacity=.96;
+  // Muzzle flash sulla punta
+  if(typeof getP==='function'){
+    for(let i=0;i<4;i++){
+      const p=getP();if(!p)break;
+      p.spawn(
+        new THREE.Vector3(SUBORBIT.anchor.x+muzzWx,laneWorldY,SUBORBIT.anchor.z+(muzzWz-SUBORBIT.offset)),
+        new THREE.Vector3((Math.random()-.5)*10,(Math.random()-.5)*6,40+Math.random()*30),
+        0xaaffff,.16,0.9
+      );
+    }
+  }
   return true;
 }
 function spawnSuborbitBoss(){
@@ -11234,7 +11401,10 @@ function completeMission(m){
   else if(m.id==='story_8'){setTimeout(()=>playFinaleSequence(),600);}
   if(m.id&&m.id.startsWith('story_')){
     if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
-    setTimeout(checkStoryInterludes,3200);
+    // Interludi dopo che l'utente chiude il banner capitolo (niente auto-sostituzione)
+    const runIl=()=>checkStoryInterludes();
+    if(typeof storyBannerOpen==='function'&&storyBannerOpen())STORY_BANNER._afterClose.push(runIl);
+    else setTimeout(runIl,500);
   }
   if(typeof saveGame==='function')saveGame(true);
 }
@@ -13140,8 +13310,9 @@ function ensureBeghelliPalace(force){
   if(typeof notify==='function'){
     notify('Radar: firma enorme — Palazzo Beghelli in sistema. [T] radio se sei vicino.',4200);
   }
+  // Solo notify se un banner storia è già aperto / in coda; altrimenti mostra modal dedicato.
   if(typeof showStoryBanner==='function'){
-    showStoryBanner('CASATA BEGHELLI','Il Palazzo entra in orbita','Una nave da casata, più grande di uno space hulk. Un tempo dominavano Valsamoggio. Ora sono secondari — ma presenti.',7000);
+    showStoryBanner('CASATA BEGHELLI','Il Palazzo entra in orbita','Una nave da casata, più grande di uno space hulk. Un tempo dominavano Valsamoggio. Ora sono secondari — ma presenti.');
   }
 }
 function updateBeghelli(dt){

@@ -21,10 +21,25 @@ html,body{
 
 #film-grain{opacity:.055;}
 
-/* Story banner above HUD; mobile controls above a11y leftovers */
-#story-banner{z-index:120!important;}
+/* Story banner above dock/HUD; fullscreen overlay */
+#story-banner{z-index:125!important;}
+#story-banner.show{display:flex !important;}
+#story-banner .sb-backdrop{position:absolute;inset:0;background:rgba(0,4,10,.78);backdrop-filter:blur(5px);}
+#story-banner .sb-panel{
+  position:relative;z-index:1;width:min(640px,94vw);max-height:min(92vh,720px);overflow:hidden;
+  text-align:center;pointer-events:auto;
+  background:linear-gradient(165deg,rgba(6,20,28,.97) 0%,rgba(3,10,16,.98) 100%);
+  border:1px solid rgba(70,180,160,.4);
+  box-shadow:
+    0 0 0 1px rgba(196,137,58,.2),
+    0 28px 70px rgba(0,0,0,.65),
+    inset 0 0 60px rgba(20,80,70,.08);
+  border-radius:6px;padding:0;backdrop-filter:blur(14px);
+  font-family:var(--FD);
+}
 body.story-open #a11y-strip,
 body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
+body.story-open #dkscr{pointer-events:none;}
 
 /* Mobile: keep flight buttons clear of chrome */
 @media(max-width:700px),(pointer:coarse){
@@ -109,22 +124,7 @@ body.story-open #fx-toggle{pointer-events:none;opacity:.35;}
   border-radius:4px;
 }
 
-/* Story banner — cinematic matte frame */
-#story-banner{
-  display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-  z-index:45;text-align:center;pointer-events:auto;
-  width:min(640px,94vw);
-  max-height:min(92vh,720px);
-  overflow:hidden;
-  background:linear-gradient(165deg,rgba(6,20,28,.97) 0%,rgba(3,10,16,.98) 100%);
-  border:1px solid rgba(70,180,160,.4);
-  box-shadow:
-    0 0 0 1px rgba(196,137,58,.2),
-    0 28px 70px rgba(0,0,0,.65),
-    inset 0 0 60px rgba(20,80,70,.08);
-  border-radius:6px;padding:0;backdrop-filter:blur(14px);
-  font-family:var(--FD);
-}
+/* Story banner inner art / typography (overlay chrome is at top of file) */
 #story-banner .sb-art-wrap{
   position:relative;width:100%;aspect-ratio:16/9;max-height:38vh;
   overflow:hidden;background:#041018;
@@ -279,7 +279,7 @@ body:not(.landing-pano) #land-pano{display:none!important;opacity:0!important;}
 @media(max-width:700px){
   .cb-row-extra .cb{width:48px;height:48px;}
   .hb-controls .cg{gap:4px;}
-  #story-banner{width:min(100vw - 12px,640px);max-height:94vh;}
+  #story-banner .sb-panel{width:min(100vw - 12px,640px);max-height:94vh;}
   #story-banner .sb-art-wrap{max-height:28vh;}
   #story-banner .sb-body{padding:10px 14px 12px;}
   #story-banner .sd{max-height:min(36vh,280px);font-size:11px;}
