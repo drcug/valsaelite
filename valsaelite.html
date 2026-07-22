@@ -1103,7 +1103,7 @@ body.suborbit-active #smsg{
 <div id="boarding-prompt">
   <div class="bp-title" id="bpnm"></div>
   <div class="bp-sub" id="bpds">[G] abborda</div>
-  <button type="button" id="bpbtn-board" onclick="tryBoardingTrigger()">ABBORDA</button>
+  <button type="button" id="bpbtn-board">ABBORDA</button>
 </div>
 <div id="suborbit-ui">
   <div class="srow">
@@ -4569,7 +4569,7 @@ function suborbitOutcomeFlavor(completed,grade,hp){
 function suborbitSnapshotSummary(opts){
   opts=opts||{};
   const sm=SUBORBIT.planet;
-  if(!sm)return{showPanel:false,completed:false,earlyEsc:!!opts.toDock,dur:0,kills:0,collected:0,pname:'—',acc:0,grade:'—',credDelta:0,sideDone:false,rough:0,startHp:100,flavor:'',daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId};
+  if(!sm)return{showPanel:false,completed:false,earlyEsc:!!opts.toDock,dur:0,kills:0,collected:0,pname:'—',acc:0,grade:'—',credDelta:0,sideDone:false,rough:0,startHp:100,flavor:'',daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct:0};
   const rs=SUBORBIT.runStats||{};
   const completed=!!SUBORBIT.corridorComplete;
   const dur=Math.max(0,(performance.now()-(rs.t0||performance.now()))/1000);
@@ -4579,6 +4579,8 @@ function suborbitSnapshotSummary(opts){
   const sideDone=!!(SUBORBIT.sideObjective&&SUBORBIT.sideObjective.done);
   const pname=(sm&&sm.sd&&sm.sd.name)||'—';
   const off=SUBORBIT.offset|0;
+  const goal=Math.max(1,SUBORBIT.runGoal||32000);
+  const progressPct=Math.min(100,Math.round(100*off/goal));
   const grade=suborbitComputeGrade(completed,playerShip&&playerShip.health||0,rs,acc,sideDone);
   const credDelta=typeof PS!=='undefined'?PS.credits-(rs.startCred||0):0;
   let showPanel=off>420||kills>0||collected>0||completed||dur>12;
@@ -4586,12 +4588,13 @@ function suborbitSnapshotSummary(opts){
   return{
     showPanel,completed,earlyEsc:!!opts.toDock,dur,kills,collected,pname,acc,grade,credDelta,sideDone,
     rough:rs.roughHits||0,startHp:rs.startHp||100,flavor:suborbitOutcomeFlavor(completed,grade,playerShip&&playerShip.health||0),
-    daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId
+    daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct
   };
 }
 function hideSuborbitDebrief(){
   const d=document.getElementById('suborbit-debrief');
   if(d)d.style.display='none';
+  setPausedReason('suborbit',false);
   const cb=SUBORBIT._debriefCb;
   SUBORBIT._debriefCb=null;
   if(typeof cb==='function')try{cb();}catch(_){}
@@ -4608,6 +4611,7 @@ function showSuborbitDebrief(sum,onClose){
   sum.dailyBonus=rw&&!rw.already?rw.bonus:0;
   sum.dailyAlready=!!(rw&&rw.already);
   SUBORBIT._debriefCb=onClose||null;
+  setPausedReason('suborbit',true);
   const title=sum.completed?'Corridoio completato':'Fine volo suborbitale';
   document.getElementById('suborbit-debrief-title').textContent=title;
   g.textContent=sum.completed?sum.grade:'—';
@@ -4637,6 +4641,7 @@ function showTutorialOnce(lsKey,title,htmlBody){
   b.innerHTML=htmlBody;
   m.dataset.tutKey=lsKey;
   m.classList.add('show');
+  setPausedReason('dialogue',true);
   return true;
 }
 function tryShowTutorialSuborbit(){
@@ -4722,10 +4727,18 @@ function continueSandbox(){
   document.getElementById('go').classList.remove('show');
   window._gameplaySessionStarted=true;
   PS.sandboxMode=true;
+  // Sblocca eventuali pause rimaste dal finale / menu / dock.
+  if(GAME.pausedReasons){
+    Object.keys(GAME.pausedReasons).forEach(k=>{GAME.pausedReasons[k]=false;});
+  }
+  document.body.classList.remove('docked-ui','story-open','menu-open','intro-open');
   GAME.state='flying';
+  GAME.dockedSt=null;
   playerShip.alive=true;
   playerShip.health=Math.max(playerShip.health,40);
   playerShip.mesh.visible=true;
+  if(playerShip.mesh&&!playerShip.mesh.parent)scene.add(playerShip.mesh);
+  document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
   document.getElementById('radar').style.display='block';
   notify('Modalità sandbox: missioni procedurali e epilogo disponibili.',2600);
@@ -4738,19 +4751,8 @@ function loadGameFromGameOver(){
 }
 function updateBoardingButtonVisibility(){
   const b=document.getElementById('btnboard');if(!b)return;
-  let show=GAME.state==='flying'&&!BOARDING.active;
-  if(show){
-    show=false;
-    for(const h of HULKS){if(h.looted)continue;if(playerShip.mesh.position.distanceTo(h.mesh.position)<5200){show=true;break;}}
-    if(!show){
-      for(const ns of NPCS){
-        if(!ns.ship||!ns.ship.alive)continue;
-        if(ns.ship.health>35)continue;
-        if(playerShip.mesh.position.distanceTo(ns.ship.mesh.position)>900)continue;
-        show=true;break;
-      }
-    }
-  }
+  // Stessi criteri di findNearHulk / findBoardingTarget (niente falso positivo a 900m).
+  const show=GAME.state==='flying'&&!BOARDING.active&&(!!findNearHulk(1400)||!!findBoardingTarget());
   b.style.display=show?'flex':'none';
 }
 
@@ -5103,7 +5105,13 @@ class Ship{
         const cv=document.getElementById('cv');if(cv){cv.classList.remove('shake');void cv.offsetWidth;cv.classList.add('shake');}
       }
       if(absorbed>0&&typeof notify==='function'&&Math.random()<0.35)notify('Scudo −'+absorbed,900);
-      if(this.health>0&&this.health<=28)notify('⚠ SCAFO CRITICO',1400);
+      if(this.health>0&&this.health<=28){
+        const now=performance.now();
+        if(!this._hullCritToastAt||now-this._hullCritToastAt>4800){
+          this._hullCritToastAt=now;
+          notify('⚠ SCAFO CRITICO',1400);
+        }
+      }
     }else{
       this._hitFlash=0.22;
     }
@@ -5649,10 +5657,24 @@ const fadeEl=document.getElementById('fadeov');
 const ltEl=document.getElementById('land-title');
 
 window.addEventListener('keydown',e=>{
+  const tag=(e.target&&e.target.tagName||'').toLowerCase();
+  const typing=tag==='input'||tag==='textarea'||tag==='select'||!!(e.target&&e.target.isContentEditable);
+  if(typing){
+    if(e.code==='Escape'&&e.target&&e.target.blur)e.target.blur();
+    return;
+  }
   if(typeof storyBannerOpen==='function'&&storyBannerOpen()){
     // Solo CONTINUA chiude il modal storia — blocca input di gioco
     e.preventDefault();
     return;
+  }
+  if(e.code==='Escape'){
+    const gm=document.getElementById('gmap');
+    if(gm&&gm.style.display==='block'){e.preventDefault();closeMap();return;}
+    const help=document.getElementById('help-modal');
+    if(help&&help.classList.contains('show')){e.preventDefault();closeHelpModal();return;}
+    const deb=document.getElementById('suborbit-debrief');
+    if(deb&&deb.style.display==='flex'){e.preventDefault();hideSuborbitDebrief();return;}
   }
   if(BOARDING.active&&GAME.state==='boarding'){
     // Il boarding riusa left/right/thrust/boost/fire per muoversi + sparare.
@@ -5717,7 +5739,9 @@ window.addEventListener('keydown',e=>{
   if(e.code==='KeyP')openBlueprintModal();
   if(e.code==='KeyT'||e.code==='KeyH'){
     if(typeof nearBeghelli==='function'&&nearBeghelli(2200)){openBeghelliDialogue();return;}
-    const n=getNpcForComm();if(n)openIdlg(n);
+    const n=getNpcForComm();
+    if(n)openIdlg(n);
+    else notify('Nessuna nave nel raggio di comunicazione.',1600);
   }
   if(e.code==='KeyR'||e.code==='Tab'){e.preventDefault();cycleTarget();}
   if(e.code==='KeyQ'){e.preventDefault();launchPlayerMissile();}
@@ -5829,11 +5853,6 @@ touchTap('btnmiss',()=>launchPlayerMissile());
 touchTap('btntgt',()=>cycleTarget());
 touchTap('btnboard',()=>tryBoardingTrigger());
 touchTap('bpbtn-board',()=>tryBoardingTrigger());
-// Backup click (alcuni browser mobile mangiano il secondo evento dopo touchstart)
-const _bpBoardBtn=document.getElementById('bpbtn-board');
-if(_bpBoardBtn)_bpBoardBtn.addEventListener('pointerup',e=>{
-  if(e.pointerType==='touch'||e.pointerType==='pen'){e.preventDefault();tryBoardingTrigger();}
-},{passive:false});
 
 /** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
 const FLY_STEER={active:false,nx:0};
@@ -5902,6 +5921,14 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
   });
   bindKeys(document.getElementById('boarding-fire-mob'),['fire']);
 })();
+function clearInputState(){
+  INP.left=false;INP.right=false;INP.thrust=false;INP.boost=false;INP.fire=false;INP.tractor=false;
+  if(typeof FLY_STEER!=='undefined')FLY_STEER.active=false;
+}
+window.addEventListener('blur',clearInputState);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInputState();});
+window.addEventListener('touchcancel',clearInputState,{passive:true});
+
 document.getElementById('btnmap').addEventListener('click',toggleMap);
 document.getElementById('btn-diary').addEventListener('click',()=>toggleDiary());
 document.getElementById('btnhail').addEventListener('click',()=>{
@@ -6859,7 +6886,10 @@ function suborbitLootForPlanet(sd){
 }
 function grantSuborbitLoot(sm,silent){
   const sd=sm.sd||{};
-  if(cargoCnt()>=PS.cargoMax)return;
+  if(cargoCnt()>=PS.cargoMax){
+    if(!silent)notify('Stiva piena — niente raccolto.',1400);
+    return;
+  }
   const lootId=pickWeighted(suborbitLootForPlanet(sd));
   PS.cargo[lootId]=(PS.cargo[lootId]||0)+1;
   if(!silent)suborbitSfxPickup();
@@ -7749,6 +7779,7 @@ function spawnSuborbitBoss(){
   SUBORBIT.bossSpawned=true;
   SUBORBIT.boss.active=true;
   SUBORBIT.boss.hp=pf.bossHp||8;
+  SUBORBIT.boss.hitCd=0;
   SUBORBIT.boss.wx=(Math.random()-.5)*SUBORBIT.corridorHalf*.9;
   SUBORBIT.boss.wz=SUBORBIT.offset+1200;
   SUBORBIT.boss.mesh.visible=true;
@@ -7963,6 +7994,7 @@ function updateSuborbitActors(dt){
   }
   if(SUBORBIT.boss&&SUBORBIT.boss.active){
     const b=SUBORBIT.boss;
+    if(b.hitCd>0)b.hitCd-=dt;
     const dz=b.wz-SUBORBIT.offset;
     b.wx+=Math.sin(SUBORBIT.time*1.4+b.wz*.0023)*46*dt;
     b.mesh.rotation.y+=1.1*dt;
@@ -7975,7 +8007,8 @@ function updateSuborbitActors(dt){
       }
     }
     if(dz<-140){b.active=false;b.mesh.visible=false;}
-    if(Math.abs(b.wx-SUBORBIT.x)<44&&Math.abs(dz-40)<64){
+    if((b.hitCd||0)<=0&&Math.abs(b.wx-SUBORBIT.x)<44&&Math.abs(dz-40)<64){
+      b.hitCd=0.9;
       if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
       playerShip.takeDamage((pf.enemyHitDmg||10)+8);
       suborbitImpactSparks(b.mesh.position.clone(),pf.bossColor||0xff7744);
@@ -8145,6 +8178,7 @@ function leaveSuborbit(opts){
           GAME.state='docked';
           setPausedReason('docked',true);
           playerShip.mesh.visible=false;
+          document.body.classList.add('docked-ui');
           document.getElementById('dkscr').style.display='block';
           document.getElementById('hud').style.display='none';
           document.getElementById('radar').style.display='none';
@@ -8161,6 +8195,7 @@ function leaveSuborbit(opts){
       GAME.state='docked';
       setPausedReason('docked',true);
       playerShip.mesh.visible=false;
+      document.body.classList.add('docked-ui');
       document.getElementById('dkscr').style.display='block';
       document.getElementById('hud').style.display='none';
       document.getElementById('radar').style.display='none';
@@ -8204,6 +8239,8 @@ function checkPlanetCrash(){
   }
 }
 function updatePlanetSkim(dt){
+  // Congela il corridoio dietro diary / help / tutorial / debrief.
+  if(typeof gameplayPaused==='function'&&gameplayPaused())return;
   const bar=document.getElementById('skim-bar'),fill=document.getElementById('skim-fill'),lbl=document.getElementById('skim-lbl');
   if(GAME.state==='suborbit'&&SUBORBIT.active){
     const sm=SUBORBIT.planet;if(!sm){leaveSuborbit();return;}
@@ -8820,18 +8857,22 @@ function leaveBoarding(opts){
   } else if(opts.killed){
     RUN_STATS.boardingsFailed++;
     playerShip.takeDamage(40);
-    notify('Abbordaggio fallito: feriti a bordo.',2200);
+    if(playerShip.alive)notify('Abbordaggio fallito: feriti a bordo.',2200);
   } else {
     notify(wasHulk?'Modulo di fuga attivato.':'Ritiro dall\'abbordaggio.',1500);
   }
   BOARDING.sourceNpc=null;BOARDING.sourceHulk=null;
+  // Se takeDamage ha già attivato game over, non forzare lo stato volo.
+  if(GAME.state==='gameover'||!playerShip.alive){
+    if(wasHulk&&typeof showHulkCine==='function')showHulkCine(opts.success?'victory':'escape',null);
+    return;
+  }
   GAME.state='flying';
   fadeEl.style.transition='opacity .46s ease';
   fadeEl.style.opacity='.72';
   setTimeout(()=>{fadeEl.style.opacity='0';},180);
-  if(wasHulk){
-    const cineKind=opts.success?'victory':'escape';
-    setTimeout(()=>{if(typeof showHulkCine==='function')showHulkCine(cineKind,null);},320);
+  if(wasHulk&&typeof showHulkCine==='function'){
+    showHulkCine(opts.success?'victory':'escape',null);
   }
 }
 /** Collisione continua: il centro del PG è in (sx+0.5, sy+0.5) in coordinate cella. */
@@ -11179,8 +11220,7 @@ function completeMission(m){
   RUN_STATS.missionsDone++;
   Object.entries(m.repGain||{}).forEach(([f,v])=>changeRep(f,v));
   showStatus('MISSIONE COMPLETATA<br><span style="color:#ffcc33">'+m.title+'</span><br>+'+fmt(m.reward));
-  if(typeof saveGame==='function')saveGame(true);
-  // Story chapter advancement
+  // Story chapter advancement (prima del save, così il payload include frammenti / capitolo)
   if(m.id==='story_1'){
     PS.cargo.frammento=(PS.cargo.frammento||0)+1;
     advanceStory(2);
@@ -11196,6 +11236,7 @@ function completeMission(m){
     if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
     setTimeout(checkStoryInterludes,3200);
   }
+  if(typeof saveGame==='function')saveGame(true);
 }
 
 // ─────────────────────────────────────────────────
@@ -12632,6 +12673,7 @@ renderRep();
     if(k)try{localStorage.setItem(k,'1');}catch(_){}
     m.classList.remove('show');
     m.dataset.tutKey='';
+    if(GAME.state!=='dialogue')setPausedReason('dialogue',false);
     setTimeout(()=>{
       if(k==='valsaelite_tut_flight')tryShowTutorialDock();
       else if(k==='valsaelite_tut_dock')tryShowTutorialMap();
@@ -13213,6 +13255,54 @@ function openBeghelliDialogue(){
   document.getElementById('idlg').style.display='flex';
 }
 
+/** Espone lo stato di gioco a window per save.js / story-sys / root-dialogues. */
+function exposeGameState(){
+  const g=typeof window!=='undefined'?window:globalThis;
+  g.PS=PS;
+  g.STORY=STORY;
+  g.GAME=GAME;
+  g.playerShip=playerShip;
+  g.stations=stations;
+  g.rep=rep;
+  g.HULKS=HULKS;
+  g.CREW_POOL=CREW_POOL;
+  g.ECON=ECON;
+  g.BOOST=BOOST;
+  g.RUN_STATS=RUN_STATS;
+  g.GOODS=GOODS;
+  g.scene=scene;
+  g._shownInterludes=_shownInterludes;
+  Object.defineProperty(g,'bpGrid',{
+    get(){return bpGrid;},
+    set(v){bpGrid=v;},
+    configurable:true
+  });
+  Object.defineProperty(g,'navDestId',{
+    get(){return navDestId;},
+    set(v){navDestId=v;},
+    configurable:true
+  });
+  Object.defineProperty(g,'navDestPending',{
+    get(){return navDestPending;},
+    set(v){navDestPending=v;},
+    configurable:true
+  });
+  Object.defineProperty(g,'_hullRepSnapHex',{
+    get(){return _hullRepSnapHex;},
+    set(v){_hullRepSnapHex=v;},
+    configurable:true
+  });
+  g.setPausedReason=setPausedReason;
+  g.applyModules=typeof applyModules==='function'?applyModules:g.applyModules;
+  g.rebuildPlayerMesh=rebuildPlayerMesh;
+  g.renderRep=renderRep;
+  g.buildDock=buildDock;
+  g.updateHUD=updateHUD;
+  g.notify=notify;
+  if(typeof ensureBeghelliPalace==='function')g.ensureBeghelliPalace=ensureBeghelliPalace;
+}
+
+exposeGameState();
 animate();
 </script>
 <script src="js/audio.js"></script>

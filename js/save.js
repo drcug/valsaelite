@@ -128,9 +128,16 @@
     restoreMissionStates(data);
     const ship=global.playerShip;
     if(ship&&data.ship){
-      ship.health=data.ship.health;ship.energy=data.ship.energy;
-      ship.mesh.position.set(data.ship.x,data.ship.y,data.ship.z);
-      ship.mesh.rotation.set(0,data.ship.rotY,0);
+      // Revive dopo game over: die() rimuove la mesh e lascia alive=false.
+      ship.alive=true;
+      ship.health=Math.max(1,data.ship.health);
+      ship.energy=data.ship.energy;
+      if(ship.mesh){
+        ship.mesh.visible=true;
+        ship.mesh.position.set(data.ship.x,data.ship.y,data.ship.z);
+        ship.mesh.rotation.set(0,data.ship.rotY,0);
+        if(!ship.mesh.parent&&global.scene)global.scene.add(ship.mesh);
+      }
       ship.velocity.set(data.ship.vx,data.ship.vy,data.ship.vz);
     }
     global.navDestId=data.navDestId||null;
@@ -168,6 +175,12 @@
     if(typeof global.applyModules==='function')global.applyModules();
     if(typeof global.rebuildPlayerMesh==='function')global.rebuildPlayerMesh();
     if(typeof global.renderRep==='function')global.renderRep();
+    // Pulisci pause residue (game over / story / overlay).
+    if(global.GAME&&global.GAME.pausedReasons){
+      Object.keys(global.GAME.pausedReasons).forEach(k=>{
+        if(k!=='docked')global.GAME.pausedReasons[k]=false;
+      });
+    }
     const g=data.game||{};
     if(g.state==='docked'&&g.dockedStId){
       const st=global.stations.find(s=>s.sd.id===g.dockedStId);
@@ -186,9 +199,10 @@
       }
     }else{
       global.GAME.state='flying';
+      global.GAME.dockedSt=null;
       global.setPausedReason('docked',false);
       ship.mesh.visible=true;
-      document.body.classList.remove('docked-ui');
+      document.body.classList.remove('docked-ui','story-open','menu-open');
       document.getElementById('dkscr').style.display='none';
       document.getElementById('hud').style.display='flex';
       document.getElementById('radar').style.display='block';

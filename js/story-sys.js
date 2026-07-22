@@ -54,12 +54,19 @@
       if (!PS) return;
       const t = m.cargo.type;
       const need = Math.max(1, (m.cargo.qty | 0) || 1);
+      // Riserva già impegnata da altre missioni attive sullo stesso tipo.
+      let reservedOther = 0;
+      (PS.activeMissions || []).forEach((am) => {
+        if (!am || am === m || am.done || !am.cargo || am.cargo.type !== t) return;
+        reservedOther += Math.max(1, (am.cargo.qty | 0) || 1);
+      });
       const have = (PS.cargo[t] | 0) || 0;
-      const add = Math.max(0, need - have);
+      const freeForThis = Math.max(0, have - reservedOther);
+      const add = Math.max(0, need - freeForThis);
       if (add <= 0) {
         if (typeof global.notify === 'function') {
           const name = (global.GOODS && global.GOODS[t]) ? global.GOODS[t].name : t;
-          global.notify('Carico missione già a bordo: ' + name + ' ×' + have, 1800);
+          global.notify('Carico missione già a bordo: ' + name + ' ×' + need, 1800);
         }
         return;
       }

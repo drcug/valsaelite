@@ -546,6 +546,8 @@
         global.setPausedReason('docked', true);
       }
     }
+    // Persiste rootSeen / loreFlags dopo ogni dialogo Radici.
+    if (typeof global.saveGame === 'function') global.saveGame(true);
   }
 
   function offerOnDock(st) {
