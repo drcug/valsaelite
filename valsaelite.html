@@ -1569,7 +1569,7 @@ const SDATA = [
   {id:'bazzano',    name:'Bazzano Prime',       faction:'bazzano',
    orbitR:8500,  orbitSpeed:0.12, sat:false,
    pType:'earth',    pR:720, dR:1100, rings:'saturn',
-   desc:'"Tavo\'! Csa fet?" — il saluto ufficiale. Capitale indiscussa. Ogni contratto passa da qui. Taproblem se sei bazzanese.',
+   desc:'Capitale indiscussa. Ogni contratto passa da qui. Il saluto ufficiale è «Tavò!» — e se sei bazzanese, taproblem.',
    svcs:['repair','trade','recruit','missions','tavern']},
   {id:'sirena',     name:'Stazione Sirena',     faction:'bazzano',
    sat:true, parentId:'bazzano', satR:4000, satSpeed:0.72,
@@ -1623,7 +1623,7 @@ const SDATA = [
   {id:'montebudello',name:'Forte Montebudello', faction:'monteveglio',
    sat:true, parentId:'monteveglio', satR:5200, satSpeed:0.34,
    pType:'fortress', pR:285, dR:600,
-   desc:'Presidio militare. Addestramento cavalieri. Forgiatura armature. Teba entrarci disarmati.',
+   desc:'Presidio militare. Addestramento cavalieri. Forgiatura armature. Entrerci disarmati non è consigliato — per eufemismo.',
    svcs:['repair','recruit','missions','trade']},
   {id:'montecalvo', name:'Ziribega',            faction:'monteveglio',
    sat:true, parentId:'monteveglio', satR:6400, satSpeed:0.20,
@@ -1707,19 +1707,19 @@ const SG = {
 const CREW_POOL = [
   {id:'marco',    name:'Marco il Tavo\'',    origin:'bazzano',    skill:'Pilota',        bonus:'+15% vel.',  fn:p=>{p.maxSpeed=Math.round(p.maxSpeed*1.15)}, cost:500, hired:false,
    portrait:'sprites/faces/crew/marco.png', gender:'m',
-   quote:'"Tavo\'! Csa fet? Sono il mejon pilota del sistema — taproblem entrare a Savigno senza mappe, ci sono stato tre volte."'},
+   quote:'"Tavò, sali. Sono il mejon pilota del sistema — o almeno il più onesto. A Savigno ci sono entrato tre volte senza mappe. Taproblem, se mi ascolti."'},
   {id:'riccardo', name:'Sindaco Riccardo',   origin:'calcara',    skill:'Diplomatico',   bonus:'-12% prezzi',fn:p=>{p.tradeBonus=0.88}, cost:2200, hired:false,
    portrait:'sprites/faces/crew/riccardo.png', gender:'m',
-   quote:'"Ho una proposta tecnica: costruiamo un hangar. A Calcara. Costera\' quattro milioni. Non si discute il prezzo, si discute solo dove mettere il cartello di inaugurazione."'},
+   quote:'"Ho una proposta tecnica: costruiamo un hangar. A Calcara. Quattro milioni. Il prezzo non si discute — si discute solo dove mettere il cartello di inaugurazione."'},
   {id:'lothar',   name:'Sir Lothar',         origin:'monteveglio',skill:'Combattente',   bonus:'+22% danno', fn:p=>{p.dmgBonus=1.22}, cost:900, hired:false,
    portrait:'sprites/faces/crew/lothar.png', gender:'m',
-   quote:'"Per la Rocca! Ho vinto il torneo del Castellano per tre anni di fila. Con l\'armatura spaziale. Le chiamiamo frecce di luce ma sono laser, lo so."'},
+   quote:'"Per la Rocca! Ho vinto il torneo del Castellano tre anni di fila — con l\'armatura spaziale. Le chiamiamo frecce di luce, ma sono laser. Lo so. Lo sanno tutti."'},
   {id:'graziella',name:'Nonna Graziella',    origin:'savigno',    skill:'Cuoca',         bonus:'+35% en.regen',fn:p=>{p.energyRegen=Math.round(p.energyRegen*1.35)}, cost:300, hired:false,
    portrait:'sprites/faces/crew/graziella.png', gender:'f',
-   quote:'"Ho portato tortellini al tartufo per tutta la ciurma. Mangiare bene e\' il primo principio della sopravvivenza cosmica."'},
+   quote:'"Ho portato tortellini al tartufo per tutta la ciurma. Mangiare bene è il primo principio della sopravvivenza cosmica — e il secondo è non discutere con la cuoca."'},
   {id:'assessore',name:'L\'Assessore',       origin:'crespellano',skill:'Burocrate',     bonus:'Nessuno.',   fn:_=>{}, cost:0, hired:false,
    portrait:'sprites/faces/crew/assessore.png', gender:'m',
-   quote:'"Abbiamo fatto richiesta per il semaforo nel 2003. Ogni anno ci dicono "presto". E\' diventata la nostra tradizione piu\' antica."'},
+   quote:'"Abbiamo fatto richiesta per il semaforo nel 2003. Ogni anno ci dicono «presto». È diventata la nostra tradizione più antica — dopo l\'attesa stessa."'},
   {id:'zappo',    name:'Capitano Zappo',     origin:'savigno',    skill:'Tattico',       bonus:'+1 proiettile/colpo',fn:p=>{p.doubleShot=true}, cost:1500, hired:false,
    portrait:'sprites/faces/crew/zappo.png', gender:'m',
    quote:'"Ho difeso Zappolino per vent\'anni. La battaglia simulata la vinco sempre. Quella vera anche."'},
@@ -2212,35 +2212,35 @@ function storyEpilogueBody(){
 const DIALOGUES = {
   bazzano:[
     {name:'Pattuglia Bazzanese',    lines:[
-      'Tavò, fermet un attimo. Csa fet in cul set? Identificati, poi si parla.',
+      'Tavò, fermati un attimo. Chi sei e dove vai? Identificati, poi si parla.',
       'Se sei in regola, taproblem. Contiamo le scie lo stesso: a Prime dormono poco, ultimamente.',
-      'Sistema bazzanese. Nichita entra senza dire chi è. I furbetti li toronto al primo controllo.',
+      'Sistema bazzanese. Qui nessuno entra senza dire chi è. I furbetti li fermiamo al primo controllo.',
       'Se il Patto torna davvero, qualcuno a Prime smetterà di dormire col comunicatore acceso. Tieni a mente.'
     ]},
     {name:'Mercante Bazzanese',     lines:[
-      'Porto vino ai margini. Tagiov la canz sui dazi, se puoi: oggi i doganieri sono nervosi.',
-      'Tamonei in bisaccia dopo l\'ultimo viaggio, ma il vino vale il rischio. Tu dove vai?',
+      'Porto vino ai margini. Se puoi, tira un occhio ai dazi: oggi i doganieri sono nervosi.',
+      'I crediti in bisaccia dopo l\'ultimo viaggio… diciamo che il vino vale ancora il rischio. Tu dove vai?',
       'Ho visto navi partire per Crespellano piene di speranza e tornare con la modulistica. Stessa rotta, altra faccia.'
     ]},
     {name:'Courier di Bazzano',     lines:[
-      'Missione urgente da Bazzano Prime. Tavò, non fermarmi: bsoa arrivare entro un\'ora.',
+      'Missione urgente da Bazzano Prime. Non fermarmi, tavò: devo arrivare entro un\'ora.',
       'Se porti notizie del Patto, ricorda: il silenzio pesa meno del carburante. E costa meno.'
     ]},
   ],
   crespellano:[
     {name:'Pattuglia Crespellanese',lines:[
-      'Siamo pirati perché toronto i lavori a Crespellano. Non è poesia: è la lista paga.',
+      'Siamo pirati perché a Crespellano i lavori onesti finiscono in lista d\'attesa. Non è poesia: è la busta paga.',
       'L\'incrociatore l\'abbiamo riparato coi pezzi della scuola rovescia. Funziona. Più o meno.',
       'Fermo. Stiamo ancora aspettando l\'autorizzazione al decollo dal 2019. Siediti, se vuoi: c\'è posto.',
       'L\'archivio dice «niente», ma puzza di storia. Chi entra senza permesso trova polvere… e gente ambiziosa.'
     ]},
     {name:'Ribelle Crespellanese',  lines:[
       'Vuoi comprare del «niente»? È il nostro unico prodotto. Almeno è autentico.',
-      'Il semaforo? Toronto. Quando lo fanno, se lo fanno, noi saremo già altrove.',
+      'Il semaforo? Lascia stare. Quando lo fanno — se lo fanno — noi saremo già altrove.',
       'Se cerchi il Patto, non ascoltare i discorsi. Guarda i cassetti etichettati male.'
     ]},
     {name:'Contrabbandiere locale', lines:[
-      'Sto portando piadine a Castelletto. Non farti i cazzi miei, tavò.',
+      'Sto portando piadine a Castelletto. Non farti i fatti miei, tavò.',
       'Tra una piadina e un frammento antico, a volte è la piadina che ti salva la pelle.'
     ]},
   ],
@@ -2271,7 +2271,7 @@ const DIALOGUES = {
       'Quando Calcara dice «certificato», noi sentiamo «copia». La Rocca ascolta il sangue, non i fogli.'
     ]},
     {name:'Mercante dell\'Ordine',  lines:[
-      'Armature fresche dalla fucina. Resistono anche ai laser. Le chiamiamo frecce di luce, ma sono laser, tavò.',
+      'Armature fresche dalla fucina. Resistono anche ai laser — che qui chiamiamo ancora frecce di luce, per tradizione.',
       'Compro storie solo se hanno un manico. Il resto è politica orbitale.'
     ]},
   ],
@@ -2282,8 +2282,8 @@ const DIALOGUES = {
       'Il sigillo del Patto non si paga a slogan. Si paga in aroma. E in silenzio.'
     ]},
     {name:'Mercante di Savigno',    lines:[
-      'Prezzo 420. Non scende. Toronto la trattativa.',
-      'Zantic lo spazio, caldo il tartufo. Se non capisci, gira.'
+      'Prezzo 420. Non scende. Lascia stare la trattativa.',
+      'Freddo lo spazio, caldo il tartufo. Se non capisci, gira.'
     ]},
     {name:'Esploratore di Savigno', lines:[
       'Vengo da Zappolino. Ho vinto la battaglia simulata. Premio: tartufi. Ovvio.',
@@ -2294,7 +2294,7 @@ const DIALOGUES = {
     {name:'Pirata Spaziale',        lines:[
       'Crediti o fuoco. Scegli, e scegli in fretta.',
       'Non sono di nessuna fazione. Sono di chi paga meglio.',
-      'Taproblem col commercio onesto: per questo faccio il pirata.',
+      'Col commercio onesto non mi trovo: per questo faccio il pirata.',
       'Il Patto? Lo vendo al peso, come tutto il resto.'
     ]},
   ],
@@ -2302,40 +2302,40 @@ const DIALOGUES = {
 
 const TAVERN = {
   bazzano:[
-    {s:'Avventore col tavo\'',     t:'"Tavo\'! Sai che Crespellano aspetta il semaforo del 2003? Toronto il traffico spaziale a Crespellano — tanto non c\'e\' niente da attraversare."'},
-    {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta. Taebol chi si stupisce."'},
-    {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — teba i cavalieri col fiasco pieno."'},
-    {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
+    {s:'Avventore al banco',       t:'"Sai che Crespellano aspetta il semaforo dal 2003? Lascia stare il traffico spaziale da quelle parti — tanto non c\'è niente da attraversare. Letteralmente."'},
+    {s:'Pilota stagionale',        t:'"Il nuovo sindaco viene da Calcara. Terzo hangar inaugurato ieri. Crespellano aspetta ancora. Chi si stupisce, a questo punto, paga da bere."'},
+    {s:'Mercante di vino',         t:'"Vino dei colli quest\'anno: mejon del \'28, peggio del \'31. Porto tre bottiglie a Monteveglio — i cavalieri, col fiasco pieno, firmano di tutto."'},
+    {s:'Navigatore anziano',       t:'"Chi va a Crespellano cercando commercio torna con la modulistica. Nessuno compra niente là. L\'ho visto nel listino prezzi: «niente», scritto così."'},
     {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina. Però Imperium lo vuole dritto: dicono che sotto le anomalie c\'è roba che fa litigare le casate."'},
-    {s:'Corriere in pausa',        t:'"A Imperium le grandi casate si mangiano i corridoi. Qui siamo patio di servizio. Finché il Mulino gira, restiamo invisibili. Se si spezza… non lo so."'},
-    {s:'Tecnico di hangar',        t:'"Nave morta: pezzi. Hulk: mostri. Confondere i due è come confondere un cantiere e un incubo. Se porti moduli a Bazzano, il Mulino ti riconosce."'},
+    {s:'Corriere in pausa',        t:'"A Imperium le grandi casate si mangiano i corridoi. Qui siamo patio di servizio. Finché il Mulino gira, restiamo invisibili. Se si spezza… non lo so, e non voglio saperlo a stomaco vuoto."'},
+    {s:'Tecnico di hangar',        t:'"Nave morta: pezzi. Hulk: mostri. Confondere i due è come confondere un cantiere e un incubo. Se porti moduli a Bazzano, il Mulino ti riconosce — e io pure, dalla faccia."'},
   ],
   crespellano:[
-    {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
-    {s:'Pirati in pausa caffe\'',  t:'"Siamo diventati pirati nel 2038. L\'alternativa era fare i burocrati a Calcara. Abbiamo scelto il male minore."'},
+    {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. È diventata la nostra tradizione più antica — seconda solo all\'attesa del semaforo."'},
+    {s:'Pirati in pausa caffè',    t:'"Siamo diventati pirati nel 2038. L\'alternativa era fare i burocrati a Calcara. Abbiamo scelto il male minore — e il caffè migliore."'},
     {s:'Prof della scuola rovescia',t:'"Insegno da dieci anni nell\'istituto costruito alla rovescia. I ragazzi entrano dal tetto. Lo trovano normale. Siamo noi che ci siamo adattati."'},
-    {s:'Custode dell\'archivio',   t:'"Qui dentro c\'e\' roba classificata male. A volte \'male\' e\' un complimento: significa che qualcuno aveva paura di scrivere bene."'},
+    {s:'Custode dell\'archivio',   t:'"Qui dentro c\'è roba classificata male. A volte «male» è un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
   calcara:[
-    {s:'Funzionario al bar',       t:'"Il quinto hangar e\' in fase di inaugurazione anticipata. Firmi qui, qui e — no, non leggere. Solo firma."'},
-    {s:'Contabile orbitale',       t:'"La reputazione qui e\' una fattura: sotto zero paghi pedaggio. Sopra quaranta ti facciamo lo sconto sulla lamiera."'},
+    {s:'Funzionario al bar',       t:'"Il quinto hangar è in fase di inaugurazione anticipata. Firmi qui, qui e — no, non leggere. Solo firma. La lettura è un optional a pagamento."'},
+    {s:'Contabile orbitale',       t:'"La reputazione qui è una fattura: sotto zero paghi pedaggio. Sopra quaranta ti facciamo lo sconto sulla lamiera. È tutto molto umano, a modo nostro."'},
     {s:'Appaltatore stanco',       t:'"Crespellano aspetta il semaforo. Noi vendiamo il verde. Coincidenze? Preferisco chiamarle opportunità."'},
   ],
   monteveglio:[
-    {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser."'},
-    {s:'Castellano (il vero)',     t:'"La nuova torre e\' quasi pronta. 200 metri. L\'ho promesso in campagna elettorale. Al contrario di Calcara che promette hangar e li costruisce davvero, troppo e troppi."'},
-    {s:'Bardo Spaziale',           t:'"Ho cantato la ballata di Crespellano — quella del popolo che aspetta il semaforo. Mi hanno pagato in piadine. Tagiov la canz? Forse. Le piadine erano ottime."'},
-    {s:'Scriba dell\'Ordine',      t:'"Le stelle sopra la Rocca sembrano punte di lancia. Se il Patto torna, qualcuno dovra\' smetterla di usarle solo per il turismo."'},
+    {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser. Conta il gesto."'},
+    {s:'Castellano (il vero)',     t:'"La nuova torre è quasi pronta. Duecento metri. L\'ho promesso in campagna elettorale. A differenza di Calcara, che promette hangar e li costruisce davvero — troppi, e troppo in fretta."'},
+    {s:'Bardo Spaziale',           t:'"Ho cantato la ballata di Crespellano — quella del popolo che aspetta il semaforo. Mi hanno pagato in piadine. La canzone? Forse. Le piadine erano ottime."'},
+    {s:'Scriba dell\'Ordine',      t:'"Le stelle sopra la Rocca sembrano punte di lancia. Se il Patto torna, qualcuno dovrà smetterla di usarle solo per il turismo."'},
   ],
   savigno:[
-    {s:'Commerciante di tartufi',  t:'"Il prezzo e\' 420. Non tratto. Non abbasso. Non saldo. Il tartufo spaziale non conosce crisi economica."'},
-    {s:'Vecchio isolazionista',    t:'"Vivo qui da 40 anni. L\'isolamento e\' una scelta. Quando voglio compagnia insulto qualcuno di Crespellano sul comunicatore."'},
-    {s:'Sommelier di funghi',      t:'"Il porcino stellare si abbina al silenzio cosmico. Savigno capisce queste cose. Gli altri no, toronto."'},
-    {s:'Astrologa da taverna',     t:'"Ho letto il futuro nel fondo di una tazza: vedo tartufi, vedo sangue, vedo un timbro calcarese che brucia da solo."'},
+    {s:'Commerciante di tartufi',  t:'"Il prezzo è 420. Non tratto. Non abbasso. Non saldo. Il tartufo spaziale non conosce crisi economica — conosce solo rispetto."'},
+    {s:'Vecchio isolazionista',    t:'"Vivo qui da quarant\'anni. L\'isolamento è una scelta. Quando voglio compagnia insulto qualcuno di Crespellano sul comunicatore."'},
+    {s:'Sommelier di funghi',      t:'"Il porcino stellare si abbina al silenzio cosmico. Savigno capisce queste cose. Gli altri no — e lasciamoli stare."'},
+    {s:'Astrologa da taverna',     t:'"Ho letto il futuro nel fondo di una tazza: vedo tartufi, vedo sangue, vedo un timbro calcarese che brucia da solo. Il conto, invece, lo vedo chiaro."'},
   ],
   castelletto:[
-    {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffe\'. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
-    {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. E\' una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
+    {s:'Barista di Castelletto',   t:'"Abbiamo benzina. Abbiamo caffè. Non chiedermi altro — non lo so neanche io cosa altro ci sia su questo asteroide."'},
+    {s:'Neutrale professionale',   t:'"Non sono di nessuna fazione. Non lo sono mai stato. È una questione di principio. E di sopravvivenza. Principalmente di sopravvivenza."'},
     {s:'Veterano della fascia',    t:'"Tra un asteroide e l\'altro passano le storie del Patto. Io vendo benzina: le storie le lascio volare gratis, tanto nessuno le paga."'},
     {s:'Osservatore radar',        t:'"Hai visto quella firma enorme? Più grossa di uno hulk. Palazzo Beghelli. Casata minore, un tempo padroni. Chiamali in radio se ti senti coraggioso — o connesso."'},
     {s:'Reduce di abbordaggio',    t:'"Gli space hulk? Dentro cammina gente che non è più gente. Macguffinium delle anomalie: muta tutto. Io sono uscito. Loro no."'},
@@ -2391,7 +2391,7 @@ function makeMissions(sid){
     });
   }
   const lore={
-    bazzano:    {title:'Vino per Savigno',   desc:'"Porta 2 bot di Vino a Savigno. I savignesi Toronto il vino bazzanese, ma il Comandante insiste."', reward:280, repGain:{bazzano:12,savigno:7}, cargo:{type:'vino',qty:2}, targetSid:'savigno', type:'delivery'},
+    bazzano:    {title:'Vino per Savigno',   desc:'"Porta 2 bottiglie di vino a Savigno. I savignesi lasciano stare il vino bazzanese — ma il Comandante insiste."', reward:280, repGain:{bazzano:12,savigno:7}, cargo:{type:'vino',qty:2}, targetSid:'savigno', type:'delivery'},
     crespellano:{title:'La Grande Richiesta',desc:'"Recupera Modulistica da Bazzano per la domanda del semaforo del 2003. Questa volta forse la approvano."', reward:60, repGain:{crespellano:22,bazzano:-5}, cargo:{type:'documenti',qty:1}, targetSid:'crespellano', type:'delivery'},
     calcara:    {title:'Sesto Hangar',       desc:'"Porta Materiali a Calcara. Inaugurazione domani mattina alle 8. Il quinto era stato inaugurato ieri alle 9."', reward:200, repGain:{calcara:14}, cargo:{type:'materiali',qty:2}, targetSid:'calcara', type:'delivery'},
     monteveglio:{title:'Sagra Medievale',    desc:'"Scorta tartufi da Savigno alla Rocca. Il Castellano aspetta per il banchetto. Onore e tartufo."', reward:400, repGain:{monteveglio:15,savigno:9}, cargo:{type:'tartufi',qty:1}, targetSid:'monteveglio', type:'delivery'},
@@ -6654,8 +6654,8 @@ const DLG_TREES={
         {label:'[OK] "Lo terrò a mente."',next:null,fx:{rep:2}},
         {label:'[PRESSIONE] "Dimmi chi aspetta davvero."',next:'a5',fx:{rep:-2}}
       ]},
-      a3:{text:'Passaggio libero. Le scie si contano lo stesso. Non fare il furbo vicino ai dazi, eh.',choices:[
-        {label:'[CHIUDI] "Capito. Taproblem."',next:null}
+      a3:{text:'Passaggio libero. Le scie si contano lo stesso. Non fare il furbo vicino ai dazi — e se dici «taproblem», dillo senza sembrare un manuale.',choices:[
+        {label:'[CHIUDI] "Capito. Grazie."',next:null}
       ]},
       a4:{text:'Sotto traccia: tre rotte, un archivio, un nome che a Prime non dicono ad alta voce. Ti do un appiglio, se ti fidi. Costa un po\' di simpatia.',choices:[
         {label:'[ACCETTA] "Parla. Ascolto."',next:'a6',fx:{rep:3,mission:'dlg_tip_bazz'}},
@@ -6664,7 +6664,7 @@ const DLG_TREES={
       a5:{text:'Non in radio, tavò. Se proprio vuoi sapere, porta documenti a Calcara e guarda chi suda. Le casate di Imperium hanno orecchie lunghe anche qui.',choices:[
         {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
       ]},
-      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco. E parla meno.',choices:[
+      a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco. E parla meno — merito raro, da queste parti.',choices:[
         {label:'[GRAZIE] "Ricevuto."',next:null,fx:{credits:40}}
       ]},
       a7:{text:'Perché nelle anomalie c\'è macguffinium: materia a nove dimensioni. Contamina scafi, carne, memoria. Gli hulk non sono cimiteri: sono incubatrici. Chi ci restava dentro non è più quello che era. Abborda se ti serve un pezzo del Patto, ma non restare a chiacchierare coi mostri.',choices:[
@@ -6681,7 +6681,7 @@ const DLG_TREES={
         {label:'[HULK] "Cosa so sugli space hulk?"',next:'p4'},
         {label:'[ATTACCA] Apri il fuoco',next:null,fx:{angry:true,rep:-20}}
       ]},
-      p2:{text:'Accettato. Questa volta. La prossima costa di più. Magari una missione sporca, se ti va di sporcarti.',choices:[
+      p2:{text:'Accettato. Questa volta. La prossima costa di più. Magari una missione sporca, se ti va di sporcarti le mani — e la coscienza.',choices:[
         {label:'[OK] "Dimmi di più."',next:null,fx:{mission:'dlg_pirate_job'}}
       ]},
       p3:{text:'Calcara? Allora forse non sei solo carne da laser. Sparisci prima che cambi idea.',choices:[
@@ -6751,7 +6751,7 @@ const DLG_TREES={
         {label:'[ACCETTA PISTA] "Ci vado."',next:null,fx:{mission:'dlg_sav_truffle',rep:4}},
         {label:'[DOPO] "Non oggi."',next:null}
       ]},
-      s3:{text:'420. Sempre. Se torni con meno, non tornare. Toronto la discussione.',choices:[
+      s3:{text:'420. Sempre. Se torni con meno, non tornare. Lascia stare la discussione — e il portafoglio.',choices:[
         {label:'[OK] "Chiaro."',next:null,fx:{credits:-20}}
       ]},
       s4:{text:'Gli hulk puzzano di metallo sbagliato, non di terra. È macguffinium: muta ciò che mangia. I mostri nei corridoi erano gente, una volta. Noi a Savigno teniamo l\'aroma pulito. Loro, lassù, tengono le fauci aperte.',choices:[
@@ -6827,7 +6827,7 @@ function buildDlgChoices(ns){
   choices.push({label:'[SALUTA] "Buon viaggio, comandante."',cls:'',fn:()=>{
     const greets={
       bazzano:'Taproblem. Vola sicuro, ma non troppo lontano dalla nostra zona. A Prime qualcuno conta le scie due volte.',
-      crespellano:'Sì. Vola. Qui le mappe mentono per abitudine, non per malizia. Toronto chi ci crede.',
+      crespellano:'Sì. Vola. Qui le mappe mentono per abitudine, non per malizia. Chi ci crede, lascia stare.',
       calcara:'Grazie. Abbiamo appena inaugurato un altro hangar. Se ti serve un contratto, parla chiaro e firma.',
       monteveglio:'Per l\'onore della Rocca. Se cerchi prove, non portarci scuse.',
       savigno:'Ricevuto. Attento ai tartufi contraffatti e alle promesse di Calcara.',
@@ -6899,9 +6899,9 @@ function buildDlgChoices(ns){
   choices.push({label:'[INFORMAZIONI] "Novità nel settore?"',cls:'',fn:()=>{
     const infos={
       bazzano:[
-        'Ho sentito che Calcara ha inaugurato il settimo hangar. Il Sindaco era a Crespellano. Taebol chi si stupisce.',
-        'Bazzano Prime ha aumentato le tasse di transito. Nichita sorpreso, davvero.',
-        'La sagra del vino dei colli è fra dieci giorni. Prezzi alle stelle, qualità mejon.',
+        'Ho sentito che Calcara ha inaugurato il settimo hangar. Il Sindaco era a Crespellano. Chi si stupisce, a questo punto, paga da bere.',
+        'Bazzano Prime ha aumentato le tasse di transito. Nessuno sorpreso, davvero — meno che mai i doganieri.',
+        'La sagra del vino dei colli è fra dieci giorni. Prezzi alle stelle, qualità mejon. Come sempre.',
       ],
       crespellano:[
         'Niente da segnalare. È la nostra condizione permanente.',
@@ -6936,7 +6936,7 @@ function buildDlgChoices(ns){
   // ── Bribe / passage (hostile)
   if(hostile){
     choices.push({label:'[CORRUZIONE] Offri 400 Cr per passare libero.',cls:'trade',fn:()=>{
-      if(PS.credits<400){showIdlgLine(ns,'Tamonei in bisaccia? Me ne vado, ma torno.',()=>closeIdlg());return;}
+      if(PS.credits<400){showIdlgLine(ns,'Crediti in bisaccia? Non ne hai abbastanza. Me ne vado, ma torno.',()=>closeIdlg());return;}
       PS.credits-=400;changeRep(faction,6);
       showIdlgLine(ns,'Accettato. Questa volta. La prossima costa di più.',()=>closeIdlg());
     }});
@@ -7035,7 +7035,7 @@ function idlgTradeMenu(ns){
   document.getElementById('idlg-trade-text').textContent=trade;
   const choices=[
     {label:`[COMPRA] Acquista ${GOODS[gk]?.name||gk} — ${fmt(price)}`,cls:'trade',fn:()=>{
-      if(PS.credits<price){showIdlgLine(ns,'Tamonei in bisaccia. Torna quando hai i soldi.',()=>closeIdlg());return;}
+      if(PS.credits<price){showIdlgLine(ns,'Crediti in bisaccia? Torna quando hai i soldi.',()=>closeIdlg());return;}
       if(cargoCnt()>=PS.cargoMax){showIdlgLine(ns,'La tua stiva e\' piena. Svuotala prima.',()=>closeIdlg());return;}
       PS.credits-=price;PS.cargo[gk]=(PS.cargo[gk]||0)+1;
       notify('Acquistato da nave: '+(GOODS[gk]?.name||gk));closeIdlg();
@@ -9405,7 +9405,7 @@ function leaveBoarding(opts){
       if(!PS.loreFlags.bp_salvage_radio){
         PS.loreFlags.bp_salvage_radio=1;
         setTimeout(()=>{
-          if(typeof showDlg==='function')showDlg('Tecnico di Bazzano','bazzano','Quei moduli… li montava tuo zio al Molino. Non sono pezzi da Imperium: sono pezzi di casa. Portane altri se vuoi che la nave torni a sembrare tua.');
+          if(typeof showDlg==='function')showDlg('Tecnico di Bazzano','bazzano','Quei moduli… li montava tuo zio al Molino. Non sono pezzi da Imperium: sono pezzi di casa. Portane altri, tavò, se vuoi che la nave torni a sembrare tua.');
         },900);
       }
       // Recupero pacifico (niente colpi sparati)
