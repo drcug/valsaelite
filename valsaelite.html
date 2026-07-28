@@ -978,6 +978,14 @@ body.suborbit-active #smsg{
 <div id="dprompt">
   <div class="dn" id="dpnm"></div>
   <div class="ds" id="dpds">[E] attracca &nbsp;·&nbsp; [T] hail nave vicina</div>
+  <div id="dp-approach" style="margin:6px 0 2px;display:none">
+    <div style="display:flex;justify-content:space-between;font-family:var(--FM);font-size:8px;color:#6a9ab0;letter-spacing:.08em;margin-bottom:3px">
+      <span id="dp-dist">—</span><span id="dp-spd">—</span>
+    </div>
+    <div style="height:4px;background:rgba(20,40,70,.7);border-radius:2px;overflow:hidden">
+      <div id="dp-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#2277ee,#55e0c8);transition:width .08s linear"></div>
+    </div>
+  </div>
   <div style="display:flex;gap:8px;align-items:center;justify-content:center">
     <button id="dpbtn-dock" onclick="startLanding()">APPRODA</button>
   </div>
@@ -1075,7 +1083,15 @@ body.suborbit-active #smsg{
       <button onclick="clearNavDest()" style="background:rgba(255,255,255,.05);color:#88aacc;border:1px solid rgba(44,100,190,.3);border-radius:5px;padding:6px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;cursor:pointer">ANNULLA</button>
     </div>
   </div>
-  <!-- zoom hints -->
+  <!-- legend + zoom hints -->
+  <div id="gmlegend" style="position:absolute;bottom:14px;left:14px;pointer-events:none;font-family:'Share Tech Mono',monospace;font-size:9px;
+    background:rgba(2,8,22,.88);border:1px solid rgba(70,160,180,.35);border-radius:6px;padding:8px 10px;color:#9bb8cc;line-height:1.55;max-width:200px">
+    <div style="color:#cce4ff;letter-spacing:.12em;margin-bottom:4px">LEGENDA</div>
+    <div><span style="color:#77ccff">▲</span> Tu &nbsp;·&nbsp; <span style="color:#88aaff">●</span> Pianeta/staz.</div>
+    <div><span style="color:#ff9a50">◇</span> Space Hulk &nbsp;·&nbsp; <span style="color:#cc55ff">○</span> Anomalia</div>
+    <div><span style="color:#66eeff">━</span> Corsia &nbsp;·&nbsp; <span style="color:#88ffaa">R</span> Radici</div>
+    <div style="opacity:.7;margin-top:4px">Tasti <kbd style="border:1px solid #456;padding:0 3px;border-radius:2px">1–7</kbd> filtri · doppio click = naviga</div>
+  </div>
   <div style="position:absolute;bottom:14px;right:14px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#334455;text-align:right;pointer-events:none">
     SCROLL = zoom &nbsp;·&nbsp; DRAG = pan &nbsp;·&nbsp; CLICK = seleziona
   </div>
@@ -2015,6 +2031,7 @@ function advanceStory(ch){
     // Spawn dopo chiusura banner — non rubare il modal capitolo
     STORY_BANNER._afterClose.push(()=>ensureBeghelliPalace());
   }
+  if(typeof refreshStoryHulkMarks==='function')refreshStoryHulkMarks();
 }
 
 // Interludi intermedi: nodi narrativi non bloccanti, condizionati da rep/frammenti.
@@ -2045,6 +2062,10 @@ const STORY_INTERLUDES=[
     body:'Un funzionario anziano, off the record: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è macguffinium, le casate scendono qui e l\'Impero rischia di non sopravvivere alla guerra che ne segue. Il Patto non è nostalgia: è diga.»'},
   {id:'il_mulino',after:7,minRep:{bazzano:30},title:'Il Mulino Acceso',
     body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: «Promozione a sesto livello — se taci.» Tu scegli il rumore del mulino.'},
+  {id:'il_pezzi_casa',after:2,minRep:{},title:'Pezzi di casa',
+    body:'Un tecnico in radio: «Quei moduli non sono di Imperium. Li riconosce chi ha lavorato al Molino.» Se recuperi pezzi dalle navi morte — non dagli hulk — stai raccogliendo memoria, non solo ferro.'},
+  {id:'il_nave_vs_hulk',after:3,minRep:{},title:'Morti e mutati',
+    body:'In osteria: «Una nave disabilitata è un cantiere spegnuto. Uno space hulk è un cantiere che ha iniziato a sognare. Dentro, il macguffinium riscrive la carne. Fuori, restano solo pezzi da blueprint.»'},
 ];
 const _shownInterludes=new Set();
 function diaryStationLabel(sid){
@@ -2116,6 +2137,10 @@ function renderDiaryContent(){
     if(PS.loreFlags.casate_rumore||PS.loreFlags.periferia)bits.push('A Imperium le grandi casate si combattono; Valsamoggio resta periferia finché il Mulino gira.');
     if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)bits.push('Nelle anomalie si parla di macguffinium: materia a nove dimensioni, il materiale più prezioso dell\'universo.');
     if(PS.loreFlags.hulk_mutazioni)bits.push('Gli space hulk sono pieni di mostri perché il macguffinium muta equipaggi e carne nei corridoi contaminati.');
+    if(PS.loreFlags.bp_salvage_radio||PS.loreFlags.pezzi_casa)bits.push('I pezzi recuperati dalle navi disabilitate sanno di casa: moduli del Molino, non di Imperium.');
+    if(PS.loreFlags.peaceful_salvager)bits.push('Hai abbordato senza sparare: a Bazzano ti chiamano funzionario che recupera, non pirata.');
+    if(PS.loreFlags.hulk_visited)bits.push('Hai respirato i corridoi di uno hulk. L\'odore resta nella tuta — e nelle voci delle Radici.');
+    if(PS.loreFlags.nave_vs_hulk)bits.push('Osteria: nave morta = pezzi; hulk = incubo. Non confondere i due.');
     if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
     if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli — un tempo dominante, ora minore — può offrire un aiuto limitato dal Palazzo.');
     if(bits.length){
@@ -2134,7 +2159,7 @@ function renderDiaryContent(){
     html+='<div class="diary-ch '+cls+'"><h3>Space Hulk · relitti</h3><p class="dm">'
       +(open.length
         ?('Relitti ancora intatti: <strong>'+open.length+'</strong>'+(names?' — '+names+(open.length>4?'…':''):'')+'. Contengono mutazioni da macguffinium: ossigeno limitato, mostri, bottino raro.')
-        :('Hai messo a segno tutti i relitti noti ('+done+'). Possono ancora dare un bottino ridotto se li rivisiti.'))
+        :('Hai messo a segno tutti i relitti noti ('+done+'). I segnali di pericolo sui rombi in mappa sono spenti.'))
       +'</p><div class="dst">In mappa: filtro HULK · rombi arancio. Radar: quadrati. [G] vicino al relitto.</div></div>';
   }
   el.innerHTML=html;
@@ -2283,6 +2308,7 @@ const TAVERN = {
     {s:'Navigatore anziano',       t:'"Tabrein in cupola chi va a Crespellano cercando commercio. Nichita compra niente la\'. Letteralmente niente — l\'ho visto nel loro listino prezzi."'},
     {s:'Archivista ubriaco',       t:'"Il Patto del Molino? Una volta lo lessi da sobrio. Poi lessi anche la lista vini. Preferii la seconda pagina. Però Imperium lo vuole dritto: dicono che sotto le anomalie c\'è roba che fa litigare le casate."'},
     {s:'Corriere in pausa',        t:'"A Imperium le grandi casate si mangiano i corridoi. Qui siamo patio di servizio. Finché il Mulino gira, restiamo invisibili. Se si spezza… non lo so."'},
+    {s:'Tecnico di hangar',        t:'"Nave morta: pezzi. Hulk: mostri. Confondere i due è come confondere un cantiere e un incubo. Se porti moduli a Bazzano, il Mulino ti riconosce."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"Repair bay richiesto nel 2019. Ogni anno ci ridipromettono. E\' diventata la nostra tradizione piu\' antica — seconda solo all\'attesa del semaforo."'},
@@ -2377,6 +2403,16 @@ function makeMissions(sid){
   };
   const l=lore[sid];
   if(l)ms.push(Object.assign({id:sid+'_lore',done:false,active:false,sid},l));
+  // Prova del Patto: consegna pezzi blueprint (mid-game / dopo primi abbordaggi)
+  if(sid==='bazzano'){
+    ms.push({
+      id:'bazzano_bp_patto', type:'bp_parts', sid:'bazzano', targetSid:'bazzano',
+      title:'[PATTO] Pezzi per il Mulino',
+      desc:'Porta 2 pezzi blueprint recuperati da navi disabilitate. Prova che il Patto ripara, non solo firma.',
+      reward:780, repGain:{bazzano:18}, bpNeed:2, done:false, active:false,
+      requireBoarding:1
+    });
+  }
   appendEpilogueMissions(ms,sid,sd);
   if(typeof STORY!=='undefined'&&STORY.won){
     const sandDest=SDATA.filter(s=>s.id!==sid&&!s.sat);
@@ -2452,6 +2488,8 @@ const PS={
   loreFlags:{},
   beghelliAppeared:false,
   beghelliAidUsed:0,
+  bpScanPending:0,
+  peacefulBoardings:0,
 };
 const cargoCnt=()=>Object.values(PS.cargo).reduce((a,b)=>a+b,0);
 
@@ -3853,6 +3891,13 @@ function rebuildPlayerMesh(opt){
         addMesh(new THREE.TorusGeometry(rad,0.05,6,14),em,p.x,p.y-u*0.05,p.z+u*0.15+len*0.48,0,Math.PI/2,0);
         const glow=new THREE.MeshBasicMaterial({color:boost?0xff4400:ah,transparent:true,opacity:.92,blending:THREE.AdditiveBlending,depthWrite:false});
         addMesh(new THREE.CircleGeometry(rad*0.85,12),glow,p.x,p.y-u*0.05,p.z+u*0.15+len*0.52,0,Math.PI,0);
+        // Alone motore leggibile da lontano
+        const eg=new THREE.Mesh(
+          new THREE.SphereGeometry(rad*1.15,10,8),
+          new THREE.MeshBasicMaterial({color:boost?0xff6622:ah,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false})
+        );
+        eg.position.set(p.x,p.y-u*0.05,p.z+u*0.15+len*0.55);
+        playerShip.mesh.add(eg);
         engPositions.push([p.x,p.y-u*0.05,p.z]);
       }else if(id==='weapon'||id==='weapon2'){
         const big=id==='weapon2';
@@ -4411,16 +4456,24 @@ function buildStationMesh(sd){
   mat.normalScale=new THREE.Vector2(1.08,1.08);
   const mesh=new THREE.Mesh(geo,mat);
   mesh.userData.planetBody=true;
-  // Atmosphere glow
+  // Atmosphere glow — alone tintato per fazione (Bazzano caldo, Savigno freddo, …)
   const f=FACTIONS[sd.faction];const gc=f?f.hex:0x334455;
+  const ATM_TINT={bazzano:0xffcc88,crespellano:0xff8866,calcara:0xffdd66,monteveglio:0xcc88ff,savigno:0x88ffcc,pirate:0xff6655};
+  const haloCol=ATM_TINT[sd.faction]!=null?ATM_TINT[sd.faction]:gc;
   if(['earth','fortress','ice','green'].includes(sd.pType)){
-    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
-    // Alone atmosferico esterno (Fresnel-like: guscio più grande, solo bordo visibile).
+    const atm=new THREE.Mesh(new THREE.SphereGeometry(sd.pR+sd.pR*.12,32,32),new THREE.MeshBasicMaterial({color:haloCol,transparent:true,opacity:.24,blending:THREE.AdditiveBlending,side:THREE.BackSide}));mesh.add(atm);
     const halo=new THREE.Mesh(
-      new THREE.SphereGeometry(sd.pR+sd.pR*.22,28,26),
-      new THREE.MeshBasicMaterial({color:gc,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,side:THREE.BackSide,depthWrite:false})
+      new THREE.SphereGeometry(sd.pR+sd.pR*.28,28,26),
+      new THREE.MeshBasicMaterial({color:haloCol,transparent:true,opacity:.11,blending:THREE.AdditiveBlending,side:THREE.BackSide,depthWrite:false})
     );
     mesh.add(halo);
+  }else if(['industrial','station','dock','rocky','lava'].includes(sd.pType)||sd.pR>80){
+    // Alone soft anche su mondi «secchi» / stazioni: leggibilità a distanza
+    const soft=new THREE.Mesh(
+      new THREE.SphereGeometry(sd.pR*1.42,24,18),
+      new THREE.MeshBasicMaterial({color:haloCol,transparent:true,opacity:sd.pType==='station'||sd.pType==='dock'?.07:.09,blending:THREE.AdditiveBlending,side:THREE.BackSide,depthWrite:false})
+    );
+    mesh.add(soft);
   }
   // Strato nuvole (rotazione indipendente su mondi con atmosfera).
   if(['earth','green','ice'].includes(sd.pType)){
@@ -5288,6 +5341,16 @@ class Ship{
         p.spawn(ep,v,thrustMult>1?0xffaa55:col,(.12+Math.random()*.2)*lifeMul,(2.4+Math.random()*2.8)*scMul);
       }
     }
+    // Scia lunga giocatore: silhouette leggibile a distanza
+    if(this.isPlayer){
+      for(let k=0;k<(thrustMult>1?3:2);k++){
+        const ep=this.mesh.position.clone().addScaledVector(fwd,-(10+k*3.2));
+        const p=getP();if(!p)break;
+        const v=fwd.clone().multiplyScalar(-(22+k*8)*thrustMult).add(this.velocity);
+        v.x+=(Math.random()-.5)*6;v.y+=(Math.random()-.5)*4;v.z+=(Math.random()-.5)*6;
+        p.spawn(ep,v,thrustMult>1?0xff8844:0x44ccff,(.28+k*.08)*lifeMul,(3.2+k*1.1)*scMul);
+      }
+    }
   }
   fire(){
     const nBurst=this.isPlayer?(PS.weaponVolley||1):1;
@@ -5614,7 +5677,18 @@ function spawnNpc(faction,stationId,type){
   const sm=getSM(stationId);
   if(sm){const a=Math.random()*Math.PI*2;const r=sm.sd.pR+1000+Math.random()*1500;ship.mesh.position.set(sm.mesh.position.x+Math.cos(a)*r,0,sm.mesh.position.z+Math.sin(a)*r);}
   ship.mesh.lookAt(playerShip.mesh.position);
-  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null,angry:false});
+  NPCS.push({ship,faction,stationId,type,dtimer:rnd(10,25),pang:Math.random()*Math.PI*2,destId:null,angry:false,routeId:null,routeT:Math.random(),routeDir:Math.random()<.5?-1:1,_routeTried:false});
+}
+/** Assegna mercanti/courier alle corsie (lazy: ROUTE_CORRIDORS nasce più avanti nel file). */
+function lazyAssignNpcRoute(ns){
+  if(!ns||ns._routeTried)return;
+  ns._routeTried=true;
+  if(typeof ROUTE_CORRIDORS==='undefined'||!ROUTE_CORRIDORS||!ROUTE_CORRIDORS.length)return;
+  const type=ns.type;
+  if(!(type==='merchant'||type==='courier'||type==='freighter'))return;
+  const candidates=ROUTE_CORRIDORS.filter(r=>r.a===ns.stationId||r.b===ns.stationId);
+  if(candidates.length&&Math.random()<.72)ns.routeId=candidates[(Math.random()*candidates.length)|0].id;
+  else if(Math.random()<.28)ns.routeId=ROUTE_CORRIDORS[(Math.random()*ROUTE_CORRIDORS.length)|0].id;
 }
 function factionHitSfx(faction){
   return ({
@@ -5908,18 +5982,37 @@ function npcAI(ns,dt){
       if(dot>fireDot&&dist<fireDist)ship.fire();
     }
   }else{
-    const hsm=getSM(ns.stationId);
-    if(hsm){
-      const pr=type==='merchant'?2700:type==='courier'?3600:fStyle.patrolR;
-      ns.pang+=0.18*dt;
-      const tx=hsm.mesh.position.x+Math.cos(ns.pang)*pr,tz=hsm.mesh.position.z+Math.sin(ns.pang)*pr;
-      const td=ns.tmp.v1.set(tx-pos.x,0,tz-pos.z);
-      const tdLen=td.length()||1;
-      td.multiplyScalar(1/tdLen);
-      const c2=ns.tmp.v2.crossVectors(fwd,td).y;
-      if(c2>0.08)ship.mesh.rotation.y+=ship.turnSpeed*dt*.5;
-      else if(c2<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt*.5;
-      if(tdLen>360)ship.applyThrust(dt);
+    if(typeof lazyAssignNpcRoute==='function')lazyAssignNpcRoute(ns);
+    if(ns.routeId&&typeof ROUTE_CORRIDORS!=='undefined'){
+      const rc=ROUTE_CORRIDORS.find(r=>r.id===ns.routeId);
+      const a=rc&&getSM(rc.a), b=rc&&getSM(rc.b);
+      if(a&&b){
+        ns.routeT=cl((ns.routeT||0)+dt*0.016*(ns.routeDir||1),0,1);
+        if(ns.routeT<=0||ns.routeT>=1)ns.routeDir=-(ns.routeDir||1);
+        const tx=a.mesh.position.x+(b.mesh.position.x-a.mesh.position.x)*ns.routeT;
+        const tz=a.mesh.position.z+(b.mesh.position.z-a.mesh.position.z)*ns.routeT;
+        const td=ns.tmp.v1.set(tx-pos.x,0,tz-pos.z);
+        const tdLen=td.length()||1;
+        td.multiplyScalar(1/tdLen);
+        const c2=ns.tmp.v2.crossVectors(fwd,td).y;
+        if(c2>0.06)ship.mesh.rotation.y+=ship.turnSpeed*dt*.65;
+        else if(c2<-0.06)ship.mesh.rotation.y-=ship.turnSpeed*dt*.65;
+        if(tdLen>380)ship.applyThrust(dt*(type==='courier'?1.15:1));
+      }else ns.routeId=null;
+    }else{
+      const hsm=getSM(ns.stationId);
+      if(hsm){
+        const pr=type==='merchant'?2700:type==='courier'?3600:fStyle.patrolR;
+        ns.pang+=0.18*dt;
+        const tx=hsm.mesh.position.x+Math.cos(ns.pang)*pr,tz=hsm.mesh.position.z+Math.sin(ns.pang)*pr;
+        const td=ns.tmp.v1.set(tx-pos.x,0,tz-pos.z);
+        const tdLen=td.length()||1;
+        td.multiplyScalar(1/tdLen);
+        const c2=ns.tmp.v2.crossVectors(fwd,td).y;
+        if(c2>0.08)ship.mesh.rotation.y+=ship.turnSpeed*dt*.5;
+        else if(c2<-0.08)ship.mesh.rotation.y-=ship.turnSpeed*dt*.5;
+        if(tdLen>360)ship.applyThrust(dt);
+      }
     }
   }
   ns.dtimer-=dt;
@@ -6004,7 +6097,8 @@ window.addEventListener('keydown',e=>{
     toggleDiary();
     return;
   }
-  if(gameplayPaused()&&e.code!=='KeyM'&&e.code!=='Escape')return;
+  if(typeof mapFilterKeyHandler==='function')mapFilterKeyHandler(e);
+  if(gameplayPaused()&&e.code!=='KeyM'&&e.code!=='Escape'&&!/^Digit[0-7]$/.test(e.code))return;
   if(GAME.state==='docked')return;
   if(GAME.state==='dialogue'){if(e.code==='Escape')closeIdlg();return;}
   if(SUBORBIT.active&&GAME.state==='suborbit'&&e.code==='KeyE'){
@@ -7275,7 +7369,7 @@ function getSuborbitProfile(sm){
     profile.bossTriggerKills=(profile.bossTriggerKills||6)+T.bossKillsAdd;
     profile.bossHp=Math.max(6,Math.round((profile.bossHp||8)*T.bossHpMul));
   }
-  // Difficoltà legata al capitolo: più avanti = densità e danni più alti (moltiplicatori spawn <1 = più traffico).
+  // Difficoltà: capitolo + reputazione locale (alleati più soft, ostili più duro).
   const chDiff=Math.min(8,Math.max(0,(typeof STORY!=='undefined'?(STORY.chapter|0):0)));
   const densMul=Math.max(0.58,1-chDiff*0.048);
   const dmgCh=1+chDiff*0.06+(STORY&&STORY.won?0.08:0);
@@ -7286,9 +7380,27 @@ function getSuborbitProfile(sm){
   if(profile.boss){
     profile.bossHp=Math.max(6,Math.round(profile.bossHp*(1+chDiff*0.045)));
   }
+  let repMod=0;
+  if(typeof rep!=='undefined'&&sd.faction&&rep[sd.faction]!=null){
+    const rv=rep[sd.faction]|0;
+    if(rv>=40)repMod=-1;
+    else if(rv>=15)repMod=-0.5;
+    else if(rv<=-40)repMod=1.5;
+    else if(rv<=-15)repMod=0.75;
+  }
+  if(repMod){
+    const densRep=repMod>0?Math.max(0.72,1-repMod*0.08):Math.min(1.18,1-repMod*0.1);
+    profile.spawnEnemyBase*=densRep;
+    profile.spawnHazardBase*=densRep;
+    profile.enemyHitDmg=Math.max(6,Math.round(profile.enemyHitDmg*(1+repMod*0.07)));
+    profile.hazardHitDmg=Math.max(8,Math.round(profile.hazardHitDmg*(1+repMod*0.06)));
+  }
   profile.chapterDiff=chDiff;
-  const diffLbl=chDiff<=1?'FACILE':chDiff<=3?'STANDARD':chDiff<=5?'IMPEGNATIVO':chDiff<=7?'DURO':'ESTREMO';
-  profile.tag=(profile.tag||'SUBORBITALE')+' · CAP.'+chDiff+' '+diffLbl;
+  profile.repMod=repMod;
+  const eff=chDiff+repMod;
+  const diffLbl=eff<=1?'FACILE':eff<=3?'STANDARD':eff<=5?'IMPEGNATIVO':eff<=7?'DURO':'ESTREMO';
+  const repNote=repMod<=-0.5?' · ALLEATO':repMod>=0.75?' · OSTILE':'';
+  profile.tag=(profile.tag||'SUBORBITALE')+' · CAP.'+chDiff+' '+diffLbl+repNote;
   return profile;
 }
 function getSuborbitTerrainMap(pType){
@@ -9208,6 +9320,7 @@ function buildBoardingMap(kind){
   BOARDING.selectTarget=null;
   BOARDING.timer=0;BOARDING.introT=.42;BOARDING.outcome=null;
   BOARDING.lootTable=big?BOARDING_LOOT_HULK:BOARDING_LOOT_SHIP;
+  BOARDING.shotsFired=0;
 }
 function enterBoarding(opts){
   if(BOARDING.active)return;
@@ -9276,12 +9389,35 @@ function leaveBoarding(opts){
       bpInvRestore(bid,1);
       const lab=(typeof BP_MODULES!=='undefined'&&BP_MODULES.find(x=>x.id===bid)||{}).label||bid;
       extraNote=' · pezzo cantiere: '+lab;
-      // Chance pezzo extra
       if(Math.random()<.35){
         const bid2=(typeof GameplayPolish!=='undefined'&&GameplayPolish.pickWeighted)?GameplayPolish.pickWeighted(pool):'cargo';
         bpInvRestore(bid2,1);
         const lab2=(BP_MODULES.find(x=>x.id===bid2)||{}).label||bid2;
         extraNote+=' + '+lab2;
+      }
+      // Scanner pezzi: chance diagnostica celle rotte da riparare in stazione
+      if(Math.random()<.42){
+        PS.bpScanPending=(PS.bpScanPending|0)+1;
+        extraNote+=' · scan cantiere';
+        notify('Scanner: possibile cella blueprint da riparare in hangar.',2200);
+      }
+      if(!PS.loreFlags)PS.loreFlags={};
+      if(!PS.loreFlags.bp_salvage_radio){
+        PS.loreFlags.bp_salvage_radio=1;
+        setTimeout(()=>{
+          if(typeof showDlg==='function')showDlg('Tecnico di Bazzano','bazzano','Quei moduli… li montava tuo zio al Molino. Non sono pezzi da Imperium: sono pezzi di casa. Portane altri se vuoi che la nave torni a sembrare tua.');
+        },900);
+      }
+      // Recupero pacifico (niente colpi sparati)
+      if((BOARDING.shotsFired|0)===0){
+        PS.peacefulBoardings=(PS.peacefulBoardings|0)+1;
+        if(PS.peacefulBoardings>=3&&!PS.loreFlags.peaceful_salvager){
+          PS.loreFlags.peaceful_salvager=1;
+          if(typeof showStoryBanner==='function'){
+            setTimeout(()=>showStoryBanner('INTERLUDIO','Funzionario, non pirata',
+              'Tre navi senza sparare un colpo. A Imperium ti chiamerebbero «efficiente». Qui, a Bazzano, ti chiamano ancora Zvan — quello che recupera pezzi invece di farli a pezzi. Il Mulino preferisce le mani che riparano.'),1400);
+          }
+        }
       }
     }else if(typeof GameplayPolish!=='undefined'&&GameplayPolish.rollBoardingExtraLoot&&(!repeatHulk||Math.random()>.55)){
       const extra=GameplayPolish.rollBoardingExtraLoot(BOARDING.kind);
@@ -9309,7 +9445,8 @@ function leaveBoarding(opts){
       const hulk=BOARDING.sourceHulk;
       const first=!hulk.looted;
       hulk.looted=true;
-      if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.hulk_mutazioni=1;PS.loreFlags.macguffinium_voce=1;}
+      if(hulk.storyMarked)hulk.storyMarked=false;
+      if(PS){if(!PS.loreFlags)PS.loreFlags={};PS.loreFlags.hulk_mutazioni=1;PS.loreFlags.macguffinium_voce=1;PS.loreFlags.hulk_visited=1;}
       const g=hulk.mesh;
       if(first&&g){
         g.traverse(o=>{
@@ -9444,6 +9581,7 @@ function boardingFire(){
   const ox=p.sx+.5+dx*.44, oy=p.sy+.5+dy*.44;
   BOARDING.shots.push({x:ox,y:oy,dx,dy,life:.98,own:'p',ph:Math.random()*Math.PI*2});
   BOARDING.flashes.push({x:ox,y:oy,t:.11,max:.11,col:'#bff3ff'});
+  BOARDING.shotsFired=(BOARDING.shotsFired|0)+1;
   if(typeof playTone==='function')playTone(720,.024,.032,'square');
 }
 function updateBoarding(dt){
@@ -10087,24 +10225,30 @@ function drawIsoFloor(ctx,gx,gy,iso,isHulk,lit){
     const rust=((gx*17+gy*31)&7);
     ctx.fillStyle=`rgba(${18+lit*70+rust*4|0},${8+lit*28|0},${6+lit*18|0},1)`;
   }else{
-    ctx.fillStyle=`rgba(${14+lit*85|0},${24+lit*110|0},${38+lit*140|0},1)`;
+    // Cantiere: pavimento blu/ambra emergenza
+    const amber=((gx+gy*3)%5)===0;
+    if(amber)ctx.fillStyle=`rgba(${28+lit*90|0},${22+lit*55|0},${12+lit*30|0},1)`;
+    else ctx.fillStyle=`rgba(${12+lit*70|0},${28+lit*100|0},${48+lit*130|0},1)`;
   }
   ctx.fill();
-  ctx.strokeStyle=isHulk?'rgba(80,10,10,.18)':'rgba(180,230,255,.05)';ctx.lineWidth=1;ctx.stroke();
+  ctx.strokeStyle=isHulk?'rgba(80,10,10,.18)':'rgba(180,210,255,.08)';ctx.lineWidth=1;ctx.stroke();
   if(isHulk&&((gx*3+gy*5)%7)===0){
-    // Macchia di sangue / olio corroso
     ctx.fillStyle='rgba(90,8,8,.35)';
     ctx.beginPath();ctx.ellipse(top.x,top.y+th*.55,tw*.18,th*.12,0,0,Math.PI*2);ctx.fill();
   }
+  if(!isHulk&&((gx*5+gy)%8)===0){
+    // Luci emergenza ambra a pavimento
+    ctx.fillStyle='rgba(255,170,60,.22)';
+    ctx.beginPath();ctx.ellipse(top.x,top.y+th*.5,tw*.12,th*.08,0,0,Math.PI*2);ctx.fill();
+  }
   if(isHulk&&((gx+gy*2)%9)===0){
-    // Vene warp verdastre
     ctx.strokeStyle='rgba(60,180,40,.22)';ctx.lineWidth=1.2;
     ctx.beginPath();
     ctx.moveTo(top.x-tw*.2,top.y+th*.35);ctx.lineTo(top.x+tw*.15,top.y+th*.7);
     ctx.stroke();
   }
   if(((gx+gy)%4)===0){
-    ctx.strokeStyle=isHulk?'rgba(200,40,30,.12)':'rgba(120,200,255,.12)';
+    ctx.strokeStyle=isHulk?'rgba(200,40,30,.12)':'rgba(100,190,255,.16)';
     ctx.beginPath();
     ctx.moveTo(top.x,top.y+th*0.25);ctx.lineTo(top.x,top.y+th*0.75);
     ctx.stroke();
@@ -10133,7 +10277,7 @@ function drawIsoWall(ctx,gx,gy,iso,isHulk,map){
   if(!wallE&&!hideEastFace){
     const gR=ctx.createLinearGradient(right.x,right.y,right.x,right.y+up);
     if(isHulk){gR.addColorStop(0,'#5a2218');gR.addColorStop(.45,'#2a0e0a');gR.addColorStop(1,'#0c0403');}
-    else{gR.addColorStop(0,'#567ab0');gR.addColorStop(1,'#1c2a48');}
+    else{gR.addColorStop(0,'#4a6a98');gR.addColorStop(.5,'#2a4068');gR.addColorStop(1,'#1a2840');}
     ctx.fillStyle=gR;
     ctx.beginPath();
     ctx.moveTo(right.x,right.y);ctx.lineTo(bot.x,bot.y);
@@ -10341,10 +10485,17 @@ function drawBoarding(){
       ctx.fillRect(0,yy,W,1);
     }
   }else{
-    for(let i=0;i<34;i++){
-      const yy=(i*31+t*36)%H;
-      ctx.fillStyle=`rgba(120,180,255,${0.015+(i%4)*0.004})`;
+    // Luci emergenza blu/ambra (nave disabilitata, non hulk)
+    for(let i=0;i<28;i++){
+      const yy=(i*37+t*28)%H;
+      ctx.fillStyle=`rgba(80,160,255,${0.02+(i%4)*0.005})`;
       ctx.fillRect(0,yy,W,1);
+    }
+    for(let i=0;i<10;i++){
+      const xx=(Math.sin(i*7.3+t*.4)*.5+.5)*W;
+      const yy=(Math.cos(i*5.1+t*.25)*.5+.5)*H;
+      ctx.fillStyle=`rgba(255,160,50,${0.04+(i%3)*.015})`;
+      ctx.beginPath();ctx.arc(xx,yy,1.5+(i%2),0,Math.PI*2);ctx.fill();
     }
   }
   const isHulk=BOARDING.kind==='hulk';
@@ -11047,13 +11198,33 @@ function spawnHulks(){
     group.rotation.x=(rng()-.5)*.18;
     scene.add(group);
     HULKS.push({
-      id:'hulk_'+i, mesh:group, archetype:arch, looted:false,
+      id:'hulk_'+i, mesh:group, archetype:arch, looted:false, storyMarked:false,
       driftAng:rng()*Math.PI*2, driftR:.3+rng()*.35,
       driftSpd:.002+rng()*.004,
       pulsePh:rng()*Math.PI*2,
       name:HULK_NAMES[i%HULK_NAMES.length],
     });
   });
+  refreshStoryHulkMarks();
+}
+function refreshStoryHulkMarks(){
+  if(typeof HULKS==='undefined'||!HULKS.length)return;
+  const ch=(typeof STORY!=='undefined'?(STORY.chapter|0):0);
+  // Dal cap. 5 in poi un hulk non looted è «segnato dalla trama» (ping radar)
+  const needMark=ch>=5&&!(typeof STORY!=='undefined'&&STORY.won&&ch>=7);
+  let marked=HULKS.find(h=>h.storyMarked&&!h.looted);
+  if(!needMark){
+    HULKS.forEach(h=>{h.storyMarked=false;});
+    return;
+  }
+  if(!marked){
+    const cand=HULKS.filter(h=>!h.looted);
+    if(cand.length){
+      marked=cand[(Math.floor(cand.length/2)+ch)%cand.length];
+      marked.storyMarked=true;
+    }
+  }
+  HULKS.forEach(h=>{if(h!==marked)h.storyMarked=false;});
 }
 function updateHulks(dt){
   const t=performance.now()/1000;
@@ -11225,10 +11396,31 @@ function checkNear(){
     const dockBtn=document.getElementById('dpbtn-dock');
     const desc=document.getElementById('dpds');
     if(dockBtn)dockBtn.textContent='APPRODA';
-    if(desc)desc.textContent='[E] attracca · assist. frenata attiva · [T] radio';
+    if(desc)desc.textContent='[E] attracca · assist. frenata · [T] radio';
+    updateDockApproachHud();
     showTutorialOnce('valsaelite_tut_near','Primo attracco',
       '<p>Sei in range di <strong>'+GAME.nearSt.sd.name+'</strong>. Premi <strong>E</strong> o <strong>APPRODA</strong>.</p><p>Vicino alla stazione la nave <strong>rallenta da sola</strong>. In stazione: commercio, missioni, equipaggio e <strong>salvataggio</strong>.</p>');
-  }else el.style.display='none';
+  }else{
+    el.style.display='none';
+    const ap=document.getElementById('dp-approach');if(ap)ap.style.display='none';
+  }
+}
+function updateDockApproachHud(){
+  const ap=document.getElementById('dp-approach');
+  if(!ap||!GAME.nearSt||!playerShip)return;
+  const st=GAME.nearSt;
+  const d=playerShip.mesh.position.distanceTo(st.mesh.position);
+  const baseDr=Number.isFinite(st.sd.dR)?st.sd.dR:Math.max(320,st.sd.pR*.95);
+  const dockRange=baseDr*1.75+st.sd.pR*1.15+420;
+  const t=cl(1-d/dockRange,0,1);
+  const spd=playerShip.velocity.length();
+  ap.style.display='block';
+  const distEl=document.getElementById('dp-dist');
+  const spdEl=document.getElementById('dp-spd');
+  const bar=document.getElementById('dp-bar');
+  if(distEl)distEl.textContent=Math.round(d)+' m';
+  if(spdEl)spdEl.textContent=Math.round(spd)+' u/s'+(t>0.15?' · frenata '+Math.round(t*100)+'%':'');
+  if(bar)bar.style.width=Math.round(t*100)+'%';
 }
 /** Assistenza decelerazione in approccio orbitale. */
 function updateDockApproachAssist(dt){
@@ -11241,10 +11433,10 @@ function updateDockApproachAssist(dt){
   const t=1-d/dockRange; // 0 bordo → 1 centro
   const damp=1-Math.min(0.72,t*t*0.85)*Math.min(1,dt*3.2);
   playerShip.velocity.multiplyScalar(damp);
-  // Marker visivo: pulse sul dock ring
   if(st.mesh&&st.mesh._dr&&st.mesh._dr.material){
     st.mesh._dr.material.opacity=0.22+t*0.45+Math.sin(performance.now()*.008)*0.08;
   }
+  updateDockApproachHud();
 }
 
 // ─────────────────────────────────────────────────
@@ -11258,9 +11450,38 @@ function missionCargoHave(m){
   if(!ct)return 0;
   return (PS.cargo[ct]|0)||0;
 }
+function bpInvTotalPieces(){
+  const inv=PS.bpInv||{};
+  let n=0;
+  Object.keys(inv).forEach(id=>{
+    if(typeof BP_FREE!=='undefined'&&BP_FREE.has&&BP_FREE.has(id))return;
+    n+=Math.max(0,inv[id]|0);
+  });
+  return n;
+}
+function consumeBpPieces(need){
+  need=Math.max(1,need|0);
+  const inv=PS.bpInv||{};
+  const ids=Object.keys(inv).filter(id=>{
+    if(typeof BP_FREE!=='undefined'&&BP_FREE.has&&BP_FREE.has(id))return false;
+    return (inv[id]|0)>0;
+  });
+  let left=need;
+  for(const id of ids){
+    if(left<=0)break;
+    const take=Math.min(left,inv[id]|0);
+    inv[id]-=take;left-=take;
+    if(inv[id]<=0)delete inv[id];
+  }
+  return left<=0;
+}
 function canDeliverMission(m,stId){
-  if(!m||m.done||m.type!=='delivery')return false;
-  if(stId&&m.targetSid!==stId)return false;
+  if(!m||m.done)return false;
+  if(stId&&m.targetSid&&m.targetSid!==stId)return false;
+  if(m.type==='bp_parts'){
+    return bpInvTotalPieces()>=Math.max(1,m.bpNeed|0||2);
+  }
+  if(m.type!=='delivery')return false;
   const ct=m.cargo&&m.cargo.type;
   if(!ct)return false;
   return missionCargoHave(m)>=missionCargoNeed(m);
@@ -11274,11 +11495,30 @@ function tryDeliverMission(mId,opts){
     if(!silent)notify('Missione non trovata o già completata.',1800);
     return{ok:false,msg:'missing'};
   }
+  const stId=(GAME.dockedSt&&GAME.dockedSt.sd&&GAME.dockedSt.sd.id)||opts.stId||null;
+  if(m.type==='bp_parts'){
+    if(!stId||(m.targetSid&&m.targetSid!==stId)){
+      if(!silent)notify('Attracca a Bazzano Prime per consegnare i pezzi.',2000);
+      return{ok:false,msg:'dest'};
+    }
+    const need=Math.max(1,m.bpNeed|0||2);
+    if(bpInvTotalPieces()<need){
+      if(!silent)notify('Servono '+need+' pezzi blueprint in inventario (hai '+bpInvTotalPieces()+').',2400);
+      return{ok:false,msg:'bp'};
+    }
+    if(!consumeBpPieces(need)){
+      if(!silent)notify('Consumo pezzi fallito.',1800);
+      return{ok:false,msg:'consume'};
+    }
+    if(PS.loreFlags)PS.loreFlags.pezzi_casa=1;
+    completeMission(m);
+    if(GAME.dockedSt)buildDock(GAME.dockedSt);
+    return{ok:true,msg:'ok'};
+  }
   if(m.type!=='delivery'){
     if(!silent)notify('Questa missione non è una consegna.',1800);
     return{ok:false,msg:'type'};
   }
-  const stId=(GAME.dockedSt&&GAME.dockedSt.sd&&GAME.dockedSt.sd.id)||opts.stId||null;
   if(!stId||m.targetSid!==stId){
     if(!silent)notify('Attracca alla destinazione per consegnare.',2000);
     return{ok:false,msg:'dest'};
@@ -11489,7 +11729,39 @@ function tRepair(pnl,st){
   +(sMax>0
     ?('<div class="ic" style="border-color:rgba(60,200,180,.35)"><div class="in2"><div class="nm" style="color:#66e0d0">Ricarica Scudo</div><div class="dc">Scudo: '+Math.round(sHp)+'/'+sMax+' &bull; Costo: '+fmt(sCost)+'</div></div><button class="db rp2" onclick="doRechargeShield('+sCost+','+sMiss+')" '+(sMiss===0||PS.credits<sCost?'disabled':'')+'>RICARICA SCUDO</button></div>')
     :'<div class="ic" style="opacity:.7"><div class="in2"><div class="nm">Scudo</div><div class="dc">Nessun modulo scudo sul blueprint. Aggiungi «Scudo» in cantiere · oppure Scudo Energetico Mk in officina.</div></div></div>')
-  +'<div class="ic" style="border-color:rgba(255,160,0,.3)"><div class="in2"><div class="nm" style="color:#ffcc66">Cantiere Navale — Blueprint</div><div class="dc">Modifica la struttura, aggiungi moduli. Silhouette laterale live. [P] da fuori.</div></div><button class="db" style="background:rgba(255,120,0,.12);color:#ffaa44;border:1px solid rgba(255,120,0,.3)" onclick="openBlueprintModal()">APRI BLUEPRINT</button></div>';
+  +'<div class="ic" style="border-color:rgba(255,160,0,.3)"><div class="in2"><div class="nm" style="color:#ffcc66">Cantiere Navale — Blueprint</div><div class="dc">Modifica la struttura, aggiungi moduli. Silhouette laterale live. [P] da fuori.</div></div><button class="db" style="background:rgba(255,120,0,.12);color:#ffaa44;border:1px solid rgba(255,120,0,.3)" onclick="openBlueprintModal()">APRI BLUEPRINT</button></div>'
+  +((PS.bpScanPending|0)>0
+    ?('<div class="ic" style="border-color:rgba(90,200,255,.4)"><div class="in2"><div class="nm" style="color:#88ddff">Scanner pezzi</div><div class="dc">Diagnostiche in coda: '+(PS.bpScanPending|0)+'. Ripara celle scollegate / moduli non agganciati (120₡).</div></div><button class="db rp2" onclick="repairBrokenBlueprint()" '+(PS.credits<120?'disabled':'')+'>RIPARA BLUEPRINT</button></div>')
+    :'');
+}
+function repairBrokenBlueprint(){
+  if((PS.bpScanPending|0)<=0){notify('Nessuna diagnostica scanner in coda.',1600);return;}
+  const cost=120;
+  if(PS.credits<cost){notify('Crediti insufficienti ('+fmt(cost)+' ₡).',1800);return;}
+  if(typeof GameplayPolish==='undefined'||!GameplayPolish.bpBrokenCells){
+    PS.credits-=cost;PS.bpScanPending=Math.max(0,(PS.bpScanPending|0)-1);
+    notify('Scanner eseguito: nessun pezzo critico.',1800);buildDock(GAME.dockedSt);return;
+  }
+  const broken=GameplayPolish.bpBrokenCells(bpGrid,BP_ROWS,BP_COLS,typeof bpIsStructure==='function'?bpIsStructure:(id=>id==='hull'||id==='fin'||id==='wing_l'||id==='wing_r'));
+  PS.credits-=cost;
+  PS.bpScanPending=Math.max(0,(PS.bpScanPending|0)-1);
+  if(!broken.size){
+    // Nessuna cella rotta: ricompensa pezzo minore
+    if(typeof bpInvRestore==='function')bpInvRestore('hull',1);
+    notify('Blueprint integro. Pezzo di ricambio recuperato dallo scanner.',2200);
+  }else{
+    broken.forEach(k=>{
+      const parts=k.split(',');
+      const r=+parts[0],c=+parts[1];
+      const id=bpGrid[r]&&bpGrid[r][c];
+      if(id&&typeof bpInvRestore==='function')bpInvRestore(id,1);
+      if(bpGrid[r])bpGrid[r][c]='hull';
+    });
+    if(typeof applyModules==='function')applyModules();
+    if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh();
+    notify('Blueprint riparato: '+broken.size+' celle isolate riconvertite in scafo.',2400);
+  }
+  buildDock(GAME.dockedSt);
 }
 function doRepair(c,m){
   if(m===0){notify('Scafo già al massimo.',1400);return;}
@@ -11650,10 +11922,11 @@ function tMissions(pnl,st){
   const av=st.missionsList.filter(m=>!m.active&&!m.done);
   if(!av.length)pnl.innerHTML+='<div style="color:#446688;font-family:var(--FM);font-size:11px;padding:12px">Nessuna missione disponibile.</div>';
   av.forEach(m=>{
-    const tag=m.type==='delivery'?'<span class="mtg md">CONSEGNA</span>':m.type==='combat'?'<span class="mtg mc">COMBATTIMENTO</span>':'<span class="mtg ms2">SPECIALE</span>';
+    const tag=m.type==='delivery'?'<span class="mtg md">CONSEGNA</span>':m.type==='combat'?'<span class="mtg mc">COMBATTIMENTO</span>':m.type==='bp_parts'?'<span class="mtg ms2">PEZZI BP</span>':'<span class="mtg ms2">SPECIALE</span>';
     const rt=Object.entries(m.repGain||{}).map(([f,v])=>(FACTIONS[f]?.short||f)+': '+(v>0?'+':'')+v).join(' · ');
     const dest=m.targetSid?(' &rarr; '+(SDATA.find(s=>s.id===m.targetSid)?.name||m.targetSid)):'';
-    pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+m.title+' '+tag+'</div><div class="dc">'+m.desc+'</div><div class="mr">+'+fmt(m.reward)+dest+(rt?' &bull; '+rt:'')+'</div></div><button type="button" class="db ms" data-accept="'+m.id+'" data-st="'+st.sd.id+'">ACCETTA</button></div>';
+    const bpHint=m.type==='bp_parts'?(' · pezzi inv '+bpInvTotalPieces()+'/'+Math.max(1,m.bpNeed|0||2)):'';
+    pnl.innerHTML+='<div class="ic"><div class="in2"><div class="nm">'+m.title+' '+tag+'</div><div class="dc">'+m.desc+bpHint+'</div><div class="mr">+'+fmt(m.reward)+dest+(rt?' &bull; '+rt:'')+'</div></div><button type="button" class="db ms" data-accept="'+m.id+'" data-st="'+st.sd.id+'">ACCETTA</button></div>';
   });
   if(PS.activeMissions.length>0){
     pnl.innerHTML+='<div class="stt" style="margin-top:14px">MISSIONI ATTIVE</div>';
@@ -11673,6 +11946,13 @@ function tMissions(pnl,st){
         how=' · carico '+(ct||'?')+': '+have+'/'+need+(here?' · sei a destinazione':' · vai a destinazione e attracca');
         if(canDeliverMission(m,st.sd.id)){
           btn='<button type="button" class="db hi2" data-deliver="'+m.id+'">CONSEGNA</button>';
+        }
+      }else if(m.type==='bp_parts'){
+        const need=Math.max(1,m.bpNeed|0||2);
+        const have=bpInvTotalPieces();
+        how=' · pezzi blueprint: '+have+'/'+need+' · consegna a Bazzano';
+        if(canDeliverMission(m,st.sd.id)){
+          btn='<button type="button" class="db hi2" data-deliver="'+m.id+'">CONSEGNA PEZZI</button>';
         }
       }else if(m.type==='combat'){
         how=' · abbattine abbastanza in volo: la missione si chiude da sola';
@@ -11729,6 +12009,10 @@ function doAccept(mId,stId){
     tryDeliverMission(m.id);
     return;
   }
+  if(m.type==='bp_parts'&&GAME.dockedSt&&canDeliverMission(m,GAME.dockedSt.sd.id)){
+    tryDeliverMission(m.id);
+    return;
+  }
   buildDock(GAME.dockedSt);
 }
 
@@ -11763,7 +12047,12 @@ function buyTavernClue(clueId,stId){
   }
   PS.credits-=cost;
   const m=Object.assign({done:false,active:false,sid:st.sd.id},clue);
+  if(clue.loreOnBuy){
+    if(!PS.loreFlags)PS.loreFlags={};
+    PS.loreFlags[clue.loreOnBuy]=1;
+  }
   delete m.cost;
+  delete m.loreOnBuy;
   st.missionsList.push(m);
   notify('Indizio comprato: '+m.title+' — vedi Missioni.',2400);
   if(typeof playChime==='function')playChime('success');
@@ -12625,16 +12914,17 @@ function drawMap(){
     if(!h||!h.mesh)return;
     const p=worldToMap(h.mesh.position.x,h.mesh.position.z);
     const sz=Math.max(3,4*MAP.zoom);
-    ctx.strokeStyle=h.looted?'rgba(120,120,120,.5)':'rgba(255,160,80,.85)';
-    ctx.fillStyle=h.looted?'rgba(80,80,80,.25)':'rgba(255,120,40,.28)';
-    ctx.lineWidth=1.4;
+    const marked=h.storyMarked&&!h.looted;
+    ctx.strokeStyle=h.looted?'rgba(120,120,120,.5)':(marked?'rgba(255,220,90,.95)':'rgba(255,160,80,.85)');
+    ctx.fillStyle=h.looted?'rgba(80,80,80,.25)':(marked?'rgba(255,200,60,.35)':'rgba(255,120,40,.28)');
+    ctx.lineWidth=marked?2:1.4;
     ctx.beginPath();
     ctx.moveTo(p.x,p.y-sz);ctx.lineTo(p.x+sz,p.y);ctx.lineTo(p.x,p.y+sz);ctx.lineTo(p.x-sz,p.y);ctx.closePath();
     ctx.fill();ctx.stroke();
     if(MAP.zoom>.55&&!h.looted){
-      ctx.fillStyle='rgba(255,180,120,.85)';
+      ctx.fillStyle=marked?'rgba(255,230,140,.95)':'rgba(255,180,120,.85)';
       ctx.font=`${Math.round(8*MAP.zoom)}px Share Tech Mono`;ctx.textAlign='center';
-      ctx.fillText(h.name||'HULK',p.x,p.y-sz-5);
+      ctx.fillText((marked?'★ ':'')+(h.name||'HULK'),p.x,p.y-sz-5);
     }
   });
 
@@ -12887,12 +13177,29 @@ function setupMapEvents(){
     filt.addEventListener('click',e=>{
       const btn=e.target&&e.target.closest?e.target.closest('.gmfilter'):null;
       if(!btn||!filt.contains(btn))return;
-      const f=btn.getAttribute('data-filter')||'all';
-      MAP.filter=f;
-      filt.querySelectorAll('.gmfilter').forEach(b=>b.classList.toggle('active',b===btn));
-      drawMap();
+      setMapFilter(btn.getAttribute('data-filter')||'all');
     });
   }
+  // Doppio click = naviga subito
+  cv.addEventListener('dblclick',e=>{
+    handleMapClick(e);
+    if(navDestPending&&typeof setNavDest==='function')setNavDest();
+  });
+}
+function setMapFilter(f){
+  MAP.filter=f||'all';
+  const filt=document.getElementById('gmfilters');
+  if(filt)filt.querySelectorAll('.gmfilter').forEach(b=>b.classList.toggle('active',b.getAttribute('data-filter')===MAP.filter));
+  drawMap();
+}
+function mapFilterKeyHandler(e){
+  const gm=document.getElementById('gmap');
+  if(!gm||gm.style.display!=='block')return;
+  const tag=(e.target&&e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea')return;
+  // 1–7 = filtri (senza TUTTO); 0 = tutto
+  const keys={Digit0:'all',Digit1:'planet',Digit2:'sat',Digit3:'trade',Digit4:'missions',Digit5:'hulk',Digit6:'anomaly',Digit7:'corridor'};
+  if(keys[e.code]){e.preventDefault();setMapFilter(keys[e.code]);}
 }
 
 // ─────────────────────────────────────────────────
@@ -12940,9 +13247,16 @@ function drawRadar(){
     const ry=(h.mesh.position.z-playerShip.mesh.position.z)*sc;
     const ax=cx+rx,ay=cy+ry;
     if(!clipR(ax,ay))return;
-    ctx.strokeStyle=h.looted?'rgba(120,120,120,.45)':'rgba(255,170,90,.78)';
+    const px=cl(ax,5,W-5),py=cl(ay,5,W-5);
+    if(h.storyMarked&&!h.looted){
+      const pulse=.55+Math.sin(performance.now()*.008)*.4;
+      ctx.strokeStyle=`rgba(255,220,90,${pulse})`;
+      ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(px,py,7+Math.sin(performance.now()*.01)*1.5,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.strokeStyle=h.looted?'rgba(120,120,120,.45)':(h.storyMarked?'rgba(255,200,60,.95)':'rgba(255,170,90,.78)');
     ctx.lineWidth=1.4;
-    ctx.strokeRect(cl(ax,5,W-5)-4,cl(ay,5,W-5)-4,8,8);
+    ctx.strokeRect(px-4,py-4,8,8);
   });
   // Palazzo Beghelli (nave-casata enorme)
   if(typeof BEGHELLI!=='undefined'&&BEGHELLI.mesh){
@@ -13068,13 +13382,17 @@ function updateHUD(){
   if(misReady&&mis)tickParts.push(mis);
   if(navFx)tickParts.push(navFx);
   if(typeof HULKS!=='undefined'&&playerShip&&playerShip.mesh&&GAME.state==='flying'){
-    let nearest=null,nd=Infinity;
+    let nearest=null,nd=Infinity,storyH=null;
     for(const h of HULKS){
       if(!h||h.looted||!h.mesh)continue;
       const d=playerShip.mesh.position.distanceTo(h.mesh.position);
+      if(h.storyMarked)storyH=h;
       if(d<12000&&d<nd){nd=d;nearest=h;}
     }
-    if(nearest)tickParts.push('HULK: '+(nearest.name||'relitto')+' · '+Math.round(nd)+'m');
+    if(storyH){
+      const d=Math.round(playerShip.mesh.position.distanceTo(storyH.mesh.position));
+      tickParts.push('★ HULK TRAMA: '+(storyH.name||'relitto')+' · '+d+'m');
+    }else if(nearest)tickParts.push('HULK: '+(nearest.name||'relitto')+' · '+Math.round(nd)+'m');
   }
   if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
     const roots=RootDialogues.stationsWithAvailable();
@@ -13919,6 +14237,7 @@ function exposeGameState(){
   g.GOODS=GOODS;
   g.scene=scene;
   g._shownInterludes=_shownInterludes;
+  g.refreshStoryHulkMarks=refreshStoryHulkMarks;
   Object.defineProperty(g,'bpGrid',{
     get(){return bpGrid;},
     set(v){bpGrid=v;},

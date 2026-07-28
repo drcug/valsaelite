@@ -48,7 +48,9 @@
         rootSeen:{...(ps.rootSeen||{})},
         loreFlags:{...(ps.loreFlags||{})},
         beghelliAppeared:!!ps.beghelliAppeared,
-        beghelliAidUsed:ps.beghelliAidUsed|0
+        beghelliAidUsed:ps.beghelliAidUsed|0,
+        bpScanPending:ps.bpScanPending|0,
+        peacefulBoardings:ps.peacefulBoardings|0
       },
       STORY:{chapter:global.STORY.chapter,won:!!global.STORY.won},
       storyFlags:global.StorySys&&global.StorySys.flags?{
@@ -124,7 +126,9 @@
       rootSeen:{...(d.rootSeen||{})},
       loreFlags:{...(d.loreFlags||{})},
       beghelliAppeared:!!d.beghelliAppeared,
-      beghelliAidUsed:d.beghelliAidUsed|0
+      beghelliAidUsed:d.beghelliAidUsed|0,
+      bpScanPending:d.bpScanPending|0,
+      peacefulBoardings:d.peacefulBoardings|0
     });
     global.STORY.chapter=data.STORY.chapter|0;
     global.STORY.won=!!data.STORY.won;
@@ -171,6 +175,7 @@
         }
         if(data.hulksLooted&&data.hulksLooted[h.id]){
           h.looted=true;
+          h.storyMarked=false;
           if(h.mesh&&typeof THREE!=='undefined')h.mesh.traverse(o=>{
             if(!o.material)return;
             if('emissiveIntensity' in o.material)o.material.emissiveIntensity*=.18;
@@ -178,6 +183,7 @@
           });
         }
       });
+      if(typeof global.refreshStoryHulkMarks==='function')global.refreshStoryHulkMarks();
     }
     if(data.econ&&data.econ.marketMood)global.ECON.marketMood={...data.econ.marketMood};
     if(data.boost){

@@ -223,7 +223,8 @@
   const TAVERN_CLUES = {
     bazzano: [
       { id: 'tav_bazz_sirena', title: '[OSTERIA] Sussurro Sirena', desc: 'Porta documenti a Sirena: qualcuno parla del Patto a voce troppo alta.', type: 'delivery', targetSid: 'sirena', cargo: { type: 'documenti', qty: 1 }, reward: 260, repGain: { bazzano: 6 }, cost: 80 },
-      { id: 'tav_bazz_calc', title: '[OSTERIA] Timbrature', desc: 'Consegna materiali a Calcara e ascolta i funzionari.', type: 'delivery', targetSid: 'calcara', cargo: { type: 'materiali', qty: 1 }, reward: 300, repGain: { calcara: 5 }, cost: 100 }
+      { id: 'tav_bazz_calc', title: '[OSTERIA] Timbrature', desc: 'Consegna materiali a Calcara e ascolta i funzionari.', type: 'delivery', targetSid: 'calcara', cargo: { type: 'materiali', qty: 1 }, reward: 300, repGain: { calcara: 5 }, cost: 100 },
+      { id: 'tav_bazz_nave_hulk', title: '[OSTERIA] Morti e mutati', desc: 'Porta documenti a Castelletto: la voce dice che nave morta ≠ hulk. Lore inclusa.', type: 'delivery', targetSid: 'castelletto', cargo: { type: 'documenti', qty: 1 }, reward: 320, repGain: { bazzano: 5 }, cost: 70, loreOnBuy: 'nave_vs_hulk' }
     ],
     calcara: [
       { id: 'tav_calc_appalto', title: '[OSTERIA] Appalto ombra', desc: 'Elimina 2 navi crespellanesi — qualcuno paga per il silenzio.', type: 'combat', killFaction: 'crespellano', killsNeeded: 2, killsDone: 0, reward: 480, repGain: { calcara: 8, crespellano: -10 }, cost: 120 }

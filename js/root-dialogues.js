@@ -109,6 +109,47 @@
         }
       },
       {
+        id: 'root_bazz_hulk_odore',
+        minChapter: 5,
+        requireHulkBoarded: true,
+        title: 'Odore di relitto',
+        npcName: 'Morosina',
+        npcTitle: 'ASILO · SUORE · BAZZANO',
+        npcSeed: 4419,
+        faction: 'bazzano',
+        gender: 'f',
+        blurb: 'Ti annusa come al cortile. Dice che hai portato il fetore dello hulk in porto.',
+        start: 'h1',
+        nodes: {
+          h1: {
+            speaker: 'npc',
+            text: 'Zvanino, puzzi di corridoio che cammina. Non è sudore di viaggio: è macguffinium. Hai messo piede in uno hulk, eh? Porta quel fetore fuori dall’osteria — o siediti e raccontami cosa hai visto senza inventare mostri da manifesto.',
+            choices: [
+              { label: '[ZVAN] "Erano persone. Una volta."', next: 'h2' },
+              { label: '[ZVAN] "Ho preso pezzi. Niente di più."', next: 'h2b' }
+            ]
+          },
+          h2: {
+            speaker: 'zvan',
+            text: 'Dentro non c’era silenzio. C’erano cose che un tempo avevano nome. Io ho recuperato documenti e pezzi. Ho portato anche l’odore. Scusa.',
+            choices: [{ label: '[ASCOLTA]', next: 'h3' }]
+          },
+          h2b: {
+            speaker: 'npc',
+            text: 'Pezzi. Sempre pezzi. Meglio pezzi che bugie. Ma se hai visto i mutati e fingi di no, il Mulino te lo legge in faccia.',
+            choices: [{ label: '[ZVAN] "Li ho visti. Non li dimentico."', next: 'h3' }]
+          },
+          h3: {
+            speaker: 'npc',
+            text: 'Allora ascolta: le navi morte ti danno ferro. Gli hulk ti danno incubi. Non confonderli, tavò. E lava la tuta prima di tornare dalle suore — anche se loro non ci sono più.',
+            choices: [
+              { label: '[RESTA] Bevi. Lascia che l’odore passi. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Morosina ti passa un panno. Puzza di sapone e di casa.', lore: 'hulk_visited' } },
+              { label: '[PARTE] "Devo tornare al relitto."', next: null, fx: { note: '«Allora porta armi — e pietà.»', lore: 'hulk_mutazioni' } }
+            ]
+          }
+        }
+      },
+      {
         id: 'root_bazz_specchio',
         minChapter: 6,
         title: 'Bagno dell’osteria — dopo l’ispettore',
@@ -404,6 +445,7 @@
     return encountersForStation(stId).filter((e) => {
       if (isSeen(e.id)) return false;
       if ((e.minChapter || 1) > ch && !(global.STORY && global.STORY.won)) return false;
+      if (e.requireHulkBoarded && !(global.StorySys && global.StorySys.flags && global.StorySys.flags.hulkBoarded)) return false;
       return true;
     });
   }
