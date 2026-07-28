@@ -254,6 +254,7 @@
     bpBrokenCells,
     snapBpCell,
     buildBpPreset,
+    pickWeighted,
     rollBoardingExtraLoot,
     runRankFromStats,
     repPriceMult,

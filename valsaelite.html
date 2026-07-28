@@ -341,6 +341,9 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
 
 /* Galaxy map */
 #gmap{display:none;position:fixed;inset:0;z-index:40;background:rgba(0,1,5,.98)}
+#gmfilters .gmfilter{pointer-events:auto;padding:4px 8px;border-radius:4px;border:1px solid rgba(70,160,180,.35);
+  background:rgba(4,16,28,.85);color:#7aa8b8;font:700 8px var(--FD);letter-spacing:.08em;cursor:pointer}
+#gmfilters .gmfilter.active,#gmfilters .gmfilter:hover{border-color:rgba(62,207,187,.55);color:#c8fff0;background:rgba(20,60,70,.9)}
 #gmcv{display:block;width:100%;height:100%}
 .gmb{position:absolute;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 13px;font-family:var(--FD);font-weight:700;font-size:12px;color:var(--txt);cursor:pointer;letter-spacing:.1em}
 .gmb:hover{border-color:var(--acc);color:var(--bright)}
@@ -1039,15 +1042,27 @@ body.suborbit-active #smsg{
   <div id="gmti">SISTEMA VALSAMOGGIO</div>
   <canvas id="gmcv"></canvas>
   <button class="gmb" id="gmcl" onclick="closeMap()">CHIUDI [M]</button>
-  <!-- search box -->
-  <div style="position:absolute;top:14px;left:14px;display:flex;gap:8px;align-items:center">
-    <input id="gmsearch" placeholder="Cerca sistema..." autocomplete="off"
-      style="background:rgba(2,8,22,.9);border:1px solid rgba(44,100,190,.4);border-radius:5px;
-             color:#cce4ff;font-family:'Share Tech Mono',monospace;font-size:12px;
-             padding:6px 12px;outline:none;width:180px;pointer-events:auto">
-    <div id="gmsearch-results" style="position:absolute;top:36px;left:0;background:rgba(2,8,22,.97);
-      border:1px solid rgba(44,100,190,.3);border-radius:5px;width:180px;display:none;z-index:5;
-      font-family:'Share Tech Mono',monospace;font-size:11px;pointer-events:auto"></div>
+  <!-- search + filtri destinazione -->
+  <div style="position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:6px;pointer-events:auto;z-index:6">
+    <div style="display:flex;gap:8px;align-items:center;position:relative">
+      <input id="gmsearch" placeholder="Cerca sistema..." autocomplete="off"
+        style="background:rgba(2,8,22,.9);border:1px solid rgba(44,100,190,.4);border-radius:5px;
+               color:#cce4ff;font-family:'Share Tech Mono',monospace;font-size:12px;
+               padding:6px 12px;outline:none;width:180px;pointer-events:auto">
+      <div id="gmsearch-results" style="position:absolute;top:36px;left:0;background:rgba(2,8,22,.97);
+        border:1px solid rgba(44,100,190,.3);border-radius:5px;width:180px;display:none;z-index:5;
+        font-family:'Share Tech Mono',monospace;font-size:11px;pointer-events:auto"></div>
+    </div>
+    <div id="gmfilters" style="display:flex;flex-wrap:wrap;gap:4px;max-width:min(92vw,320px)">
+      <button type="button" class="gmfilter active" data-filter="all">TUTTO</button>
+      <button type="button" class="gmfilter" data-filter="planet">PIANETI</button>
+      <button type="button" class="gmfilter" data-filter="sat">SATELLITI</button>
+      <button type="button" class="gmfilter" data-filter="trade">MERCATO</button>
+      <button type="button" class="gmfilter" data-filter="missions">MISSIONI</button>
+      <button type="button" class="gmfilter" data-filter="hulk">HULK</button>
+      <button type="button" class="gmfilter" data-filter="anomaly">ANOMALIE</button>
+      <button type="button" class="gmfilter" data-filter="corridor">CORSIE</button>
+    </div>
   </div>
   <!-- destination info panel -->
   <div id="gmdest" style="display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
@@ -1268,7 +1283,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
-    <div class="help-grid"><span>Abbordaggio</span><span><kbd>WASD</kbd> (e diagonali: due tasti) = <kbd>8 direzioni</kbd> · <kbd>Spazio</kbd> fuoco · pad 3×3 su mobile · <kbd>Esc</kbd> ritiro</span></div>
+    <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · nave = recupero pezzi blueprint (niente mostri) · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
     <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
@@ -2109,6 +2124,18 @@ function renderDiaryContent(){
   }
   if(PS.beghelliAppeared){
     html+='<div class="diary-ch done"><h3>Palazzo Beghelli</h3><p class="dm">Un\'astronave più grande di uno space hulk è entrata in sistema: il Palazzo della Casata Beghelli. [T] in radio se sei vicino. Con connessioni giuste ottieni poco; senza, quasi niente.</p></div>';
+  }
+  // Space Hulk: obiettivi di esplorazione
+  if(typeof HULKS!=='undefined'&&HULKS.length){
+    const open=HULKS.filter(h=>!h.looted);
+    const done=HULKS.length-open.length;
+    const names=open.slice(0,4).map(h=>h.name||h.id).join(', ');
+    const cls=open.length?'active':'done';
+    html+='<div class="diary-ch '+cls+'"><h3>Space Hulk · relitti</h3><p class="dm">'
+      +(open.length
+        ?('Relitti ancora intatti: <strong>'+open.length+'</strong>'+(names?' — '+names+(open.length>4?'…':''):'')+'. Contengono mutazioni da macguffinium: ossigeno limitato, mostri, bottino raro.')
+        :('Hai messo a segno tutti i relitti noti ('+done+'). Possono ancora dare un bottino ridotto se li rivisiti.'))
+      +'</p><div class="dst">In mappa: filtro HULK · rombi arancio. Radar: quadrati. [G] vicino al relitto.</div></div>';
   }
   el.innerHTML=html;
 }
@@ -4807,7 +4834,7 @@ function tryShowTutorialDock(){
 }
 function tryShowTutorialMap(){
   return showTutorialOnce('valsaelite_tut_map','Mappa galattica',
-    '<p><strong>M</strong> apre la mappa. Clicca una stazione → <strong>NAVIGA QUI</strong> per la freccia di rotta.</p><p>Le <strong>fasce ciano</strong> sono <strong>corridoi spaziali</strong> (corsie +spinta). Gli anelli colorati sono anomalie.</p><p>Scroll zoom · drag pan · cerca per nome in alto a sinistra.</p>');
+    '<p><strong>M</strong> apre la mappa. Gli <strong>anelli</strong> sono orbite dei pianeti; i <strong>punti intorno</strong> sono satelliti/stazioni.</p><p>Clicca una destinazione → <strong>NAVIGA QUI</strong>. Filtri in alto: pianeti, satelliti, mercato, hulk, anomalie, corsie.</p><p>Le <strong>fasce ciano</strong> = corsie (+spinta). Anelli colorati = anomalie. Rombi arancio = space hulk.</p>');
 }
 function openHelpModal(){
   if(typeof closeOverlappingModals==='function')closeOverlappingModals('help');
@@ -5717,7 +5744,18 @@ function lazySpawnFleet(batchSize){
 function spawnDynamicNpc(){
   if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
   if(NPCS.length>=DYNAMIC_NPC_SPAWN.max)return;
+  // Densità per fascia: core mercantile più traffico civile, frontiera più pirati.
+  const rSun=playerShip&&playerShip.mesh?playerShip.mesh.position.length():20000;
   let pick=FLEET[(Math.random()*FLEET.length)|0];
+  if(rSun<18000){
+    // Core: preferisci mercanti / courier / bazzano
+    const core=FLEET.filter(f=>f[2]==='merchant'||f[2]==='courier'||f[2]==='freighter'||f[0]==='bazzano');
+    if(core.length&&Math.random()<.62)pick=core[(Math.random()*core.length)|0];
+  }else if(rSun>38000){
+    // Frontiera: più pirati / escort ostili
+    const fringe=FLEET.filter(f=>f[0]==='pirate'||f[2]==='pirate'||f[2]==='escort'||f[1]==='serravalle'||f[1]==='castelletto');
+    if(fringe.length&&Math.random()<.7)pick=fringe[(Math.random()*fringe.length)|0];
+  }
   // Più pirati / ostili man mano che la storia avanza
   if(typeof StorySys!=='undefined'&&Math.random()<StorySys.pirateWeightBonus()){
     const pirates=FLEET.filter(f=>f[0]==='pirate'||f[2]==='pirate');
@@ -9087,8 +9125,8 @@ function buildBoardingMap(kind){
   BOARDING.player.walk=0;BOARDING.player.bob=0;BOARDING.player.hit=0;
   BOARDING.enemies.length=0;BOARDING.pickups.length=0;BOARDING.hazards.length=0;BOARDING.shots.length=0;
   const used=[{x:sp.x,y:sp.y},{x:ex,y:ey}];
-  // Enemies: 3 per ship, 5 per hulk — solo su celle raggiungibili.
-  const eN=big?5:3;
+  // Nemici solo sullo SPACE HULK (mutazioni). Nave disabilitata = recupero pezzi, senza mostri.
+  const eN=big?5:0;
   for(let i=0;i<eN;i++){
     const cell=boardingPickFromReach(reach,rnd,used,3);
     used.push(cell);
@@ -9108,9 +9146,12 @@ function buildBoardingMap(kind){
     });
   }
   // Obiettivo PRIMA del loot (altrimenti BOARDING.objective è null → crash abbordaggio).
-  BOARDING.objective={type:'loot',collected:0,needed:1,label:'Recupera l\'obiettivo (cassa dorata).'};
+  BOARDING.objective={type:'loot',collected:0,needed:1,label:big?'Recupera l\'obiettivo (cassa dorata).':'Recupera pezzi di cantiere (casse dorate).'};
   BOARDING._o2Mul=1;
   BOARDING.reward=big?ECON.hulkBase:ECON.boardingBase;
+  if(!big){
+    BOARDING.objective={type:'loot',collected:0,needed:1,label:'Recupera pezzi di cantiere (cassa dorata) — nave senza difesa.'};
+  }
   if(big){
     const or=rnd();
     if(or>.62){
@@ -9199,7 +9240,7 @@ function enterBoarding(opts){
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='block';
   notify(BOARDING.kind==='hulk'
     ?'Abbordaggio HULK: corridoi contaminati. I mostri? Mutazioni da macguffinium nelle anomalie.'
-    :'Abbordaggio nave nemica.',2200);
+    :'Abbordaggio nave: equipaggio fuori combattimento. Recupera pezzi per il blueprint.',2400);
   initBoardingPointer();
   if(typeof PortraitAtlas!=='undefined')PortraitAtlas.load();
 }
@@ -9228,7 +9269,21 @@ function leaveBoarding(opts){
       if(cargoCnt()<PS.cargoMax){PS.cargo[lootId]=(PS.cargo[lootId]||0)+1;lootName=GOODS[lootId]?.name||lootId;}
     }
     let extraNote='';
-    if(typeof GameplayPolish!=='undefined'&&GameplayPolish.rollBoardingExtraLoot&&(!repeatHulk||Math.random()>.55)){
+    // Nave normale: almeno 1 pezzo blueprint (missione di recupero pezzi).
+    if(!wasHulk&&typeof bpInvRestore==='function'){
+      const pool=[['hull',.22],['fin',.18],['cargo',.22],['shield',.18],['weapon',.12],['engine',.08]];
+      const bid=(typeof GameplayPolish!=='undefined'&&GameplayPolish.pickWeighted)?GameplayPolish.pickWeighted(pool):'hull';
+      bpInvRestore(bid,1);
+      const lab=(typeof BP_MODULES!=='undefined'&&BP_MODULES.find(x=>x.id===bid)||{}).label||bid;
+      extraNote=' · pezzo cantiere: '+lab;
+      // Chance pezzo extra
+      if(Math.random()<.35){
+        const bid2=(typeof GameplayPolish!=='undefined'&&GameplayPolish.pickWeighted)?GameplayPolish.pickWeighted(pool):'cargo';
+        bpInvRestore(bid2,1);
+        const lab2=(BP_MODULES.find(x=>x.id===bid2)||{}).label||bid2;
+        extraNote+=' + '+lab2;
+      }
+    }else if(typeof GameplayPolish!=='undefined'&&GameplayPolish.rollBoardingExtraLoot&&(!repeatHulk||Math.random()>.55)){
       const extra=GameplayPolish.rollBoardingExtraLoot(BOARDING.kind);
       if(extra){
         if(extra.type==='bp_mod'&&extra.id){
@@ -9637,7 +9692,8 @@ function updateBoarding(dt){
   const hud=document.getElementById('boarding-hud');
   if(hud){
     hud.style.display='block';
-    const title=BOARDING.kind==='hulk'?'RELIQUIA · SPACE HULK':'ABBORDAGGIO NEMICO';
+    const isHulk=BOARDING.kind==='hulk';
+    const title=isHulk?'RELIQUIA · SPACE HULK':'RECUPERO · NAVE DISABILITATA';
     const hpw=Math.max(0,Math.round(p.hp));
     const o2w=Math.max(0,Math.round(p.o2));
     const doneObj=BOARDING.objective.collected>=BOARDING.objective.needed;
@@ -9646,11 +9702,14 @@ function updateBoarding(dt){
     const obj=doneObj
       ?'Raggiungi la <strong>cella lampeggiante</strong> (uscita / capsula).'
       :((BOARDING.objective.label||'Recupera l\'obiettivo (cassa dorata).')+' <span style="color:#c8e8ff">['+prog+']</span>');
-    const o2Block=BOARDING.kind==='hulk'
+    const o2Block=isHulk
       ?('<div class="bh-row"><span>OSSIGENO</span><span style="color:'+(o2w<30?'#ff6644':'#88ddff')+'">'+o2w+'%</span></div>'
         +'<div class="bh-bar o2'+(o2w<30?' low':'')+'"><div style="width:'+o2w+'%"></div></div>')
       :'';
     const enemiesLeft=BOARDING.enemies.filter(e=>e.hp>0).length;
+    const hint=isHulk
+      ?('Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> 8 dir. · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · raccolta a contatto · <strong>Esc</strong> ritiro.')
+      :('<strong>Nessun ostile</strong> · recupera le casse · <strong>WASD</strong> 8 dir. · raccolta a contatto · all\'uscita: pezzi blueprint · <strong>Esc</strong> ritiro.');
     hud.innerHTML=
       '<div class="bh-title">'+title+'</div>'
       +'<div class="bh-phase'+(doneObj?' exit':'')+'">'+phase+'</div>'
@@ -9658,7 +9717,7 @@ function updateBoarding(dt){
       +'<div class="bh-bar"><div style="width:'+hpw+'%"></div></div>'
       +o2Block
       +'<div class="bh-obj">'+obj+'</div>'
-      +'<div class="bh-hint">Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> 8 dir. · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · raccolta a contatto · <strong>Esc</strong> ritiro.</div>';
+      +'<div class="bh-hint">'+hint+'</div>';
   }
 }
 // ---- Antropomorphic character renderer ----
@@ -11074,6 +11133,22 @@ function findNearHulk(rangePad){
   }
   return best;
 }
+/** Avviso una tantum quando un hulk entra in raggio scanner. */
+const _hulkScanTold=new Set();
+function updateNearHulkScan(dt){
+  if(!playerShip||!playerShip.alive||GAME.state!=='flying')return;
+  const SCAN=9200;
+  for(const h of HULKS){
+    if(!h||h.looted||_hulkScanTold.has(h.id))continue;
+    const d=playerShip.mesh.position.distanceTo(h.mesh.position);
+    if(d<SCAN){
+      _hulkScanTold.add(h.id);
+      const arch=HULK_ARCHETYPES[h.archetype]?.label||'Relitto';
+      notify('Firma hulk: '+(h.name||arch)+' · '+Math.round(d)+'m — apri mappa [M] o avvicinati [G]',3200);
+      break;
+    }
+  }
+}
 function tryBoardingTrigger(){
   if(GAME.state!=='flying'){notify('Abbordaggio solo in volo.',1400);return false;}
   // Usa il target memorizzato dal prompt, altrimenti cerca di nuovo
@@ -11122,8 +11197,8 @@ function updateBoardingPrompt(){
   else if(ns){
     el.style.display='block';
     const tag=NPC_TITLES[ns.type]||'NAVE';
-    if(title)title.textContent='ABBORDAGGIO · '+tag;
-    if(sub)sub.textContent='[G] abborda · '+Math.round(ns.ship.health)+' HP';
+    if(title)title.textContent='RECUPERO · '+tag;
+    if(sub)sub.textContent='[G] pezzi blueprint · senza difesa · '+Math.round(ns.ship.health)+' HP';
   }
   else el.style.display='none';
 }
@@ -11150,10 +11225,26 @@ function checkNear(){
     const dockBtn=document.getElementById('dpbtn-dock');
     const desc=document.getElementById('dpds');
     if(dockBtn)dockBtn.textContent='APPRODA';
-    if(desc)desc.textContent='[E] attracca · [T] hail nave vicina';
+    if(desc)desc.textContent='[E] attracca · assist. frenata attiva · [T] radio';
     showTutorialOnce('valsaelite_tut_near','Primo attracco',
-      '<p>Sei in range di <strong>'+GAME.nearSt.sd.name+'</strong>. Premi <strong>E</strong> o <strong>APPRODA</strong>.</p><p>In stazione: commercio, missioni, equipaggio e <strong>salvataggio</strong> (tab Riparazione).</p>');
+      '<p>Sei in range di <strong>'+GAME.nearSt.sd.name+'</strong>. Premi <strong>E</strong> o <strong>APPRODA</strong>.</p><p>Vicino alla stazione la nave <strong>rallenta da sola</strong>. In stazione: commercio, missioni, equipaggio e <strong>salvataggio</strong>.</p>');
   }else el.style.display='none';
+}
+/** Assistenza decelerazione in approccio orbitale. */
+function updateDockApproachAssist(dt){
+  if(!playerShip||!playerShip.alive||GAME.state!=='flying'||!GAME.nearSt)return;
+  const st=GAME.nearSt;
+  const d=playerShip.mesh.position.distanceTo(st.mesh.position);
+  const baseDr=Number.isFinite(st.sd.dR)?st.sd.dR:Math.max(320,st.sd.pR*.95);
+  const dockRange=baseDr*1.75+st.sd.pR*1.15+420;
+  if(d>dockRange)return;
+  const t=1-d/dockRange; // 0 bordo → 1 centro
+  const damp=1-Math.min(0.72,t*t*0.85)*Math.min(1,dt*3.2);
+  playerShip.velocity.multiplyScalar(damp);
+  // Marker visivo: pulse sul dock ring
+  if(st.mesh&&st.mesh._dr&&st.mesh._dr.material){
+    st.mesh._dr.material.opacity=0.22+t*0.45+Math.sin(performance.now()*.008)*0.08;
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -11735,15 +11826,16 @@ const ROUTE_CORRIDORS=[
   {id:'frontier-run',name:'Run Frontiera',a:'castelletto',b:'serravalle',width:2800,safety:-0.08,speed:1.14}
 ];
 const SPACE_ANOMALIES=[
-  {id:'rift-calcara',name:'Rift di Calcara',x:14200,z:9800,r:2200,risk:0.58,reward:210,color:'#ff6633',colorB:'#ffee88',colorC:'#9933ff',
+  /* Fasce inter-orbita (come gli hulk): lontano dai pianeti */
+  {id:'rift-calcara',name:'Rift di Calcara',x:9800,z:10800,r:2200,risk:0.58,reward:210,color:'#ff6633',colorB:'#ffee88',colorC:'#9933ff',
     drift:32,hullStress:0.055,energyLeak:1.48,rewardMul:1,shake:0.18},
-  {id:'ghost-belt',name:'Eco Fascia',x:-23600,z:8500,r:2600,risk:0.5,reward:255,color:'#cc55ff',colorB:'#55eeff',colorC:'#ff88aa',
+  {id:'ghost-belt',name:'Eco Fascia',x:-22000,z:6200,r:2600,risk:0.5,reward:255,color:'#cc55ff',colorB:'#55eeff',colorC:'#ff88aa',
     drift:46,hullStress:0.028,energyLeak:0.88,rewardMul:1.32,shake:0.12},
-  {id:'cold-savigno',name:'Sacca Fredda Savigno',x:18900,z:25900,r:2400,risk:0.42,reward:235,color:'#44ccff',colorB:'#ddeeff',colorC:'#66ffcc',
+  {id:'cold-savigno',name:'Sacca Fredda Savigno',x:31000,z:36000,r:2400,risk:0.42,reward:235,color:'#44ccff',colorB:'#ddeeff',colorC:'#66ffcc',
     drift:12,hullStress:0,energyLeak:0.68,rewardMul:1,healRate:0.55,shake:0.05},
-  {id:'rust-echo',name:'Riverbero Rosso',x:-8200,z:-19600,r:1900,risk:0.52,reward:200,color:'#ff4422',colorB:'#ff9944',colorC:'#884422',
+  {id:'rust-echo',name:'Riverbero Rosso',x:-14000,z:-28000,r:1900,risk:0.52,reward:200,color:'#ff4422',colorB:'#ff9944',colorC:'#884422',
     drift:24,hullStress:0.065,energyLeak:1.2,rewardMul:1.08,shake:0.14},
-  {id:'blue-gyre',name:'Vortice Cobalto',x:25100,z:-14200,r:2100,risk:0.46,reward:245,color:'#3388ff',colorB:'#88ffff',colorC:'#bb66ff',
+  {id:'blue-gyre',name:'Vortice Cobalto',x:42000,z:-18000,r:2100,risk:0.46,reward:245,color:'#3388ff',colorB:'#88ffff',colorC:'#bb66ff',
     drift:34,hullStress:0.02,energyLeak:1.18,rewardMul:1.15,shake:0.1}
 ];
 let NAV_EFFECT={inCorridor:null,inAnomaly:null,prevAnomalyId:null,prevCorridorId:null,bonusSpeed:1,hazardMul:1,lastTick:0,ambienceT:0};
@@ -12405,8 +12497,23 @@ const MAP={
   zoom:1, panX:0, panY:0,
   dragging:false, dragStart:{x:0,y:0}, panStart:{x:0,y:0},
   starCache:null,
+  filter:'all'
 };
-const BASE_SC=()=>Math.min(innerWidth,innerHeight)/78000;
+function mapFilterMatch(sd){
+  const f=MAP.filter||'all';
+  if(f==='all'||f==='hulk'||f==='anomaly'||f==='corridor')return true;
+  if(!sd)return false;
+  if(f==='planet')return !sd.sat;
+  if(f==='sat')return !!sd.sat;
+  if(f==='trade')return (sd.svcs||[]).includes('trade');
+  if(f==='missions')return (sd.svcs||[]).includes('missions');
+  return true;
+}
+function mapShowLayer(kind){
+  const f=MAP.filter||'all';
+  return f==='all'||f===kind;
+}
+const BASE_SC=()=>Math.min(innerWidth,innerHeight)/90000;
 
 function mapClientToCanvas(cv,clientX,clientY){
   const r=cv.getBoundingClientRect();
@@ -12477,7 +12584,7 @@ function drawMap(){
     ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
   });
   // Optional route corridors
-  ROUTE_CORRIDORS.forEach(rc=>{
+  if(mapShowLayer('corridor'))ROUTE_CORRIDORS.forEach(rc=>{
     const a=getSM(rc.a),b=getSM(rc.b);if(!a||!b)return;
     const ap=worldToMap(a.mesh.position.x,a.mesh.position.z),bp=worldToMap(b.mesh.position.x,b.mesh.position.z);
     const active=NAV_EFFECT.inCorridor&&NAV_EFFECT.inCorridor.id===rc.id;
@@ -12499,7 +12606,7 @@ function drawMap(){
     }
   });
   // High-risk anomalies
-  SPACE_ANOMALIES.forEach(an=>{
+  if(mapShowLayer('anomaly'))SPACE_ANOMALIES.forEach(an=>{
     const p=worldToMap(an.x,an.z),r=an.r*sc;
     const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);
     g.addColorStop(0,withAlpha(an.color,.26));
@@ -12507,6 +12614,28 @@ function drawMap(){
     g.addColorStop(1,withAlpha(an.colorC||an.colorB||an.color,0));
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();
     ctx.strokeStyle=withAlpha(an.colorB||an.color,.55);ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.stroke();
+    if(MAP.zoom>.4){
+      ctx.fillStyle=withAlpha(an.colorB||an.color,.9);
+      ctx.font=`${Math.round(8*MAP.zoom)}px Share Tech Mono`;ctx.textAlign='center';
+      ctx.fillText(an.name,p.x,p.y-r-4);
+    }
+  });
+  // Space hulk markers
+  if(mapShowLayer('hulk')&&typeof HULKS!=='undefined')HULKS.forEach(h=>{
+    if(!h||!h.mesh)return;
+    const p=worldToMap(h.mesh.position.x,h.mesh.position.z);
+    const sz=Math.max(3,4*MAP.zoom);
+    ctx.strokeStyle=h.looted?'rgba(120,120,120,.5)':'rgba(255,160,80,.85)';
+    ctx.fillStyle=h.looted?'rgba(80,80,80,.25)':'rgba(255,120,40,.28)';
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y-sz);ctx.lineTo(p.x+sz,p.y);ctx.lineTo(p.x,p.y+sz);ctx.lineTo(p.x-sz,p.y);ctx.closePath();
+    ctx.fill();ctx.stroke();
+    if(MAP.zoom>.55&&!h.looted){
+      ctx.fillStyle='rgba(255,180,120,.85)';
+      ctx.font=`${Math.round(8*MAP.zoom)}px Share Tech Mono`;ctx.textAlign='center';
+      ctx.fillText(h.name||'HULK',p.x,p.y-sz-5);
+    }
   });
 
   // Asteroid belt
@@ -12540,6 +12669,9 @@ function drawMap(){
 
   // Stations
   smeshes.forEach(sm=>{
+    if(!mapFilterMatch(sm.sd))return;
+    // Con filtro hulk/anomaly/corridor nascondi stazioni non rilevanti
+    if(MAP.filter==='hulk'||MAP.filter==='anomaly'||MAP.filter==='corridor')return;
     const {x,y}=worldToMap(sm.mesh.position.x,sm.mesh.position.z);
     const f=FACTIONS[sm.sd.faction];const col=f?f.color:'#888';
     const r=Math.max(3,sm.sd.pR*sc*1.6);
@@ -12748,6 +12880,19 @@ function setupMapEvents(){
     });
   });
   inp.addEventListener('blur',()=>setTimeout(()=>{res.style.display='none';},200));
+
+  // Filtri mappa (pianeti / hulk / anomalie / …)
+  const filt=document.getElementById('gmfilters');
+  if(filt){
+    filt.addEventListener('click',e=>{
+      const btn=e.target&&e.target.closest?e.target.closest('.gmfilter'):null;
+      if(!btn||!filt.contains(btn))return;
+      const f=btn.getAttribute('data-filter')||'all';
+      MAP.filter=f;
+      filt.querySelectorAll('.gmfilter').forEach(b=>b.classList.toggle('active',b===btn));
+      drawMap();
+    });
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -12922,6 +13067,15 @@ function updateHUD(){
   if(mTxt)tickParts.push(mTxt);
   if(misReady&&mis)tickParts.push(mis);
   if(navFx)tickParts.push(navFx);
+  if(typeof HULKS!=='undefined'&&playerShip&&playerShip.mesh&&GAME.state==='flying'){
+    let nearest=null,nd=Infinity;
+    for(const h of HULKS){
+      if(!h||h.looted||!h.mesh)continue;
+      const d=playerShip.mesh.position.distanceTo(h.mesh.position);
+      if(d<12000&&d<nd){nd=d;nearest=h;}
+    }
+    if(nearest)tickParts.push('HULK: '+(nearest.name||'relitto')+' · '+Math.round(nd)+'m');
+  }
   if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
     const roots=RootDialogues.stationsWithAvailable();
     if(roots.length){
@@ -13481,7 +13635,9 @@ function animate(){
         playerShip.velocity.copy(along.add(lateral));
       }
       checkNear();
+      if(typeof updateDockApproachAssist==='function')updateDockApproachAssist(dt);
       updateHulks(dt);
+      if(typeof updateNearHulkScan==='function')updateNearHulkScan(dt);
       if(typeof updateBeghelli==='function')updateBeghelli(dt);
       updateBoardingPrompt();
 

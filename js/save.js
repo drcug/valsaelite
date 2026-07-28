@@ -26,7 +26,17 @@
     const ps=global.PS,ship=global.playerShip;
     if(!ps||!ship||!ship.mesh)return null;
     const looted={};
-    (global.HULKS||[]).forEach(h=>{looted[h.id]=!!h.looted;});
+    const hulksPos={};
+    (global.HULKS||[]).forEach(h=>{
+      looted[h.id]=!!h.looted;
+      if(h.mesh&&h.mesh.position){
+        hulksPos[h.id]={
+          x:h.mesh.position.x,y:h.mesh.position.y,z:h.mesh.position.z,
+          rotY:h.mesh.rotation.y,rotX:h.mesh.rotation.x,rotZ:h.mesh.rotation.z,
+          driftAng:h.driftAng||0
+        };
+      }
+    });
     return{
       v:VER,t:Date.now(),
       PS:{
@@ -64,6 +74,7 @@
       },
       navDestId:global.navDestId||null,
       hulksLooted:looted,
+      hulksPos:hulksPos,
       econ:{marketMood:{...global.ECON.marketMood}},
       boost:{heat:global.BOOST.heat,overheated:global.BOOST.overheated,overheatTimer:global.BOOST.overheatTimer},
       stats:global.RUN_STATS?{...global.RUN_STATS}:null,
@@ -148,9 +159,17 @@
         if(typeof global.ensureBeghelliPalace==='function')global.ensureBeghelliPalace(true);
       }
     }
-    if(data.hulksLooted){
+    if(data.hulksLooted||data.hulksPos){
       (global.HULKS||[]).forEach(h=>{
-        if(data.hulksLooted[h.id]){
+        const pos=data.hulksPos&&data.hulksPos[h.id];
+        if(pos&&h.mesh){
+          h.mesh.position.set(pos.x,pos.y,pos.z);
+          if(pos.rotY!=null)h.mesh.rotation.y=pos.rotY;
+          if(pos.rotX!=null)h.mesh.rotation.x=pos.rotX;
+          if(pos.rotZ!=null)h.mesh.rotation.z=pos.rotZ;
+          if(pos.driftAng!=null)h.driftAng=pos.driftAng;
+        }
+        if(data.hulksLooted&&data.hulksLooted[h.id]){
           h.looted=true;
           if(h.mesh&&typeof THREE!=='undefined')h.mesh.traverse(o=>{
             if(!o.material)return;
