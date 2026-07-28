@@ -2240,10 +2240,10 @@ function checkStoryInterludes(){
 // Finale condizionato dalla rep: messaggi epilogo diversi.
 function storyEpilogueBody(){
   const bz=rep.bazzano||0, cal=rep.calcara||0, mont=rep.monteveglio||0, sav=rep.savigno||0;
-  if(sav>40&&cal<-30)return 'Epilogo: i Savignesi aprono il primo consolato fuori dal loro sistema — nel tuo hangar. Calcara non ti ha perdonato, ma non ha piu\' il monopolio della parola "ufficiale".';
-  if(mont>40)return 'Epilogo: la Rocca ti nomina "Cavaliere del Molino". Monteveglio ricama il tuo nome su un drappo in orbita: durera\' finche\' le frecce di luce saranno laser.';
-  if(bz>60&&cal<-10)return 'Epilogo: Bazzano riaccende il Mulino nella piazza principale. La gente applaude, i contratti tornano a circolare: il Patto respira, tu provi a dormire.';
-  return 'Epilogo: il Patto torna, ma scricchiola. Qualcuno lo studiera\' di nuovo, qualcun altro cerchera\' di farne un\'altra concessionaria. Il cielo di Valsamoggia, pero\', e\' di nuovo un cielo.';
+  if(sav>40&&cal<-30)return 'Epilogo: i Savignesi aprono il primo consolato fuori dal loro sistema — proprio nel tuo hangar. Calcara non ti ha perdonato, ma ha perso il monopolio della parola «ufficiale».';
+  if(mont>40)return 'Epilogo: la Rocca ti nomina Cavaliere del Molino. Monteveglio ricama il tuo nome su un drappo in orbita, e durerà finché le frecce di luce resteranno laser.';
+  if(bz>60&&cal<-10)return 'Epilogo: Bazzano riaccende il Mulino in piazza. La gente applaude, i contratti tornano a circolare, il Patto respira — e tu, finalmente, provi a dormire.';
+  return 'Epilogo: il Patto torna, ma scricchiola ancora. Qualcuno lo studierà di nuovo; qualcun altro cercherà di farne un\'altra concessionaria. Il cielo di Valsamoggia, però, è di nuovo un cielo.';
 }
 
 // ─────────────────────────────────────────────────
