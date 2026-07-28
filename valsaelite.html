@@ -104,7 +104,32 @@ body.suborbit-active #a11y-strip{display:none !important;}
   color:#c8efe6;font:700 10px var(--FD);letter-spacing:.1em;cursor:pointer}
 .bp-tool:hover{background:rgba(40,120,110,.55);border-color:#7fdcc8}
 .bp-tool.ghost{opacity:.75;border-style:dashed}
-.bp-tool.erase-on{background:rgba(160,40,40,.55)!important;border-color:#ff8866!important;color:#ffd0c8!important}
+.bp-tool.erase-on,.bp-tool.mode-on[data-bp-mode="erase"]{background:rgba(160,40,40,.55)!important;border-color:#ff8866!important;color:#ffd0c8!important}
+.bp-tool.mode-on[data-bp-mode="place"]{background:rgba(30,90,160,.55)!important;border-color:#88bbff!important;color:#d8ecff!important}
+.bp-tool.sym-on{background:rgba(90,60,160,.55)!important;border-color:#c8a8ff!important;color:#efe8ff!important}
+#bp-mode-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+#bp-sticky-sel{
+  display:none;position:sticky;top:0;z-index:3;width:100%;max-width:min(420px,96vw);
+  margin:0 auto 6px;padding:8px 10px;border-radius:8px;
+  border:1px solid rgba(90,170,220,.4);background:rgba(6,18,36,.94);
+  font:10px var(--FM);color:#c8dde8;letter-spacing:.04em;text-align:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+}
+#bp-sticky-sel.show{display:block}
+#bp-sticky-sel b{color:#eaf6ff;font-family:var(--FD);letter-spacing:.1em}
+#bp-effect-preview{
+  font:9px var(--FM);color:#7a9ab8;line-height:1.45;min-height:2.6em;
+  padding:4px 2px 2px;border-top:1px solid rgba(44,100,190,.18);margin-top:4px;
+}
+#bp-effect-preview strong{color:#b8d4ec;font-weight:700}
+#bp-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-top:12px;width:min(980px,100%)}
+#bp-discard{
+  padding:10px 22px;border-radius:6px;cursor:pointer;
+  border:1px solid rgba(180,90,70,.45);background:rgba(60,20,14,.55);
+  color:#ffc8b8;font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.12em;
+}
+#bp-discard:hover{background:rgba(90,30,20,.7);border-color:#ffaa88}
+#bp-keys-hint{font:8px var(--FM);color:#446688;letter-spacing:.06em;text-align:center;margin-top:4px;max-width:min(96vw,720px)}
 
 /* ─ Abbordaggio / Space hulk ─ */
 #boarding{display:none;position:fixed;inset:0;z-index:90;background:
@@ -583,7 +608,7 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
   background:rgba(34,119,238,.2);color:var(--bright);font-family:var(--FD);font-weight:700;letter-spacing:.12em;cursor:pointer;}
 #diary-close:hover{background:rgba(34,119,238,.35);}
 #bp-title{font-size:17px;font-weight:700;color:var(--bright);letter-spacing:.14em;margin:0 0 2px;line-height:1.1;}
-#bp-subtitle{font-size:9px;color:#557799;font-family:var(--FM);letter-spacing:.12em;margin-bottom:8px;line-height:1.25;max-width:min(96vw,720px);text-align:center;}
+#bp-subtitle{font-size:9px;color:#557799;font-family:var(--FM);letter-spacing:.08em;margin-bottom:8px;line-height:1.4;max-width:min(96vw,720px);text-align:center;}
 #bp-wrap{
   display:flex;gap:12px;align-items:flex-start;justify-content:center;
   width:min(980px,100%);max-height:min(78vh,calc(100vh - 110px));padding:0 4px;flex:1 1 auto;min-height:0;
@@ -646,7 +671,7 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 .bp-buy:active{transform:translateY(1px);}
 .bp-stats{font-family:var(--FM);font-size:10px;color:#446688;line-height:1.9;}
 .bp-stat-val{color:#88aacc;}
-#bp-close{margin-top:14px;padding:10px 32px;background:var(--acc);color:#fff;border:none;
+#bp-close{margin-top:0;padding:10px 32px;background:var(--acc);color:#fff;border:none;
   border-radius:6px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.15em;cursor:pointer;}
 #bp-close:hover{background:#4499ff;}
 /* Speed bar + optional screen shake (set by JS) */
@@ -657,7 +682,13 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 @media(max-width:700px){
   #blueprint-modal{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;}
   #bp-title{font-size:14px;margin-bottom:0;}
-  #bp-subtitle{font-size:8px;margin-bottom:4px;max-height:2.6em;overflow:hidden;}
+  #bp-subtitle{font-size:8px;margin-bottom:4px;line-height:1.45;max-height:none;overflow:visible;padding:0 4px;}
+  #bp-sticky-sel{display:block;position:sticky;top:0}
+  #bp-sticky-sel:not(.show){display:none}
+  #bp-actions{position:sticky;bottom:0;z-index:2;padding:8px 0 max(6px,env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,transparent,rgba(0,2,8,.92) 28%);width:100%;}
+  #bp-close{width:min(100%,280px);padding:10px 18px;font-size:13px}
+  #bp-discard{width:min(100%,280px);padding:10px 18px}
   #bp-wrap{flex-direction:column;align-items:stretch;max-height:none;width:100%;flex:0 0 auto;gap:8px;overflow:visible;}
   #bp-grid-col{width:100%;}
   #bp-panel{max-width:100%;width:100%;overflow:visible;flex:1 1 auto;}
@@ -672,7 +703,6 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
   .bp-mod-icon{font-size:12px;}
   .bp-mod-name{font-size:9px;}
   #bp-stats-hull-row{grid-template-columns:1fr;}
-  #bp-close{margin-top:8px;padding:10px 24px;width:min(100%,360px);position:sticky;bottom:0;z-index:2;}
   /* Larghezza fluida + aspect-ratio bitmap: evita distorsione e hit-test sbagliato */
   #bp-cv{
     width:min(320px,92vw) !important;
@@ -1191,21 +1221,25 @@ body.suborbit-active #smsg{
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
   <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">Sinistra = PRUA · Destra = POPPA · Tocca un pezzo per rimuoverlo · Scegli un modulo e tocca per piazzarlo · ANNULLA / CANCELLA</div>
+  <div id="bp-subtitle">Prua a sinistra · Poppa a destra · Modalità Piazza / Gomma · Esc annulla le modifiche</div>
+  <div id="bp-sticky-sel" aria-live="polite"></div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
       <canvas id="bp-cv"></canvas>
+      <div id="bp-mode-row">
+        <button type="button" class="bp-tool mode-on" data-bp-mode="place" id="bp-mode-place" title="Piazza moduli (1–9 palette)">PIAZZA</button>
+        <button type="button" class="bp-tool" data-bp-mode="erase" id="bp-mode-erase" title="Gomma: tocca per rimuovere (E)">GOMMA</button>
+      </div>
       <div id="bp-toolbar">
-        <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo piazzamento">ANNULLA</button>
-        <button type="button" class="bp-tool" id="bp-erase" title="Modalità cancella: tocca i pezzi da rimuovere">CANCELLA</button>
-        <button type="button" class="bp-tool" id="bp-sym" title="Copia simmetrica sull’asse">SIMMETRIA</button>
-        <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona modulo">DESELEZIONA</button>
+        <button type="button" class="bp-tool" id="bp-undo" title="Annulla ultimo passo (Z)">ANNULLA</button>
+        <button type="button" class="bp-tool" id="bp-sym" title="Simmetria live: anteprima + copia sull’asse">SIMMETRIA</button>
+        <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona (Q)">DESELEZIONA</button>
         <button type="button" class="bp-tool" id="bp-reset" title="Ripristina layout iniziale">INIZIALE</button>
       </div>
       <div id="bp-presets" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;justify-content:center">
-        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset stiva">KIT STIVA</button>
-        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento">KIT COMBATTIMENTO</button>
-        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione">KIT ESPLORAZIONE</button>
+        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset stiva (controlla pezzi)">KIT STIVA</button>
+        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento (controlla pezzi)">KIT COMBATTIMENTO</button>
+        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione (controlla pezzi)">KIT ESPLORAZIONE</button>
       </div>
     </div>
     <div id="bp-panel">
@@ -1215,9 +1249,10 @@ body.suborbit-active #smsg{
       </div>
       <div class="bp-modules-section">
         <div class="bp-section-title">MODULI · scorri · clicca · piazza (attacca allo scafo)</div>
-        <div class="bp-mod-scroll-hint">↕ scorri la lista · scorri anche il pannello cantiere</div>
+        <div class="bp-mod-scroll-hint">↕ scorri la lista · 1–9 sceglie · E gomma · Z annulla</div>
         <div class="bp-module-list" id="bp-module-list"></div>
       </div>
+      <div id="bp-effect-preview"></div>
       <div id="bp-stats-hull-row" class="bp-stats-section">
         <div>
           <div class="bp-section-title">STATISTICHE</div>
@@ -1237,7 +1272,11 @@ body.suborbit-active #smsg{
       </div>
     </div>
   </div>
-  <button id="bp-close" onclick="closeBlueprintModal()">CONFERMA E COSTRUISCI</button>
+  <div id="bp-actions">
+    <button type="button" id="bp-discard" onclick="discardBlueprintChanges()">ANNULLA MODIFICHE</button>
+    <button type="button" id="bp-close" onclick="closeBlueprintModal()">CONFERMA E COSTRUISCI</button>
+  </div>
+  <div id="bp-keys-hint">Esc = esci senza salvare · Z = undo · E = gomma · Q = deseleziona · 1–9 = palette</div>
 </div>
 <div id="diary-modal" aria-modal="true" role="dialog" aria-labelledby="diary-title">
   <div id="diary-inner">
@@ -2715,28 +2754,115 @@ const defaultBlueprint=(()=>{
 // Runtime grid: array[row][col] = moduleId | null
 let bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
 let bpSelected=null; // module id selected in palette
+let bpEditMode='place'; // 'place' | 'erase'
+let bpSymLive=false; // anteprima + piazzamento speculare
 let bpDragFrom=null;
 let bpHoverCell=null; // {r,c} cella sotto dito/mouse (feedback mobile)
-const BP_UNDO=[]; // stack di snapshot griglia+inv per UNDO
+let bpWarnCells=new Set(); // celle evidenziate dopo validazione fallita
+let bpOpenSnapshot=null; // {grid,inv,hullPaintHex} all'apertura — Esc / Annulla modifiche
+const BP_UNDO=[]; // stack di snapshot griglia+inv+vernice per UNDO
 const BP_UNDO_MAX=24;
 
+function bpModuleLabel(id){
+  if(id==='__erase')return 'Gomma';
+  const m=BP_MODULES.find(x=>x.id===id);
+  return m?m.label:(id||'—');
+}
+function bpEffectText(id){
+  if(!id||id==='__erase')return 'Modalità Gomma: tocca un pezzo per rimuoverlo (torna in inventario).';
+  const m=BP_MODULES.find(x=>x.id===id);if(!m)return '';
+  const bits=[];
+  if(id==='hull')bits.push('Struttura portante');
+  else if(id==='cockpit')bits.push('Cabina obbligatoria');
+  else if(id==='engine')bits.push('+spinta / velocità');
+  else if(id==='engine2')bits.push('+velocità (×2 rispetto a Motore)');
+  else if(id==='boost_eng')bits.push('Sblocca postbruciatore [B]');
+  else if(id==='weapon')bits.push('+danno cannone');
+  else if(id==='weapon2')bits.push('+danno pesante (×2)');
+  else if(id==='missile')bits.push('Sblocca missili [Q] · +capacità');
+  else if(id==='shield')bits.push('+20 HP scudo');
+  else if(id==='cargo')bits.push('+8 stiva');
+  else if(id==='wing_l'||id==='wing_r')bits.push('+manovrabilità');
+  else if(id==='fin')bits.push('+rotazione');
+  const cost=m.cost?(' · acquisto '+fmt(m.cost)+' ₡'):' · gratuito';
+  const size=(m.w>1||m.h>1)?(' · '+m.w+'×'+m.h):'';
+  return '<strong>'+m.label+'</strong> — '+(bits.join(' · ')||m.desc)+size+cost;
+}
 function bpCloneGrid(){
   return bpGrid.map(row=>row.slice());
 }
-function bpPushUndo(){
-  BP_UNDO.push({
+function bpSnapshotState(){
+  return{
     grid:bpCloneGrid(),
-    inv:Object.assign({},PS.bpInv||{})
-  });
+    inv:Object.assign({},PS.bpInv||{}),
+    hullPaintHex:normalizeHullHex(PS.hullPaintHex)
+  };
+}
+function bpRestoreState(snap){
+  if(!snap)return;
+  bpGrid=snap.grid.map(row=>row.slice());
+  PS.bpInv=Object.assign({},snap.inv);
+  if(snap.hullPaintHex)PS.hullPaintHex=normalizeHullHex(snap.hullPaintHex);
+  const inp=document.getElementById('bp-hull-color');
+  if(inp)inp.value=normalizeHullHex(PS.hullPaintHex);
+}
+function bpPushUndo(){
+  BP_UNDO.push(bpSnapshotState());
   if(BP_UNDO.length>BP_UNDO_MAX)BP_UNDO.shift();
 }
 function bpUndo(){
   const snap=BP_UNDO.pop();
   if(!snap){notify('Niente da annullare.',1200);return;}
-  bpGrid=snap.grid.map(row=>row.slice());
-  PS.bpInv=Object.assign({},snap.inv);
-  buildBpPalette();drawBlueprint();
+  bpRestoreState(snap);
+  bpWarnCells=new Set();
+  buildBpPalette();drawBlueprint();syncBpModeUi();
+  if(typeof updateBpHullRepHint==='function')updateBpHullRepHint();
   notify('Blueprint: annullato.',1200);
+}
+function bpIsEraseMode(){return bpEditMode==='erase'||bpSelected==='__erase';}
+function bpSetEditMode(mode){
+  bpEditMode=(mode==='erase')?'erase':'place';
+  if(bpEditMode==='erase'){
+    // Mantieni ultimo pezzo in memoria per ri-piazzamento dopo gomma, ma attiva erase
+    if(bpSelected==='__erase')bpSelected=null;
+  }else if(bpSelected==='__erase'){
+    bpSelected=null;
+  }
+  syncBpModeUi();
+  buildBpPalette();drawBlueprint();
+}
+function syncBpModeUi(){
+  const place=document.getElementById('bp-mode-place');
+  const erase=document.getElementById('bp-mode-erase');
+  const sym=document.getElementById('bp-sym');
+  if(place)place.classList.toggle('mode-on',bpEditMode==='place');
+  if(erase)erase.classList.toggle('mode-on',bpEditMode==='erase');
+  if(sym)sym.classList.toggle('sym-on',!!bpSymLive);
+  const sticky=document.getElementById('bp-sticky-sel');
+  if(sticky){
+    if(bpIsEraseMode()){
+      sticky.classList.add('show');
+      sticky.innerHTML='<b>GOMMA</b> · tocca un pezzo per rimuoverlo · poi lo riseleziona per ripiazzarlo';
+    }else if(bpSelected){
+      sticky.classList.add('show');
+      sticky.innerHTML='<b>'+bpModuleLabel(bpSelected)+'</b> · tocca la griglia per piazzare · long-press / tasto destro = rimuovi';
+    }else{
+      sticky.classList.remove('show');
+      sticky.innerHTML='';
+    }
+  }
+  const fx=document.getElementById('bp-effect-preview');
+  if(fx){
+    if(bpIsEraseMode())fx.innerHTML=bpEffectText('__erase');
+    else if(bpSelected)fx.innerHTML=bpEffectText(bpSelected);
+    else fx.innerHTML='Scegli un modulo nella palette (o tasti <strong>1–9</strong>). Modalità <strong>Gomma</strong> per rimuovere.';
+  }
+}
+function bpMirrorCell(c){return BP_COLS-1-c;}
+function bpMirrorId(id){
+  if(id==='wing_l')return 'wing_r';
+  if(id==='wing_r')return 'wing_l';
+  return id;
 }
 function bpMirrorSymmetry(){
   // Copia metà sinistra → destra (esclusa colonna centrale se dispari)
@@ -2745,14 +2871,21 @@ function bpMirrorSymmetry(){
   for(let r=0;r<BP_ROWS;r++){
     for(let c=0;c<mid;c++){
       const id=bpGrid[r][c];
-      const mirrorC=BP_COLS-1-c;
-      if(id==='wing_l')bpGrid[r][mirrorC]='wing_r';
-      else if(id==='wing_r')bpGrid[r][mirrorC]='wing_l';
-      else bpGrid[r][mirrorC]=id;
+      const mirrorC=bpMirrorCell(c);
+      bpGrid[r][mirrorC]=id?bpMirrorId(id):null;
     }
   }
+  bpWarnCells=new Set();
   buildBpPalette();drawBlueprint();
-  notify('Simmetria applicata sull’asse.',1400);
+  notify(bpSymLive?'Simmetria applicata (live attivo).':'Simmetria applicata sull’asse.',1400);
+}
+function bpToggleSymLive(){
+  bpSymLive=!bpSymLive;
+  syncBpModeUi();
+  drawBlueprint();
+  notify(bpSymLive
+    ?'Simmetria live ON — ghost speculare e copia automatica al piazzamento. Shift+click su SIMMETRIA = applica tutta la nave.'
+    :'Simmetria live OFF.',2200);
 }
 
 function initBlueprintGrid(){
@@ -2929,59 +3062,90 @@ function drawBlueprint(){
     });
   });
 
-  // Ghost preview modulo selezionato sotto il cursore
-  if(bpHoverCell&&bpSelected&&bpSelected!=='__erase'){
+  // Evidenzia celle problema (validazione guidata)
+  if(bpWarnCells&&bpWarnCells.size){
+    bpWarnCells.forEach(k=>{
+      const parts=String(k).split(',');
+      const wr=+parts[0],wc=+parts[1];
+      if(wr<0||wc<0||wr>=BP_ROWS||wc>=BP_COLS)return;
+      const wx=wc*BP_CELL+1, wy=wr*BP_CELL+1;
+      ctx.save();
+      ctx.fillStyle='rgba(255,140,40,.28)';
+      ctx.fillRect(wx+1,wy+1,BP_CELL-2,BP_CELL-2);
+      ctx.strokeStyle='rgba(255,170,60,.95)';
+      ctx.lineWidth=2;
+      ctx.strokeRect(wx+0.5,wy+0.5,BP_CELL-1,BP_CELL-1);
+      ctx.restore();
+    });
+  }
+
+  // Ghost preview modulo selezionato sotto il cursore (+ specchio se simmetria live)
+  function bpDrawGhostAt(id,hr,hc,alpha){
+    const m=BP_MODULES.find(x=>x.id===id);if(!m)return;
+    if(hr<0||hc<0||hr+m.h>BP_ROWS||hc+m.w>BP_COLS)return;
+    const gx=hc*BP_CELL+2, gy=hr*BP_CELL+2;
+    const gw=m.w*BP_CELL-4, gh=m.h*BP_CELL-4;
+    const placeOk=(typeof bpCanPlaceModule==='function')?bpCanPlaceModule(id,hr,hc).ok:true;
+    ctx.save();
+    ctx.globalAlpha=alpha==null?0.45:alpha;
+    ctx.fillStyle=placeOk?(m.color+'99'):'#ff442288';
+    roundRect(ctx,gx,gy,gw,gh,4);ctx.fill();
+    ctx.globalAlpha=Math.min(0.95,(alpha==null?0.9:alpha+0.4));
+    ctx.strokeStyle=placeOk?'#a8e8ff':'#ff8866';
+    ctx.lineWidth=2;
+    ctx.setLineDash([5,4]);
+    roundRect(ctx,gx,gy,gw,gh,4);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#fff';
+    ctx.font=`${Math.round(BP_CELL*.36)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(m.icon,gx+gw/2,gy+gh/2);
+    ctx.restore();
+  }
+  if(bpHoverCell&&bpSelected&&bpSelected!=='__erase'&&!bpIsEraseMode()){
     const m=BP_MODULES.find(x=>x.id===bpSelected);
     const hr=bpHoverCell.r|0, hc=bpHoverCell.c|0;
-    if(m&&hr>=0&&hc>=0&&hr+m.h<=BP_ROWS&&hc+m.w<=BP_COLS){
-      const gx=hc*BP_CELL+2, gy=hr*BP_CELL+2;
-      const gw=m.w*BP_CELL-4, gh=m.h*BP_CELL-4;
-      const placeOk=(typeof bpCanPlaceModule==='function')?bpCanPlaceModule(bpSelected,hr,hc).ok:true;
-      ctx.save();
-      ctx.globalAlpha=0.45;
-      ctx.fillStyle=placeOk?(m.color+'99'):'#ff442288';
-      roundRect(ctx,gx,gy,gw,gh,4);ctx.fill();
-      ctx.globalAlpha=0.9;
-      ctx.strokeStyle=placeOk?'#a8e8ff':'#ff8866';
-      ctx.lineWidth=2;
-      ctx.setLineDash([5,4]);
-      roundRect(ctx,gx,gy,gw,gh,4);ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle='#fff';
-      ctx.font=`${Math.round(BP_CELL*.36)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(m.icon,gx+gw/2,gy+gh/2);
-      ctx.restore();
+    if(m){
+      bpDrawGhostAt(bpSelected,hr,hc,0.45);
+      if(bpSymLive){
+        const mc=BP_COLS-hc-m.w;
+        if(mc!==hc)bpDrawGhostAt(bpMirrorId(bpSelected),hr,mc,0.28);
+      }
     }
   }
 
-  // Feedback cella attiva (mobile/mouse): riquadro = cella che verrà installata/cancellata
+  // Feedback cella attiva (mobile/mouse)
   if(bpHoverCell){
     const hr=bpHoverCell.r|0, hc=bpHoverCell.c|0;
     if(hr>=0&&hr<BP_ROWS&&hc>=0&&hc<BP_COLS){
       const hx=hc*BP_CELL+1, hy=hr*BP_CELL+1;
+      const erasing=bpIsEraseMode();
       ctx.save();
-      ctx.strokeStyle=bpSelected==='__erase'||!bpSelected?'rgba(255,120,80,.95)':'rgba(120,220,255,.95)';
+      ctx.strokeStyle=erasing?'rgba(255,120,80,.95)':'rgba(120,220,255,.95)';
       ctx.lineWidth=2;
       ctx.setLineDash([4,3]);
       ctx.strokeRect(hx+0.5,hy+0.5,BP_CELL-1,BP_CELL-1);
-      ctx.fillStyle=bpSelected==='__erase'||!bpSelected?'rgba(255,80,40,.12)':'rgba(80,180,255,.12)';
+      ctx.fillStyle=erasing?'rgba(255,80,40,.12)':'rgba(80,180,255,.12)';
       ctx.fillRect(hx+1,hy+1,BP_CELL-2,BP_CELL-2);
       ctx.restore();
     }
   }
 
-  if(broken.size){
+  if(broken.size||(bpWarnCells&&bpWarnCells.size)){
     ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(255,90,70,.9)';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText('⚠ Scafo spezzato — celle rosse non connesse (CONFERMA bloccata)',4,4);
+    ctx.fillText(broken.size?'⚠ Scafo spezzato — CONFERMA bloccata':'⚠ Celle problema evidenziate — correggi prima di confermare',4,4);
   }
 
-  // Hover/selected highlight for palette
-  if(bpSelected){
-    ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(77,170,255,.7)';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText(bpSelected==='__erase'?'[CANCELLA] → tocca un pezzo':'['+bpSelected+'] → tocca griglia (tocca pezzo = rimuovi)',4,H-11);
+  // Status IT (niente id grezzi)
+  ctx.font='9px Share Tech Mono';ctx.textAlign='left';ctx.textBaseline='top';
+  if(bpIsEraseMode()){
+    ctx.fillStyle='rgba(255,140,100,.85)';
+    ctx.fillText('Gomma → tocca un pezzo per rimuoverlo',4,H-11);
+  }else if(bpSelected){
+    ctx.fillStyle='rgba(77,170,255,.75)';
+    ctx.fillText(bpModuleLabel(bpSelected)+' → tocca griglia'+(bpSymLive?' · simmetria live':''),4,H-11);
   }else{
-    ctx.font='9px Share Tech Mono';ctx.fillStyle='rgba(255,140,100,.75)';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText('Tocca un pezzo per rimuoverlo · oppure scegli un modulo',4,H-11);
+    ctx.fillStyle='rgba(120,160,190,.75)';
+    ctx.fillText('Scegli un modulo · oppure attiva Gomma',4,H-11);
   }
   ctx.textAlign='left';ctx.textBaseline='alphabetic';
 
@@ -3065,13 +3229,23 @@ function openBlueprintModal(){
   stripBlueprintToUnlocked();
   // Se lo strip ha spezzato qualcosa, ripristina di nuovo
   if(ensureStarterBlueprintOk()){/* già notificati */}
+  bpOpenSnapshot=bpSnapshotState();
+  BP_UNDO.length=0;
+  bpWarnCells=new Set();
+  bpEditMode='place';
+  bpSelected=null;
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
+  syncBpModeUi();
   drawBlueprint();
   setupBpEvents();
   setupBpHullPaintUi();
   const conn=bpValidateConnectivity();
-  if(!conn.ok)notify('Attenzione: '+conn.msg+' Ripristina lo scafo continuo prima di confermare.',3200);
+  if(!conn.ok){
+    bpWarnCells=conn.cells||new Set();
+    notify('Attenzione: '+conn.msg+' Ripristina lo scafo continuo prima di confermare.',3200);
+    drawBlueprint();
+  }
   setTimeout(()=>{
     tryShowTutorialBlueprint();
     // Assicura scroll touch sulla lista moduli (iOS / nested scroll)
@@ -3089,7 +3263,57 @@ function openBlueprintModal(){
     }
     if(modal)modal.scrollTop=0;
     drawBpSilhouette();
+    syncBpModeUi();
   },80);
+}
+function discardBlueprintChanges(){
+  const bm=document.getElementById('blueprint-modal');
+  if(!bm||!bm.classList.contains('show'))return;
+  if(bpOpenSnapshot)bpRestoreState(bpOpenSnapshot);
+  bpOpenSnapshot=null;
+  BP_UNDO.length=0;
+  bpWarnCells=new Set();
+  bpSelected=null;
+  bpEditMode='place';
+  bpHoverCell=null;
+  setPausedReason('blueprint',false);
+  bm.classList.remove('show');
+  if(typeof updateBpHullRepHint==='function')updateBpHullRepHint();
+  notify('Modifiche blueprint annullate.',1600);
+}
+function bpBlueprintModalOpen(){
+  const bm=document.getElementById('blueprint-modal');
+  return !!(bm&&bm.classList.contains('show'));
+}
+/** Scorciatoie cantiere: Esc Z E Q 1–9. Ritorna true se gestito. */
+function handleBlueprintHotkeys(e){
+  if(!bpBlueprintModalOpen())return false;
+  if(e.code==='Escape'){e.preventDefault();discardBlueprintChanges();return true;}
+  if(e.code==='KeyZ'){e.preventDefault();bpUndo();return true;}
+  if(e.code==='KeyE'){e.preventDefault();bpSetEditMode(bpEditMode==='erase'?'place':'erase');return true;}
+  if(e.code==='KeyQ'){
+    e.preventDefault();
+    bpSelected=null;bpEditMode='place';
+    buildBpPalette();drawBlueprint();syncBpModeUi();
+    return true;
+  }
+  const dig=e.code&&e.code.match(/^Digit([1-9])$/);
+  if(dig){
+    e.preventDefault();
+    const idx=(+dig[1])-1;
+    const unlocked=BP_MODULES.filter(m=>bpShopUnlocked(m.unlockShop));
+    const m=unlocked[idx];
+    if(!m){notify('Nessun modulo nello slot '+dig[1]+'.',1200);return true;}
+    if(!BP_FREE.has(m.id)&&bpInvAvail(m.id)<=0){
+      notify('Inventario vuoto per «'+m.label+'».',1800);return true;
+    }
+    bpEditMode='place';
+    bpSelected=m.id;
+    buildBpPalette();drawBlueprint();syncBpModeUi();
+    return true;
+  }
+  if(e.code==='KeyP'){e.preventDefault();return true;}
+  return false;
 }
 
 function bpStructuralCellCount(){
@@ -3140,9 +3364,10 @@ function bpStructureConnected(){
   }
   return seen.size===total;
 }
-/** Ogni pezzo non-strutturale tocca scafo/cabina. */
-function bpAllModulesAttached(){
+/** Ogni pezzo non-strutturale tocca scafo/cabina. Ritorna true oppure Set di celle problema. */
+function bpAllModulesAttached(collectCells){
   const checked=new Set();
+  const bad=new Set();
   for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
     const id=bpGrid[r][c];
     if(!id||bpIsStructure(id))continue;
@@ -3153,16 +3378,58 @@ function bpAllModulesAttached(){
     const key=r0+','+c0+','+id;
     if(checked.has(key))continue;
     checked.add(key);
-    if(!bpBlockTouchesStructure(r0,c0,m.w,m.h))return false;
+    if(!bpBlockTouchesStructure(r0,c0,m.w,m.h)){
+      if(!collectCells)return false;
+      for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
+        if(r0+dr<BP_ROWS&&c0+dc<BP_COLS)bad.add((r0+dr)+','+(c0+dc));
+      }
+    }
   }
+  if(collectCells)return bad;
   return true;
+}
+function bpDisconnectedStructureCells(){
+  const cells=new Set();
+  let start=null,total=0;
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    if(!bpIsStructure(bpGrid[r][c]))continue;
+    total++;
+    if(!start)start=[r,c];
+  }
+  if(!start||total<=1)return cells;
+  const seen=new Set();
+  const q=[start];
+  seen.add(start[0]+','+start[1]);
+  while(q.length){
+    const [r,c]=q.pop();
+    for(const [nr,nc] of bpOrthoNeighbors(r,c)){
+      if(!bpIsStructure(bpGrid[nr][nc]))continue;
+      const k=nr+','+nc;
+      if(seen.has(k))continue;
+      seen.add(k);q.push([nr,nc]);
+    }
+  }
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    if(!bpIsStructure(bpGrid[r][c]))continue;
+    const k=r+','+c;
+    if(!seen.has(k))cells.add(k);
+  }
+  return cells;
 }
 /** Validazione completa del blueprint corrente. */
 function bpValidateConnectivity(){
-  if(bpStructuralCellCount()<1)return{ok:false,msg:'Serve almeno una cella di scafo o cabina.'};
-  if(!bpStructureConnected())return{ok:false,msg:'Lo scafo deve essere continuo: collega le sezioni con celle di scafo.'};
-  if(!bpAllModulesAttached())return{ok:false,msg:'Ogni pezzo deve toccare lo scafo (o la cabina). Niente pezzi fluttuanti.'};
-  return{ok:true};
+  if(bpStructuralCellCount()<1){
+    return{ok:false,msg:'Serve almeno una cella di scafo o cabina.',cells:new Set()};
+  }
+  const disc=bpDisconnectedStructureCells();
+  if(disc.size){
+    return{ok:false,msg:'Lo scafo deve essere continuo: collega le sezioni con celle di scafo.',cells:disc};
+  }
+  const floaters=bpAllModulesAttached(true);
+  if(floaters&&floaters.size){
+    return{ok:false,msg:'Ogni pezzo deve toccare lo scafo (o la cabina). Niente pezzi fluttuanti.',cells:floaters};
+  }
+  return{ok:true,cells:new Set()};
 }
 /** Dopo un piazzamento simulato: il pezzo non-strutturale deve toccare scafo. */
 function bpCanPlaceModule(id,r,c){
@@ -3224,15 +3491,33 @@ function bpCanRemoveModule(id, r0, c0, w, h){
   return true;
 }
 function closeBlueprintModal(){
-  if(bpCountModules('cockpit')<1){notify('Blueprint invalido: serve almeno una Cabina di pilotaggio.');if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');return;}
-  if(bpStructuralCellCount()<4){notify('Blueprint invalido: struttura troppo ridotta (min. 4 celle scafo/cabina).');if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');return;}
-  const conn=bpValidateConnectivity();
-  if(!conn.ok){
-    notify((conn.msg||'Blueprint non connesso.')+' Celle spezzate in rosso.',2800);
+  if(bpCountModules('cockpit')<1){
+    bpWarnCells=new Set();
+    for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpGrid[r][c])bpWarnCells.add(r+','+c);
+    notify('Blueprint invalido: serve almeno una Cabina di pilotaggio. Celle evidenziate.');
     drawBlueprint();
     if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');
     return;
   }
+  if(bpStructuralCellCount()<4){
+    bpWarnCells=new Set();
+    for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++)if(bpIsStructure(bpGrid[r][c]))bpWarnCells.add(r+','+c);
+    notify('Blueprint invalido: struttura troppo ridotta (min. 4 celle scafo/cabina).');
+    drawBlueprint();
+    if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');
+    return;
+  }
+  const conn=bpValidateConnectivity();
+  if(!conn.ok){
+    bpWarnCells=conn.cells||new Set();
+    notify((conn.msg||'Blueprint non connesso.')+' Celle problema evidenziate in arancio.',2800);
+    drawBlueprint();
+    if(typeof GameplayPolish!=='undefined')GameplayPolish.bpHaptic('deny');
+    return;
+  }
+  bpWarnCells=new Set();
+  bpOpenSnapshot=null;
+  BP_UNDO.length=0;
   setPausedReason('blueprint',false);
   document.getElementById('blueprint-modal').classList.remove('show');
   applyModules();
@@ -3243,23 +3528,144 @@ function closeBlueprintModal(){
   notify(`Nave ricostruita · ARM ${s.weapons} · SCU ${s.shieldHp} · STIVA ${s.cargoMax}`+(repAdj?' · Livrea: simpatie aggiornate.':''),repAdj?3000:2400);
 }
 
-function applyBpPreset(kind){
-  if(typeof GameplayPolish==='undefined'||!GameplayPolish.buildBpPreset)return;
-  bpPushUndo();
-  const items=GameplayPolish.buildBpPreset(kind,defaultBlueprint);
+function bpItemsModuleNeeds(items){
+  const need={};
+  items.forEach(({id})=>{
+    if(!id||BP_FREE.has(id))return;
+    need[id]=(need[id]|0)+1;
+  });
+  return need;
+}
+function bpReturnPlacedToInv(){
+  const restored=new Set();
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    const id=bpGrid[r][c];if(!id||BP_FREE.has(id))continue;
+    const m=BP_MODULES.find(x=>x.id===id);if(!m)continue;
+    let rr=r,cc=c;
+    while(cc>0&&bpGrid[rr][cc-1]===id)cc--;
+    while(rr>0&&bpGrid[rr-1][cc]===id)rr--;
+    const key=rr+','+cc+','+id;
+    if(restored.has(key))continue;
+    restored.add(key);
+    bpInvRestore(id,1);
+  }
+}
+function bpMissingForNeeds(need){
+  const missing=[];
+  Object.keys(need).forEach(id=>{
+    const have=bpInvAvail(id);
+    const n=need[id]|0;
+    if(have<n)missing.push({id,label:bpModuleLabel(id),need:n,have,gap:n-have,cost:(BP_MODULES.find(x=>x.id===id)||{}).cost|0});
+  });
+  return missing;
+}
+function bpFormatMissingList(missing){
+  return missing.map(m=>m.label+' ×'+m.gap+(m.cost?(' ('+fmt(m.cost*m.gap)+' ₡)'):'')).join(', ');
+}
+function bpBuyMissingList(missing){
+  let total=0;
+  missing.forEach(m=>{total+=(m.cost|0)*(m.gap|0);});
+  if(PS.credits<total){notify('Crediti insufficienti per i pezzi mancanti ('+fmt(total)+' ₡).',2200);return false;}
+  for(const m of missing){
+    if(!bpShopUnlocked((BP_MODULES.find(x=>x.id===m.id)||{}).unlockShop)){
+      notify('Pezzo bloccato: «'+m.label+'». Sbloccalo in officina.',2400);return false;
+    }
+  }
+  PS.credits-=total;
+  missing.forEach(m=>bpInvRestore(m.id,m.gap));
+  return true;
+}
+function bpStampLayoutItems(items,opts){
+  opts=opts||{};
+  const partial=!!opts.partial;
   bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
+  const skipped=[];
   items.forEach(({r,c,id})=>{
-    if(r<0||c<0||r>=BP_ROWS||c>=BP_COLS)return;
+    if(r<0||c<0||r>=BP_ROWS||c>=BP_COLS||!id)return;
     const m=BP_MODULES.find(x=>x.id===id);
     if(!m){bpGrid[r][c]=id;return;}
+    if(!BP_FREE.has(id)){
+      if(bpInvAvail(id)<=0){
+        if(partial){skipped.push(id);return;}
+        return;
+      }
+      if(!bpBlueprintUnlocked(id)){if(partial){skipped.push(id);return;}return;}
+      bpInvConsume(id,1);
+    }
     for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
       if(r+dr<BP_ROWS&&c+dc<BP_COLS)bpGrid[r+dr][c+dc]=id;
     }
   });
-  stripBlueprintToUnlocked();
-  ensureStarterBlueprintOk();
-  buildBpPalette();drawBlueprint();
-  notify('Preset «'+kind+'» applicato. Controlla inventario/sblocchi.',2000);
+  return skipped;
+}
+function applyBpPreset(kind){
+  if(typeof GameplayPolish==='undefined'||!GameplayPolish.buildBpPreset)return;
+  const items=GameplayPolish.buildBpPreset(kind,defaultBlueprint);
+  // Simula inventario dopo restituzione pezzi piazzati
+  const simInv=Object.assign({},PS.bpInv||{});
+  const restored=new Set();
+  for(let r=0;r<BP_ROWS;r++)for(let c=0;c<BP_COLS;c++){
+    const id=bpGrid[r][c];if(!id||BP_FREE.has(id))continue;
+    const m=BP_MODULES.find(x=>x.id===id);if(!m)continue;
+    let rr=r,cc=c;
+    while(cc>0&&bpGrid[rr][cc-1]===id)cc--;
+    while(rr>0&&bpGrid[rr-1][cc]===id)rr--;
+    const key=rr+','+cc+','+id;
+    if(restored.has(key))continue;
+    restored.add(key);
+    simInv[id]=(simInv[id]|0)+1;
+  }
+  const need=bpItemsModuleNeeds(items);
+  const missing=[];
+  Object.keys(need).forEach(id=>{
+    const have=BP_FREE.has(id)?999:(simInv[id]|0);
+    const n=need[id]|0;
+    if(have<n){
+      const mod=BP_MODULES.find(x=>x.id===id)||{};
+      missing.push({id,label:bpModuleLabel(id),need:n,have,gap:n-have,cost:mod.cost|0});
+    }
+  });
+  const label={cargo:'Stiva',combat:'Combattimento',scout:'Esplorazione'}[kind]||kind;
+  const run=(mode)=>{
+    bpPushUndo();
+    bpReturnPlacedToInv();
+    if(mode==='buy'){
+      if(!bpBuyMissingList(missing)){const snap=BP_UNDO.pop();if(snap)bpRestoreState(snap);buildBpPalette();drawBlueprint();return;}
+    }
+    const skipped=bpStampLayoutItems(items,{partial:mode==='partial'});
+    stripBlueprintToUnlocked();
+    ensureStarterBlueprintOk();
+    bpWarnCells=new Set();
+    buildBpPalette();drawBlueprint();syncBpModeUi();
+    if(mode==='partial'&&(missing.length||skipped.length)){
+      notify('Preset «'+label+'» parziale. Mancano: '+bpFormatMissingList(missing)+'.',2800);
+    }else{
+      notify('Preset «'+label+'» applicato.',2000);
+    }
+  };
+  if(!missing.length){
+    run('full');
+    return;
+  }
+  const buyCost=missing.reduce((s,m)=>s+(m.cost|0)*(m.gap|0),0);
+  const canBuy=PS.credits>=buyCost&&missing.every(m=>bpShopUnlocked((BP_MODULES.find(x=>x.id===m.id)||{}).unlockShop));
+  const body='Per il kit <b>'+label+'</b> mancano:<br><b>'+bpFormatMissingList(missing)+'</b><br><br>'
+    +(canBuy
+      ?('Puoi <b>acquistare i mancanti</b> ('+fmt(buyCost)+' ₡) oppure applicare solo l\'inventario.')
+      :('Crediti/sblocchi insufficienti per comprare tutto ('+fmt(buyCost)+' ₡). Puoi applicare solo i pezzi disponibili.'));
+  if(typeof uiConfirm==='function'){
+    uiConfirm({
+      title:'PRESET · PEZZI MANCANTI',
+      bodyHtml:body,
+      ok:canBuy?'COMPRA E APPLICA':'APPLICA PARZIALE',
+      cancel:canBuy?'SOLO INVENTARIO':'ANNULLA',
+      onOk:()=>run(canBuy?'buy':'partial'),
+      onCancel:()=>{if(canBuy)run('partial');}
+    });
+  }else{
+    notify('Mancano: '+bpFormatMissingList(missing)+'. Applico solo i disponibili.',2600);
+    run('partial');
+  }
 }
 
 let _bpHullPaintDebounce=null;
@@ -3280,6 +3686,7 @@ function setupBpHullPaintUi(){
     b.style.background=`linear-gradient(180deg,${p.hex},#0a0a12)`;
     b.title=p.hex;
     b.addEventListener('click',()=>{
+      if(normalizeHullHex(PS.hullPaintHex)!==normalizeHullHex(p.hex))bpPushUndo();
       PS.hullPaintHex=p.hex;
       inp.value=normalizeHullHex(p.hex);
       updateBpHullRepHint();
@@ -3288,7 +3695,10 @@ function setupBpHullPaintUi(){
     });
     presets.appendChild(b);
   });
+  let _bpPaintUndoArmed=false;
+  inp.onfocus=()=>{_bpPaintUndoArmed=true;};
   inp.oninput=()=>{
+    if(_bpPaintUndoArmed){bpPushUndo();_bpPaintUndoArmed=false;}
     PS.hullPaintHex=normalizeHullHex(inp.value);
     updateBpHullRepHint();
     clearTimeout(_bpHullPaintDebounce);
@@ -3305,7 +3715,7 @@ function buildBpPalette(){
     const cnt=bpInvAvail(m.id);
     const free=BP_FREE.has(m.id);
     const btn=document.createElement('div');btn.className='bp-mod-btn'+(ok?'':' locked');
-    if(bpSelected===m.id)btn.classList.add('selected');
+    if(bpSelected===m.id&&!bpIsEraseMode())btn.classList.add('selected');
     if(!free&&cnt<=0)btn.classList.add('empty');
     const cntTxt=free?'∞':('×'+cnt);
     const cntCol=free?'#66aa88':(cnt>0?'#a8ffcc':'#8a4444');
@@ -3324,7 +3734,7 @@ function buildBpPalette(){
       if(buyEl){
         e.stopPropagation();
         buyBpModule(m.id);
-        buildBpPalette();drawBlueprint();
+        buildBpPalette();drawBlueprint();syncBpModeUi();
         return;
       }
       if(!ok){notify('Sblocco blueprint: «'+(reqName||m.unlockShop)+'» in officina (o modulo superiore sulla stessa linea).');return;}
@@ -3332,24 +3742,26 @@ function buildBpPalette(){
         notify('Inventario vuoto per «'+m.label+'». Premi +'+fmt(m.cost)+' per acquistarne uno.',2200);
         return;
       }
+      bpEditMode='place';
       bpSelected=bpSelected===m.id?null:m.id;
-      buildBpPalette();drawBlueprint();
+      bpWarnCells=new Set();
+      buildBpPalette();drawBlueprint();syncBpModeUi();
     });
     el.appendChild(btn);
   });
-  // Erase button
-  const erase=document.createElement('div');erase.className='bp-mod-btn'+(bpSelected==='__erase'?' selected':'');
-  erase.innerHTML='<span class="bp-mod-icon">X</span><span class="bp-mod-name">Cancella</span><span class="bp-mod-cnt" style="color:#886633">torna in inv.</span>';
-  erase.addEventListener('click',()=>{bpSelected=bpSelected==='__erase'?null:'__erase';buildBpPalette();drawBlueprint();
-    const b=document.getElementById('bp-erase');if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
+  // Scorciatoia gomma in palette
+  const erase=document.createElement('div');erase.className='bp-mod-btn'+(bpIsEraseMode()?' selected':'');
+  erase.innerHTML='<span class="bp-mod-icon">X</span><span class="bp-mod-name">Gomma</span><span class="bp-mod-cnt" style="color:#886633">torna in inv.</span>';
+  erase.addEventListener('click',()=>{
+    bpSetEditMode(bpEditMode==='erase'?'place':'erase');
   });
   el.appendChild(erase);
-  // Barra crediti, così l'utente vede budget senza uscire dal modale.
   const info=document.createElement('div');
   info.className='bp-mod-credits';
   info.style.cssText='grid-column:1/-1;margin-top:2px;font-family:var(--FM);font-size:8px;color:#99b3cc;letter-spacing:.03em';
   info.innerHTML='<span style="color:#ffcc55">'+fmt(PS.credits)+' ₡</span> · «+costo» = acquisto 1u.';
   el.appendChild(info);
+  syncBpModeUi();
 }
 
 let bpEventsSetup=false;
@@ -3359,35 +3771,35 @@ function setupBpEvents(){
   const undoBtn=document.getElementById('bp-undo');
   const symBtn=document.getElementById('bp-sym');
   const clearSel=document.getElementById('bp-clear-sel');
-  const eraseBtn=document.getElementById('bp-erase');
+  const modePlace=document.getElementById('bp-mode-place');
+  const modeErase=document.getElementById('bp-mode-erase');
   if(undoBtn)undoBtn.addEventListener('click',()=>bpUndo());
-  if(symBtn)symBtn.addEventListener('click',()=>bpMirrorSymmetry());
-  if(clearSel)clearSel.addEventListener('click',()=>{bpSelected=null;buildBpPalette();drawBlueprint();syncBpEraseBtn();});
-  if(eraseBtn)eraseBtn.addEventListener('click',()=>{
-    bpSelected=bpSelected==='__erase'?null:'__erase';
-    buildBpPalette();drawBlueprint();syncBpEraseBtn();
+  if(symBtn)symBtn.addEventListener('click',e=>{
+    if(e.shiftKey){bpMirrorSymmetry();return;}
+    bpToggleSymLive();
   });
+  if(clearSel)clearSel.addEventListener('click',()=>{
+    bpSelected=null;bpEditMode='place';buildBpPalette();drawBlueprint();syncBpModeUi();
+  });
+  if(modePlace)modePlace.addEventListener('click',()=>bpSetEditMode('place'));
+  if(modeErase)modeErase.addEventListener('click',()=>bpSetEditMode('erase'));
   const resetBtn=document.getElementById('bp-reset');
   if(resetBtn)resetBtn.addEventListener('click',()=>{
     bpPushUndo();
     initBlueprintGrid();
-    buildBpPalette();drawBlueprint();
+    bpWarnCells=new Set();
+    buildBpPalette();drawBlueprint();syncBpModeUi();
     notify('Layout starter ripristinato.',1600);
   });
   document.querySelectorAll('[data-bp-preset]').forEach(btn=>{
     btn.addEventListener('click',()=>applyBpPreset(btn.getAttribute('data-bp-preset')));
   });
-  function syncBpEraseBtn(){
-    const b=document.getElementById('bp-erase');
-    if(b)b.classList.toggle('erase-on',bpSelected==='__erase');
-  }
-  syncBpEraseBtn();
+  syncBpModeUi();
   function getPointerClient(e){
     if(e&&e.touches&&e.touches[0])return{x:e.touches[0].clientX,y:e.touches[0].clientY};
     if(e&&e.changedTouches&&e.changedTouches[0])return{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
     return{x:(e&&e.clientX)||0,y:(e&&e.clientY)||0};
   }
-  /** Mappa client→cella allineata alle linee griglia (offset +1) e al content-box (senza bordo). */
   function getCellAt(e){
     const rect=cv.getBoundingClientRect();
     const cs=getComputedStyle(cv);
@@ -3401,13 +3813,12 @@ function setupBpEvents(){
     const pt=getPointerClient(e);
     const x=(pt.x-rect.left-bl)*sx;
     const y=(pt.y-rect.top-bt)*sy;
-    // Linee a n*BP_CELL+1 → la cella (r,c) occupa [c*BP_CELL+1, (c+1)*BP_CELL+1)
     let c=Math.max(0,Math.min(BP_COLS-1,Math.floor((x-1)/BP_CELL)));
     let r=Math.max(0,Math.min(BP_ROWS-1,Math.floor((y-1)/BP_CELL)));
     if(typeof GameplayPolish!=='undefined'&&GameplayPolish.snapBpCell){
       const snapped=GameplayPolish.snapBpCell(r,c,x,y,{
         BP_CELL,BP_ROWS,BP_COLS,bpGrid,
-        eraseMode:!bpSelected||bpSelected==='__erase'
+        eraseMode:bpIsEraseMode()
       });
       r=snapped.r;c=snapped.c;
     }
@@ -3423,12 +3834,10 @@ function setupBpEvents(){
       const rr=r0+dr,cc=c0+dc;if(rr>=0&&rr<BP_ROWS&&cc>=0&&cc<BP_COLS)bpGrid[rr][cc]=null;
     }
   }
-  /** Trova l’anchor NW del pezzo che occupa (r,c). Per 1×1 = la cella stessa. */
   function bpModuleOriginAt(r,c){
     const id=bpGrid[r][c];if(!id)return null;
     const m=BP_MODULES.find(x=>x.id===id);if(!m)return {r,c,id,w:1,h:1};
     if(m.w===1&&m.h===1)return {r,c,id,w:1,h:1};
-    // Cerca l’anchor w×h che contiene (r,c)
     for(let rr=Math.max(0,r-m.h+1);rr<=r;rr++){
       for(let cc=Math.max(0,c-m.w+1);cc<=c;cc++){
         let ok=true;
@@ -3440,7 +3849,6 @@ function setupBpEvents(){
     }
     return {r,c,id,w:1,h:1};
   }
-  /** Rimuove il pezzo sotto (r,c). Restituisce true se ha cancellato. */
   function eraseAt(r,c){
     if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return false;
     const id=bpGrid[r][c];if(!id)return false;
@@ -3449,91 +3857,111 @@ function setupBpEvents(){
     bpPushUndo();
     bpClearRect(origin.r,origin.c,origin.w,origin.h);
     bpInvRestore(origin.id,1);
+    bpWarnCells=new Set();
+    // Dopo gomma: riseleziona quel modulo in modalità Piazza per ripiazzarlo in fretta
+    bpSelected=origin.id;
+    bpEditMode='place';
     if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayEraseSfx();
     else if(typeof playTone==='function')playTone(180,.025,.03,'triangle');
-    buildBpPalette();drawBlueprint();
+    buildBpPalette();drawBlueprint();syncBpModeUi();
+    return true;
+  }
+  function placeModuleOnce(id,r,c,opts){
+    opts=opts||{};
+    const silent=!!opts.silent;
+    const m=BP_MODULES.find(x=>x.id===id);if(!m)return false;
+    if(c+m.w>BP_COLS||r+m.h>BP_ROWS)return false;
+    if(!bpBlueprintUnlocked(id)){if(!silent)notify('Pezzo bloccato: installa il modulo richiesto in officina.');return false;}
+    if(bpInvAvail(id)<=0){if(!silent)notify('Inventario vuoto per «'+m.label+'».',2000);return false;}
+    let sameAll=true;
+    for(let dr=0;dr<m.h&&sameAll;dr++)for(let dc=0;dc<m.w;dc++){
+      if(bpGrid[r+dr][c+dc]!==id){sameAll=false;break;}
+    }
+    if(sameAll)return false;
+    const toClear=[];
+    const seen=new Set();
+    for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
+      const c0=bpGrid[r+dr][c+dc];
+      if(c0&&c0!==id){
+        const origin=bpModuleOriginAt(r+dr,c+dc);
+        if(origin){
+          const key=origin.r+','+origin.c+','+origin.id;
+          if(!seen.has(key)){seen.add(key);toClear.push(origin);}
+        }
+      }
+    }
+    for(const t of toClear){
+      if(!bpCanRemoveModule(t.id,t.r,t.c,t.w,t.h))return false;
+    }
+    const placeCheck=bpCanPlaceModule(id,r,c);
+    if(!placeCheck.ok){if(!silent)notify(placeCheck.msg||'Piazzamento non valido.',2200);return false;}
+    for(const t of toClear){
+      bpClearRect(t.r,t.c,t.w,t.h);
+      bpInvRestore(t.id,1);
+    }
+    bpInvConsume(id,1);
+    for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++)bpGrid[r+dr][c+dc]=id;
     return true;
   }
   function placeAt(r,c,opt){
     opt=opt||{};
     if(r<0||r>=BP_ROWS||c<0||c>=BP_COLS)return;
     const occupied=!!bpGrid[r][c];
-    // Cancella: modalità CANCELLA, nessuna selezione, long-press, oppure tap su pezzo già piazzato dello stesso tipo
-    const wantErase=opt.forceErase||bpSelected==='__erase'||bpSelected==null
-      ||(occupied&&bpSelected&&bpGrid[r][c]===bpSelected&&opt.tapEraseSame);
-    if(wantErase){
+    if(opt.forceErase||bpIsEraseMode()){
       if(occupied)eraseAt(r,c);
       return;
     }
-    if(bpSelected){
-      if(!bpBlueprintUnlocked(bpSelected)){notify('Pezzo bloccato: installa il modulo richiesto in officina.');return;}
-      const m=BP_MODULES.find(x=>x.id===bpSelected);
-      if(!m)return;
-      if(c+m.w>BP_COLS||r+m.h>BP_ROWS)return;
-      // No-op se l'intera area è già coperta dallo stesso modulo (evita consumi accidentali durante il drag).
-      let sameAll=true;
+    if(!bpSelected||bpSelected==='__erase')return;
+    const m=BP_MODULES.find(x=>x.id===bpSelected);if(!m)return;
+    // Tap sullo stesso pezzo già piazzato → rimuovi (poi riseleziona)
+    let sameAll=true;
+    if(occupied&&c+m.w<=BP_COLS&&r+m.h<=BP_ROWS){
       for(let dr=0;dr<m.h&&sameAll;dr++)for(let dc=0;dc<m.w;dc++){
         if(bpGrid[r+dr][c+dc]!==bpSelected){sameAll=false;break;}
       }
-      if(sameAll){
-        // Secondo tap sullo stesso pezzo → rimuovi
-        eraseAt(r,c);
-        return;
+      if(sameAll){eraseAt(r,c);return;}
+    }else sameAll=false;
+    bpPushUndo();
+    const okMain=placeModuleOnce(bpSelected,r,c);
+    let okMirror=true;
+    if(okMain&&bpSymLive){
+      const mc=BP_COLS-c-m.w;
+      if(mc!==c&&mc>=0){
+        const mid=bpMirrorId(bpSelected);
+        okMirror=placeModuleOnce(mid,r,mc,{silent:true});
       }
-      if(bpInvAvail(bpSelected)<=0){
-        notify('Inventario vuoto per «'+m.label+'»: acquistane uno nella palette.',2000);
-        return;
-      }
-      const toClear=[];
-      const seen=new Set();
-      for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++){
-        const c0=bpGrid[r+dr][c+dc];
-        if(c0&&c0!==bpSelected){
-          const origin=bpModuleOriginAt(r+dr,c+dc);
-          if(origin){
-            const key=origin.r+','+origin.c+','+origin.id;
-            if(!seen.has(key)){seen.add(key);toClear.push(origin);}
-          }
-        }
-      }
-      for(const t of toClear){
-        if(!bpCanRemoveModule(t.id,t.r,t.c,t.w,t.h))return;
-      }
-      const placeCheck=bpCanPlaceModule(bpSelected,r,c);
-      if(!placeCheck.ok){notify(placeCheck.msg||'Piazzamento non valido.',2200);return;}
-      bpPushUndo();
-      for(const t of toClear){
-        bpClearRect(t.r,t.c,t.w,t.h);
-        bpInvRestore(t.id,1);
-      }
-      bpInvConsume(bpSelected,1);
-      for(let dr=0;dr<m.h;dr++)for(let dc=0;dc<m.w;dc++)bpGrid[r+dr][c+dc]=bpSelected;
-      const conn=bpValidateConnectivity();
-      if(!conn.ok){
-        const snap=BP_UNDO.pop();
-        if(snap){bpGrid=snap.grid.map(row=>row.slice());PS.bpInv=Object.assign({},snap.inv);}
-        notify(conn.msg||'Piazzamento spezzerebbe la nave.',2400);
-        buildBpPalette();drawBlueprint();return;
-      }
-      const cat=bpSelected.startsWith('engine')||bpSelected==='boost_eng'?'eng'
-        :bpSelected.startsWith('weapon')||bpSelected==='missile'?'wep'
-        :bpSelected==='shield'?'shd'
-        :bpSelected==='cargo'?'crg':'hull';
-      const freq={eng:360,wep:560,shd:440,crg:300,hull:220}[cat];
-      if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayPlaceSfx();
-      else if(typeof playTone==='function')playTone(freq,.02,.025,'square');
-      if(bpInvAvail(bpSelected)<=0)bpSelected=null;
-      buildBpPalette();
-      syncBpEraseBtn();
     }
+    if(!okMain){
+      const snap=BP_UNDO.pop();
+      if(snap)bpRestoreState(snap);
+      return;
+    }
+    const conn=bpValidateConnectivity();
+    if(!conn.ok){
+      const snap=BP_UNDO.pop();
+      if(snap)bpRestoreState(snap);
+      bpWarnCells=conn.cells||new Set();
+      notify(conn.msg||'Piazzamento spezzerebbe la nave.',2400);
+      buildBpPalette();drawBlueprint();syncBpModeUi();return;
+    }
+    bpWarnCells=new Set();
+    const cat=bpSelected.startsWith('engine')||bpSelected==='boost_eng'?'eng'
+      :bpSelected.startsWith('weapon')||bpSelected==='missile'?'wep'
+      :bpSelected==='shield'?'shd'
+      :bpSelected==='cargo'?'crg':'hull';
+    const freq={eng:360,wep:560,shd:440,crg:300,hull:220}[cat];
+    if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayPlaceSfx();
+    else if(typeof playTone==='function')playTone(freq,.02,.025,'square');
+    if(bpInvAvail(bpSelected)<=0)bpSelected=null;
+    buildBpPalette();
+    syncBpModeUi();
     drawBlueprint();
   }
-  // Long-press su cella occupata → cancella (anche con un modulo selezionato)
   let _bpLongTmr=0,_bpLongCell=null,_bpLongFired=false,_bpPendingPlace=null;
   let _bpTouchScroll=null;
   function bpSyncEditTouch(){
-    // Con pezzo selezionato: cattura tocco. Senza: lascia scrollare la finestra sulla griglia.
-    cv.classList.toggle('bp-editing',!!bpSelected);
+    // Piazza con selezione O Gomma: cattura tocco. Altrimenti scroll.
+    cv.classList.toggle('bp-editing',bpIsEraseMode()||!!bpSelected);
   }
   function clearBpLong(){if(_bpLongTmr){clearTimeout(_bpLongTmr);_bpLongTmr=0;}_bpLongCell=null;}
   function armBpLong(r,c){
@@ -3549,24 +3977,22 @@ function setupBpEvents(){
     setBpHover(r,c);
     const occupied=!!(bpGrid[r]&&bpGrid[r][c]);
     _bpPendingPlace=null;_bpLongFired=false;
-    // Senza selezione: non editare — permette di scrollare la finestra trascinando sulla griglia
-    if(!bpSelected){
-      bpDragFrom=null;
-      return;
-    }
-    if(bpSelected==='__erase'){
+    if(bpIsEraseMode()){
       if(occupied)eraseAt(r,c);
       bpDragFrom={r,c,eraseDrag:true};
       return;
     }
-    // Modulo selezionato + cella occupata: long-press cancella, tap breve sovrascrive/piazza
+    // Senza selezione in Piazza: non editare — permette scroll
+    if(!bpSelected){
+      bpDragFrom=null;
+      return;
+    }
     if(occupied){
       armBpLong(r,c);
       _bpPendingPlace={r,c};
       bpDragFrom={r,c};
       return;
     }
-    // Cella vuota: piazza subito
     placeAt(r,c);
     bpDragFrom={r,c};
   }
@@ -3583,7 +4009,7 @@ function setupBpEvents(){
     }
     if(_bpLongFired)return;
     if(r!==bpDragFrom.r||c!==bpDragFrom.c){
-      if(bpDragFrom.eraseDrag||!bpSelected||bpSelected==='__erase'){
+      if(bpDragFrom.eraseDrag||bpIsEraseMode()){
         if(bpGrid[r]&&bpGrid[r][c])eraseAt(r,c);
       }else{
         placeAt(r,c);
@@ -3609,9 +4035,10 @@ function setupBpEvents(){
   cv.addEventListener('mouseleave',()=>{bpHoverCell=null;pointerUp();drawBlueprint();});
   cv.addEventListener('touchstart',e=>{
     const t=e.touches[0]||e;
-    _bpTouchScroll={editing:!!bpSelected};
+    const editing=bpIsEraseMode()||!!bpSelected;
+    _bpTouchScroll={editing};
     bpSyncEditTouch();
-    if(bpSelected){
+    if(editing){
       e.preventDefault();
       pointerDown(t);
     }else{
@@ -3645,7 +4072,8 @@ function setupBpEvents(){
     eraseAt(r,c);
   });
   document.getElementById('bp-module-list')?.addEventListener('click',bpSyncEditTouch);
-  document.getElementById('bp-erase')?.addEventListener('click',bpSyncEditTouch);
+  document.getElementById('bp-mode-place')?.addEventListener('click',bpSyncEditTouch);
+  document.getElementById('bp-mode-erase')?.addEventListener('click',bpSyncEditTouch);
   document.getElementById('bp-clear-sel')?.addEventListener('click',bpSyncEditTouch);
   bpSyncEditTouch();
 }
@@ -4851,10 +5279,10 @@ function tryShowTutorialSuborbit(){
 }
 function tryShowTutorialBlueprint(){
   return showTutorialOnce('valsaelite_tut_blueprint','Cantiere · touch',
-    '<p><strong>Tocca un pezzo</strong> per rimuoverlo (senza selezione). Con un modulo scelto: <strong>tap</strong> piazza, <strong>long-press</strong> cancella.</p>'
-    +'<p>Il <strong>riquadro</strong> e il <strong>ghost</strong> mostrano la cella/ingombro reali. Ai bordi: snap automatico.</p>'
-    +'<p><strong>KIT CARGO / COMBAT / SCOUT</strong> e <strong>STARTER</strong> nella toolbar. Celle rosse = scafo spezzato (CONFERMA bloccata).</p>'
-    +'<p style="opacity:.85;margin-top:8px;font-size:11px">ANNULLA · CANCELLA · SIMMETRIA · vernice fusoliera. La silhouette laterale si aggiorna mentre editi.</p>');
+    '<p><strong>Piazza</strong> / <strong>Gomma</strong>: due modalità chiare. In Gomma tocca un pezzo per rimuoverlo (poi viene riselezionato per ripiazzarlo).</p>'
+    +'<p>Ghost + riquadro = anteprima. <strong>Simmetria</strong> = live (Shift+click = applica tutta). Kit onesti: se mancano pezzi, scegli compra o inventario.</p>'
+    +'<p><strong>Esc</strong> / Annulla modifiche = esci senza salvare. <strong>Z</strong> undo · <strong>E</strong> gomma · <strong>1–9</strong> palette · <strong>Q</strong> deseleziona.</p>'
+    +'<p style="opacity:.85;margin-top:8px;font-size:11px">Celle arancio = problemi di validazione. CONFERMA applica la nave.</p>');
 }
 function tryShowTutorialFlight(){
   return showTutorialOnce('valsaelite_tut_flight','Primo volo',
@@ -4974,9 +5402,10 @@ function uiConfirm(opts){
     return;
   }
   tit.textContent=opts.title||'CONFERMA';
-  body.textContent=opts.body||'';
-  ok.textContent=opts.ok||'CONFERMA';
-  cancel.textContent=opts.cancel||'ANNULLA';
+  if(opts.bodyHtml){body.innerHTML=opts.bodyHtml;}
+  else{body.textContent=opts.body||'';}
+  ok.textContent=opts.ok||opts.okLabel||'CONFERMA';
+  cancel.textContent=opts.cancel||opts.cancelLabel||'ANNULLA';
   ok.classList.toggle('danger',!!opts.danger);
   UIC._onOk=typeof opts.onOk==='function'?opts.onOk:null;
   UIC._onCancel=typeof opts.onCancel==='function'?opts.onCancel:null;
@@ -5004,6 +5433,7 @@ function uiConfirmClose(accepted){
     setPausedReason('dialogue',false);
     if(typeof storyBannerOpen==='function'&&storyBannerOpen())setPausedReason('story',true);
     else if(GAME&&GAME.state==='docked')setPausedReason('docked',true);
+    if(typeof bpBlueprintModalOpen==='function'&&bpBlueprintModalOpen())setPausedReason('blueprint',true);
   }
   if(accepted){if(okCb)try{okCb();}catch(_){}}
   else{if(cancelCb)try{cancelCb();}catch(_){}}
@@ -6062,6 +6492,9 @@ window.addEventListener('keydown',e=>{
     if(help&&help.classList.contains('show')){e.preventDefault();closeHelpModal();return;}
     const deb=document.getElementById('suborbit-debrief');
     if(deb&&deb.style.display==='flex'){e.preventDefault();hideSuborbitDebrief();return;}
+    if(typeof bpBlueprintModalOpen==='function'&&bpBlueprintModalOpen()){
+      e.preventDefault();discardBlueprintChanges();return;
+    }
   }
   if(BOARDING.active&&GAME.state==='boarding'){
     // Il boarding riusa left/right/thrust/boost/fire per muoversi + sparare.
@@ -6091,6 +6524,9 @@ window.addEventListener('keydown',e=>{
     e.preventDefault();
     if(typeof closeRootDialogue==='function')closeRootDialogue();
     return;
+  }
+  if(typeof bpBlueprintModalOpen==='function'&&bpBlueprintModalOpen()){
+    if(typeof handleBlueprintHotkeys==='function'&&handleBlueprintHotkeys(e))return;
   }
   if(e.code==='KeyJ'){
     e.preventDefault();
@@ -6205,15 +6641,9 @@ function closeOverlappingModals(except){
   if(except!=='blueprint'){
     const bm=document.getElementById('blueprint-modal');
     if(bm&&bm.classList.contains('show')){
-      // Chiudi senza applicare se forzato da altro modal; se invalido, forza hide
       try{
-        if(bpCountModules('cockpit')>=1&&bpStructuralCellCount()>=4){
-          setPausedReason('blueprint',false);
-          bm.classList.remove('show');
-        }else{
-          setPausedReason('blueprint',false);
-          bm.classList.remove('show');
-        }
+        if(typeof discardBlueprintChanges==='function')discardBlueprintChanges();
+        else{bm.classList.remove('show');setPausedReason('blueprint',false);}
       }catch(_){bm.classList.remove('show');setPausedReason('blueprint',false);}
     }
   }
@@ -11742,26 +12172,57 @@ function repairBrokenBlueprint(){
     PS.credits-=cost;PS.bpScanPending=Math.max(0,(PS.bpScanPending|0)-1);
     notify('Scanner eseguito: nessun pezzo critico.',1800);buildDock(GAME.dockedSt);return;
   }
-  const broken=GameplayPolish.bpBrokenCells(bpGrid,BP_ROWS,BP_COLS,typeof bpIsStructure==='function'?bpIsStructure:(id=>id==='hull'||id==='fin'||id==='wing_l'||id==='wing_r'));
-  PS.credits-=cost;
-  PS.bpScanPending=Math.max(0,(PS.bpScanPending|0)-1);
+  const broken=GameplayPolish.bpBrokenCells(bpGrid,BP_ROWS,BP_COLS,typeof bpIsStructure==='function'?bpIsStructure:(id=>id==='hull'||id==='cockpit'));
+  const changes=[];
+  broken.forEach(k=>{
+    const parts=String(k).split(',');
+    const r=+parts[0],c=+parts[1];
+    const id=bpGrid[r]&&bpGrid[r][c];
+    changes.push({r,c,from:id||'—',to:'hull',label:bpModuleLabel(id||'hull')});
+  });
+  const doRepairBp=()=>{
+    PS.credits-=cost;
+    PS.bpScanPending=Math.max(0,(PS.bpScanPending|0)-1);
+    if(!broken.size){
+      if(typeof bpInvRestore==='function')bpInvRestore('hull',1);
+      notify('Blueprint integro. Pezzo di ricambio recuperato dallo scanner.',2200);
+    }else{
+      broken.forEach(k=>{
+        const parts=String(k).split(',');
+        const r=+parts[0],c=+parts[1];
+        const id=bpGrid[r]&&bpGrid[r][c];
+        if(id&&typeof bpInvRestore==='function')bpInvRestore(id,1);
+        if(bpGrid[r])bpGrid[r][c]='hull';
+      });
+      if(typeof applyModules==='function')applyModules();
+      if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh();
+      notify('Blueprint riparato: '+broken.size+' celle isolate → scafo.',2400);
+    }
+    buildDock(GAME.dockedSt);
+  };
   if(!broken.size){
-    // Nessuna cella rotta: ricompensa pezzo minore
-    if(typeof bpInvRestore==='function')bpInvRestore('hull',1);
-    notify('Blueprint integro. Pezzo di ricambio recuperato dallo scanner.',2200);
-  }else{
-    broken.forEach(k=>{
-      const parts=k.split(',');
-      const r=+parts[0],c=+parts[1];
-      const id=bpGrid[r]&&bpGrid[r][c];
-      if(id&&typeof bpInvRestore==='function')bpInvRestore(id,1);
-      if(bpGrid[r])bpGrid[r][c]='hull';
-    });
-    if(typeof applyModules==='function')applyModules();
-    if(typeof rebuildPlayerMesh==='function')rebuildPlayerMesh();
-    notify('Blueprint riparato: '+broken.size+' celle isolate riconvertite in scafo.',2400);
+    if(typeof uiConfirm==='function'){
+      uiConfirm({
+        title:'SCANNER BLUEPRINT',
+        body:'Nessuna cella critica. Costo '+fmt(cost)+' ₡ — ottieni un pezzo di ricambio scafo.',
+        ok:'ESEGUI',
+        cancel:'ANNULLA',
+        onOk:doRepairBp
+      });
+    }else doRepairBp();
+    return;
   }
-  buildDock(GAME.dockedSt);
+  const preview=changes.slice(0,8).map(ch=>'(r'+(ch.r+1)+',c'+(ch.c+1)+') '+ch.label+' → Scafo').join('\n');
+  const extra=changes.length>8?'\n… +'+(changes.length-8)+' altre':'';
+  if(typeof uiConfirm==='function'){
+    uiConfirm({
+      title:'RIPARA BLUEPRINT',
+      body:'Costo '+fmt(cost)+' ₡. Celle riconvertite in scafo (pezzi tornano in inventario):\n'+preview+extra,
+      ok:'RIPARA',
+      cancel:'ANNULLA',
+      onOk:doRepairBp
+    });
+  }else doRepairBp();
 }
 function doRepair(c,m){
   if(m===0){notify('Scafo già al massimo.',1400);return;}
