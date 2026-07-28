@@ -128,6 +128,12 @@
     // Ritratti dedicati equipaggio (CREW_POOL.portrait)
     const pool = global.CREW_POOL || [];
     pool.forEach((c) => { if (c && c.portrait) push(c.portrait); });
+    // Ritratti dedicati incontri RADICI
+    const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
+    Object.keys(roots).forEach((st) => {
+      (roots[st] || []).forEach((enc) => { if (enc && enc.portrait) push(enc.portrait); });
+    });
+    ((L.rootPortraits) || []).forEach(push);
     return urls;
   }
 
@@ -150,10 +156,13 @@
     get(path) { return path ? partCache[path] || null : null; },
     get ready() { return partsState.ready && partsState.ok > 0; },
     reloadCrew() {
-      // Permette di ricaricare se CREW_POOL arriva dopo
+      // Permette di ricaricare se CREW_POOL / Radici arrivano dopo
       const urls = [];
-      (global.CREW_POOL || []).forEach((c) => {
-        if (c && c.portrait && !partCache[c.portrait]) urls.push(c.portrait);
+      const push = (u) => { if (u && !partCache[u] && urls.indexOf(u) < 0) urls.push(u); };
+      (global.CREW_POOL || []).forEach((c) => { if (c && c.portrait) push(c.portrait); });
+      const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
+      Object.keys(roots).forEach((st) => {
+        (roots[st] || []).forEach((enc) => { if (enc && enc.portrait) push(enc.portrait); });
       });
       if (!urls.length) return Promise.resolve(true);
       return Promise.all(urls.map((u) =>
@@ -314,7 +323,12 @@
     }
     let im = PortraitParts.get(path);
     if (!im && path) {
-      // lazy load missing crew portrait
+      // lazy load missing dedicated portrait (crew / radici)
+      loadImage(absUrl(path)).then((loaded) => {
+        partCache[path] = loaded;
+        partsState.ok++;
+        redrawAllVisiblePortraits();
+      }).catch(() => {});
       PortraitParts.reloadCrew();
     }
     if (!im && !isPlayer && !resolveCrewPortraitPath(drawOpt)) im = atlasTile(seed, drawOpt);

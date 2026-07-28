@@ -16,6 +16,7 @@
         npcSeed: 4417,
         faction: 'bazzano',
         gender: 'f',
+        portrait: 'sprites/faces/roots/palmira.png',
         blurb: 'Palmira dell\'asilo dalle suore. Ti chiama ancora Zvanino, distintivo o no.',
         start: 'n1',
         nodes: {
@@ -78,6 +79,7 @@
         npcSeed: 4412,
         faction: 'bazzano',
         gender: 'f',
+        portrait: 'sprites/faces/roots/ornella.png',
         blurb: 'Ti ha visto partire. Non ti ha mai scritto: «prima scendi a terra», diceva.',
         start: 'z1',
         nodes: {
@@ -119,6 +121,7 @@
         npcSeed: 4419,
         faction: 'bazzano',
         gender: 'f',
+        portrait: 'sprites/faces/roots/palmira.png',
         blurb: 'Ti annusa come al cortile. Dice che hai portato il fetore dello hulk in porto.',
         start: 'h1',
         nodes: {
@@ -200,6 +203,8 @@
         npcTitle: 'CUGINA · CRESPELLANO',
         npcSeed: 5502,
         faction: 'crespellano',
+        gender: 'f',
+        portrait: 'sprites/faces/roots/lia.png',
         blurb: 'Stesso cognome. Stessa coda alle pratiche. Lei non è mai partita.',
         start: 'c1',
         nodes: {
@@ -242,6 +247,8 @@
         npcTitle: 'EX COMPAGNO · CALCARA',
         npcSeed: 6603,
         faction: 'calcara',
+        gender: 'm',
+        portrait: 'sprites/faces/roots/dario.png',
         blurb: 'Da ragazzi rubavate bollette per ridere. Ora lui stampa verità.',
         start: 'k1',
         nodes: {
@@ -285,6 +292,7 @@
         npcSeed: 7704,
         faction: 'monteveglio',
         gender: 'f',
+        portrait: 'sprites/faces/roots/serafina.png',
         blurb: 'Insieme giocavate a essere cavalieri. Lei ha continuato. Tu sei andato al marmo.',
         start: 'm1',
         nodes: {
@@ -327,6 +335,8 @@
         npcTitle: 'FAMIGLIA · SAVIGNO',
         npcSeed: 8805,
         faction: 'savigno',
+        gender: 'm',
+        portrait: 'sprites/faces/roots/remo.png',
         blurb: 'Parla poco. Giudica dall\'aroma.',
         start: 'v1',
         nodes: {
@@ -370,6 +380,7 @@
         npcSeed: 9906,
         faction: 'castelletto',
         gender: 'f',
+        portrait: 'sprites/faces/roots/vera.png',
         blurb: 'Anche lei è partita — ma non per Imperium. Per non scegliere fazione.',
         start: 'e1',
         nodes: {
@@ -514,7 +525,8 @@
         global.PortraitRenderer.drawCanvas(npcCv, enc.npcSeed || 1, enc.faction || 'bazzano', {
           name: enc.npcName,
           gender: enc.gender === 'f' ? 'f' : (enc.gender === 'm' ? 'm' : undefined),
-          kind: enc.faction === 'pirate' ? 'pirate' : undefined
+          kind: enc.faction === 'pirate' ? 'pirate' : undefined,
+          portraitPath: enc.portrait || null
         });
       }
     }

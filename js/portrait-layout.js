@@ -29,6 +29,16 @@ window.PORTRAIT_LAYOUT = {
     accY: 0
   },
   hairTints: ['#e8e6e2'],
+  /** Percorsi busti dedicati RADICI (preload anche se RootDialogues arriva dopo) */
+  rootPortraits: [
+    'sprites/faces/roots/palmira.png',
+    'sprites/faces/roots/ornella.png',
+    'sprites/faces/roots/lia.png',
+    'sprites/faces/roots/dario.png',
+    'sprites/faces/roots/serafina.png',
+    'sprites/faces/roots/remo.png',
+    'sprites/faces/roots/vera.png'
+  ],
   player: {
     head: 'sprites/faces/player/zvan_complete.png',
     name: 'Zvan Marìa',
