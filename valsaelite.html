@@ -1522,108 +1522,111 @@ function updateBpHullRepHint(){
 // ─────────────────────────────────────────────────
 // STATION / SATELLITE DATA
 // ─────────────────────────────────────────────────
-// STATION / SATELLITE DATA  — flat ecliptic plane orbitR world units | SUN_R=1560 | ARENA=39000
+// STATION / SATELLITE DATA  — piano eclittico | unità mondo | SUN_R / ARENA sotto
+// Satelliti: satR = distanza dal pianeta genitore (ben oltre pR+dR).
+// Hulk: spawn in fasce inter-orbita, lontano da pianeti e sole.
 
 const SUN_R=2200;
 const GRAV=10;
-const ARENA=62000;
-const ORBIT_SCALE=1.28;
-const SAT_ORBIT_SCALE=1.2;
-const BELT_R=28600;
+const ARENA=72000;
+const ORBIT_SCALE=1.32;
+/** Moltiplicatore satelliti: i satR sotto sono già in unità mondo “finali” (≈ distanza dal pianeta). */
+const SAT_ORBIT_SCALE=1.0;
+const BELT_R=34000;
 const SDATA = [
   // ── BAZZANO cluster ─────────────────────────────
   {id:'bazzano',    name:'Bazzano Prime',       faction:'bazzano',
-   orbitR:7200,  orbitSpeed:0.12, sat:false,
+   orbitR:8500,  orbitSpeed:0.12, sat:false,
    pType:'earth',    pR:720, dR:1100, rings:'saturn',
    desc:'"Tavo\'! Csa fet?" — il saluto ufficiale. Capitale indiscussa. Ogni contratto passa da qui. Taproblem se sei bazzanese.',
    svcs:['repair','trade','recruit','missions','tavern']},
   {id:'sirena',     name:'Stazione Sirena',     faction:'bazzano',
-   sat:true, parentId:'bazzano', satR:1620, satSpeed:0.8,
+   sat:true, parentId:'bazzano', satR:4000, satSpeed:0.72,
    pType:'station',  pR:165, dR:380,
    desc:'Porto orbitale di Bazzano. Rifornimento, vino di qualità, nessuna domanda.',
    svcs:['repair','trade']},
   {id:'lavino',     name:'Porto Lavino',        faction:'bazzano',
-   sat:true, parentId:'bazzano', satR:2580, satSpeed:0.45,
+   sat:true, parentId:'bazzano', satR:5800, satSpeed:0.42,
    pType:'dock',     pR:120, dR:280,
    desc:'"Porto Lavino di Mezzo" — crocevia silenzioso tra Bazzano e il resto del sistema.',
    svcs:['trade','missions']},
   {id:'zola',       name:'Zola Predosa Hub',    faction:'bazzano',
-   sat:true, parentId:'bazzano', satR:3600, satSpeed:0.28,
+   sat:true, parentId:'bazzano', satR:7600, satSpeed:0.26,
    pType:'station',  pR:95, dR:220,
    desc:'"Zola Predosa" — base logistica. Famosa per l\'Amaretto spaziale e per avere la burocrazia leggermente meno assurda di Calcara.',
    svcs:['repair','trade','missions']},
 
   // ── CRESPELLANO cluster ──────────────────────────
   {id:'crespellano',name:'Crespellano',         faction:'crespellano',
-   orbitR:13500, orbitSpeed:0.065, sat:false,
+   orbitR:16500, orbitSpeed:0.065, sat:false,
    pType:'barren',   pR:630, dR:970, rings:'dust',
    desc:'"A Crespellano non c\'e\' niente." Le medie costruite alla rovescia nel 2031 sono diventate attrazione turistica.',
    svcs:['repair','trade','missions','recruit','tavern']},
   {id:'calcara',    name:'Calcara Station',     faction:'calcara',
-   sat:true, parentId:'crespellano', satR:1800, satSpeed:0.65,
+   sat:true, parentId:'crespellano', satR:4200, satSpeed:0.58,
    pType:'industrial',pR:360, dR:650,
    desc:'Orbita attorno a Crespellano. Tutti i soldi orbitano attorno a Calcara. Legge di gravitazione selettiva.',
    svcs:['repair','trade','missions']},
   {id:'pragatto',   name:'Pragatto Depot',      faction:'crespellano',
-   sat:true, parentId:'crespellano', satR:2880, satSpeed:0.32,
+   sat:true, parentId:'crespellano', satR:6200, satSpeed:0.30,
    pType:'rock',     pR:210, dR:460,
    desc:'"Pragatto Depot" — parcheggio orbitale. Lista d\'attesa per l\'autorizzazione d\'atterraggio dal 2024.',
    svcs:['repair','trade']},
   {id:'manzolino',  name:'Manzolino Outpost',   faction:'crespellano',
-   sat:true, parentId:'crespellano', satR:4200, satSpeed:0.18,
+   sat:true, parentId:'crespellano', satR:8200, satSpeed:0.16,
    pType:'rock',     pR:140, dR:320,
    desc:'"Manzolino" — avamposto lontano. Qui si rifugiano i crespellanesi che non aspettano più il semaforo.',
    svcs:['missions','tavern','trade']},
 
   // ── MONTEVEGLIO cluster ──────────────────────────
   {id:'monteveglio',name:'Rocca di Monteveglio',faction:'monteveglio',
-   orbitR:21000, orbitSpeed:0.038, sat:false,
+   orbitR:25500, orbitSpeed:0.038, sat:false,
    pType:'fortress', pR:825, dR:1240,
    desc:'Il grande LARP è diventato governo nel 2041. Armature obbligatorie. Missili = frecce. Il Castellano regna.',
    svcs:['repair','trade','missions','recruit','tavern']},
   {id:'oliveto',    name:'Oliveto Alta',        faction:'monteveglio',
-   sat:true, parentId:'monteveglio', satR:1860, satSpeed:0.72,
+   sat:true, parentId:'monteveglio', satR:3800, satSpeed:0.64,
    pType:'green',    pR:240, dR:520,
    desc:'Monastero-stazione dell\'Ordine. Biblioteca dell\'Armatura Spaziale. Razioni di viaggio medievali eccellenti.',
    svcs:['trade','missions','tavern']},
   {id:'montebudello',name:'Forte Montebudello', faction:'monteveglio',
-   sat:true, parentId:'monteveglio', satR:3060, satSpeed:0.38,
+   sat:true, parentId:'monteveglio', satR:5200, satSpeed:0.34,
    pType:'fortress', pR:285, dR:600,
    desc:'Presidio militare. Addestramento cavalieri. Forgiatura armature. Teba entrarci disarmati.',
    svcs:['repair','recruit','missions','trade']},
   {id:'montecalvo', name:'Ziribega',            faction:'monteveglio',
-   sat:true, parentId:'monteveglio', satR:4500, satSpeed:0.22,
+   sat:true, parentId:'monteveglio', satR:6400, satSpeed:0.20,
    pType:'rock',     pR:180, dR:400,
    desc:'"Ziribega" — avamposto di confine nel Valsamoggio. LARP così estremo che le pergamene passano per contratti (firma col sigillo di ceralacca).',
    svcs:['trade','missions']},
 
   // ── SAVIGNO cluster ──────────────────────────────
   {id:'savigno',    name:'Savigno Deep',        faction:'savigno',
-   orbitR:31500, orbitSpeed:0.018, sat:false,
+   orbitR:39000, orbitSpeed:0.018, sat:false,
    pType:'ice',      pR:705, dR:1070, rings:'ice',
    desc:'Lontanissimi da tutti per scelta. Tartufi spaziali 420 Cr/kg. Non negoziabile. Non esiste saldo.',
    svcs:['repair','trade','missions','recruit','tavern']},
   {id:'zappolino',  name:'Fortezza Zappolino',  faction:'savigno',
-   sat:true, parentId:'savigno', satR:2250, satSpeed:0.48,
+   sat:true, parentId:'savigno', satR:4200, satSpeed:0.44,
    pType:'fortress', pR:264, dR:570,
    desc:'Difesa perimetrale di Savigno. La battaglia simulata annuale è diventata abbastanza reale.',
    svcs:['missions','recruit']},
   {id:'san_chierlo', name:'San Chierlo Station',faction:'savigno',
-   sat:true, parentId:'savigno', satR:3600, satSpeed:0.28,
+   sat:true, parentId:'savigno', satR:7200, satSpeed:0.24,
    pType:'ice',      pR:180, dR:400,
    desc:'"San Chierlo" — stazione di ricerca tartufi in orbita esterna. Attrezzatura avanzata. Risultati: tartufi.',
    svcs:['trade','missions']},
 
   // ── CASTELLETTO neutrale ─────────────────────────
   {id:'castelletto',name:'Castelletto Rock',    faction:null,
-   orbitR:25500, orbitSpeed:0.025, sat:false,
+   orbitR:32000, orbitSpeed:0.025, sat:false,
    pType:'asteroid', pR:285, dR:570,
    desc:'"CASTELLETTO — ABBIAMO BENZINA." Neutrale per mancanza di interesse altrui. Unico posto dove non chiedono da dove vieni.',
    svcs:['repair','trade','missions','tavern']},
 
   // ── SAVIGNO-ADJACENT outer bodies ────────────────
   {id:'serravalle', name:'Serravalle Frontier',  faction:'savigno',
-   orbitR:36000, orbitSpeed:0.012, sat:false,
+   orbitR:48000, orbitSpeed:0.012, sat:false,
    pType:'rock',     pR:350, dR:680,
    desc:'"Serravalle" — confine del sistema. Base di rifornimento per chi vuole uscire. O per chi non vuole rientrare.',
    svcs:['repair','trade']},
@@ -10930,37 +10933,65 @@ function buildHulkGroup(seed,archetypeKey){
 }
 
 function spawnHulks(){
-  const positions=[
-    {x:-9200, z:14800,  arch:'cargo'},
-    {x:16500, z:-6400,  arch:'military'},
-    {x:-18500,z:-12000, arch:'hospital'},
-    {x:22800, z:21200,  arch:'xeno'},
-    {x:-26200,z:3600,   arch:'cargo'},
-    {x:4800,  z:27800,  arch:'military'},
-    {x:28800, z:-17200, arch:'hospital'},
-    {x:-4200, z:-23000, arch:'xeno'},
-    {x:11200, z:9200,   arch:'cargo'},
-    {x:-14800,z:19800,  arch:'military'},
-    {x:19600, z:-21000, arch:'xeno'},
-    {x:-22000,z:-8000,  arch:'hospital'},
-    {x:32000, z:4000,   arch:'military'},
-    {x:-30000,z:16000,  arch:'cargo'},
-    {x:8000,  z:-30000, arch:'xeno'},
-    {x:-8000, z:32000,  arch:'hospital'},
+  // Relitti in fasce inter-orbita / orlo esterno — mai a ridosso di pianeti o satelliti.
+  const archs=['cargo','military','hospital','xeno','cargo','military','hospital','xeno','cargo','military','xeno','hospital','military','cargo','xeno','hospital'];
+  const bands=[
+    {r0:13000,r1:15500}, // tra Bazzano e Crespellano
+    {r0:21000,r1:24500}, // tra Crespellano e Monteveglio
+    {r0:30000,r1:34500}, // tra Monteveglio e Castelletto
+    {r0:43000,r1:50000}, // fascia Savigno esterna
+    {r0:54000,r1:62000}  // orlo arena
   ];
-  positions.forEach((p,i)=>{
-    const seed=((i+1)*104729 + p.x*31 + p.z*17)|0;
-    const group=buildHulkGroup(seed,p.arch);
-    group.position.set(p.x, Math.random()*180-90, p.z);
-    group.rotation.y=Math.random()*Math.PI*2;
-    group.rotation.z=(Math.random()-.5)*.35;
-    group.rotation.x=(Math.random()-.5)*.18;
+  const minSun=SUN_R+7500;
+  const minBody=9200;   // distanza minima da qualsiasi pianeta/stazione
+  const minHulk=6200;
+  const placed=[];
+  const rng=_hulkRng(20260728);
+
+  function clearOfBodies(x,z){
+    if(Math.hypot(x,z)<minSun)return false;
+    for(const sm of smeshes){
+      if(!sm||!sm.mesh)continue;
+      const dx=x-sm.mesh.position.x, dz=z-sm.mesh.position.z;
+      const need=minBody+(sm.sd.pR||0)*0.35+(sm.sd.sat?400:0);
+      if(dx*dx+dz*dz<need*need)return false;
+    }
+    for(const p of placed){
+      const dx=x-p.x, dz=z-p.z;
+      if(dx*dx+dz*dz<minHulk*minHulk)return false;
+    }
+    return true;
+  }
+
+  archs.forEach((arch,i)=>{
+    let x=0,z=0,ok=false;
+    const band=bands[i%bands.length];
+    for(let attempt=0;attempt<48&&!ok;attempt++){
+      const r=band.r0+rng()*(band.r1-band.r0);
+      const a=((i*2.399963)+(attempt*0.73)+rng()*0.2)%(Math.PI*2);
+      x=Math.cos(a)*r;
+      z=Math.sin(a)*r;
+      ok=clearOfBodies(x,z);
+    }
+    if(!ok){
+      // Fallback: anello esterno lontano
+      const a=(i*0.95+1.1)%(Math.PI*2);
+      const r=56000+i*700;
+      x=Math.cos(a)*r;z=Math.sin(a)*r;
+    }
+    placed.push({x,z});
+    const seed=((i+1)*104729 + Math.round(x)*31 + Math.round(z)*17)|0;
+    const group=buildHulkGroup(seed,arch);
+    group.position.set(x, (rng()-.5)*160, z);
+    group.rotation.y=rng()*Math.PI*2;
+    group.rotation.z=(rng()-.5)*.35;
+    group.rotation.x=(rng()-.5)*.18;
     scene.add(group);
     HULKS.push({
-      id:'hulk_'+i, mesh:group, archetype:p.arch, looted:false,
-      driftAng:Math.random()*Math.PI*2, driftR:.3+Math.random()*.35,
-      driftSpd:.002+Math.random()*.004,
-      pulsePh:Math.random()*Math.PI*2,
+      id:'hulk_'+i, mesh:group, archetype:arch, looted:false,
+      driftAng:rng()*Math.PI*2, driftR:.3+rng()*.35,
+      driftSpd:.002+rng()*.004,
+      pulsePh:rng()*Math.PI*2,
       name:HULK_NAMES[i%HULK_NAMES.length],
     });
   });
