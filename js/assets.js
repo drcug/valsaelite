@@ -16,6 +16,11 @@
     stamp: 'sprites/story/ch03.jpg',
     finale: 'sprites/story/finale.jpg',
     finaleSeq: 'sprites/story/finale_seq.jpg',
+    finale1: 'sprites/story/finale/finale_01.jpg',
+    finale2: 'sprites/story/finale/finale_02.jpg',
+    finale3: 'sprites/story/finale/finale_03.jpg',
+    finale4: 'sprites/story/finale/finale_04.jpg',
+    finale5: 'sprites/story/finale/finale_05.jpg',
     intro1: 'sprites/story/intro/intro_01.jpg',
     intro2: 'sprites/story/intro/intro_02.jpg',
     intro3: 'sprites/story/intro/intro_03.jpg',
@@ -65,7 +70,13 @@
     if (/ombra|imperium|castelletto|rapporto/i.test(t)) return STORY_ART[6];
     if (/fuoco|pirat|caccia/i.test(t)) return STORY_ART[7];
     if (/mulino acceso|piadin/i.test(t)) return STORY_ART[8];
-    if (/finale|mulino acceso|vittoria/i.test(t)) return STORY_ART.finale;
+    if (/finale|mulino acceso|vittoria|patto firmato|rapporto a imperium/i.test(t)) {
+      if (/casa|cipress|ritorno/i.test(t)) return STORY_ART.finale4 || STORY_ART.finaleSeq;
+      if (/imperium|rapporto|bollettino/i.test(t)) return STORY_ART.finale3 || STORY_ART.finale;
+      if (/firm|fazioni|patto/i.test(t)) return STORY_ART.finale2 || STORY_ART.finale;
+      if (/zvan|osteria|bicchiere/i.test(t)) return STORY_ART.finale5 || STORY_ART.finale;
+      return STORY_ART.finale1 || STORY_ART.finale;
+    }
     if (/consigliere|bazzano|patto|molino/i.test(t)) return STORY_ART.finale;
     if (/pressione|pirata/i.test(t)) return STORY_ART.stamp;
     return STORY_ART.prologue;

@@ -1442,7 +1442,26 @@ const INTRO_SLIDES=[
     text:'La navetta lascia i moli di Imperium. Dietro restano marmo e burocrazia; davanti si apre Valsamoggio, con i suoi rancori e le sue osterie. Vent\'anni dopo, il ritorno comincia così — senza applausi e senza istruzioni chiare.',
     art:'sprites/story/intro/intro_05.jpg'}
 ];
-let INTRO_STATE={i:0,open:false,onDone:null};
+
+const FINALE_SLIDES=[
+  {chap:'FINALE · I',title:'Il Mulino Acceso',
+    text:'Sopra Bazzano Prime le pale ripartono: teal e rame, lente e sicure. La piazza si riempie senza slogan. Per una sera il Mulino non è un simbolo da verbale: è un rumore che torna, e basta.',
+    art:'sprites/story/finale/finale_01.jpg'},
+  {chap:'FINALE · II',title:'Il Patto Firmato',
+    text:'Le cinque fazioni restano sotto lo stesso cielo e firmano di nuovo. Non spariscono i rancori; sparisce, per un po\', la voglia di spegnersi a vicenda. Il Patto torna a essere una scelta che si rinnova foglio dopo foglio.',
+    art:'sprites/story/finale/finale_02.jpg'},
+  {chap:'FINALE · III',title:'Rapporto a Imperium',
+    text:'Il bollettino parte verso i corridoi di marmo: «Situazione stabilizzata. Funzionario Marìa resta in loco.» Qualcuno in alto firma senza applaudire. Per una volta va bene così.',
+    art:'sprites/story/finale/finale_03.jpg'},
+  {chap:'FINALE · IV',title:'Casa',
+    text:'Valsamoggio non è più solo una cartella. Cipressi, stazioni di bronzo, navi in discesa: il sistema ti riconosce senza chiederti il grado. Il ritorno lascia una porta aperta, non un verbale chiuso.',
+    art:'sprites/story/finale/finale_04.jpg'},
+  {chap:'FINALE · V',title:'Zvan Marìa',
+    text:'Funzionario di settimo livello, figlio di Valsamoggio. Dopo vent\'anni resti a tavola con un bicchiere e il Mulino che gira fuori dalla finestra. Imperium può aspettare. Per stasera basta questo.',
+    art:'sprites/story/finale/finale_05.jpg'}
+];
+
+let INTRO_STATE={i:0,open:false,onDone:null,slides:INTRO_SLIDES,endLabel:'INIZIA'};
 
 function showMainMenu(){
   cancelBootStory();
@@ -1489,41 +1508,55 @@ function loadGameFromMenu(){
   setPausedReason('story',false);
   if(typeof loadGame==='function')loadGame(true);
 }
-function playIntroSlideshow(onDone){
+/** Slideshow generico (intro / finale). */
+function playStorySlideshow(slides,onDone,opts){
+  opts=opts||{};
+  const list=(slides&&slides.length)?slides:INTRO_SLIDES;
   INTRO_STATE.i=0;
   INTRO_STATE.open=true;
   INTRO_STATE.onDone=typeof onDone==='function'?onDone:null;
+  INTRO_STATE.slides=list;
+  INTRO_STATE.endLabel=opts.endLabel||'CONTINUA';
   hideMainMenu();
   const el=document.getElementById('intro-slideshow');
   if(!el){if(INTRO_STATE.onDone)INTRO_STATE.onDone();return;}
+  const aria=opts.ariaLabel||'Slideshow';
+  el.setAttribute('aria-label',aria);
   el.classList.add('show');
   document.body.classList.add('intro-open');
   setPausedReason('story',true);
   renderIntroSlide();
+}
+function playIntroSlideshow(onDone){
+  playStorySlideshow(INTRO_SLIDES,onDone,{endLabel:'INIZIA',ariaLabel:'Introduzione'});
 }
 function hideIntroSlideshow(silent){
   const el=document.getElementById('intro-slideshow');
   if(el)el.classList.remove('show');
   document.body.classList.remove('intro-open');
   INTRO_STATE.open=false;
+  INTRO_STATE.slides=INTRO_SLIDES;
+  INTRO_STATE.endLabel='INIZIA';
   if(!silent&&INTRO_STATE.onDone){
     const cb=INTRO_STATE.onDone;INTRO_STATE.onDone=null;cb();
   }else INTRO_STATE.onDone=null;
 }
 function renderIntroSlide(){
-  const s=INTRO_SLIDES[INTRO_STATE.i];if(!s)return;
+  const slides=INTRO_STATE.slides||INTRO_SLIDES;
+  const s=slides[INTRO_STATE.i];if(!s)return;
   const art=document.getElementById('is-art');
-  if(art){art.removeAttribute('style');art.src=s.art;}
+  if(art){art.removeAttribute('style');art.src=s.art;art.alt=s.title||'';}
   const chap=document.getElementById('is-chap');if(chap)chap.textContent=s.chap;
   const tit=document.getElementById('is-title');if(tit)tit.textContent=s.title;
   const txt=document.getElementById('is-text');if(txt)txt.textContent=s.text;
   const prog=document.getElementById('is-progress');
-  if(prog)prog.textContent=(INTRO_STATE.i+1)+' / '+INTRO_SLIDES.length;
+  if(prog)prog.textContent=(INTRO_STATE.i+1)+' / '+slides.length;
   const next=document.getElementById('is-next');
-  if(next)next.textContent=INTRO_STATE.i>=INTRO_SLIDES.length-1?'INIZIA':'AVANTI';
+  if(next)next.textContent=INTRO_STATE.i>=slides.length-1?(INTRO_STATE.endLabel||'CONTINUA'):'AVANTI';
 }
 function introNext(){
-  if(INTRO_STATE.i>=INTRO_SLIDES.length-1){hideIntroSlideshow(false);return;}
+  const slides=INTRO_STATE.slides||INTRO_SLIDES;
+  if(INTRO_STATE.i>=slides.length-1){hideIntroSlideshow(false);return;}
   INTRO_STATE.i++;
   renderIntroSlide();
 }
@@ -12566,12 +12599,14 @@ function completeMission(m){
   else if(m.id==='story_6'){advanceStory(7);}
   else if(m.id==='story_7'){advanceStory(8);}
   else if(m.id==='story_8'){setTimeout(()=>playFinaleSequence(),600);}
-  if(m.id&&m.id.startsWith('story_')){
+  if(m.id&&m.id.startsWith('story_')&&m.id!=='story_8'){
     if(typeof refreshDynamicSpawnTuning==='function')refreshDynamicSpawnTuning();
     // Interludi dopo che l'utente chiude il banner capitolo (niente auto-sostituzione)
     const runIl=()=>checkStoryInterludes();
     if(typeof storyBannerOpen==='function'&&storyBannerOpen())STORY_BANNER._afterClose.push(runIl);
     else setTimeout(runIl,500);
+  } else if(m.id==='story_8'&&typeof refreshDynamicSpawnTuning==='function'){
+    refreshDynamicSpawnTuning();
   }
   if(typeof saveGame==='function')saveGame(true);
 }
@@ -13931,27 +13966,16 @@ function triggerVictory(){
   stations.forEach(st=>appendEpilogueMissions(st.missionsList,st.sd.id,st.sd));
 }
 
-const FINALE_SLIDES=[
-  {chap:'FINALE · I',title:'Il Mulino Acceso',
-    text:'Le pale simboliche ripartono sopra Bazzano Prime e cinque fazioni restano, per una volta, sotto lo stesso cielo. Il Patto torna a essere una scelta che si rinnova foglio dopo foglio, senza bisogno di gridarlo.',
-    art:'sprites/story/finale_seq.jpg'},
-  {chap:'FINALE · II',title:'Rapporto a Imperium',
-    text:'Il bollettino parte verso Imperium: «Situazione stabilizzata. Funzionario Marìa resta in loco.» Qualcuno in alto firma senza applaudire, e per una volta va bene così.',
-    art:'sprites/story/finale.jpg'},
-  {chap:'FINALE · III',title:'Zvan Marìa',
-    text:'Funzionario di settimo livello, figlio di Valsamoggio. Dopo vent\'anni il ritorno lascia una casa riaperta più che una missione chiusa. Il mulino gira, e per stasera basta questo.',
-    art:'sprites/story/finale_seq.jpg'}
-];
 function playFinaleSequence(){
-  // Riusa lo slideshow intro con slide finali, poi vittoria
-  const prev=INTRO_SLIDES.slice();
-  INTRO_SLIDES.length=0;
-  FINALE_SLIDES.forEach(s=>INTRO_SLIDES.push(s));
-  playIntroSlideshow(()=>{
-    INTRO_SLIDES.length=0;
-    prev.forEach(s=>INTRO_SLIDES.push(s));
+  if(typeof closeOverlappingModals==='function')closeOverlappingModals('story');
+  if(typeof hideStoryBanner==='function')hideStoryBanner();
+  // Slideshow sopra dock / HUD
+  const el=document.getElementById('intro-slideshow');
+  if(el)el.style.zIndex='220';
+  playStorySlideshow(FINALE_SLIDES,()=>{
+    if(el)el.style.zIndex='';
     triggerVictory();
-  });
+  },{endLabel:'FINE',ariaLabel:'Sequenza finale'});
 }
 
 // ─────────────────────────────────────────────────
