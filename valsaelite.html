@@ -3859,9 +3859,9 @@ function setupBpEvents(){
     bpClearRect(origin.r,origin.c,origin.w,origin.h);
     bpInvRestore(origin.id,1);
     bpWarnCells=new Set();
-    // Dopo gomma: riseleziona quel modulo in modalità Piazza per ripiazzarlo in fretta
+    // Dopo gomma: memorizza il pezzo. In Piazza → riseleziona per ripiazzarlo; in Gomma resta Gomma (drag multiplo).
     bpSelected=origin.id;
-    bpEditMode='place';
+    if(bpEditMode!=='erase')bpEditMode='place';
     if(typeof GameplayPolish!=='undefined')GameplayPolish.bpPlayEraseSfx();
     else if(typeof playTone==='function')playTone(180,.025,.03,'triangle');
     buildBpPalette();drawBlueprint();syncBpModeUi();
