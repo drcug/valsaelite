@@ -1427,19 +1427,19 @@ function scheduleBootStory(){
 
 const INTRO_SLIDES=[
   {chap:'IMPERIUM · I',title:'La Capitale di Marmo',
-    text:'Sistema Imperium. Corridoi di pietra e rame, bolle di sicurezza, rapporti che si accumulano senza lettori. Vent\'anni da funzionario di settimo livello, Zvan Marìa, lontano dal cielo di Valsamoggio.',
+    text:'Sistema Imperium: corridoi di pietra e rame, bolle di sicurezza, rapporti che si accumulano senza lettori. Qui hai passato vent\'anni da funzionario di settimo livello, Zvan Marìa, lontano dal cielo di Valsamoggio e da tutto ciò che sapeva ancora di casa.',
     art:'sprites/story/intro/intro_01.jpg'},
   {chap:'IMPERIUM · II',title:'La Convocazione',
-    text:'Il capo ti fa chiamare senza cerimonie. Una busta nera, uno sguardo stanco. Le cinque fazioni stanno per far collassare l\'anello orbitale, e questa volta tocca a te.',
+    text:'Il capo ti fa chiamare senza cerimonie: una busta nera sul tavolo e uno sguardo troppo stanco per fingere. Le cinque fazioni di Valsamoggio stanno per far collassare l\'anello orbitale, e questa volta il compito tocca a te.',
     art:'sprites/story/intro/intro_02.jpg'},
   {chap:'IMPERIUM · III',title:'La Missione',
-    text:'«Torna a casa, Marìa. Conosci il dialetto, il vino e i rancori: ti servono tutti e tre. Il Patto del Molino è sparito, e il guaio lo gestisci tu.» Sul tavolo restano le coordinate di Valsamoggio e un saluto di pietra.',
+    text:'«Torna a casa, Marìa. Conosci il dialetto, il vino e i rancori, e ti serviranno tutti e tre. Il Patto del Molino è sparito: il guaio lo gestisci tu.» Sul tavolo restano le coordinate di Valsamoggio e un saluto di pietra che sa già di addio.',
     art:'sprites/story/intro/intro_03.jpg'},
   {chap:'IMPERIUM · IV',title:'La Mappa',
-    text:'Cinque fazioni, un mulino spento, e un figlio del sistema che deve ricordare ancora dove ha lasciato i piedi. La mappa holografica pulsa di teal e rame.',
+    text:'Cinque fazioni, un mulino spento, e un figlio del sistema che deve ricordare ancora dove ha lasciato i piedi. La mappa holografica pulsa di teal e rame, come se anche lei avesse fretta di vedere il ritorno.',
     art:'sprites/story/intro/intro_04.jpg'},
   {chap:'IMPERIUM · V',title:'Partenza',
-    text:'La navetta lascia i moli di Imperium. Dietro restano marmo e burocrazia; davanti, Valsamoggio. Vent\'anni dopo, il ritorno comincia così.',
+    text:'La navetta lascia i moli di Imperium. Dietro restano marmo e burocrazia; davanti si apre Valsamoggio, con i suoi rancori e le sue osterie. Vent\'anni dopo, il ritorno comincia così — senza applausi e senza istruzioni chiare.',
     art:'sprites/story/intro/intro_05.jpg'}
 ];
 let INTRO_STATE={i:0,open:false,onDone:null};
@@ -1774,35 +1774,35 @@ const STORY = {
   won:false,   // true dopo triggerVictory (Patto restaurato)
   playerName:'Zvan Marìa',
   playerTitle:'Funzionario di settimo livello · Impero Galattico',
-  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Per vent\'anni hai lavorato a Imperium — corridoi di marmo, bolle di sicurezza, rapporti che nessuno leggeva — senza rimettere piede nel Sistema Valsamoggio. Ora i superiori ti rimandano a casa: le cinque fazioni stanno per far collassare l\'anello orbitale e serve qualcuno che conosca il dialetto, il vino e i rancori. Il "Patto del Molino" è sparito. Il guaio è tuo. Dopo due decenni c\'è anche la questione del ritorno: non sei più solo un messaggero, sei un figlio del sistema che deve dimostrare di non essere diventato un estraneo. A Imperium le grandi casate si combattono per il potere; Valsamoggio, periferia, sembra fuori da quella lotta. Almeno fino a quando il Mulino non torna a girare.',
+  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Per vent\'anni hai vissuto a Imperium, tra corridoi di marmo e bolle di sicurezza, firmando rapporti che quasi nessuno leggeva, senza rimettere piede nel Sistema Valsamoggio. Ora i superiori ti rimandano a casa: le cinque fazioni stanno per far collassare l\'anello orbitale, e serve qualcuno che conosca ancora il dialetto, il vino e i vecchi rancori. Il Patto del Molino è sparito, e il guaio tocca a te. Dopo due decenni non sei soltanto un messaggero: sei un figlio del sistema che deve dimostrare di non essere diventato un estraneo. A Imperium le grandi casate si combattono per il potere; Valsamoggio, periferia, sembra fuori da quella lotta — almeno finché il Mulino non torna a girare.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
-      intro:'A Bazzano Prime ti aspettano come "l\'imperiale tornato". Il Consiglio vuole il primo frammento del Patto a Crespellano. Ti consegnano le credenziali: portale.',
+      intro:'A Bazzano Prime ti ricevono come «l\'imperiale tornato»: mezzo rispetto e mezzo sospetto. Il Consiglio vuole che tu recuperi il primo frammento del Patto, custodito nell\'archivio di Crespellano. Ti consegnano le credenziali imperiali e una porta da attraversare: da qui in poi il ritorno diventa lavoro.',
       mission:{id:'story_1', type:'delivery', sid:'bazzano', targetSid:'crespellano',
         title:'[STORIA] Cerca a Crespellano',
-        desc:'Porta le credenziali imperiali (modulistica) e recupera il frammento custodito nell\'archivio crespellanese.',
+        desc:'Porta le credenziali imperiali (modulistica) a Crespellano e recupera il frammento custodito nell\'archivio.',
         reward:500, repGain:{bazzano:15}, cargo:{type:'documenti',qty:1}, done:false, active:false},
     },
     {
-      num:2, title:'Niente e\' Qualcosa',
-      intro:'Dentro c\'e\' la prima pagina del Patto. Calcara vuole certificartela. Autorizza, ma non firmare tu.',
+      num:2, title:'Niente è Qualcosa',
+      intro:'Nel pacco c\'è la prima pagina del Patto, o almeno quello che ne resta. Calcara vuole autenticarla: accettano di certificare il pezzo, ma ti avvertono — a mezza bocca — di non firmare tu il verbale. A Crespellano «niente» è sempre stato un mestiere; a Calcara diventa un prodotto con timbro.',
       mission:{id:'story_2', type:'delivery', sid:'crespellano', targetSid:'calcara',
         title:'[STORIA] Autentica il Frammento',
-        desc:'Porta il Frammento del Patto a Calcara Station.',
+        desc:'Porta il Frammento del Patto a Calcara Station per l\'autenticazione ufficiale.',
         reward:700, repGain:{crespellano:12,calcara:-5}, cargo:{type:'frammento',qty:1}, done:false, active:false},
     },
     {
       num:3, title:'La Copia di Calcara',
-      intro:'Il Castellano di Monteveglio vuole prove, non timbri: affronta le navi calcaresi nel vuoto.',
+      intro:'Il Castellano di Monteveglio non si fida dei timbri calcaresi: vuole prove nel vuoto, non copie firmate a tavolino. Ti chiede di affrontare le navi dell\'Oligarchia e di tornare con qualcosa di più convincente di un bollino.',
       mission:{id:'story_3', type:'combat', sid:'monteveglio',
         title:'[STORIA] Torneo della Rocca',
-        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema.',
+        desc:'Abbatti 3 navi dell\'Oligarchia di Calcara nel sistema, poi torna alla Rocca.',
         reward:900, repGain:{monteveglio:20,calcara:-25}, killFaction:'calcara',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Savigno vuole tartufi — e vuole che tu ricordi casa. Prima di accettare: fai un volo suborbitale sul pianeta (SUBORBITA) per ispezionare i depositi.',
+      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Vogliono tartufi — e vogliono sapere se ricordi ancora il sapore di casa. Prima di accettare la consegna, ispeziona i depositi con un volo suborbitale sul pianeta.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
         desc:'Completa un volo SUBORBITALE su Savigno, poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
@@ -1810,15 +1810,15 @@ const STORY = {
     },
     {
       num:5, title:'Il Molino di Bazzano',
-      intro:'Hai ricomposto il trittico. Riporta i frammenti a Bazzano Prime.',
+      intro:'Hai ricomposto il trittico: tre pezzi, tre fazioni, tre modi diversi di dire la stessa verità. Ora i frammenti devono tornare a Bazzano Prime, dove il Mulino aspetta di ripartire — e dove qualcuno proverà a riscrivere il testo mentre tu cerchi un\'orbita stabile.',
       mission:{id:'story_5', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Riporta il Patto',
-        desc:'Riporta i tre frammenti a Bazzano Prime.',
+        desc:'Riporta i tre frammenti del Patto a Bazzano Prime.',
         reward:2000, repGain:{bazzano:30,crespellano:20,monteveglio:20,savigno:20,calcara:-30}, cargo:{type:'frammento',qty:3}, done:false, active:false},
     },
     {
       num:6, title:'L\'Ombra di Imperium',
-      intro:'Imperium manda un ispettore. Prima di firmare: abborda uno Space Hulk e recupera le prove occultate nei relitti — poi porta i documenti a Castelletto.',
+      intro:'Imperium manda un ispettore. Prima di firmare qualsiasi rapporto ufficiale, ti chiedono di abbordare uno Space Hulk e di recuperare le prove occultate nei relitti: documenti che non dovrebbero esistere, e che qualcuno preferirebbe lasciare nel ventre del mostro. Poi porta tutto a Castelletto.',
       mission:{id:'story_6', type:'delivery', sid:'bazzano', targetSid:'castelletto',
         title:'[STORIA] Relitto e Rapporto',
         desc:'Abborda uno SPACE HULK (obbligatorio), poi consegna i documenti imperiali a Castelletto Rock.',
@@ -1826,32 +1826,32 @@ const STORY = {
     },
     {
       num:7, title:'Fuoco sulla Rocca',
-      intro:'I pirati — pagati da chi non ama il Patto — aprono il fuoco sull\'anello esterno. Ripulisci il vuoto.',
+      intro:'Sull\'anello esterno aprono il fuoco navi senza bandiera. Non sono casuali: qualcuno ha pagato i pirati perché il Mulino non torni a girare. Castelletto ti chiede di ripulire il vuoto prima che la cerimonia diventi un funerale.',
       mission:{id:'story_7', type:'combat', sid:'castelletto',
         title:'[STORIA] Caccia ai Pirati',
-        desc:'Abbatti 3 navi pirata. Accetta a Castelletto Rock.',
+        desc:'Abbatti 3 navi pirata. Accetta la missione a Castelletto Rock.',
         reward:1400, repGain:{bazzano:12,savigno:8}, killFaction:'pirate',killsNeeded:3,killsDone:0, done:false, active:false},
     },
     {
       num:8, title:'Il Mulino Acceso',
-      intro:'La cerimonia del Mulino Acceso. Consegna le piadine a Bazzano — poi il Patto e\' davvero vivo.',
+      intro:'La cerimonia del Mulino Acceso è pronta. Consegna le piadine a Bazzano Prime, resta finché le pale ripartono, e lascia che Imperium aspetti un funzionario che ha ritrovato casa. Solo allora il Patto torna davvero vivo.',
       mission:{id:'story_8', type:'delivery', sid:'bazzano', targetSid:'bazzano',
         title:'[STORIA] Accendi il Mulino',
-        desc:'Consegna una cassa di piadine a Bazzano Prime per la cerimonia.',
+        desc:'Consegna una cassa di piadine a Bazzano Prime per la cerimonia del Mulino Acceso.',
         reward:2500, repGain:{bazzano:25,crespellano:10,monteveglio:10,savigno:10,calcara:5}, cargo:{type:'piadine',qty:1}, done:false, active:false},
     },
   ],
 };
 
 const STORY_LINES={
-  story_1:'[IMPERIUM → ZVAN] "Funzionario Marìa: l\'archivio di Crespellano non apre porte, apre scatoloni. Se puzza di pergamena e burocrazia, e\' il Patto — o un\'altra cosa che aspetta da vent\'anni, come te."',
-  story_2:'[CALCARA] "Autenticazione rapida: troppo rapida. Qualcuno ha gia\' preparato il timbro mentre tu ancora decollavi da Imperium. Ricorda: qui l\'ufficialita\' e\' un prodotto, non un fatto."',
-  story_3:'[MONTEVEGLIO] "Il Castellano non vuole copie imperiali: vuole prove. Tre navi calcaresi nel vuoto non sono poesia — sono messaggio. Porta il messaggio, riporta il frammento."',
-  story_4:'[SAVIGNO] "Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo — e in quanto ricordi ancora il sapore di casa. Tre chili: non e\' ricatto, e\' tradizione."',
-  story_5:'[BAZZANO PRIME] "I tre pezzi tornano a casa. Anche tu. Se Calcara intercetta, non e\' pirateria — e\' revisione di testo. Non lasciare che riscrivano il Patto mentre cerchi un parcheggio in orbita."',
-  story_6:'[IMPERIUM] "Ispettore in arrivo. Consegna il rapporto a Castelletto. Non firmare cio\' che non hai letto — e non leggere cio\' che non puoi difendere."',
-  story_7:'[CASTELLETTO] "I pirati non sono casuali: qualcuno paga il fuoco. Tre scafi. Poi il vuoto torna a essere solo vuoto."',
-  story_8:'[BAZZANO] "Il mulino gira. Porta le piadine alla cerimonia — e resta, Zvan. Imperium puo\' aspettare un funzionario che ha ritrovato casa."',
+  story_1:'[IMPERIUM → ZVAN] «Funzionario Marìa: l\'archivio di Crespellano non apre porte, apre scatoloni. Se puzza di pergamena e di burocrazia, probabilmente hai trovato il Patto — oppure un\'altra cosa che aspetta da vent\'anni, come te. Vai, e torna con qualcosa di leggibile.»',
+  story_2:'[CALCARA] «Autenticazione rapida, troppo rapida. Qualcuno aveva già preparato il timbro mentre tu ancora decollavi da Imperium. Ricorda: da noi l\'ufficialità è un prodotto che si vende, e il verbale non è mai innocente. Porta il frammento, firma solo ciò che puoi difendere.»',
+  story_3:'[MONTEVEGLIO] «Il Castellano non vuole copie imperiali: vuole prove. Tre navi calcaresi nel vuoto valgono più di un bollino. Porta il messaggio a chi ha bisogno di capirlo, e riporta il frammento intero.»',
+  story_4:'[SAVIGNO] «Il sigillo non ha prezzo in crediti. Si paga in tartufo, e in quanto ricordi ancora il sapore di casa. Tre chili: per noi è tradizione, non ricatto. Prima, però, guarda i depositi da vicino — un volo suborbitale basta.»',
+  story_5:'[BAZZANO PRIME] «I tre pezzi tornano a casa, e anche tu. Se Calcara intercetta il carico, non chiamarla pirateria: è una revisione di testo fatta con i laser. Non lasciare che riscrivano il Patto mentre cerchi un parcheggio in orbita.»',
+  story_6:'[IMPERIUM] «Ispettore in arrivo. Prima del rapporto ufficiale, recupera ciò che giace negli hulk e consegna i documenti a Castelletto. Non firmare ciò che non hai letto, e non leggere ciò che non puoi difendere.»',
+  story_7:'[CASTELLETTO] «I pirati non sono comparsi per caso: qualcuno paga il fuoco perché il Mulino resti spento. Tre scafi. Poi il vuoto potrà tornare a essere soltanto vuoto.»',
+  story_8:'[BAZZANO] «Il mulino gira. Porta le piadine alla cerimonia e resta, Zvan. Imperium può aspettare un funzionario che ha ritrovato casa.»',
 };
 SDATA.forEach(sd=>{
   if(sd.sat)sd.satR=Math.round(sd.satR*SAT_ORBIT_SCALE);
@@ -1990,21 +1990,21 @@ const HULK_CINE={
   suit:{
     label:'SPACE HULK · PREPARAZIONE',
     title:'Tuta e casco',
-    text:'Zvan Marìa sigilla la tuta da abbordaggio. Il casco chiude con un click sordo: dentro c\'è solo il respiro e il rumore del relitto. Macguffinium, mutazioni, corridoi che non dovrebbero esistere. Entra. Non restare.',
+    text:'Zvan Marìa sigilla la tuta da abbordaggio e il casco chiude con un click sordo. Dentro restano solo il respiro e il rumore basso del relitto. Macguffinium, mutazioni, corridoi che non dovrebbero esistere: tutto questo aspetta oltre il portello. Entra se ti serve un pezzo del Patto — e non restare più del necessario.',
     art:'sprites/story/hulk/hulk-suit-up.jpg',
     ok:'ABBORDA'
   },
   escape:{
     label:'SPACE HULK · ESTRAZIONE',
     title:'Modulo di fuga',
-    text:'Troppi danni. Il corridoio vomita fuoco e carne sbagliata. Un modulo di fuga si stacca dal ventre del hulk e sparisce nel vuoto: una capsula piccola, lontana, con una scia ciano. Zvan Marìa è dentro. Il hulk resta affamato.',
+    text:'Troppi danni. Il corridoio vomita fuoco e carne sbagliata, e non c\'è più tempo per discutere. Un modulo di fuga si stacca dal ventre dello hulk e sparisce nel vuoto: una capsula piccola, lontana, con una scia ciano. Zvan Marìa è dentro. Lo hulk resta affamato alle sue spalle.',
     art:'sprites/story/hulk/hulk-escape-pod.jpg',
     ok:'RIENTRO'
   },
   victory:{
     label:'SPACE HULK · ESTRAZIONE RIUSCITA',
     title:'Fuori dal ventre',
-    text:'Il bottino è a bordo. La tuta puzza di ferro e anomalia. Dietro, il hulk chiude le fauci. Zvan Marìa è ancora Funzionario VII — e ancora intero.',
+    text:'Il bottino è a bordo e la tuta puzza di ferro e di anomalia. Dietro, lo hulk chiude le fauci come se niente fosse successo. Zvan Marìa è ancora Funzionario VII — e, per ora, ancora intero.',
     art:'sprites/story/hulk/hulk-victory.jpg',
     ok:'CONTINUA'
   },
@@ -2077,35 +2077,35 @@ function advanceStory(ch){
 // Interludi intermedi: nodi narrativi non bloccanti, condizionati da rep/frammenti.
 const STORY_INTERLUDES=[
   {id:'il_consigliere',after:1,minRep:{bazzano:25},title:'Il Consigliere di Bazzano',
-    body:'Un ologramma del consigliere Dosi ti raggiunge in volo: «Stai facendo più di quanto ti sia stato chiesto. Continua così: il Patto ha bisogno di testardi, non di eroi. A Imperium le casate maggiori si azzannano; noi siamo il patio di servizio. Teniamolo ordinato.»'},
+    body:'Un ologramma del consigliere Dosi ti raggiunge in volo: «Stai facendo più di quanto ti sia stato chiesto. Continua così: il Patto ha bisogno di testardi, non di eroi da manifesto. A Imperium le casate maggiori si azzannano; noi restiamo il patio di servizio dell\'Impero. Teniamolo ordinato, tavò.»'},
   {id:'il_timbro',after:2,minRep:{calcara:-1},title:'Il Timbro di Calcara',
-    body:'Un archivista calcarese ti fissa dallo schermo: «Hai consegnato. Ora il timbro è nostro. I timbri, comandante, possono anche scomparire. Ricordatelo.»'},
+    body:'Un archivista calcarese ti fissa dallo schermo con la pazienza di chi ha già stampato mille ricevute: «Hai consegnato. Ora il timbro è nostro. I timbri, comandante, possono anche scomparire dalla carta. Ricordatelo quando tornerai a chiedere favori.»'},
   {id:'la_copia',after:2,minRep:{calcara:-25},title:'La Copia in Circolazione',
-    body:'Rete di Bazzano segnala frammenti «autenticati» che circolano senza di te. Calcara non ti perdona l\'originale: aspettati più scorte sulle rotte mercantili.'},
+    body:'La rete di Bazzano segnala frammenti «autenticati» che circolano senza di te. Calcara non ti perdona l\'originale: sulle rotte mercantili le scorte si fanno più frequenti, e i pedaggi più personali.'},
   {id:'la_rocca',after:3,minRep:{monteveglio:20},title:'La Rocca Ti Riconosce',
-    body:'Il Castellano incide il tuo nome sulla Tavola del Torneo: «Frecce di luce, sangue cosmico, verità intera. Ti aspettiamo alla prossima giostra.» Qualcuno mormora che i Beghelli stanno rientrando in sistema.'},
+    body:'Il Castellano incide il tuo nome sulla Tavola del Torneo: «Frecce di luce, sangue cosmico, verità intera. Ti aspettiamo alla prossima giostra.» Qualcuno, dietro di lui, mormora che i Beghelli stanno rientrando in sistema — e che stavolta non vengono solo per cortesia.'},
   {id:'anomalie_voce',after:3,minRep:{},title:'Voci dalle anomalie',
-    body:'Un pilota ubriaco a Castelletto: «Nelle pieghe dello spazio qualcosa luccica storto. Dicono macguffinium — materia a nove dimensioni. Se è vero, le casate di Imperium smetteranno di fingere che Valsamoggio non conti. E gli space hulk? Pieni di mostri perché quella roba muta chi resta a bordo. Non sono alieni da manifesto: sono equipaggi andati a male.»'},
+    body:'Un pilota ubriaco a Castelletto abbassa la voce: «Nelle pieghe dello spazio qualcosa luccica storto. Dicono macguffinium — materia a nove dimensioni. Se è vero, le casate di Imperium smetteranno di fingere che Valsamoggio non conti. E gli space hulk? Sono pieni di mostri perché quella roba muta chi resta a bordo troppo a lungo. Non sono alieni da manifesto: sono equipaggi andati a male.»'},
   {id:'hulk_mutazioni',after:5,minRep:{},title:'Corridoi che camminano',
-    body:'Un reduce di abbordaggio, voce rotta: «Dentro lo hulk non c\'era silenzio. C\'erano cose che un tempo avevano nome. Il macguffinium delle anomalie non uccide subito: riscrive. Se cerchi prove del Patto là dentro, porta armi — e pietà.»'},
+    body:'Un reduce di abbordaggio, voce rotta, ti ferma nel corridoio: «Dentro lo hulk non c\'era silenzio. C\'erano cose che un tempo avevano un nome. Il macguffinium delle anomalie non uccide subito: riscrive. Se cerchi prove del Patto là dentro, porta armi — e un poco di pietà.»'},
   {id:'la_pressione',after:3,minRep:{calcara:-40},title:'Pressione Calcarese',
-    body:'Un comunicato pirata intercettato: «Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto.»'},
+    body:'Un comunicato pirata intercettato gira sulla fascia: «Taglia su di te raddoppiata. Calcara paga chi chiude la bocca al comandante. Occhio a Pragatto — e non fidarti di chi ti offre un pedaggio scontato.»'},
   {id:'il_palato',after:4,minRep:{savigno:25},title:'Il Palato del Consiglio',
-    body:'Nonna Graziella (se a bordo) scuote la testa: «Tre chili? I Savignesi non vendono la storia, la degustano. Sei entrato nella loro bocca, comandante.»'},
+    body:'Nonna Graziella (se è a bordo) scuote la testa e sorride: «Tre chili? I Savignesi non vendono la storia, la degustano. Sei entrato nella loro bocca, comandante — e loro sanno quando qualcuno mente sul sapore.»'},
   {id:'beghelli_arrivo',after:4,minRep:{},title:'Palazzo Beghelli',
-    body:'Radar: firma enorme, più grande di uno space hulk. Palazzo mobile della Casata Beghelli — un tempo padroni di Valsamoggio, ora casata minore. Puoi chiamarli in radio se sei abbastanza vicino. Aiuto sì, se hai connessioni. Risultati? Probabilmente pochi.'},
+    body:'Il radar firma qualcosa di enorme, più grande di uno space hulk: il Palazzo mobile della Casata Beghelli. Un tempo erano padroni di Valsamoggio; ora sono una casata minore, ma ancora capaci di offrire un aiuto — se hai le connessioni giuste. I risultati, di solito, restano cortesi e pochi.'},
   {id:'il_ispettore',after:5,minRep:{bazzano:20},title:'L\'Ispettore di Sesto Livello',
-    body:'Canale cifrato da Imperium: «Il Patto è patrimonio dell\'Impero. Preparati a restituire le carte.» Sotto, un allegato cancellato a metà: «…anomalie / macguff… — priorità stabilità.» A Bazzano rispondono: «Qui le carte hanno sapore di casa.»'},
+    body:'Canale cifrato da Imperium: «Il Patto è patrimonio dell\'Impero. Preparati a restituire le carte.» Sotto, un allegato cancellato a metà parla di anomalie e di «macguff…» con priorità alla stabilità. A Bazzano rispondono a voce alta: «Qui le carte hanno sapore di casa. L\'Impero può aspettare.»'},
   {id:'la_rocca_nera',after:6,minRep:{},title:'La Roccia Nera',
-    body:'Castelletto segnala scie non registrate. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare. Forse una casata. Forse solo fame.'},
+    body:'Castelletto segnala scie non registrate lungo l\'anello esterno. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare. Forse una casata. Forse soltanto fame. In ogni caso, il fuoco non è casuale.'},
   {id:'patto_perche',after:6,minRep:{bazzano:15},title:'Perché il Mulino deve girare',
-    body:'Un funzionario anziano, off the record: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è macguffinium, le casate scendono qui e l\'Impero rischia di non reggere la guerra che ne segue. Il Patto, per noi, fa da diga — nostalgia a parte.»'},
+    body:'Un funzionario anziano, off the record, ti parla a voce bassa: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è davvero macguffinium, le casate scenderanno qui e l\'Impero rischia di non reggere la guerra che ne segue. Il Patto, per noi, fa da diga. La nostalgia, se vuoi, ce la mettiamo dopo.»'},
   {id:'il_mulino',after:7,minRep:{bazzano:30},title:'Il Mulino Acceso',
-    body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: «Promozione a sesto livello — se taci.» Tu scegli il rumore del mulino.'},
+    body:'Le pale simboliche ripartono sopra Prime e l\'aria cambia sapore. Un messaggio da Imperium resta in coda: «Promozione a sesto livello — se taci.» Tu scegli il rumore del mulino, e lasci il messaggio a fermentare.'},
   {id:'il_pezzi_casa',after:2,minRep:{},title:'Pezzi di casa',
-    body:'Un tecnico in radio: «Quei moduli non sono di Imperium. Li riconosce chi ha lavorato al Molino.» Se recuperi pezzi dalle navi morte — non dagli hulk — stai raccogliendo memoria, non solo ferro.'},
+    body:'Un tecnico in radio, voce da hangar: «Quei moduli non sanno di Imperium. Li riconosce chi ha lavorato al Molino.» Se recuperi pezzi dalle navi morte — lasciando stare gli hulk — stai raccogliendo memoria, non soltanto ferro da cantiere.'},
   {id:'il_nave_vs_hulk',after:3,minRep:{},title:'Morti e mutati',
-    body:'In osteria: «Una nave disabilitata è un cantiere spegnuto. Uno space hulk è un cantiere che ha iniziato a sognare. Dentro, il macguffinium riscrive la carne. Fuori, restano solo pezzi da blueprint.»'},
+    body:'In osteria qualcuno alza il bicchiere: «Una nave disabilitata è un cantiere spegnuto. Uno space hulk è un cantiere che ha iniziato a sognare. Dentro, il macguffinium riscrive la carne; fuori restano i pezzi da blueprint, se hai il coraggio di prenderli.»'},
 ];
 const _shownInterludes=new Set();
 function diaryStationLabel(sid){
@@ -2159,7 +2159,7 @@ function renderDiaryContent(){
     html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p><div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
   });
   if(STORY.won){
-    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso. Epilogo e missioni sandbox disponibili.</p></div>'+html;
+    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso ha ripreso a girare. Restano epilogo e missioni sandbox, se vuoi continuare a volare.</p></div>'+html;
   }
   // Note RADICI
   if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
@@ -2174,15 +2174,15 @@ function renderDiaryContent(){
   }
   if(PS.loreFlags&&Object.keys(PS.loreFlags).length){
     const bits=[];
-    if(PS.loreFlags.casate_rumore||PS.loreFlags.periferia)bits.push('A Imperium le grandi casate si combattono; Valsamoggio resta periferia finché il Mulino gira.');
-    if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)bits.push('Nelle anomalie si parla di macguffinium: materia a nove dimensioni, il materiale più prezioso dell\'universo.');
+    if(PS.loreFlags.casate_rumore||PS.loreFlags.periferia)bits.push('A Imperium le grandi casate si combattono per il potere; Valsamoggio resta periferia finché il Mulino gira e tiene il sistema in piedi.');
+    if(PS.loreFlags.macguffinium_voce||PS.loreFlags.macguffinium_capito)bits.push('Nelle anomalie si parla di macguffinium: materia a nove dimensioni, forse il materiale più prezioso dell\'universo.');
     if(PS.loreFlags.hulk_mutazioni)bits.push('Gli space hulk sono pieni di mostri perché il macguffinium muta equipaggi e carne nei corridoi contaminati.');
-    if(PS.loreFlags.bp_salvage_radio||PS.loreFlags.pezzi_casa)bits.push('I pezzi recuperati dalle navi disabilitate sanno di casa: moduli del Molino, non di Imperium.');
-    if(PS.loreFlags.peaceful_salvager)bits.push('Hai abbordato senza sparare: a Bazzano ti chiamano funzionario che recupera, non pirata.');
-    if(PS.loreFlags.hulk_visited)bits.push('Hai respirato i corridoi di uno hulk. L\'odore resta nella tuta — e nelle voci delle Radici.');
-    if(PS.loreFlags.nave_vs_hulk)bits.push('Osteria: nave morta = pezzi; hulk = incubo. Non confondere i due.');
+    if(PS.loreFlags.bp_salvage_radio||PS.loreFlags.pezzi_casa)bits.push('I pezzi recuperati dalle navi disabilitate sanno di casa: moduli del Molino, riconosciuti da chi ci ha lavorato.');
+    if(PS.loreFlags.peaceful_salvager)bits.push('Hai abbordato senza sparare. A Bazzano ti chiamano funzionario che recupera, non pirata.');
+    if(PS.loreFlags.hulk_visited)bits.push('Hai respirato i corridoi di uno hulk. L\'odore resta nella tuta, e torna nelle voci delle Radici.');
+    if(PS.loreFlags.nave_vs_hulk)bits.push('In osteria lo dicono chiaro: nave morta dà pezzi, hulk dà incubi. Non confondere i due.');
     if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
-    if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli — un tempo dominante, ora minore — può offrire un aiuto limitato dal Palazzo.');
+    if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli, un tempo dominante e ora minore, può offrire un aiuto limitato dal Palazzo.');
     if(bits.length){
       html+='<div class="diary-ch done"><h3>Cosa hai scoperto</h3><p class="dm">'+bits.join(' ')+'</p><div class="dst">Lore raccolta giocando · dialoghi, osterie, interludi.</div></div>';
     }
@@ -2469,9 +2469,9 @@ function makeMissions(sid){
 function appendEpilogueMissions(ms,sid,sd){
   if(typeof STORY==='undefined'||!STORY.won||!sd)return;
   const ep={
-    zappolino:{id:'ep_patrol_zap',type:'combat',title:'[EPILOGO] Pattuglia Zappolino',desc:'Tieni lontani i pirati dalla fortezza savignese.',killFaction:'pirate',killsNeeded:3,killsDone:0,reward:650,repGain:{savigno:12}},
-    calcara:{id:'ep_neg_calc',type:'delivery',title:'[EPILOGO] Negoziazione Calcara',desc:'Documenti per smorzare le tensioni post-Patto.',targetSid:'calcara',cargo:{type:'documenti',qty:2},reward:500,repGain:{calcara:15,bazzano:5}},
-    monteveglio:{id:'ep_guard_roc',type:'combat',title:'[EPILOGO] Guardia della Rocca',desc:'Proteggi la processione del Patto restaurato.',killFaction:'calcara',killsNeeded:2,killsDone:0,reward:720,repGain:{monteveglio:18}}
+    zappolino:{id:'ep_patrol_zap',type:'combat',title:'[EPILOGO] Pattuglia Zappolino',desc:'Tieni lontani i pirati dalla fortezza savignese e dalle rotte del tartufo.',killFaction:'pirate',killsNeeded:3,killsDone:0,reward:650,repGain:{savigno:12}},
+    calcara:{id:'ep_neg_calc',type:'delivery',title:'[EPILOGO] Negoziazione Calcara',desc:'Consegna documenti per smorzare le tensioni rimaste dopo la firma del Patto.',targetSid:'calcara',cargo:{type:'documenti',qty:2},reward:500,repGain:{calcara:15,bazzano:5}},
+    monteveglio:{id:'ep_guard_roc',type:'combat',title:'[EPILOGO] Guardia della Rocca',desc:'Proteggi la processione del Patto restaurato dalle navi calcaresi ancora ostili.',killFaction:'calcara',killsNeeded:2,killsDone:0,reward:720,repGain:{monteveglio:18}}
   };
   const e=ep[sid];
   if(e&&!ms.some(m=>m.id===e.id))ms.push(Object.assign({sid,done:false,active:false},e));
@@ -9851,7 +9851,7 @@ function leaveBoarding(opts){
           PS.loreFlags.peaceful_salvager=1;
           if(typeof showStoryBanner==='function'){
             setTimeout(()=>showStoryBanner('INTERLUDIO','Funzionario, non pirata',
-              'Tre navi senza sparare un colpo. A Imperium ti chiamerebbero «efficiente». Qui, a Bazzano, ti chiamano ancora Zvan — quello che recupera pezzi invece di farli a pezzi. Il Mulino preferisce le mani che riparano.'),1400);
+              'Tre navi recuperate senza sparare un colpo. A Imperium ti chiamerebbero «efficiente»; qui a Bazzano ti chiamano ancora Zvan — quello che recupera pezzi invece di farli a pezzi. Il Mulino preferisce le mani che riparano.'),1400);
           }
         }
       }
@@ -13890,7 +13890,7 @@ function triggerGameOver(){
   document.body.classList.add('go-open');
   document.getElementById('go').classList.add('show');
   document.getElementById('got').textContent='SCONFITTO';document.getElementById('got').style.color='#ff4433';
-  document.getElementById('gos').innerHTML='La tua nave e\' andata persa tra le orbite del sistema Valsamoggio.<br>Crespellano ti piange. Tavalvol apr — ma il tuo motore si.';
+  document.getElementById('gos').innerHTML='La tua nave è andata persa tra le orbite del sistema Valsamoggio.<br>Qualcuno a Crespellano alzerà un bicchiere in tuo nome; altrove, magari, firmeranno solo un verbale. Il Mulino aspetta un altro pilota — o un altro ritorno.';
   const st=document.getElementById('go-stats');if(st)st.textContent=formatRunStats();
   document.getElementById('gor-sandbox').style.display='none';
   document.getElementById('gor-load').style.display=(typeof hasSaveGame==='function'&&hasSaveGame())?'inline-block':'none';
@@ -13901,9 +13901,9 @@ function triggerVictory(){
   GAME.state='gameover';
   document.body.classList.add('go-open');
   document.getElementById('go').classList.add('show');
-  document.getElementById('got').textContent='IL PATTO E\' RESTAURATO';document.getElementById('got').style.color='#33dd88';
+  document.getElementById('got').textContent='IL PATTO È RESTAURATO';document.getElementById('got').style.color='#33dd88';
   const epilogue=storyEpilogueBody();
-  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico gira: non macina grano, macina orgogli — finche\' qualcuno non lo spegne di nuovo.<br><br><em style="color:#aaccee">'+epilogue+'</em><br><br>Fine della campagna: "Il Patto del Molino" · Mulino Acceso';
+  document.getElementById('gos').innerHTML='Le cinque fazioni del sistema Valsamoggio firmano di nuovo sotto lo stesso cielo.<br>Il mulino simbolico riparte: non macina grano, macina orgogli — almeno finché qualcuno non prova a spegnerlo di nuovo.<br><br><em style="color:#aaccee">'+epilogue+'</em><br><br>Fine della campagna: «Il Patto del Molino» · Mulino Acceso';
   const st=document.getElementById('go-stats');if(st)st.textContent=formatRunStats();
   document.getElementById('gor-sandbox').style.display='inline-block';
   document.getElementById('gor-load').style.display='none';
@@ -13913,13 +13913,13 @@ function triggerVictory(){
 
 const FINALE_SLIDES=[
   {chap:'FINALE · I',title:'Il Mulino Acceso',
-    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Il Patto torna a essere una scelta che si rinnova, foglio dopo foglio.',
+    text:'Le pale simboliche ripartono sopra Bazzano Prime e cinque fazioni restano, per una volta, sotto lo stesso cielo. Il Patto torna a essere una scelta che si rinnova foglio dopo foglio, senza bisogno di gridarlo.',
     art:'sprites/story/finale_seq.jpg'},
   {chap:'FINALE · II',title:'Rapporto a Imperium',
-    text:'Il bollettino parte verso Imperium: «Situazione stabilizzata. Funzionario Marìa resta in loco.» Qualcuno in alto firma senza applaudire.',
+    text:'Il bollettino parte verso Imperium: «Situazione stabilizzata. Funzionario Marìa resta in loco.» Qualcuno in alto firma senza applaudire, e per una volta va bene così.',
     art:'sprites/story/finale.jpg'},
   {chap:'FINALE · III',title:'Zvan Marìa',
-    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Dopo vent\'anni il ritorno lascia una casa riaperta, più che una missione chiusa. Il mulino gira.',
+    text:'Funzionario di settimo livello, figlio di Valsamoggio. Dopo vent\'anni il ritorno lascia una casa riaperta più che una missione chiusa. Il mulino gira, e per stasera basta questo.',
     art:'sprites/story/finale_seq.jpg'}
 ];
 function playFinaleSequence(){
@@ -14573,7 +14573,7 @@ function ensureBeghelliPalace(force){
   }
   // Solo notify se un banner storia è già aperto / in coda; altrimenti mostra modal dedicato.
   if(typeof showStoryBanner==='function'){
-    showStoryBanner('CASATA BEGHELLI','Il Palazzo entra in orbita','Una nave da casata, più grande di uno space hulk. Un tempo dominavano Valsamoggio. Ora sono secondari — ma presenti.');
+    showStoryBanner('CASATA BEGHELLI','Il Palazzo entra in orbita','Il radar firma una nave da casata più grande di uno space hulk: il Palazzo Beghelli. Un tempo dominavano Valsamoggio; ora sono una potenza minore, ma ancora presenti — e ancora in grado di offrirti qualcosa, se sai a chi parlare.');
   }
 }
 function updateBeghelli(dt){
