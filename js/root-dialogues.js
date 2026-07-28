@@ -11,12 +11,12 @@
         id: 'root_bazz_osteria',
         minChapter: 1,
         title: 'Osteria del Mulino',
-        npcName: 'Morosina',
+        npcName: 'Palmira',
         npcTitle: 'ASILO · SUORE · BAZZANO',
         npcSeed: 4417,
         faction: 'bazzano',
         gender: 'f',
-        blurb: 'La Morosina dell\'asilo dalle suore. Ti chiama ancora Zvanino, distintivo o no.',
+        blurb: 'Palmira dell\'asilo dalle suore. Ti chiama ancora Zvanino, distintivo o no.',
         start: 'n1',
         nodes: {
           n1: {
@@ -46,25 +46,25 @@
           },
           n2c: {
             speaker: 'npc',
-            text: 'Muti, eh? Come quando suor Geltrude ti chiedeva della merenda e restavi lì senza fiato. Qui il silenzio è onesto. A Imperium è un protocollo. Due cose diverse, Zvanino.',
+            text: 'Muti, eh? Come quando suor Geltrude ti chiedeva della merenda e restavi lì senza fiato. Qui il silenzio sta bene così. A Imperium lo chiamavano protocollo — due mestieri diversi, Zvanino.',
             choices: [{ label: '[ZVAN] "Il protocollo mi ha tenuto in piedi. Qui mi fa male."', next: 'n3' }]
           },
           n3: {
             speaker: 'zvan',
-            text: 'Morosina, a Imperium ogni corridoio aveva un numero. Qui ogni odore ha un nome. Ricordo meglio i numeri. Tornare significa avere ancora la chiave di casa e non sapere dove mettere i piedi — come quando ci perdevamo dietro la cappella.',
+            text: 'Palmira, a Imperium ogni corridoio aveva un numero. Qui ogni odore ha un nome. Ricordo meglio i numeri. Tornare significa avere ancora la chiave di casa e non sapere dove mettere i piedi — come quando ci perdevamo dietro la cappella.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n3b: {
             speaker: 'zvan',
-            text: 'Ho detto «fretta» e mi è venuto il senso di colpa. Casa non era un ritardo: ero io che volevo sembrare qualcuno nei corridoi di marmo. Tu restavi qui. Io no.',
+            text: 'Ho detto «fretta» e mi è venuto il senso di colpa. Casa non aspettava: ero io che volevo sembrare qualcuno nei corridoi di marmo. Tu restavi qui. Io no.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n4: {
             speaker: 'npc',
-            text: 'Allora ascolta la Morosina vera: non ti chiedo di tornare bambino. Ti chiedo di non fare il satellite dopo nove ore di burocrazia. Siediti. Bevi. Se la testa gira, pazienza — serve tempo, non bollettini. E stai attento: da Imperium arrivano voci di casate che si azzannano. Qui siamo periferia. Per ora.',
+            text: 'Allora ascoltami bene: non ti chiedo di tornare bambino. Ti chiedo di non fare il satellite dopo nove ore di burocrazia. Siediti. Bevi. Se la testa gira, pazienza — serve tempo, non bollettini. E stai attento: da Imperium arrivano voci di casate che si azzannano. Qui siamo periferia. Per ora.',
             choices: [
-              { label: '[RESTA] Bevi in silenzio. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Hai lasciato l\'armatura sul bancone, per una sera. Morosina sorride come al cortile delle suore.', lore: 'casate_rumore' } },
-              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: 'Morosina scuote la testa: «Sei ancora in orbita, Zvanino. Lascia stare il resto.»' } }
+              { label: '[RESTA] Bevi in silenzio. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Hai lasciato l\'armatura sul bancone, per una sera. Palmira sorride come al cortile delle suore.', lore: 'casate_rumore' } },
+              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: 'Palmira scuote la testa: «Sei ancora in orbita, Zvanino. Lascia stare il resto.»' } }
             ]
           }
         }
@@ -77,6 +77,7 @@
         npcTitle: 'FAMIGLIA · BAZZANO',
         npcSeed: 4412,
         faction: 'bazzano',
+        gender: 'f',
         blurb: 'Ti ha visto partire. Non ti ha mai scritto: «prima scendi a terra», diceva.',
         start: 'z1',
         nodes: {
@@ -100,7 +101,7 @@
           },
           z3: {
             speaker: 'npc',
-            text: 'Allora resta. Non per il Patto: per il cortile. Se ti gira la testa, sediamoci finché capisci. Io non ti chiedo Imperium. Ti chiedo se lo spazio ti ha congelato la lingua o solo la voglia. E se ti mandano qui perché lassù le casate litigano, ricorda: noi siamo il patio di servizio dell\'Impero. Non è una metafora, è un indirizzo.',
+            text: 'Allora resta. Siediti per il cortile, lascia stare il Patto un minuto. Se ti gira la testa, restiamo finché capisci. Io non ti chiedo Imperium. Ti chiedo se lo spazio ti ha congelato la lingua o solo la voglia. E se ti mandano qui perché lassù le casate litigano, ricorda: noi siamo il patio di servizio dell\'Impero — un indirizzo, più che una metafora.',
             choices: [
               { label: '[RESTA] "Insegno a dire di nuovo Zvanino." (+rep)', next: null, fx: { rep: { bazzano: 6 }, note: 'Zia Ornella ti lascia un fazzoletto. Puzza di sapone locale.', lore: 'periferia' } },
               { label: '[PARTE] "Il Patto non aspetta."', next: null, fx: { note: 'Lei non ti ferma. Le zie sanno quando un figlio è già partito.' } }
@@ -113,7 +114,7 @@
         minChapter: 5,
         requireHulkBoarded: true,
         title: 'Odore di relitto',
-        npcName: 'Morosina',
+        npcName: 'Palmira',
         npcTitle: 'ASILO · SUORE · BAZZANO',
         npcSeed: 4419,
         faction: 'bazzano',
@@ -123,7 +124,7 @@
         nodes: {
           h1: {
             speaker: 'npc',
-            text: 'Zvanino, puzzi di corridoio che cammina. Non è sudore di viaggio: è macguffinium. Hai messo piede in uno hulk, eh? Porta quel fetore fuori dall\'osteria — oppure siediti e raccontami cosa hai visto, senza inventare mostri da manifesto.',
+            text: 'Zvanino, puzzi di corridoio che cammina. Sudore di viaggio? Macché: macguffinium. Hai messo piede in uno hulk, eh? Porta quel fetore fuori dall\'osteria — oppure siediti e raccontami cosa hai visto, senza inventare mostri da manifesto.',
             choices: [
               { label: '[ZVAN] "Erano persone. Una volta."', next: 'h2' },
               { label: '[ZVAN] "Ho preso pezzi. Niente di più."', next: 'h2b' }
@@ -143,7 +144,7 @@
             speaker: 'npc',
             text: 'Allora ascolta, tavò: le navi morte ti danno ferro. Gli hulk ti danno incubi. Non confonderli. E lava la tuta prima di tornare dalle suore — anche se loro non ci sono più.',
             choices: [
-              { label: '[RESTA] Bevi. Lascia che l\'odore passi. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Morosina ti passa un panno. Puzza di sapone e di casa.', lore: 'hulk_visited' } },
+              { label: '[RESTA] Bevi. Lascia che l\'odore passi. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Palmira ti passa un panno. Puzza di sapone e di casa.', lore: 'hulk_visited' } },
               { label: '[PARTE] "Devo tornare al relitto."', next: null, fx: { note: '«Allora porta armi — e pietà.»', lore: 'hulk_mutazioni' } }
             ]
           }
@@ -512,7 +513,8 @@
       } else {
         global.PortraitRenderer.drawCanvas(npcCv, enc.npcSeed || 1, enc.faction || 'bazzano', {
           name: enc.npcName,
-          kind: enc.gender === 'f' ? 'women' : undefined
+          gender: enc.gender === 'f' ? 'f' : (enc.gender === 'm' ? 'm' : undefined),
+          kind: enc.faction === 'pirate' ? 'pirate' : undefined
         });
       }
     }

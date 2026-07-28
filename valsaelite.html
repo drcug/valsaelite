@@ -1427,19 +1427,19 @@ function scheduleBootStory(){
 
 const INTRO_SLIDES=[
   {chap:'IMPERIUM · I',title:'La Capitale di Marmo',
-    text:'Sistema Imperium. Corridoi di pietra e rame, bolle di sicurezza, rapporti che nessuno legge. Qui hai passato vent\'anni — funzionario di settimo livello Zvan Marìa — lontano dal cielo di Valsamoggio.',
+    text:'Sistema Imperium. Corridoi di pietra e rame, bolle di sicurezza, rapporti che si accumulano senza lettori. Vent\'anni da funzionario di settimo livello, Zvan Marìa, lontano dal cielo di Valsamoggio.',
     art:'sprites/story/intro/intro_01.jpg'},
   {chap:'IMPERIUM · II',title:'La Convocazione',
-    text:'Il tuo capo ti fa chiamare. Nessuna cerimonia: solo una busta nera e uno sguardo che dice "questa volta non puoi rifiutare". Le cinque fazioni stanno per far collassare l\'anello orbitale.',
+    text:'Il capo ti fa chiamare senza cerimonie. Una busta nera, uno sguardo stanco. Le cinque fazioni stanno per far collassare l\'anello orbitale, e questa volta tocca a te.',
     art:'sprites/story/intro/intro_02.jpg'},
   {chap:'IMPERIUM · III',title:'La Missione',
-    text:'"Torna a casa, Marìa. Non per pietà — perché conosci il dialetto, il vino e i rancori. Il Patto del Molino e\' sparito. Il guaio e\' tuo." Sul tavolo: coordinate Valsamoggio e un saluto di pietra.',
+    text:'«Torna a casa, Marìa. Conosci il dialetto, il vino e i rancori: ti servono tutti e tre. Il Patto del Molino è sparito, e il guaio lo gestisci tu.» Sul tavolo restano le coordinate di Valsamoggio e un saluto di pietra.',
     art:'sprites/story/intro/intro_03.jpg'},
   {chap:'IMPERIUM · IV',title:'La Mappa',
-    text:'Cinque fazioni. Un mulino spento. Un figlio del sistema che deve dimostrare di non essere diventato un estraneo. La mappa holografica pulsa di teal e rame.',
+    text:'Cinque fazioni, un mulino spento, e un figlio del sistema che deve ricordare ancora dove ha lasciato i piedi. La mappa holografica pulsa di teal e rame.',
     art:'sprites/story/intro/intro_04.jpg'},
   {chap:'IMPERIUM · V',title:'Partenza',
-    text:'La navetta lascia i moli di Imperium. Dietro: marmo e burocrazia. Davanti: Valsamoggio. Vent\'anni dopo, il ritorno comincia.',
+    text:'La navetta lascia i moli di Imperium. Dietro restano marmo e burocrazia; davanti, Valsamoggio. Vent\'anni dopo, il ritorno comincia così.',
     art:'sprites/story/intro/intro_05.jpg'}
 ];
 let INTRO_STATE={i:0,open:false,onDone:null};
@@ -2099,7 +2099,7 @@ const STORY_INTERLUDES=[
   {id:'la_rocca_nera',after:6,minRep:{},title:'La Roccia Nera',
     body:'Castelletto segnala scie non registrate. Qualcuno ha pagato i pirati per spegnere il mulino prima che inizi a girare. Forse una casata. Forse solo fame.'},
   {id:'patto_perche',after:6,minRep:{bazzano:15},title:'Perché il Mulino deve girare',
-    body:'Un funzionario anziano, off the record: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è macguffinium, le casate scendono qui e l\'Impero rischia di non sopravvivere alla guerra che ne segue. Il Patto non è nostalgia: è diga.»'},
+    body:'Un funzionario anziano, off the record: «Se Valsamoggio si disgrega, le anomalie diventano campo aperto. Se c\'è macguffinium, le casate scendono qui e l\'Impero rischia di non reggere la guerra che ne segue. Il Patto, per noi, fa da diga — nostalgia a parte.»'},
   {id:'il_mulino',after:7,minRep:{bazzano:30},title:'Il Mulino Acceso',
     body:'Le pale simboliche ripartono sopra Prime. Un messaggio da Imperium resta in coda: «Promozione a sesto livello — se taci.» Tu scegli il rumore del mulino.'},
   {id:'il_pezzi_casa',after:2,minRep:{},title:'Pezzi di casa',
@@ -2269,7 +2269,7 @@ const DIALOGUES = {
   ],
   crespellano:[
     {name:'Pattuglia Crespellanese',lines:[
-      'Siamo pirati perché a Crespellano i lavori onesti finiscono in lista d\'attesa. Non è poesia: è la busta paga.',
+      'Siamo pirati perché a Crespellano i lavori onesti finiscono in lista d\'attesa. Alla fine conta la busta paga.',
       'L\'incrociatore l\'abbiamo riparato coi pezzi della scuola rovescia. Funziona. Più o meno.',
       'Fermo. Stiamo ancora aspettando l\'autorizzazione al decollo dal 2019. Siediti, se vuoi: c\'è posto.',
       'L\'archivio dice «niente», ma puzza di storia. Chi entra senza permesso trova polvere… e gente ambiziosa.'
@@ -2287,17 +2287,17 @@ const DIALOGUES = {
   calcara:[
     {name:'Guardia di Calcara',     lines:[
       'Zona economica speciale di Calcara. C\'è un pedaggio. Firma o gira.',
-      'Terzo hangar inaugurato ieri. Quarto domani. Crespellano aspetta il semaforo dal 2003. Coincidenze.',
-      'Qui la verità ha timbro e IVA. Se non è fatturata, per noi non esiste.'
+      'Terzo hangar inaugurato ieri, quarto in calendario per domani. A Crespellano aspettano da anni il semaforo — qui intanto si taglia il nastro.',
+      'Qui la verità passa dal timbro e dall\'IVA. Senza fattura, in ufficio non arriva.'
     ]},
     {name:'Funzionario Calcarese',  lines:[
       'Togliti: porto le pratiche per il quinto hangar.',
-      'Orbito attorno a Crespellano. I soldi orbitano attorno a me. Non è fisica: è amministrazione.',
+      'Orbito attorno a Crespellano e i soldi fanno lo stesso giro. L\'amministrazione ha le sue orbite, comandante.',
       'Autenticazione rapida, file sigillato, cliente contento. Così gira l\'universo, comandante.'
     ]},
     {name:'Nave Scorta Calcara',    lines:[
-      'Trasporto ufficiale. Non avvicinarti o rispondo coi laser. Le chiamavamo frecce, ma sono laser.',
-      'Se porti roba sensibile, abbassa i fari. Non tutti vogliono vedere cosa timbriamo.'
+      'Trasporto ufficiale. Se ti avvicini troppo rispondo coi laser — qui li chiamavamo frecce, una volta.',
+      'Se porti roba sensibile, abbassa i fari. Meglio che certi timbri restino in penombra.'
     ]},
   ],
   monteveglio:[
@@ -2333,7 +2333,7 @@ const DIALOGUES = {
   pirate:[
     {name:'Pirata Spaziale',        lines:[
       'Crediti o fuoco. Scegli, e scegli in fretta.',
-      'Non sono di nessuna fazione. Sono di chi paga meglio.',
+      'Non tengo bandiera. Lavoro per chi paga meglio.',
       'Col commercio onesto non mi trovo: per questo faccio il pirata.',
       'Il Patto? Lo vendo al peso, come tutto il resto.'
     ]},
@@ -2357,9 +2357,9 @@ const TAVERN = {
     {s:'Custode dell\'archivio',   t:'"Qui dentro c\'è roba classificata male. A volte «male» è un complimento: significa che qualcuno aveva paura di scrivere bene."'},
   ],
   calcara:[
-    {s:'Funzionario al bar',       t:'"Il quinto hangar è in fase di inaugurazione anticipata. Firmi qui, qui e — no, non leggere. Solo firma. La lettura è un optional a pagamento."'},
-    {s:'Contabile orbitale',       t:'"La reputazione qui è una fattura: sotto zero paghi pedaggio. Sopra quaranta ti facciamo lo sconto sulla lamiera. È tutto molto umano, a modo nostro."'},
-    {s:'Appaltatore stanco',       t:'"Crespellano aspetta il semaforo. Noi vendiamo il verde. Coincidenze? Preferisco chiamarle opportunità."'},
+    {s:'Funzionario al bar',       t:'"Il quinto hangar è in inaugurazione anticipata. Firmi qui, qui e… no, non leggere. Solo firma. La lettura, da noi, è un optional a pagamento."'},
+    {s:'Contabile orbitale',       t:'"La reputazione qui gira come una fattura: sotto zero paghi pedaggio, sopra quaranta trovi lo sconto sulla lamiera. A modo nostro, funziona."'},
+    {s:'Appaltatore stanco',       t:'"Crespellano aspetta il semaforo; noi intanto vendiamo il verde. Io le chiamo opportunità, non coincidenze."'},
   ],
   monteveglio:[
     {s:'Cavaliere fuori turno',    t:'"Il torneo di questa settimana: Bazzano vs Ordine. Io con l\'Ordine. Ho l\'armatura e la freccia di luce — ehm, il laser. Conta il gesto."'},
@@ -7057,11 +7057,11 @@ function pickDlgOpening(ns){
   if(typeof STORY!=='undefined'&&STORY.chapter>=4&&((ns.seed||0)%3===0)){
     const storyBits={
       bazzano:'A Prime contano le scie due volte. Dicono che Imperium tenga d\'occhio le nostre anomalie, e che le casate maggiori ascoltino i rapporti. Io ascolto il vino. E se vedi uno space hulk: dentro non c\'è solo ruggine. Il macguffinium muta ciò che tocca.',
-      crespellano:'In archivio qualcuno ha paura di firmare. Non è il semaforo: è la voce che nelle anomalie c\'è materia che vale più di un hangar. Macguffinium, dicono. A mezza voce. Gli hulk? Sono pieni di cose che un tempo erano gente.',
-      calcara:'Arrivano intermediari che non chiedono appalti. Chiedono «firme dimensionali». Parlano di macguffinium come se fosse un codice IVA. I relitti? Contaminati. Mutazioni. Non mettere in bilancio la carne.',
+      crespellano:'In archivio qualcuno ha paura di firmare. Circola la voce che nelle anomalie ci sia materia che vale più di un hangar — macguffinium, dicono, a mezza voce. Gli hulk sono pieni di cose che un tempo erano gente.',
+      calcara:'Arrivano intermediari che chiedono «firme dimensionali» al posto degli appalti. Parlano di macguffinium come di un codice IVA. I relitti li trattiamo come contaminati: mutazioni comprese. La carne, in bilancio, meglio non mettercela.',
       monteveglio:'Se vedi una nave enorme, più grossa di uno hulk: è il Palazzo Beghelli. Cortesia di casata, aiuto poco. Gli hulk veri, quelli spezzati nelle anomalie, ospitano mostri: il macguffinium non perdona.',
-      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato. Non è tartufo: è macguffinium. E dentro gli hulk... cose che non dovrebbero camminare.',
-      pirate:'Il Patto? Lo vendo a pezzi. Le mappe degli hulk? Care. Dentro ci sono mostri perché il macguffinium li ha fatti così. Non è poesia: è biologia sporca.'
+      savigno:'L\'aroma giusto non mente. Nelle anomalie invece qualcosa puzza di metallo sbagliato: macguffinium. E dentro gli hulk camminano cose che farebbero meglio a stare ferme.',
+      pirate:'Il Patto lo vendo a pezzi. Le mappe degli hulk costano. Dentro ci sono mostri perché il macguffinium li ha rifatti a modo suo — biologia sporca, se ti piace chiamarla così.'
     };
     return storyBits[ns.faction]||lines[idx];
   }
@@ -7098,7 +7098,7 @@ const DLG_TREES={
       a6:{text:'Cerca nell\'orbita esterna di Sirena. Chi porta modulistica senza manifesto sa più del sindaco. E parla meno — merito raro, da queste parti.',choices:[
         {label:'[GRAZIE] "Ricevuto."',next:null,fx:{credits:40}}
       ]},
-      a7:{text:'Perché nelle anomalie c\'è macguffinium: materia a nove dimensioni. Contamina scafi, carne, memoria. Gli hulk non sono cimiteri: sono incubatrici. Chi ci restava dentro non è più quello che era. Abborda se ti serve un pezzo del Patto, ma non restare a chiacchierare coi mostri.',choices:[
+      a7:{text:'Perché nelle anomalie c\'è macguffinium: materia a nove dimensioni. Contamina scafi, carne, memoria. Gli hulk fungono da incubatrici più che da cimiteri. Chi ci restava dentro non è più quello che era. Abborda se ti serve un pezzo del Patto, ma non restare a chiacchierare coi mostri.',choices:[
         {label:'[CAPITO] "Grazie per l\'avviso."',next:null,fx:{rep:1,lore:'hulk_mutazioni'}}
       ]}
     }
@@ -7143,7 +7143,7 @@ const DLG_TREES={
       m4:{text:'Il Palazzo Beghelli è una nave-cattedrale. Dominavano Valsamoggio quando eravamo provincia vera. Ora sono casata minore: cortesia, pochi favori, poca forza. Se hai connessioni, chiedi. Non aspettarti flotte.',choices:[
         {label:'[CAPITO] "Grazie."',next:null,fx:{rep:1}}
       ]},
-      m5:{text:'Gli space hulk non sono castelli abbandonati: sono ferite dell\'anomalia. Il macguffinium muta la carne. I mostri che trovi nei corridoi erano equipaggi, prigionieri, topi di stiva. La Rocca li chiama prove. Io li chiamo peccati da non ripetere.',choices:[
+      m5:{text:'Gli space hulk sono ferite dell\'anomalia, non castelli abbandonati. Il macguffinium muta la carne. I mostri nei corridoi erano equipaggi, prigionieri, topi di stiva. La Rocca li chiama prove; io, peccati da non ripetere.',choices:[
         {label:'[CAPITO] "Non entrerò a cuor leggero."',next:null,fx:{rep:2,lore:'hulk_mutazioni'}}
       ]}
     }
@@ -7151,20 +7151,20 @@ const DLG_TREES={
   calcara:{
     start:'c1',
     nodes:{
-      c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità. In quest\'ordine. Cosa cerchi?',choices:[
+      c1:{text:'Canale Calcara. Pedaggi, pratiche, opportunità — in quest\'ordine. Cosa cerchi?',choices:[
         {label:'[AFFARI] "Cerco un contratto discreto."',next:'c2',fx:{rep:2}},
         {label:'[PRESSIONE] "So dei vostri appalti."',next:'c3',fx:{rep:-3}},
         {label:'[HULK] "Gli hulk contano nel bilancio?"',next:'c4'},
         {label:'[CHIUDI] "Niente per ora."',next:null}
       ]},
-      c2:{text:'Discreto costa. Ma paga. Due navi crespellanesi di troppo sul corridoio mercantile, e un bonus se nessuno parla. Ti interessa?',choices:[
+      c2:{text:'Il discreto ha un prezzo, e di solito paga. Due navi crespellanesi di troppo sul corridoio mercantile, più un bonus se nessuno parla. Ti interessa?',choices:[
         {label:'[ACCETTA] "Accetto."',next:null,fx:{mission:'dlg_calc_contract',rep:3,credits:50}},
         {label:'[DOPO] "Ci ripenso."',next:null}
       ]},
-      c3:{text:'Allora sai anche che la carta vince sul laser. Porta documenti a Prime e smettila di fare il detective a mezza voce.',choices:[
+      c3:{text:'Allora sai anche che da noi la carta arriva prima del laser. Porta documenti a Prime e lascia stare il detective a mezza voce.',choices:[
         {label:'[OK] "Ci penso io."',next:null,fx:{mission:'dlg_tip_calc'}}
       ]},
-      c4:{text:'Contano come rischio. Il macguffinium nelle anomalie muta ciò che resta a bordo: scafi, ratti, uomini. Noi non lo mettiamo a bilancio come «mostro»: lo chiamiamo contaminazione. Se abbordi, porta un filtro. E non firmare ricevute con sangue.',choices:[
+      c4:{text:'Contano come rischio. Il macguffinium nelle anomalie muta ciò che resta a bordo — scafi, ratti, uomini. In bilancio lo chiamiamo contaminazione. Se abbordi, porta un filtro e tieni le ricevute pulite.',choices:[
         {label:'[OK] "Ricevuto."',next:null,fx:{lore:'hulk_mutazioni'}}
       ]}
     }
@@ -7259,7 +7259,7 @@ function buildDlgChoices(ns){
     const greets={
       bazzano:'Taproblem. Vola sicuro, ma non troppo lontano dalla nostra zona. A Prime qualcuno conta le scie due volte.',
       crespellano:'Sì. Vola. Qui le mappe mentono per abitudine, non per malizia. Chi ci crede, lascia stare.',
-      calcara:'Grazie. Abbiamo appena inaugurato un altro hangar. Se ti serve un contratto, parla chiaro e firma.',
+      calcara:'Grazie. Hangar nuovo, nastro ancora caldo. Se ti serve un contratto, parla chiaro e firma.',
       monteveglio:'Per l\'onore della Rocca. Se cerchi prove, non portarci scuse.',
       savigno:'Ricevuto. Attento ai tartufi contraffatti e alle promesse di Calcara.',
       pirate:'Mmh. Non mi fido. Ma oggi non ho voglia di fare buchi nella tua carena.',
@@ -7280,7 +7280,7 @@ function buildDlgChoices(ns){
         return 'Il Patto? Carta vecchia e nervi nuovi. Se non sei inviato, fai il turista e basta.';
       },
       crespellano:()=>'Negli scaffali sbagliati c\'è più verità che nei comunicati. Porta pazienza. O una chiave.',
-      calcara:()=>'Se ha un prezzo, lo abbiamo già messo a budget. Se non ce l\'ha, per noi non esiste.',
+      calcara:()=>'Se ha un prezzo, lo abbiamo già messo a budget. Senza prezzo, in pratica, non entra in agenda.',
       monteveglio:()=>'Il Patto non si compra: si merita. La Rocca ascolta chi torna con prove, non con voci di corridoio.',
       savigno:()=>'Si sente nell\'aria, come un tartufo vero. Il resto è propaganda orbitale.',
       pirate:()=>'Io vendo pezzi di storia al chilo. Tu hai crediti o solo domande?'
@@ -7293,9 +7293,9 @@ function buildDlgChoices(ns){
   // ── Space Hulk / macguffinium mutations
   choices.push({label:'[HULK] "Perché gli space hulk sono pieni di mostri?"',cls:'',fn:()=>{
     const bits={
-      bazzano:'Perché nelle anomalie c\'è macguffinium. Materia a nove dimensioni: muta scafi e carne. Gli hulk non sono cimiteri, sono incubatrici. Chi ci restava… non è più quello che era.',
+      bazzano:'Perché nelle anomalie c\'è macguffinium. Materia a nove dimensioni: muta scafi e carne. Gli hulk fungono da incubatrici. Chi ci restava… non è più quello che era.',
       crespellano:'In archivio lo chiamano «contaminazione anomala». In pratica: macguffinium. I mostri erano gente. Noi archiviamo. Loro camminano ancora.',
-      calcara:'Contaminazione. Mutazione. Non è un capitolo di horror: è un rischio da bilancio. Il macguffinium nelle anomalie fa questo. Porta un filtro, non una poesia.',
+      calcara:'Contaminazione, mutazione, rischio da bilancio. Il macguffinium nelle anomalie fa questo. Porta un filtro e lascia le poesie a chi non firma.',
       monteveglio:'Ferite dell\'anomalia. Il macguffinium muta la carne. I mostri nei corridoi erano equipaggi. La Rocca li chiama prove; io li chiamo peccati.',
       savigno:'Puzzano di metallo sbagliato, non di terra. Macguffinium. I mostri erano gente, una volta. Noi teniamo l\'aroma; loro, le fauci.',
       pirate:'Macguffinium. Muta tutto. Io vendo le mappe degli hulk. Tu porta un\'arma e non fare amicizia con ciò che trovi dentro.'
@@ -7519,8 +7519,13 @@ function openIdlg(ns){
   if(moodEl)moodEl.textContent=getDlgMood(ns);
   document.getElementById('idlg-trade').style.display='none';
   const pc=document.getElementById('pilot-portrait');
+  const fem=typeof portraitLooksFeminineName==='function'
+    ?portraitLooksFeminineName(ns.displayName)
+    :/a$|ina$|essa\b|capitana|ispettrice|notaia|dottore?ssa|marina\b|lia\b|dama\b|palmira\b/i.test(String(ns.displayName||''));
+  ns.gender=fem?'f':'m';
   drawPilotPortrait(pc,ns.seed,faction,{
     name:ns.displayName,
+    gender:ns.gender,
     kind:(type==='pirate'||faction==='pirate')?'pirate':undefined
   });
   document.getElementById('idlg-choices').innerHTML='';
@@ -9836,7 +9841,7 @@ function leaveBoarding(opts){
       if(!PS.loreFlags.bp_salvage_radio){
         PS.loreFlags.bp_salvage_radio=1;
         setTimeout(()=>{
-          if(typeof showDlg==='function')showDlg('Tecnico di Bazzano','bazzano','Quei moduli… li montava tuo zio al Molino. Non sono pezzi da Imperium: sono pezzi di casa. Portane altri, tavò, se vuoi che la nave torni a sembrare tua.');
+          if(typeof showDlg==='function')showDlg('Tecnico di Bazzano','bazzano','Quei moduli… li montava tuo zio al Molino. Sanno di casa, non di Imperium. Portane altri, tavò, se vuoi che la nave torni a sembrare tua.');
         },900);
       }
       // Recupero pacifico (niente colpi sparati)
@@ -13908,13 +13913,13 @@ function triggerVictory(){
 
 const FINALE_SLIDES=[
   {chap:'FINALE · I',title:'Il Mulino Acceso',
-    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Il Patto non e\' un foglio: e\' una scelta rinnovata.',
+    text:'Le pale simboliche ripartono sopra Bazzano Prime. Cinque fazioni sotto lo stesso cielo. Il Patto torna a essere una scelta che si rinnova, foglio dopo foglio.',
     art:'sprites/story/finale_seq.jpg'},
   {chap:'FINALE · II',title:'Rapporto a Imperium',
-    text:'Il bollettino parte verso Imperium: "Situazione stabilizzata. Funzionario Marìa resta in loco." Qualcuno in alto non applaude — ma firma lo stesso.',
+    text:'Il bollettino parte verso Imperium: «Situazione stabilizzata. Funzionario Marìa resta in loco.» Qualcuno in alto firma senza applaudire.',
     art:'sprites/story/finale.jpg'},
   {chap:'FINALE · III',title:'Zvan Marìa',
-    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Dopo vent\'anni il ritorno non e\' una missione chiusa: e\' una casa riaperta. Il mulino gira.',
+    text:'Funzionario di settimo livello. Figlio di Valsamoggio. Dopo vent\'anni il ritorno lascia una casa riaperta, più che una missione chiusa. Il mulino gira.',
     art:'sprites/story/finale_seq.jpg'}
 ];
 function playFinaleSequence(){

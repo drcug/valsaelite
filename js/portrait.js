@@ -49,30 +49,46 @@
 
   function looksFeminineName(name) {
     if (!name || typeof name !== 'string') return false;
-    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b|morosina\b/i;
     const s = String(name).trim();
+    const masc = L.masculineNameRe || /\b(mariotto|fausto|pax|old man|sornione|jack|lupo|bardo|scudiero|sir |tenente|agente|corsaro|brigante|pirata della|assessore|direttore|ingegnere|comm\.|dir\.|ing\.|sgt\.|cap\.)\b/i;
+    if (masc.test(s)) return false;
+    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b|palmira\b|zia\b|cugina\b/i;
     if (re.test(s)) return true;
     // Controlla primo token ("Marina del Porto", "Dottoressa Baldi")
     const first = s.split(/[\s"']+/).filter(Boolean)[0] || '';
-    return !!(first && re.test(first));
+    return !!(first && re.test(first) && !masc.test(first));
+  }
+
+  function resolveGender(opt) {
+    opt = opt || {};
+    const kind = String(opt.kind || opt.gender || '').toLowerCase();
+    if (kind === 'f' || kind === 'female' || kind === 'women' || kind === 'woman') return 'f';
+    if (kind === 'm' || kind === 'male' || kind === 'men' || kind === 'man') return 'm';
+    if (looksFeminineName(opt.name || opt.displayName)) return 'f';
+    return 'm';
   }
 
   /**
-   * Sceglie il pool busto: pirate → pirati; nome femminile → donne;
-   * altrimenti uomini/donne in base al seed (civili misti).
+   * Sceglie il pool busto rispettando il genere.
+   * Pirati: pirate_women / pirate_men. Civili: women / men.
+   * Mai ritratti femminili su nomi maschili (e viceversa).
    */
   function resolvePortraitPool(seed, opt) {
     opt = opt || {};
     if (opt.pool && L.pools && L.pools[opt.pool]) return poolIndices(opt.pool);
     const fac = String(opt.factionId || opt.faction || '');
     const kind = String(opt.kind || opt.gender || '').toLowerCase();
-    if (fac === 'pirate' || kind === 'pirate' || kind === 'pirates') return poolIndices('pirate');
-    if (kind === 'f' || kind === 'female' || kind === 'women' || kind === 'woman') return poolIndices('women');
-    if (kind === 'm' || kind === 'male' || kind === 'men' || kind === 'man') return poolIndices('men');
-    if (looksFeminineName(opt.name || opt.displayName)) return poolIndices('women');
-    // Civili: ~38% donne (pool più piccolo), resto uomini
-    const x = ((seed * 1103515245 + 12345) >>> 0);
-    if ((x % 100) < 38) return poolIndices('women');
+    const gender = resolveGender(opt);
+    const isPirate = fac === 'pirate' || kind === 'pirate' || kind === 'pirates';
+    if (isPirate) {
+      if (gender === 'f') {
+        const pw = poolIndices('pirate_women');
+        return pw.length ? pw : poolIndices('women');
+      }
+      const pm = poolIndices('pirate_men');
+      return pm.length ? pm : poolIndices('men');
+    }
+    if (gender === 'f') return poolIndices('women');
     return poolIndices('men');
   }
 
@@ -432,6 +448,8 @@
   global.portraitFaceFromSeed = portraitFaceFromSeed;
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
+  global.portraitLooksFeminineName = looksFeminineName;
+  global.portraitResolveGender = resolveGender;
   global.resolvePortraitPool = resolvePortraitPool;
   /** Capelli Zvan: argento/bianco come in sprites/story/intro/intro_03.jpg */
   global.portraitHairTint = function () { return '#e8e6e2'; };
