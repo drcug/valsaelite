@@ -81,7 +81,7 @@
     canAccept(m) {
       if (!m) return { ok: true };
       if (m.requireSuborbit && !this.flags.suborbitDone) {
-        return { ok: false, msg: 'Prima completa un volo suborbitale su un pianeta (SUBORBITA dalla stazione).' };
+        return { ok: false, msg: 'Prima completa un volo suborbitale (≥55% della rotta o corridoio intero). Dalla stazione: VOLO SUBORBITALE.' };
       }
       if (m.requireHulk && !this.flags.hulkBoarded) {
         return { ok: false, msg: 'Prima abborda uno Space Hulk (cerca i relitti e premi ABBORDA).' };

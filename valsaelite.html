@@ -1341,7 +1341,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · nave = recupero pezzi blueprint (niente mostri) · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
-    <div class="help-grid"><span>Suborbita</span><span><kbd>WASD</kbd> quota/corsia · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita · <kbd>V</kbd> preset controlli</span></div>
+    <div class="help-grid"><span>Suborbita</span><span>Corridoio atmosferico di ispezione. <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>E</kbd> depositi · <kbd>ESC</kbd> uscita. Conta se ≥55% della rotta (o intera). Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
@@ -1835,10 +1835,10 @@ const STORY = {
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Vogliono tartufi — e vogliono sapere se ricordi ancora il sapore di casa. Prima di accettare la consegna, ispeziona i depositi con un volo suborbitale sul pianeta.',
+      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Prima vuole una prova: scendi in suborbita, ispeziona i depositi tartuferi e raccogli capsule aromatiche. Solo allora il Consiglio ti crede figlio di casa — e non un funzionario di passaggio.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Completa un volo SUBORBITALE su Savigno, poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
+        desc:'Completa un volo SUBORBITALE (≥55% della rotta o corridoio intero), preferibilmente su Savigno: ispeziona i depositi. Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, requireSuborbit:true, done:false, active:false},
     },
     {
@@ -1880,7 +1880,7 @@ const STORY_LINES={
   story_1:'[IMPERIUM → ZVAN] «Funzionario Marìa: l\'archivio di Crespellano non apre porte, apre scatoloni. Se puzza di pergamena e di burocrazia, probabilmente hai trovato il Patto — oppure un\'altra cosa che aspetta da vent\'anni, come te. Vai, e torna con qualcosa di leggibile.»',
   story_2:'[CALCARA] «Autenticazione rapida, troppo rapida. Qualcuno aveva già preparato il timbro mentre tu ancora decollavi da Imperium. Ricorda: da noi l\'ufficialità è un prodotto che si vende, e il verbale non è mai innocente. Porta il frammento, firma solo ciò che puoi difendere.»',
   story_3:'[MONTEVEGLIO] «Il Castellano non vuole copie imperiali: vuole prove. Tre navi calcaresi nel vuoto valgono più di un bollino. Porta il messaggio a chi ha bisogno di capirlo, e riporta il frammento intero.»',
-  story_4:'[SAVIGNO] «Il sigillo non ha prezzo in crediti. Si paga in tartufo, e in quanto ricordi ancora il sapore di casa. Tre chili: per noi è tradizione, non ricatto. Prima, però, guarda i depositi da vicino — un volo suborbitale basta.»',
+  story_4:'[SAVIGNO] «Il sigillo non ha prezzo in crediti. Prima scendi: guarda i depositi da vicino, raccogli ciò che puzza di casa. Poi i tartufi. Tre chili. Per noi è tradizione, non ricatto.»',
   story_5:'[BAZZANO PRIME] «I tre pezzi tornano a casa, e anche tu. Se Calcara intercetta il carico, non chiamarla pirateria: è una revisione di testo fatta con i laser. Non lasciare che riscrivano il Patto mentre cerchi un parcheggio in orbita.»',
   story_6:'[IMPERIUM] «Ispettore in arrivo. Prima del rapporto ufficiale, recupera ciò che giace negli hulk e consegna i documenti a Castelletto. Non firmare ciò che non hai letto, e non leggere ciò che non puoi difendere.»',
   story_7:'[CASTELLETTO] «I pirati non sono comparsi per caso: qualcuno paga il fuoco perché il Mulino resti spento. Tre scafi. Poi il vuoto potrà tornare a essere soltanto vuoto.»',
@@ -2180,10 +2180,10 @@ function renderDiaryContent(){
     else if(m.cargo){
       const gn=(typeof GOODS!=='undefined'&&GOODS[m.cargo.type])?GOODS[m.cargo.type].name:m.cargo.type;
       extra=`Carico: ${gn} ×${m.cargo.qty||1}. Destinazione: <strong>${tgt}</strong>.`;
-      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede volo SUBORBITALE completato.</em>`;
+      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede volo SUBORBITALE (≥55% della rotta o corridoio intero — pulsante dalla stazione).</em>`;
       if(m.requireHulk&&!done)extra+=` <em style="color:#ffb080">Richiede abbordaggio SPACE HULK.</em>`;
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
-        extra+=` <em style="color:#88ccaa">I tartufi vengono forniti all'accettazione (dopo il suborbitale).</em>`;
+        extra+=` <em style="color:#88ccaa">Obiettivo del volo: ispezionare i depositi / raccogliere capsule. I tartufi della consegna arrivano all'accettazione.</em>`;
       }
       if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
         extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
@@ -2617,8 +2617,8 @@ const ECON={
 let SUBORBIT_BALANCE_PRESET='narrative'; // narrative | arcade
 const SUBORBIT_TUNING={
   /* enemyMult/hazardMult moltiplicano gli intervalli di spawn: <1 = più traffico ostile */
-  narrative:{enemyMult:.76,hazardMult:.72,pickupMult:.82,enemyDmgMul:1.14,hazardDmgMul:1.18,bossKillsAdd:2,bossHpMul:.94,lootIdleRate:.001,killReward:9,pickupReward:0,bossReward:88},
-  arcade:{enemyMult:.88,hazardMult:.84,pickupMult:.92,enemyDmgMul:1.08,hazardDmgMul:1.12,bossKillsAdd:1,bossHpMul:.98,lootIdleRate:.0015,killReward:11,pickupReward:0,bossReward:122}
+  narrative:{enemyMult:.76,hazardMult:.72,pickupMult:.78,enemyDmgMul:1.08,hazardDmgMul:1.1,bossKillsAdd:2,bossHpMul:.94,lootIdleRate:.0006,killReward:11,pickupReward:8,bossReward:95},
+  arcade:{enemyMult:.88,hazardMult:.84,pickupMult:.88,enemyDmgMul:1.05,hazardDmgMul:1.08,bossKillsAdd:1,bossHpMul:.98,lootIdleRate:.001,killReward:13,pickupReward:10,bossReward:130}
 };
 function suborbitTuning(){return SUBORBIT_TUNING[SUBORBIT_BALANCE_PRESET]||SUBORBIT_TUNING.narrative;}
 let SUBORBIT_CONTROL_PRESET='assisted'; // assisted | arcade | sim
@@ -5150,11 +5150,17 @@ function suborbitTelemetry(ev,data){
 function suborbitRandomTip(sm){
   const pool=[];
   const sd=sm&&sm.sd||{};
+  if(SUBORBIT.storyInspect){
+    return 'Ispezione depositi: raccogli le capsule (F), completa ≥55% della rotta. Poi Savigno ti ascolterà.';
+  }
+  if(sd.id==='savigno'||sd.faction==='savigno'){
+    pool.push('Cintura tartufera: le capsule aromatiche contano più dei laser.','Depositi a bassa quota: trazione (F) e occhio ai container.');
+  }
   const pe=SUBORBIT_PTYPE_EVENTS[sd.pType]||SUBORBIT_PTYPE_EVENTS.default||[];
   const pl=SUBORBIT_PLANET_EVENTS[sd.id]||[];
   (Array.isArray(pe)?pe:[]).forEach(s=>pool.push(s));
   (Array.isArray(pl)?pl:[]).forEach(s=>pool.push(s));
-  if(!pool.length)return'Corridoio attivo: quota e corsia prima del fuoco.';
+  if(!pool.length)return'Corridoio attivo: quota e corsia. Completa ≥55% perché il volo conti.';
   return pool[(Math.random()*pool.length)|0];
 }
 function suborbitBurstHazards(n){
@@ -5280,11 +5286,19 @@ function showSuborbitDebrief(sum,onClose){
   g.textContent=sum.completed?sum.grade:'—';
   g.style.color=!sum.completed?'#aabdcc':sum.grade==='S'?'#8effc8':sum.grade==='A'?'#a8e6ff':sum.grade==='B'?'#ddeeff':'#ffbbaa';
   const sec=sum.dur.toFixed(1);
+  const gateOk=!!(sum.completed||sum.progressPct>=55);
+  let storyBeat='';
+  if(sum.firstInspectUnlock&&typeof STORY!=='undefined'&&STORY.chapter===4){
+    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Ispezione registrata (${sum.progressPct}%). I depositi hanno parlato: a Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
+  }else if(gateOk&&sum.progressPct<100&&!sum.completed){
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Rotta parziale ma sufficiente (≥55%). Il volo conta.</div>`;
+  }
   b.innerHTML=
-    `<div><strong>${(sum.pname+'').toUpperCase()}</strong></div>`
-    +`<div style="margin-top:6px">Tempo <strong>${sec}s</strong> · Kill <strong>${sum.kills}</strong> · Container <strong>${sum.collected}</strong> · Precisione fuoco <strong>${sum.acc}%</strong></div>`
-    +`<div style="margin-top:6px">Crediti sessione <strong>+${fmt(sum.credDelta)}</strong> · Contatti dannosi <strong>${sum.rough}</strong>${sum.sideDone?' · Secondario <span style="color:#8f8">OK</span>':''}</div>`
+    `<div><strong>${(sum.pname+'').toUpperCase()}</strong> · avanzamento <strong>${sum.progressPct}%</strong></div>`
+    +`<div style="margin-top:6px">Tempo <strong>${sec}s</strong> · Kill <strong>${sum.kills}</strong> · Container <strong>${sum.collected}</strong> · Precisione <strong>${sum.acc}%</strong></div>`
+    +`<div style="margin-top:6px">Crediti sessione <strong>+${fmt(sum.credDelta)}</strong> · Contatti <strong>${sum.rough}</strong>${sum.sideDone?' · Secondario <span style="color:#8f8">OK</span>':''}</div>`
     +`<div style="margin-top:10px;opacity:.92">${sum.flavor}</div>`
+    +storyBeat
     +`<div style="margin-top:10px;font-size:10px;color:#7a9aba;border-top:1px solid rgba(80,140,200,.3);padding-top:8px">Sfida del giorno: <em>${sum.daily}</em> — <strong style="color:${sum.dailyOk?'#66eeaa':'#ff9977'}">${sum.dailyOk?'COMPLETATA':'Non completata'}${sum.dailyBonus?` (+${fmt(sum.dailyBonus)})`:''}${sum.dailyAlready?' (già riscossa oggi)':''}</strong></div>`;
   d.style.display='flex';
   ok.onclick=()=>hideSuborbitDebrief();
@@ -5308,8 +5322,11 @@ function showTutorialOnce(lsKey,title,htmlBody){
   return true;
 }
 function tryShowTutorialSuborbit(){
-  return showTutorialOnce('valsaelite_tut_suborbit','Primo volo suborbitale',
-    '<p>Usa <strong>WASD</strong> per quota e corsia. <strong>Spazio</strong> spara; con doppio cannone esce una raffica. I <strong>moduli potenza</strong> (sfera brillante) attivano una <strong>raffica tripla</strong> per pochi secondi.</p><p>Su touch: <strong>MOT</strong> al centro tra SX/DX = motori (stessa funzione di <strong>W</strong>).</p><p><strong>F</strong> trazione sul <strong>container più vicino</strong> (fascio dalla nave); <strong>ESC</strong> per attracco anticipato.</p><p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso = Charger, ciano = Strafer, viola = Swarm. A 25/50/75% compaiono <strong>segmenti speciali</strong> (varco stretto, deriva, ostacoli). A fine corsa vedi il <strong>riepilogo</strong>.</p>');
+  return showTutorialOnce('valsaelite_tut_suborbit_v2','Volo suborbitale · ispezione',
+    '<p>È un <strong>corridoio atmosferico</strong>: scendi a bassa quota per ispezionare depositi, raccogliere capsule e tenere la corsia.</p>'
+    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione sul container più vicino · <strong>E</strong> vicino ai depositi a terra · <strong>ESC</strong> rientro.</p>'
+    +'<p>Il volo <strong>conta</strong> se completi almeno il <strong>55%</strong> della rotta (o tutto il corridoio). A 25/50/75% arrivano segmenti speciali.</p>'
+    +'<p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso Charger · ciano Strafer · viola Swarm. I detriti costano energia, non scafo. Alla fine: riepilogo e grado.</p>');
 }
 function tryShowTutorialBlueprint(){
   return showTutorialOnce('valsaelite_tut_blueprint','Cantiere · touch',
@@ -6520,6 +6537,11 @@ window.addEventListener('keydown',e=>{
     return;
   }
   if(e.code==='Escape'){
+    if(INTRO_STATE&&INTRO_STATE.open){
+      e.preventDefault();
+      introSkip();
+      return;
+    }
     const gm=document.getElementById('gmap');
     if(gm&&gm.style.display==='block'){e.preventDefault();closeMap();return;}
     const help=document.getElementById('help-modal');
@@ -6848,9 +6870,20 @@ function requestSuborbit(){
   const sm=getSM(GAME.dockedSt.sd.id);
   if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
   const name=sm.sd.name||'pianeta';
+  const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
+  const isSav=sm.sd.id==='savigno'||sm.sd.faction==='savigno';
+  let body='Scendi nell\'atmosfera di '+name+': un corridoio di ispezione a bassa quota.\n\n'
+    +'WASD quota/corsia · Spazio fuoco · F trazione container · E vicino ai depositi · ESC esci.\n'
+    +'Completa ≥55% della rotta (o tutto il corridoio) per far contare il volo.';
+  if(needsStory){
+    body=(isSav
+      ?'Savigno vuole una prova: ispeziona i depositi tartuferi e raccogli capsule aromatiche.\n\n'
+      :'Per il Capitolo 4 serve un volo di ispezione (≥55% o rotta intera). Su Savigno ha più senso, ma vale anche qui.\n\n')
+      +'WASD · Spazio · F trazione · ESC esci.\nPoi potrai accettare «Il Prezzo del Sigillo».';
+  }
   uiConfirm({
-    title:'VOLO SUBORBITALE',
-    body:'Avviare il corridoio su '+name+'?\nPotrai uscire con ESCI o ESC.',
+    title:needsStory?'ISPEZIONE SUBORBITALE':'VOLO SUBORBITALE',
+    body:body,
     ok:'AVVIA',
     cancel:'RESTA IN STAZIONE',
     onOk:()=>startSuborbit()
@@ -7688,8 +7721,8 @@ const SUBORBIT_FACTION_STYLE={
     milestones:{25:'Canale blindato al 25% — niente deviazioni.',50:'Metà canale: controlli attivi.',75:'Uscita amministrativa: pressione massima.'}},
   monteveglio:{pickupBias:-.05,enemyBias:.2,hazardBias:.05,tag:'PATTO DELL\'ORDINE',runGoalMult:1.12,autoExitDelay:7,objectiveHud:'GUERRA / ORDINE',
     milestones:{25:'Rete tattica al 25% — pattuglie in salita.',50:'Linea di fuoco centrale.',75:'Avamposto: ostili in convergenza.'}},
-  savigno:{pickupBias:.35,enemyBias:.02,hazardBias:-.04,tag:'CINTURA TARTUFERA',runGoalMult:.95,autoExitDelay:5.2,objectiveHud:'TARTUFI',
-    milestones:{25:'Vena aromatica al 25% — sospensioni dense.',50:'Cuore tartufero: raccolta segnata.',75:'Ultimo tratto: mercato e scia privata.'}}
+  savigno:{pickupBias:.35,enemyBias:.02,hazardBias:-.04,tag:'CINTURA TARTUFERA',runGoalMult:.88,autoExitDelay:4.6,objectiveHud:'DEPOSITI',
+    milestones:{25:'Vena aromatica al 25% — depositi in vista.',50:'Cuore tartufero: raccogli le capsule.',75:'Ultimo tratto: chiudi l\'ispezione e rientra.'}}
 };
 const SUBORBIT_PLANET_STYLE={
   // Palette allineate alle illustrazioni panoramiche Forbidden Planet
@@ -7780,7 +7813,7 @@ const SUBORBIT_PLANET_EVENTS={
   crespellano:['Segnaletica incompleta: rotta aggiornata a mano.'],
   calcara:['Canale amministrativo blindato: pedaggio non negoziabile.'],
   monteveglio:['Araldo della Rocca: "Onore o collisione".'],
-  savigno:['Mercato tartufi in pressione: quote quasi esaurite.'],
+  savigno:['Mercato tartufi in pressione: quote quasi esaurite.','Ispezione depositi: le capsule aromatiche sono segnate sul radar.'],
   san_chierlo:['Laboratorio esterno: campioni aromatici confermati.'],
   zappolino:['Fortezza in allerta: droni d\'interdizione pronti.'],
   castelletto:['Broadcast locale: "Benzina aperta H24".']
@@ -8317,17 +8350,25 @@ function resetSuborbitActors(){
   SUBORBIT.autoExitRemaining=null;
   const roll=Math.random();
   let sk,need,rew,lab;
-  if(roll<.36){sk='charger';need=2+((Math.random()*2)|0);rew=16+((Math.random()*16)|0);lab=`Abbatti ${need} Charger`;}
+  const storyInspect=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
+  const savRun=SUBORBIT.planet&&SUBORBIT.planet.sd&&(SUBORBIT.planet.sd.id==='savigno'||SUBORBIT.planet.sd.faction==='savigno');
+  if(storyInspect||savRun){
+    sk='pickup';need=storyInspect?3:2+((Math.random()*2)|0);rew=storyInspect?36:22+((Math.random()*14)|0);
+    lab=storyInspect?`Ispeziona: raccogli ${need} capsule`:`Raccogli ${need} capsule aromatiche`;
+  }else if(roll<.36){sk='charger';need=2+((Math.random()*2)|0);rew=16+((Math.random()*16)|0);lab=`Abbatti ${need} Charger`;}
   else if(roll<.68){sk='swarm';need=4+((Math.random()*3)|0);rew=12+((Math.random()*12)|0);lab=`Elimina ${need} swarm`;}
   else{sk='pickup';need=3+((Math.random()*3)|0);rew=18+((Math.random()*14)|0);lab=`Raccogli ${need} container`;}
-  SUBORBIT.sideObjective={kind:sk,need,reward:Math.round(rew),label:lab,prog:0,done:false};
+  SUBORBIT.sideObjective={kind:sk,need,reward:Math.round(rew),label:lab,prog:0,done:false,story:!!storyInspect};
   const pfGoal=SUBORBIT.profile||{};
   const procBase=29600+(Math.abs((SUBORBIT.seed|0)*17)%8400);
   const gMult=pfGoal.runGoalMult!=null?pfGoal.runGoalMult:1;
   let finalG;
   if(pfGoal.runGoal!=null)finalG=pfGoal.runGoal;
   else finalG=Math.round(procBase*gMult);
-  SUBORBIT.runGoal=Math.max(12000,Math.round(finalG*0.92));
+  // Cap. 4 / primo ispezione: rotta più corta e leggibile
+  const shortMul=storyInspect?0.72:(savRun?0.88:0.92);
+  SUBORBIT.runGoal=Math.max(11000,Math.round(finalG*shortMul));
+  SUBORBIT.storyInspect=!!storyInspect;
   applySuborbitActorLook();
 }
 function trackSideObjectiveKill(kind){
@@ -9003,6 +9044,8 @@ function updateSuborbitActors(dt){
       p.active=false;p.mesh.visible=false;SUBORBIT.collected++;
       if(SUBORBIT.dailyTrack&&SUBORBIT.tractoring)SUBORBIT.dailyTrack.tractoredPickups=(SUBORBIT.dailyTrack.tractoredPickups|0)+1;
       trackSideObjectivePickup();
+      const pr=suborbitTuning().pickupReward|0;
+      if(pr>0){PS.credits+=pr;if(typeof suborbitPushFloat==='function')suborbitPushFloat('+'+pr,'#b8ffd0');}
       if(p.kind==='power'){
         // Pickup speciale: reset parziale cooldown + micro-riparazione + raffica tripla.
         SUBORBIT.fireCd=Math.max(0,SUBORBIT.fireCd-.08);
@@ -9027,12 +9070,16 @@ function updateSuborbitActors(dt){
     }
     if(dz<-120){h.active=false;h.mesh.visible=false;continue;}
     if(Math.abs(h.wx-SUBORBIT.x)<34&&Math.abs(dz-40)<44){
-      // Ostacolo: scintille di avviso, niente danno (solo i nemici feriscono).
+      // Ostacolo: avviso + leggero costo energia (i nemici restano il pericolo serio).
       for(let k=0;k<10;k++){
         const sp=getP();if(!sp)break;
         sp.spawn(h.mesh.position.clone(),new THREE.Vector3((Math.random()-.5)*30,8+Math.random()*20,(Math.random()-.5)*20),pf.hazard||0xaa44ff,.14,1.8);
       }
-      if(typeof suborbitPushFloat==='function')suborbitPushFloat('OSTACOLO','#cc99ff');
+      if(SUBORBIT.runStats)SUBORBIT.runStats.roughHits=(SUBORBIT.runStats.roughHits||0)+1;
+      if(playerShip&&playerShip.energy!=null){
+        playerShip.energy=Math.max(0,(playerShip.energy||0)-6);
+      }
+      if(typeof suborbitPushFloat==='function')suborbitPushFloat('DETRITO · −E','#cc99ff');
       h.active=false;h.mesh.visible=false;
     }
   }
@@ -9169,15 +9216,20 @@ function enterSuborbit(sm){
   updateSuborbitTerrainVisual();
   GAME.state='suborbit';
   document.body.classList.add('suborbit-active');
-  notify('Volo suborbitale attivo: '+sm.sd.name);
-  suborbitTelemetry('enter',{planet:sm.sd.id,pType:sm.sd.pType});
+  notify(SUBORBIT.storyInspect
+    ?('Ispezione suborbitale: '+sm.sd.name+' — raccogli capsule, completa ≥55%.')
+    :('Volo suborbitale: '+sm.sd.name+' — ≥55% della rotta fa contare il volo.'));
+  suborbitTelemetry('enter',{planet:sm.sd.id,pType:sm.sd.pType,story:!!SUBORBIT.storyInspect});
   setTimeout(()=>tryShowTutorialSuborbit(),420);
 }
 function leaveSuborbit(opts){
   opts=opts||{};
   const sum=suborbitSnapshotSummary(opts);
+  const wasDone=typeof StorySys!=='undefined'&&StorySys.flags&&!!StorySys.flags.suborbitDone;
   if(sum&&(sum.completed||SUBORBIT.corridorComplete||sum.progressPct>=55)){
     if(typeof StorySys!=='undefined')StorySys.markSuborbit();
+    sum.firstInspectUnlock=!wasDone;
+    sum.storyInspect=!!SUBORBIT.storyInspect;
   }
   suborbitTelemetry('leave',sum);
   triggerSeqTransition('suborbit-out',0.48,'#a9d5ff');
@@ -9415,12 +9467,12 @@ function updatePlanetSkim(dt){
       notify(`Rotta completata — rientro automatico tra ~${sec0}s. ESC = attracco veloce.`,3000);
       if(!SUBORBIT.corridorBonusTaken&&SUBORBIT.planet){
         SUBORBIT.corridorBonusTaken=true;
-        const bonusCr=Math.floor(95+Math.random()*140);
+        const bonusCr=Math.floor((SUBORBIT.storyInspect?140:95)+Math.random()*(SUBORBIT.storyInspect?120:140));
         PS.credits+=bonusCr;
         let bonusMsg=`Bonus corridoio +${bonusCr} Cr`;
         if(cargoCnt()<PS.cargoMax){
           grantSuborbitLoot(SUBORBIT.planet,true);
-          bonusMsg+=' · carico recuperato';
+          bonusMsg+=SUBORBIT.storyInspect?' · campione depositi':' · carico recuperato';
         }
         notify(bonusMsg,2200);
       }
@@ -9464,7 +9516,13 @@ function updatePlanetSkim(dt){
       const stressW=Math.round(cl(((SUBORBIT.hudStressVis||1)-1)*200+34,6,100));
       const stressCol=stressW>78?'#ff8866':stressW>52?'#ffcc66':'#8ce0ff';
       const stressRow=`<div style="margin:2px auto 6px;max-width:min(92vw,400px);text-align:left"><div style="font:8px var(--FM);color:#9bb8d8;letter-spacing:.1em;margin-bottom:2px">INTENSITÀ CORRIDOIO</div><div style="height:5px;background:rgba(0,24,48,.75);border-radius:3px;overflow:hidden;border:1px solid rgba(80,140,200,.4)"><div style="height:100%;width:${stressW}%;background:linear-gradient(90deg,#224466,${stressCol});transition:width .2s ease"></div></div></div>`;
-      const introRow=SUBORBIT.time<2.95?`<div style="font:10px var(--FD);letter-spacing:.16em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55)">INGRESSO CORRIDOIO · ${(sm.sd.name+'').toUpperCase()}</div>`:'';
+      const introRow=SUBORBIT.time<3.4
+        ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55)">${
+            SUBORBIT.storyInspect
+              ?'ISPEZIONE DEPOSITI · raccogli capsule · ≥55% della rotta'
+              :'INGRESSO CORRIDOIO · '+(sm.sd.name+'').toUpperCase()+' · ≥55% conta'
+          }</div>`
+        :'';
       const tipRow=SUBORBIT.loadingTip?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:420px;margin-left:auto;margin-right:auto;font-style:italic">${SUBORBIT.loadingTip}</div>`:'';
       suborbitApplyFogPhase(routePct);
       shud.innerHTML=
@@ -9491,7 +9549,7 @@ function updatePlanetSkim(dt){
     }
     if(playerShip.health<28&&!SUBORBIT._lowHpPip){SUBORBIT._lowHpPip=true;playTone(280,.07,.05,'triangle');notify('Integrità scafo critica in corridoio.',1400);}
     suborbitUpdateScreenFx(dt);
-    if(Math.random()<suborbitTuning().lootIdleRate*dt*60&&cargoCnt()<PS.cargoMax)grantSuborbitLoot(sm,true);
+    if(!SUBORBIT.storyInspect&&Math.random()<suborbitTuning().lootIdleRate*dt*60&&cargoCnt()<PS.cargoMax)grantSuborbitLoot(sm,true);
     return;
   }
   if(skimSt){skimSt=null;skimT=0;}
@@ -12071,7 +12129,19 @@ function buildDock(st){
   }
   const tabs=document.getElementById('dktbs'),panels=document.getElementById('dkpns');
   const subBtn=document.getElementById('ldck-suborbit');
-  if(subBtn)subBtn.style.display=SKIM_TYPES.includes(sd.pType)?'inline-block':'none';
+  if(subBtn){
+    const show=SKIM_TYPES.includes(sd.pType);
+    subBtn.style.display=show?'inline-block':'none';
+    if(show){
+      const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
+      subBtn.textContent=needsStory?'ISPEZIONE SUBORBITALE':'VOLO SUBORBITALE';
+      subBtn.title=needsStory
+        ?'Ispeziona i depositi (≥55% rotta). Serve per Il Prezzo del Sigillo.'
+        :'Corridoio atmosferico: raccolta, combattimento leggero, rientro con ESC.';
+      subBtn.style.borderColor=needsStory?'rgba(120,220,160,.55)':'';
+      subBtn.style.boxShadow=needsStory?'0 0 12px rgba(80,180,120,.25)':'none';
+    }
+  }
   const retainTab=typeof GAME!=='undefined'&&GAME.dockActiveTab?GAME.dockActiveTab:null;
   tabs.innerHTML='';panels.innerHTML='';
   const svcs=sd.svcs||[];
