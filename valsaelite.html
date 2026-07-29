@@ -9816,14 +9816,20 @@ function updatePlanetSkim(dt){
       const stressW=Math.round(cl(((SUBORBIT.hudStressVis||1)-1)*200+34,6,100));
       const stressCol=stressW>78?'#ff8866':stressW>52?'#ffcc66':'#8ce0ff';
       const stressRow=`<div style="margin:2px auto 6px;max-width:min(92vw,400px);text-align:left"><div style="font:8px var(--FM);color:#9bb8d8;letter-spacing:.1em;margin-bottom:2px">INTENSITÀ CORRIDOIO</div><div style="height:5px;background:rgba(0,24,48,.75);border-radius:3px;overflow:hidden;border:1px solid rgba(80,140,200,.4)"><div style="height:100%;width:${stressW}%;background:linear-gradient(90deg,#224466,${stressCol});transition:width .2s ease"></div></div></div>`;
-      const introRow=SUBORBIT.time<3.4
-        ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55)">${
+      // Box istruzioni solo all'ingresso: sparisce dopo i primi secondi di volo.
+      const showGuide=SUBORBIT.time<7.2;
+      if(!showGuide&&SUBORBIT.loadingTip)SUBORBIT.loadingTip='';
+      const guideFade=showGuide?Math.max(0,Math.min(1,(7.2-SUBORBIT.time)/1.4)):0;
+      const introRow=showGuide
+        ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55);opacity:${guideFade.toFixed(2)};transition:opacity .35s ease">${
             SUBORBIT.storyInspect
               ?'CIRCUITO DEPOSITI · sigilla i vault con E'
               :'CIRCUITO DEPOSITI · '+(sm.sd.name+'').toUpperCase()+' · E = sigillo'
           }</div>`
         :'';
-      const tipRow=SUBORBIT.loadingTip?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:420px;margin-left:auto;margin-right:auto;font-style:italic">${SUBORBIT.loadingTip}</div>`:'';
+      const tipRow=(showGuide&&SUBORBIT.loadingTip)
+        ?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:420px;margin-left:auto;margin-right:auto;font-style:italic;opacity:${guideFade.toFixed(2)}">${SUBORBIT.loadingTip}</div>`
+        :'';
       suborbitApplyFogPhase(routePct);
       shud.innerHTML=
         `${introRow}${tipRow}${stressRow}`
