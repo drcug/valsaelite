@@ -39,7 +39,7 @@
           },
           n2b: {
             speaker: 'npc',
-            text: '«Funzionario Marìa». Una volta scendevi a priori dai compiti di catechismo, adesso parli da ufficio. Le suore riderebbero — e poi ti darebbero ancora una merenda. Siediti.',
+            text: '«Funzionario Marìa». Una volta scendevi di corsa dai compiti di catechismo, adesso parli da ufficio. Le suore riderebbero — e poi ti darebbero ancora una merenda. Siediti.',
             choices: [
               { label: '[ZVAN] "Forse il titolo mi è restato addosso."', next: 'n3' },
               { label: '[ZVAN] "Sotto l\'armatura ho ancora sete di vino."', next: 'n3' }

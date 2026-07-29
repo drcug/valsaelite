@@ -763,7 +763,8 @@ body.suborbit-active #heat-bar,
 body.suborbit-active #heat-lbl{display:none !important;}
 body.suborbit-active #fx-toggle{display:none !important;}
 body.suborbit-active #navarrow{display:none !important;}
-body.suborbit-active #skim-lbl{display:none !important;}
+body.suborbit-active #skim-lbl,
+body.suborbit-active #skim-bar{display:none !important;}
 body.suborbit-active #notif{
   z-index:6250 !important;
   top:max(8px,env(safe-area-inset-top)) !important;
@@ -1342,7 +1343,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · nave = recupero pezzi blueprint (niente mostri) · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
-    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd>. <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita. Primario = sigilli; fallback ≥55% rotta. Non confondere con le corsie commerciali nello spazio.</span></div>
+    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd> (3 sigilli). <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> rientro in stazione. Cap.4 si sblocca solo col Circuito completo. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
@@ -1836,7 +1837,7 @@ const STORY = {
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Prima vuole una prova: scendi in suborbita, completa il Circuito Depositi e sigilla i vault tartuferi. Solo allora il Consiglio ti crede figlio di casa — e non un funzionario di passaggio.',
+      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Prima vuole una prova: scendi in suborbita e completa il Circuito Depositi (tre vault da sigillare). Solo allora il Consiglio ti crede figlio di casa — e non un funzionario di passaggio.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
         desc:'Completa il CIRCUITO DEPOSITI in suborbita (3 sigilli con E, preferibilmente su Savigno). Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
@@ -2181,10 +2182,10 @@ function renderDiaryContent(){
     else if(m.cargo){
       const gn=(typeof GOODS!=='undefined'&&GOODS[m.cargo.type])?GOODS[m.cargo.type].name:m.cargo.type;
       extra=`Carico: ${gn} ×${m.cargo.qty||1}. Destinazione: <strong>${tgt}</strong>.`;
-      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede Circuito Depositi in suborbita (3 sigilli con E — o ≥55% rotta). Dalla stazione: VOLO SUBORBITALE.</em>`;
+      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede Circuito Depositi completo (3 sigilli con E). Dalla stazione: VOLO SUBORBITALE.</em>`;
       if(m.requireHulk&&!done)extra+=` <em style="color:#ffb080">Richiede abbordaggio SPACE HULK.</em>`;
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
-        extra+=` <em style="color:#88ccaa">Obiettivo del volo: sigillare i depositi. I tartufi della consegna arrivano all'accettazione.</em>`;
+        extra+=` <em style="color:#88ccaa">Tracker: sigilla 3 depositi in suborbita. I tartufi della consegna arrivano all'accettazione.</em>`;
       }
       if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
         extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
@@ -5152,17 +5153,17 @@ function suborbitRandomTip(sm){
   const pool=[];
   const sd=sm&&sm.sd||{};
   if(SUBORBIT.storyInspect){
-    return 'Circuito Depositi: avvicinati ai vault luminosi e premi E per sigillare. Tre sigilli chiudono l\'ispezione.';
+    return 'Circuito Depositi: tre vault luminosi. Avvicinati e premi E — tutti e tre sbloccano Cap.4.';
   }
   if(sd.id==='savigno'||sd.faction==='savigno'){
     pool.push('Cintura tartufera: i vault aromatici contano più dei laser.','Depositi a bassa quota: E per sigillare, F per le capsule.');
   }
-  pool.push('Cerca i depositi con anello ciano: avvicinati e premi E.','Circuito Depositi: tre sigilli e rientri. Il combattimento è contorno.');
+  pool.push('Cerca i depositi con anello ciano: avvicinati e premi E.','Circuito Depositi: tre sigilli chiudono la missione. Il combattimento è contorno.');
   const pe=SUBORBIT_PTYPE_EVENTS[sd.pType]||SUBORBIT_PTYPE_EVENTS.default||[];
   const pl=SUBORBIT_PLANET_EVENTS[sd.id]||[];
   (Array.isArray(pe)?pe:[]).forEach(s=>pool.push(s));
   (Array.isArray(pl)?pl:[]).forEach(s=>pool.push(s));
-  if(!pool.length)return'Circuito Depositi: sigilla i siti con E. ≥55% della rotta resta un fallback.';
+  if(!pool.length)return'Circuito Depositi: sigilla i tre siti con E per chiudere la run.';
   return pool[(Math.random()*pool.length)|0];
 }
 function suborbitBurstHazards(n){
@@ -5292,16 +5293,18 @@ function showSuborbitDebrief(sum,onClose){
   g.textContent=sum.completed?sum.grade:'—';
   g.style.color=!sum.completed?'#aabdcc':sum.grade==='S'?'#8effc8':sum.grade==='A'?'#a8e6ff':sum.grade==='B'?'#ddeeff':'#ffbbaa';
   const sec=sum.dur.toFixed(1);
-  const gateOk=!!(sum.completed||sum.depositsDone||sum.progressPct>=55);
+  const circuitOk=!!sum.depositsDone;
   let storyBeat='';
   if(sum.firstInspectUnlock&&typeof STORY!=='undefined'&&STORY.chapter===4){
-    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Circuito registrato (sigilli ${sum.depositsSealed||0}/${sum.depositsNeed||3} · rotta ${sum.progressPct}%). A Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
-  }else if(sum.depositsDone){
-    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Tutti i depositi sigillati. Circuito chiuso.</div>`;
-  }else if(gateOk&&sum.progressPct<100&&!sum.completed){
-    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Rotta parziale ma sufficiente (≥55%). Il volo conta.</div>`;
+    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Circuito registrato (sigilli ${sum.depositsSealed||0}/${sum.depositsNeed||3}). A Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
+  }else if(circuitOk){
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Tutti i depositi sigillati. Circuito chiuso — gate Cap.4 sbloccato.</div>`;
+  }else if((sum.depositsSealed|0)>0){
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#c0a070">Sigilli ${sum.depositsSealed}/${sum.depositsNeed||3}: per sbloccare Cap.4 serve chiudere il Circuito (tutti i vault).</div>`;
+  }else if(sum.progressPct>=55&&!circuitOk){
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#a09070">Rotta ${sum.progressPct}%: crediti e grado ok, ma Cap.4 richiede i 3 sigilli.</div>`;
   }
-  const depRow=`<div style="margin-top:6px">Depositi sigillati <strong>${sum.depositsSealed||0}/${sum.depositsNeed||3}</strong>${sum.depositsDone?' · <span style="color:#8f8">CIRCUITO OK</span>':''}</div>`;
+  const depRow=`<div style="margin-top:6px">Depositi sigillati <strong>${sum.depositsSealed||0}/${sum.depositsNeed||3}</strong>${circuitOk?' · <span style="color:#8f8">CIRCUITO OK</span>':''}</div>`;
   b.innerHTML=
     `<div><strong>${(sum.pname+'').toUpperCase()}</strong> · avanzamento <strong>${sum.progressPct}%</strong></div>`
     +depRow
@@ -5332,10 +5335,10 @@ function showTutorialOnce(lsKey,title,htmlBody){
   return true;
 }
 function tryShowTutorialSuborbit(){
-  return showTutorialOnce('valsaelite_tut_suborbit_v3','Circuito Depositi · suborbita',
-    '<p>È un <strong>corridoio atmosferico</strong>: obiettivo primario = <strong>sigillare i depositi</strong> (vault con anello ciano).</p>'
-    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione container · <strong>E</strong> sigilla il deposito vicino · <strong>ESC</strong> rientro.</p>'
-    +'<p>Completa il <strong>Circuito</strong> (tutti i sigilli) per chiudere la missione. Fallback: ≥55% della rotta. A 25/50/75% arrivano segmenti speciali.</p>'
+  return showTutorialOnce('valsaelite_tut_suborbit_v4','Circuito Depositi · suborbita',
+    '<p>Obiettivo: <strong>sigillare 3 depositi</strong> (vault con anello ciano). È l\'unico modo per sbloccare Cap.4 / «Il Prezzo del Sigillo».</p>'
+    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione · <strong>E</strong> sigilla · <strong>ESC</strong> rientro in stazione.</p>'
+    +'<p>I tre vault sono nella prima metà della rotta. Completata la rotta o i sigilli, rientri automaticamente in stazione.</p>'
     +'<p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso Charger · ciano Strafer · viola Swarm. I detriti costano energia, non scafo.</p>');
 }
 function tryShowTutorialBlueprint(){
@@ -6884,12 +6887,12 @@ function requestSuborbit(){
   const isSav=sm.sd.id==='savigno'||sm.sd.faction==='savigno';
   let body='Scendi nell\'atmosfera di '+name+': Circuito Depositi.\n\n'
     +'WASD quota/corsia · Spazio fuoco · F trazione · E sigilla i vault · ESC esci.\n'
-    +'Obiettivo: sigilla 3 depositi. Fallback: ≥55% della rotta.';
+    +'Obiettivo: sigilla 3 depositi (nella prima metà della rotta).';
   if(needsStory){
     body=(isSav
-      ?'Savigno vuole una prova: sigilla i depositi tartuferi del Circuito.\n\n'
+      ?'Savigno vuole una prova: sigilla i tre depositi tartuferi del Circuito.\n\n'
       :'Per il Capitolo 4 serve il Circuito Depositi (3 sigilli). Su Savigno ha più senso, ma vale anche qui.\n\n')
-      +'WASD · Spazio · F trazione · E sigillo · ESC esci.\nPoi potrai accettare «Il Prezzo del Sigillo».';
+      +'WASD · Spazio · F trazione · E sigillo · ESC stazione.\nPoi potrai accettare «Il Prezzo del Sigillo».';
   }
   uiConfirm({
     title:needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE',
@@ -7934,20 +7937,22 @@ function setupSuborbitDeposits(sm){
     if(d.mesh){scene.remove(d.mesh);suborbitDisposeGroupVisual(d.mesh);}
   });
   const names=suborbitDepositNames(sm);
-  const need=SUBORBIT.storyInspect?3:(sm&&sm.sd&&(sm.sd.id==='savigno'||sm.sd.faction==='savigno')?3:3);
+  // Sempre 3: tutti prima del 55% della rotta (gate Cap.4 = solo sigilli)
+  const need=3;
   SUBORBIT.depositsNeed=need;
   SUBORBIT.depositsSealed=0;
   SUBORBIT.deposits=[];
   SUBORBIT.nearDeposit=null;
   const goal=Math.max(14000,SUBORBIT.runGoal||28000);
-  // Depositi sparsi lungo la rotta, leggermente fuori asse
+  // Posizioni ~18% / 34% / 48% — circuito chiudibile senza dover fare tutta la rotta
+  const fracs=[0.18,0.34,0.48];
   for(let i=0;i<need;i++){
-    const t=(i+1)/(need+0.35);
+    const t=fracs[i]!=null?fracs[i]:((i+1)/(need+1))*0.5;
     const dep={
       id:'dep_'+i,
       name:names[i%names.length],
       wx:(i%2===0?-1:1)*(180+i*70),
-      wz:Math.round(goal*t*0.92),
+      wz:Math.round(goal*t),
       sealed:false,
       mesh:null
     };
@@ -7976,7 +7981,7 @@ function sealSuborbitDeposit(dep){
     SUBORBIT.corridorComplete=true;
     const pf=SUBORBIT.profile||{};
     SUBORBIT.autoExitRemaining=pf.autoExitDelay!=null?Math.min(4.2,pf.autoExitDelay):4.2;
-    notify('Circuito depositi completato — rientro automatico.',2800);
+    notify('Circuito depositi completato — rientro in stazione.',2800);
     if(!SUBORBIT.corridorBonusTaken&&SUBORBIT.planet){
       SUBORBIT.corridorBonusTaken=true;
       const bonusCr=Math.floor(160+Math.random()*120);
@@ -9492,9 +9497,7 @@ function enterSuborbit(sm){
   updateSuborbitTerrainVisual();
   GAME.state='suborbit';
   document.body.classList.add('suborbit-active');
-  notify(SUBORBIT.storyInspect
-    ?('Circuito Depositi · '+sm.sd.name+' — sigilla '+SUBORBIT.depositsNeed+' siti con E.')
-    :('Circuito Depositi · '+sm.sd.name+' — sigilla i depositi (E); ≥55% resta fallback.'));
+  notify('Circuito Depositi · '+sm.sd.name+' — sigilla '+SUBORBIT.depositsNeed+' siti con E.');
   suborbitTelemetry('enter',{planet:sm.sd.id,pType:sm.sd.pType,story:!!SUBORBIT.storyInspect});
   setTimeout(()=>tryShowTutorialSuborbit(),420);
 }
@@ -9502,9 +9505,14 @@ function leaveSuborbit(opts){
   opts=opts||{};
   const sum=suborbitSnapshotSummary(opts);
   const wasDone=typeof StorySys!=='undefined'&&StorySys.flags&&!!StorySys.flags.suborbitDone;
-  if(sum&&(sum.completed||SUBORBIT.corridorComplete||sum.depositsDone||sum.progressPct>=55)){
+  // Gate Cap.4 / Prezzo del Sigillo: solo Circuito Depositi completo (non ≥55%, non morte)
+  const circuitOk=!!(sum&&sum.depositsDone);
+  if(circuitOk&&!opts.skipDebrief){
     if(typeof StorySys!=='undefined')StorySys.markSuborbit();
     sum.firstInspectUnlock=!wasDone;
+    sum.storyInspect=!!SUBORBIT.storyInspect;
+  }else if(sum){
+    sum.firstInspectUnlock=false;
     sum.storyInspect=!!SUBORBIT.storyInspect;
   }
   suborbitTelemetry('leave',sum);
@@ -9513,6 +9521,9 @@ function leaveSuborbit(opts){
   SUBORBIT.corridorHalf=720;
   SUBORBIT.autoExitRemaining=null;
   SUBORBIT.profile=null;
+  SUBORBIT.storyInspect=false;
+  SUBORBIT.circuitMode=false;
+  SUBORBIT.loadingTip='';
   SUBORBIT.terrain.chunks.forEach(ch=>ch.mesh.visible=false);
   SUBORBIT.props.forEach(m=>m.visible=false);
   SUBORBIT.enemies.forEach(e=>{e.active=false;e.mesh.visible=false;});
@@ -9521,7 +9532,7 @@ function leaveSuborbit(opts){
   (SUBORBIT.deposits||[]).forEach(d=>{
     if(d.mesh){scene.remove(d.mesh);suborbitDisposeGroupVisual(d.mesh);}
   });
-  SUBORBIT.deposits=[];SUBORBIT.nearDeposit=null;SUBORBIT.depositsSealed=0;
+  SUBORBIT.deposits=[];SUBORBIT.nearDeposit=null;SUBORBIT.depositsSealed=0;SUBORBIT.depositsNeed=3;
   if(SUBORBIT.boss&&SUBORBIT.boss.mesh){SUBORBIT.boss.active=false;SUBORBIT.boss.mesh.visible=false;SUBORBIT.boss.hp=0;}
   SUBORBIT.subBullets.forEach(b=>{
     b.active=false;b.life=0;b._hitRx=38;b._hitRz=44;b.laneWorldY=null;
@@ -9533,6 +9544,11 @@ function leaveSuborbit(opts){
   renderer.setClearColor(SUBORBIT.prevClear,1);
   clearSuborbitSkyPano();
   document.body.classList.remove('suborbit-active');
+  // Cleanup HUD: evita skim/overlay sopra debrief o orbita
+  const skimBar=document.getElementById('skim-bar'),skimLbl=document.getElementById('skim-lbl'),shudLeave=document.getElementById('suborbit-hud');
+  if(skimBar)skimBar.style.display='none';
+  if(skimLbl)skimLbl.style.display='none';
+  if(shudLeave){shudLeave.style.display='none';shudLeave.innerHTML='';}
   const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
   playerShip.velocity.copy(fwd).multiplyScalar(140);
   playerShip.mesh.rotation.x=0;playerShip.mesh.rotation.z=0;
@@ -9544,6 +9560,8 @@ function leaveSuborbit(opts){
   const fl=document.getElementById('suborbit-float-layer');
   if(fl)fl.innerHTML='';
   GAME.state='flying';
+  // Default: dopo Circuito rientra in stazione (come ESC), salvo morte / skip esplicito
+  if(opts.toDock==null&&!opts.skipDebrief)opts.toDock=true;
   const dockId=opts.toDock?sum.fromDock:null;
   if(sum.showPanel){
     showSuborbitDebrief(sum,()=>{
@@ -9627,8 +9645,8 @@ function updatePlanetSkim(dt){
       SUBORBIT.autoExitRemaining-=dt;
       if(SUBORBIT.autoExitRemaining<=0){
         SUBORBIT.autoExitRemaining=null;
-        notify('Circuito depositi chiuso — rientro in orbita bassa.',2200);
-        leaveSuborbit();
+        notify('Circuito depositi chiuso — rientro in stazione.',2200);
+        leaveSuborbit({toDock:true});
         return;
       }
     }
@@ -9721,14 +9739,8 @@ function updatePlanetSkim(dt){
       // Solo rimbalzo: niente danno da bordo corridoio.
       if(typeof suborbitPushFloat==='function')suborbitPushFloat('BORDO','#aaddff');
     }
-    if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
-    if(lbl){
-      const dep=SUBORBIT.nearDeposit&&!SUBORBIT.nearDeposit.sealed;
-      const useHint=dep?(' · E · '+SUBORBIT.nearDeposit.name):(SUBORBIT.nearProp?' · PROP':'');
-      const sealTxt=` · SIG ${SUBORBIT.depositsSealed|0}/${SUBORBIT.depositsNeed|0}`;
-      lbl.style.display='block';
-      lbl.textContent=`${sm.sd.name.toUpperCase()} · ${pf.tag||'SUBORBITALE'} · SPD ${Math.round(SUBORBIT.speed)} · K ${SUBORBIT.kills} · RACC ${SUBORBIT.collected}${sealTxt}${useHint}`;
-    }
+    if(bar)bar.style.display='none';
+    if(lbl)lbl.style.display='none';
     // Obiettivo rotta + milestone (indipendente dal DOM HUD)
     const goalDist=SUBORBIT.runGoal||32000;
     const routePct=Math.min(100,(SUBORBIT.offset/goalDist)*100);
@@ -9747,7 +9759,7 @@ function updatePlanetSkim(dt){
       SUBORBIT.corridorComplete=true;
       SUBORBIT.autoExitRemaining=pf.autoExitDelay!=null?pf.autoExitDelay:5.5;
       const sec0=Math.ceil(SUBORBIT.autoExitRemaining);
-      notify(`Rotta completata — rientro automatico tra ~${sec0}s. ESC = attracco veloce.`,3000);
+      notify(`Rotta completata — rientro in stazione tra ~${sec0}s.`,3000);
       if(!SUBORBIT.corridorBonusTaken&&SUBORBIT.planet){
         SUBORBIT.corridorBonusTaken=true;
         const bonusCr=Math.floor((SUBORBIT.storyInspect?140:95)+Math.random()*(SUBORBIT.storyInspect?120:140));
@@ -9764,7 +9776,7 @@ function updatePlanetSkim(dt){
       else if(hpN>=.38)notify('Esito rotta: accettabile — danni contenuti.',2200);
       else notify('Esito rotta: critico — intervento manutenzione consigliato.',2600);
     }
-    // Altitude / corridor HUD in #suborbit-hud (DOM, leggero)
+    // HUD snello: obiettivo sigilli + status essenziale
     const shud=document.getElementById('suborbit-hud');
     if(shud){
       const g=suborbitHeight(SUBORBIT.seed,SUBORBIT.x,SUBORBIT.offset+40);
@@ -9773,26 +9785,17 @@ function updatePlanetSkim(dt){
       const corridorPct=Math.min(100,corridorFrac*100);
       const altWarn=altAbove<40?'color:#ff6644':altAbove<90?'color:#ffcc44':'color:#88ddff';
       const corWarn=corridorFrac>.88?'color:#ff4433':corridorFrac>.7?'color:#ffbb44':'color:#88ccff';
-      const fiMax=suborbitFireInterval();
-      const cdPct=Math.max(0,Math.min(100,SUBORBIT.fireCd/fiMax*100));
-      const thrPct=Math.round((SUBORBIT.throttle+1)*50);
-      const thrCol=SUBORBIT.throttle>0.2?'#8effa0':SUBORBIT.throttle<-0.2?'#ffb37a':'#aab6c8';
-      const tw=SUBORBIT.terrainWarn;
-      const twCol=tw>.66?'#ff5533':tw>.32?'#ffbb44':'#77cfff';
       shud.style.display='block';
       const hpC=playerShip.health>=55?'#66eeaa':playerShip.health>=28?'#ffcc66':'#ff6655';
       const enC=playerShip.energy>=45?'#88ccff':playerShip.energy>=18?'#ffbb77':'#ff6655';
-      const routeBarCol=SUBORBIT.corridorComplete?'#66ffaa':'#9ec8ff';
-      const objLbl=(pf.objectiveHud||'CIRCUITO').toString().slice(0,24);
       const exitSec=SUBORBIT.autoExitRemaining!=null?Math.max(0,Math.ceil(SUBORBIT.autoExitRemaining)):0;
       const exitRow=SUBORBIT.corridorComplete&&SUBORBIT.autoExitRemaining!=null
-        ?`<div style="font:10px var(--FM);color:#a8ffd0;margin:4px 0 2px;letter-spacing:.06em">ORBITA · uscita tra <span style="color:#dff">${exitSec}</span>s · ESC = attracco</div>`
+        ?`<div style="font:10px var(--FM);color:#a8ffd0;margin:4px 0 2px;letter-spacing:.06em">RIENTRO STAZIONE · <span style="color:#dff">${exitSec}</span>s · ESC = subito</div>`
         :'';
       const so=SUBORBIT.sideObjective;
       const soRow=so&&!so.done
-        ?`<div style="font:9px var(--FM);color:#c8e6ff;margin:3px 0 1px;letter-spacing:.05em;border-top:1px solid rgba(80,140,220,.25);padding-top:4px">`
-        +`SECONDARIO · ${so.label} · <span style="color:#8ef">${so.prog||0}/${so.need}</span> · +${fmt(so.reward)} Cr</div>`
-        :(so&&so.done?`<div style="font:9px var(--FM);color:#7dffa8;margin:3px 0 1px;opacity:.9">Secondario completato.</div>`:'');
+        ?`<div style="font:9px var(--FM);color:#9ab8d0;margin:2px 0 1px;letter-spacing:.04em">+ ${so.label} · ${so.prog||0}/${so.need}</div>`
+        :'';
       const depNeed=SUBORBIT.depositsNeed|0;
       const depSeal=SUBORBIT.depositsSealed|0;
       const depDone=depNeed>0&&depSeal>=depNeed;
@@ -9801,58 +9804,45 @@ function updatePlanetSkim(dt){
       const depPct=depNeed?Math.min(100,(depSeal/depNeed)*100):0;
       const depBarCol=depDone?'#66ffaa':'#7ee8ff';
       const depPrompt=nearDep
-        ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 6px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">E · SIGILLA · ${(nearDep.name+'').toUpperCase()}</div>`
-        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 4px;letter-spacing:.06em">Prossimo vault · ${nextOpen.name}</div>`:'');
-      const depRow=`<div style="margin:5px auto 7px;max-width:min(92vw,400px);text-align:left">`
-        +`<div style="font:9px var(--FM);color:${depBarCol};letter-spacing:.08em;margin-bottom:3px">`
-        +(depDone?'CIRCUITO CHIUSO · ':'CIRCUITO DEPOSITI · ')
-        +`<span style="color:#dff">${depSeal}/${depNeed}</span> sigilli</div>`
-        +`<div style="height:7px;background:rgba(0,40,48,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,220,200,.45)">`
+        ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 4px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">E · SIGILLA · ${(nearDep.name+'').toUpperCase()}</div>`
+        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 2px;letter-spacing:.06em">Prossimo · ${nextOpen.name}</div>`:'');
+      const objRow=`<div style="margin:4px auto 6px;max-width:min(92vw,380px);text-align:left">`
+        +`<div style="font:10px var(--FM);color:${depBarCol};letter-spacing:.08em;margin-bottom:3px">`
+        +(depDone?'CIRCUITO OK · ':'SIGILLI · ')
+        +`<span style="color:#dff">${depSeal}/${depNeed}</span>`
+        +(!depDone?` · rotta ${routePct.toFixed(0)}%`:'')
+        +`</div>`
+        +`<div style="height:8px;background:rgba(0,40,48,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,220,200,.45)">`
         +`<div style="height:100%;width:${depPct}%;background:linear-gradient(90deg,#1a6655,#4affcc);box-shadow:0 0 10px rgba(80,255,200,.35);transition:width .18s ease"></div></div></div>`
         +depPrompt;
-      const gRunH=goalDist>40?SUBORBIT.offset/goalDist:0;
-      const strainH=gRunH>=.55?1+.58*((Math.min(1,gRunH)-.55)/.45):1;
-      SUBORBIT.hudStressVis=lerp(SUBORBIT.hudStressVis||1,strainH,0.14);
-      const stressW=Math.round(cl(((SUBORBIT.hudStressVis||1)-1)*200+34,6,100));
-      const stressCol=stressW>78?'#ff8866':stressW>52?'#ffcc66':'#8ce0ff';
-      const stressRow=`<div style="margin:2px auto 6px;max-width:min(92vw,400px);text-align:left"><div style="font:8px var(--FM);color:#9bb8d8;letter-spacing:.1em;margin-bottom:2px">INTENSITÀ CORRIDOIO</div><div style="height:5px;background:rgba(0,24,48,.75);border-radius:3px;overflow:hidden;border:1px solid rgba(80,140,200,.4)"><div style="height:100%;width:${stressW}%;background:linear-gradient(90deg,#224466,${stressCol});transition:width .2s ease"></div></div></div>`;
-      // Box istruzioni solo all'ingresso: sparisce dopo i primi secondi di volo.
       const showGuide=SUBORBIT.time<7.2;
       if(!showGuide&&SUBORBIT.loadingTip)SUBORBIT.loadingTip='';
       const guideFade=showGuide?Math.max(0,Math.min(1,(7.2-SUBORBIT.time)/1.4)):0;
       const introRow=showGuide
-        ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55);opacity:${guideFade.toFixed(2)};transition:opacity .35s ease">${
-            SUBORBIT.storyInspect
-              ?'CIRCUITO DEPOSITI · sigilla i vault con E'
-              :'CIRCUITO DEPOSITI · '+(sm.sd.name+'').toUpperCase()+' · E = sigillo'
+        ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55);opacity:${guideFade.toFixed(2)}">${
+            'SIGILLA 3 DEPOSITI · E vicino ai vault · '+(sm.sd.name+'').toUpperCase()
           }</div>`
         :'';
       const tipRow=(showGuide&&SUBORBIT.loadingTip)
-        ?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:420px;margin-left:auto;margin-right:auto;font-style:italic;opacity:${guideFade.toFixed(2)}">${SUBORBIT.loadingTip}</div>`
+        ?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:400px;margin-left:auto;margin-right:auto;font-style:italic;opacity:${guideFade.toFixed(2)}">${SUBORBIT.loadingTip}</div>`
         :'';
       suborbitApplyFogPhase(routePct);
       shud.innerHTML=
-        `${introRow}${tipRow}${stressRow}`
-        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-bottom:5px;font:11px var(--FD);letter-spacing:.05em">`
+        `${introRow}${tipRow}`
+        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-bottom:4px;font:11px var(--FD);letter-spacing:.05em">`
         +`<span style="color:${hpC}">HP ${Math.round(playerShip.health)}%</span>`
         +`<span style="color:${enC}">EN ${Math.round(playerShip.energy)}%</span>`
-        +`<span style="color:#eed588">${fmt(PS.credits)}</span></div>`
+        +`<span style="color:#eed588">${fmt(PS.credits)}</span>`
+        +`<span style="color:#a8c8e8">SPD ${Math.round(SUBORBIT.speed)}</span></div>`
         +`${exitRow}`
-        +`${depRow}`
+        +`${objRow}`
         +`${soRow}`
-        +`<div style="margin:5px auto 7px;max-width:min(92vw,400px);text-align:left">`
-        +`<div style="font:9px var(--FM);color:${routeBarCol};letter-spacing:.08em;margin-bottom:3px">`
-        +(SUBORBIT.corridorComplete?'ROTTA COMPLETATA · ':'AVANZAMENTO · ')
-        +`${objLbl} · <span style="color:#dff">${routePct.toFixed(0)}%</span> · ~${Math.round(goalDist/100)/10} km</div>`
-        +`<div style="height:5px;background:rgba(0,32,72,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,170,240,.35)">`
-        +`<div style="height:100%;width:${routePct}%;background:linear-gradient(90deg,#1a5599,#4af0ff);box-shadow:0 0 8px rgba(80,220,255,.25);transition:width .18s ease"></div></div></div>`
-        +`<div style="opacity:.88;margin-bottom:3px;letter-spacing:.05em;color:#b8d8ff;font-size:8px">WASD · SPAZIO fuoco · F trazione · E sigillo · V controlli · ESC attracco</div>`
+        +(showGuide?`<div style="opacity:.85;margin:2px 0 4px;letter-spacing:.05em;color:#b8d8ff;font-size:8px;opacity:${guideFade.toFixed(2)}">WASD · Spazio fuoco · F trazione · E sigillo · ESC stazione</div>`:'')
+        +`<div style="font:9px var(--FM);letter-spacing:.04em;margin-top:2px">`
         +`<span style="${altWarn}">ALT ${altAbove}m</span> · `
-        +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span> · `
-        +`<span style="color:${thrCol}">REG ${thrPct}%</span> · `
-        +`<span style="color:${twCol}">TERR ${(tw*100).toFixed(0)}%</span> · `
-        +`<span style="color:#aaa">FUOCO ${cdPct.toFixed(0)}%</span>`
-        +((SUBORBIT.spreadShotT||0)>0?` · <span style="color:#8fdfff">RAFFICA ${(SUBORBIT.spreadShotT).toFixed(1)}s</span>`:'');
+        +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span>`
+        +((SUBORBIT.spreadShotT||0)>0?` · <span style="color:#8fdfff">RAFFICA ${(SUBORBIT.spreadShotT).toFixed(1)}s</span>`:'')
+        +`</div>`;
     }
     if(playerShip.health<28&&!SUBORBIT._lowHpPip){SUBORBIT._lowHpPip=true;playTone(280,.07,.05,'triangle');notify('Integrità scafo critica in corridoio.',1400);}
     suborbitUpdateScreenFx(dt);
@@ -12444,7 +12434,7 @@ function buildDock(st){
       subBtn.textContent=needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE';
       subBtn.title=needsStory
         ?'Sigilla 3 depositi (E). Serve per Il Prezzo del Sigillo.'
-        :'Circuito Depositi: sigilla i vault, combattimento leggero, ESC per uscire.';
+        :'Circuito Depositi: 3 vault da sigillare, poi rientro in stazione.';
       subBtn.style.borderColor=needsStory?'rgba(120,220,160,.55)':'';
       subBtn.style.boxShadow=needsStory?'0 0 12px rgba(80,180,120,.25)':'none';
     }
@@ -12917,7 +12907,7 @@ function tTavern(pnl,st){
   pnl.innerHTML='<div class="stt">OSTERIA — VOCI DI CORRIDOIO</div>';
   const pool=TAVERN[st.sd.faction]||TAVERN.castelletto;
   pool.forEach(g=>{pnl.innerHTML+='<div class="tv"><span class="tvs">'+g.s+':</span> '+g.t+'</div>';});
-  const uni=[{s:'Mercante di passaggio',t:'"Ho visto Calcara inaugurare tre hangar in una settimana mentre Crespellano aspetta ancora il semaforo del 2003. E Calcara orbita intorno a Crespellano. E\' la cosa piu\' comica del sistema."'},{s:'Pilota senza nome',t:'"Il Patto del Molino... dicono che qualcuno l\'abbia rubato. Senza il patto le fazioni si stanno sgretolando. Qualcuno sta soffiando sul fuoco. E io so chi, ma non lo dico per niente meno di 500 crediti."'}];
+  const uni=[{s:'Mercante di passaggio',t:'"Ho visto Calcara inaugurare tre hangar in una settimana mentre Crespellano aspetta ancora il semaforo del 2003. E Calcara orbita intorno a Crespellano. È la cosa più comica del sistema."'},{s:'Pilota senza nome',t:'"Il Patto del Molino... dicono che qualcuno l\'abbia rubato. Senza il patto le fazioni si stanno sgretolando. Qualcuno sta soffiando sul fuoco. E io so chi, ma non lo dico per niente meno di 500 crediti."'}];
   pnl.innerHTML+='<div class="tv"><span class="tvs">'+pick(uni).s+':</span> '+pick(uni).t+'</div>';
   const clueKey=st.sd.faction||'castelletto';
   const clue=(typeof GameplayPolish!=='undefined')?GameplayPolish.pickTavernClue(clueKey):null;
