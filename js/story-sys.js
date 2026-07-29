@@ -81,7 +81,7 @@
     canAccept(m) {
       if (!m) return { ok: true };
       if (m.requireSuborbit && !this.flags.suborbitDone) {
-        return { ok: false, msg: 'Prima completa un volo suborbitale (≥55% della rotta o corridoio intero). Dalla stazione: VOLO SUBORBITALE.' };
+        return { ok: false, msg: 'Prima completa il Circuito Depositi in suborbita (3 sigilli con E, o ≥55% della rotta). Dalla stazione: VOLO SUBORBITALE.' };
       }
       if (m.requireHulk && !this.flags.hulkBoarded) {
         return { ok: false, msg: 'Prima abborda uno Space Hulk (cerca i relitti e premi ABBORDA).' };

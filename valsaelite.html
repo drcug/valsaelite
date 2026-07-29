@@ -794,6 +794,7 @@ body.suborbit-active #smsg{
 #suborbit-screen-fx{position:fixed;inset:0;z-index:6050;pointer-events:none;opacity:0;transition:opacity .08s ease-out;background:transparent}
 #suborbit-float-layer{position:fixed;inset:0;z-index:6078;pointer-events:none}
 @keyframes suborbitFloatUp{from{opacity:1;transform:translate(-50%,0) scale(1)}to{opacity:0;transform:translate(-50%,-110px) scale(.9)}}
+@keyframes suborbitPulse{from{opacity:.72;box-shadow:0 0 0 rgba(100,255,200,0)}to{opacity:1;box-shadow:0 0 18px rgba(100,255,200,.35)}}
 #suborbit-debrief{display:none;position:fixed;inset:0;z-index:6280;align-items:center;justify-content:center;background:rgba(2,6,18,.82);backdrop-filter:blur(5px);padding:16px}
 #suborbit-debrief .sdbox{max-width:min(440px,94vw);background:linear-gradient(165deg,rgba(8,22,48,.97),rgba(4,12,28,.98));border:1px solid rgba(90,170,255,.45);border-radius:14px;padding:18px 20px 16px;box-shadow:0 16px 48px rgba(0,30,60,.55);font-family:var(--FM);color:#d4e8ff}
 #suborbit-debrief .sdt{font-family:var(--FD);font-size:17px;letter-spacing:.14em;color:#f2fbff;margin-bottom:10px}
@@ -1341,7 +1342,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · nave = recupero pezzi blueprint (niente mostri) · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
-    <div class="help-grid"><span>Suborbita</span><span>Corridoio atmosferico di ispezione. <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>E</kbd> depositi · <kbd>ESC</kbd> uscita. Conta se ≥55% della rotta (o intera). Non confondere con le corsie commerciali nello spazio.</span></div>
+    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd>. <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> uscita. Primario = sigilli; fallback ≥55% rotta. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
@@ -1835,10 +1836,10 @@ const STORY = {
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Prima vuole una prova: scendi in suborbita, ispeziona i depositi tartuferi e raccogli capsule aromatiche. Solo allora il Consiglio ti crede figlio di casa — e non un funzionario di passaggio.',
+      intro:'Savigno custodisce il terzo pezzo del trittico, ma non lo scambia in crediti. Prima vuole una prova: scendi in suborbita, completa il Circuito Depositi e sigilla i vault tartuferi. Solo allora il Consiglio ti crede figlio di casa — e non un funzionario di passaggio.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Completa un volo SUBORBITALE (≥55% della rotta o corridoio intero), preferibilmente su Savigno: ispeziona i depositi. Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
+        desc:'Completa il CIRCUITO DEPOSITI in suborbita (3 sigilli con E, preferibilmente su Savigno). Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, requireSuborbit:true, done:false, active:false},
     },
     {
@@ -2180,10 +2181,10 @@ function renderDiaryContent(){
     else if(m.cargo){
       const gn=(typeof GOODS!=='undefined'&&GOODS[m.cargo.type])?GOODS[m.cargo.type].name:m.cargo.type;
       extra=`Carico: ${gn} ×${m.cargo.qty||1}. Destinazione: <strong>${tgt}</strong>.`;
-      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede volo SUBORBITALE (≥55% della rotta o corridoio intero — pulsante dalla stazione).</em>`;
+      if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede Circuito Depositi in suborbita (3 sigilli con E — o ≥55% rotta). Dalla stazione: VOLO SUBORBITALE.</em>`;
       if(m.requireHulk&&!done)extra+=` <em style="color:#ffb080">Richiede abbordaggio SPACE HULK.</em>`;
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
-        extra+=` <em style="color:#88ccaa">Obiettivo del volo: ispezionare i depositi / raccogliere capsule. I tartufi della consegna arrivano all'accettazione.</em>`;
+        extra+=` <em style="color:#88ccaa">Obiettivo del volo: sigillare i depositi. I tartufi della consegna arrivano all'accettazione.</em>`;
       }
       if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
         extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
@@ -5151,16 +5152,17 @@ function suborbitRandomTip(sm){
   const pool=[];
   const sd=sm&&sm.sd||{};
   if(SUBORBIT.storyInspect){
-    return 'Ispezione depositi: raccogli le capsule (F), completa ≥55% della rotta. Poi Savigno ti ascolterà.';
+    return 'Circuito Depositi: avvicinati ai vault luminosi e premi E per sigillare. Tre sigilli chiudono l\'ispezione.';
   }
   if(sd.id==='savigno'||sd.faction==='savigno'){
-    pool.push('Cintura tartufera: le capsule aromatiche contano più dei laser.','Depositi a bassa quota: trazione (F) e occhio ai container.');
+    pool.push('Cintura tartufera: i vault aromatici contano più dei laser.','Depositi a bassa quota: E per sigillare, F per le capsule.');
   }
+  pool.push('Cerca i depositi con anello ciano: avvicinati e premi E.','Circuito Depositi: tre sigilli e rientri. Il combattimento è contorno.');
   const pe=SUBORBIT_PTYPE_EVENTS[sd.pType]||SUBORBIT_PTYPE_EVENTS.default||[];
   const pl=SUBORBIT_PLANET_EVENTS[sd.id]||[];
   (Array.isArray(pe)?pe:[]).forEach(s=>pool.push(s));
   (Array.isArray(pl)?pl:[]).forEach(s=>pool.push(s));
-  if(!pool.length)return'Corridoio attivo: quota e corsia. Completa ≥55% perché il volo conti.';
+  if(!pool.length)return'Circuito Depositi: sigilla i siti con E. ≥55% della rotta resta un fallback.';
   return pool[(Math.random()*pool.length)|0];
 }
 function suborbitBurstHazards(n){
@@ -5238,9 +5240,10 @@ function suborbitOutcomeFlavor(completed,grade,hp){
 function suborbitSnapshotSummary(opts){
   opts=opts||{};
   const sm=SUBORBIT.planet;
-  if(!sm)return{showPanel:false,completed:false,earlyEsc:!!opts.toDock,dur:0,kills:0,collected:0,pname:'—',acc:0,grade:'—',credDelta:0,sideDone:false,rough:0,startHp:100,flavor:'',daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct:0};
+  const depositsDone=typeof suborbitDepositsDone==='function'?suborbitDepositsDone():false;
+  if(!sm)return{showPanel:false,completed:false,earlyEsc:!!opts.toDock,dur:0,kills:0,collected:0,pname:'—',acc:0,grade:'—',credDelta:0,sideDone:false,rough:0,startHp:100,flavor:'',daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct:0,depositsSealed:0,depositsNeed:0,depositsDone:false};
   const rs=SUBORBIT.runStats||{};
-  const completed=!!SUBORBIT.corridorComplete;
+  const completed=!!(SUBORBIT.corridorComplete||depositsDone);
   const dur=Math.max(0,(performance.now()-(rs.t0||performance.now()))/1000);
   const shots=rs.shots|0,hits=rs.hits|0;
   const acc=shots?Math.min(100,Math.round(100*hits/Math.max(1,shots))):100;
@@ -5250,14 +5253,17 @@ function suborbitSnapshotSummary(opts){
   const off=SUBORBIT.offset|0;
   const goal=Math.max(1,SUBORBIT.runGoal||32000);
   const progressPct=Math.min(100,Math.round(100*off/goal));
-  const grade=suborbitComputeGrade(completed,playerShip&&playerShip.health||0,rs,acc,sideDone);
+  const depositsSealed=SUBORBIT.depositsSealed|0;
+  const depositsNeed=SUBORBIT.depositsNeed|0;
+  const grade=suborbitComputeGrade(completed,playerShip&&playerShip.health||0,rs,acc,sideDone||depositsDone);
   const credDelta=typeof PS!=='undefined'?PS.credits-(rs.startCred||0):0;
-  let showPanel=off>420||kills>0||collected>0||completed||dur>12;
+  let showPanel=off>420||kills>0||collected>0||completed||depositsSealed>0||dur>12;
   if(opts.skipDebrief)showPanel=false;
   return{
     showPanel,completed,earlyEsc:!!opts.toDock,dur,kills,collected,pname,acc,grade,credDelta,sideDone,
     rough:rs.roughHits||0,startHp:rs.startHp||100,flavor:suborbitOutcomeFlavor(completed,grade,playerShip&&playerShip.health||0),
-    daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct
+    daily:getDailySuborbitChallenge(),fromDock:SUBORBIT.fromDockId,progressPct,
+    depositsSealed,depositsNeed,depositsDone
   };
 }
 function hideSuborbitDebrief(){
@@ -5281,20 +5287,24 @@ function showSuborbitDebrief(sum,onClose){
   sum.dailyAlready=!!(rw&&rw.already);
   SUBORBIT._debriefCb=onClose||null;
   setPausedReason('suborbit',true);
-  const title=sum.completed?'Corridoio completato':'Fine volo suborbitale';
+  const title=sum.completed?(sum.depositsDone?'Circuito depositi chiuso':'Corridoio completato'):'Fine volo suborbitale';
   document.getElementById('suborbit-debrief-title').textContent=title;
   g.textContent=sum.completed?sum.grade:'—';
   g.style.color=!sum.completed?'#aabdcc':sum.grade==='S'?'#8effc8':sum.grade==='A'?'#a8e6ff':sum.grade==='B'?'#ddeeff':'#ffbbaa';
   const sec=sum.dur.toFixed(1);
-  const gateOk=!!(sum.completed||sum.progressPct>=55);
+  const gateOk=!!(sum.completed||sum.depositsDone||sum.progressPct>=55);
   let storyBeat='';
   if(sum.firstInspectUnlock&&typeof STORY!=='undefined'&&STORY.chapter===4){
-    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Ispezione registrata (${sum.progressPct}%). I depositi hanno parlato: a Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
+    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Circuito registrato (sigilli ${sum.depositsSealed||0}/${sum.depositsNeed||3} · rotta ${sum.progressPct}%). A Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
+  }else if(sum.depositsDone){
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Tutti i depositi sigillati. Circuito chiuso.</div>`;
   }else if(gateOk&&sum.progressPct<100&&!sum.completed){
     storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Rotta parziale ma sufficiente (≥55%). Il volo conta.</div>`;
   }
+  const depRow=`<div style="margin-top:6px">Depositi sigillati <strong>${sum.depositsSealed||0}/${sum.depositsNeed||3}</strong>${sum.depositsDone?' · <span style="color:#8f8">CIRCUITO OK</span>':''}</div>`;
   b.innerHTML=
     `<div><strong>${(sum.pname+'').toUpperCase()}</strong> · avanzamento <strong>${sum.progressPct}%</strong></div>`
+    +depRow
     +`<div style="margin-top:6px">Tempo <strong>${sec}s</strong> · Kill <strong>${sum.kills}</strong> · Container <strong>${sum.collected}</strong> · Precisione <strong>${sum.acc}%</strong></div>`
     +`<div style="margin-top:6px">Crediti sessione <strong>+${fmt(sum.credDelta)}</strong> · Contatti <strong>${sum.rough}</strong>${sum.sideDone?' · Secondario <span style="color:#8f8">OK</span>':''}</div>`
     +`<div style="margin-top:10px;opacity:.92">${sum.flavor}</div>`
@@ -5322,11 +5332,11 @@ function showTutorialOnce(lsKey,title,htmlBody){
   return true;
 }
 function tryShowTutorialSuborbit(){
-  return showTutorialOnce('valsaelite_tut_suborbit_v2','Volo suborbitale · ispezione',
-    '<p>È un <strong>corridoio atmosferico</strong>: scendi a bassa quota per ispezionare depositi, raccogliere capsule e tenere la corsia.</p>'
-    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione sul container più vicino · <strong>E</strong> vicino ai depositi a terra · <strong>ESC</strong> rientro.</p>'
-    +'<p>Il volo <strong>conta</strong> se completi almeno il <strong>55%</strong> della rotta (o tutto il corridoio). A 25/50/75% arrivano segmenti speciali.</p>'
-    +'<p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso Charger · ciano Strafer · viola Swarm. I detriti costano energia, non scafo. Alla fine: riepilogo e grado.</p>');
+  return showTutorialOnce('valsaelite_tut_suborbit_v3','Circuito Depositi · suborbita',
+    '<p>È un <strong>corridoio atmosferico</strong>: obiettivo primario = <strong>sigillare i depositi</strong> (vault con anello ciano).</p>'
+    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione container · <strong>E</strong> sigilla il deposito vicino · <strong>ESC</strong> rientro.</p>'
+    +'<p>Completa il <strong>Circuito</strong> (tutti i sigilli) per chiudere la missione. Fallback: ≥55% della rotta. A 25/50/75% arrivano segmenti speciali.</p>'
+    +'<p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso Charger · ciano Strafer · viola Swarm. I detriti costano energia, non scafo.</p>');
 }
 function tryShowTutorialBlueprint(){
   return showTutorialOnce('valsaelite_tut_blueprint','Cantiere · touch',
@@ -6872,17 +6882,17 @@ function requestSuborbit(){
   const name=sm.sd.name||'pianeta';
   const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
   const isSav=sm.sd.id==='savigno'||sm.sd.faction==='savigno';
-  let body='Scendi nell\'atmosfera di '+name+': un corridoio di ispezione a bassa quota.\n\n'
-    +'WASD quota/corsia · Spazio fuoco · F trazione container · E vicino ai depositi · ESC esci.\n'
-    +'Completa ≥55% della rotta (o tutto il corridoio) per far contare il volo.';
+  let body='Scendi nell\'atmosfera di '+name+': Circuito Depositi.\n\n'
+    +'WASD quota/corsia · Spazio fuoco · F trazione · E sigilla i vault · ESC esci.\n'
+    +'Obiettivo: sigilla 3 depositi. Fallback: ≥55% della rotta.';
   if(needsStory){
     body=(isSav
-      ?'Savigno vuole una prova: ispeziona i depositi tartuferi e raccogli capsule aromatiche.\n\n'
-      :'Per il Capitolo 4 serve un volo di ispezione (≥55% o rotta intera). Su Savigno ha più senso, ma vale anche qui.\n\n')
-      +'WASD · Spazio · F trazione · ESC esci.\nPoi potrai accettare «Il Prezzo del Sigillo».';
+      ?'Savigno vuole una prova: sigilla i depositi tartuferi del Circuito.\n\n'
+      :'Per il Capitolo 4 serve il Circuito Depositi (3 sigilli). Su Savigno ha più senso, ma vale anche qui.\n\n')
+      +'WASD · Spazio · F trazione · E sigillo · ESC esci.\nPoi potrai accettare «Il Prezzo del Sigillo».';
   }
   uiConfirm({
-    title:needsStory?'ISPEZIONE SUBORBITALE':'VOLO SUBORBITALE',
+    title:needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE',
     body:body,
     ok:'AVVIA',
     cancel:'RESTA IN STAZIONE',
@@ -7690,6 +7700,11 @@ const SUBORBIT={
   bossSpawned:false,
   bossTriggerKills:0,
   nearProp:null,
+  nearDeposit:null,
+  deposits:[],
+  depositsNeed:3,
+  depositsSealed:0,
+  circuitMode:true,
   smoothX:0,smoothY:0,smoothGy:0,
   anchor:new THREE.Vector3(),
   prevFog:null,prevClear:SPACE_CLEAR_COLOR,
@@ -7721,8 +7736,8 @@ const SUBORBIT_FACTION_STYLE={
     milestones:{25:'Canale blindato al 25% — niente deviazioni.',50:'Metà canale: controlli attivi.',75:'Uscita amministrativa: pressione massima.'}},
   monteveglio:{pickupBias:-.05,enemyBias:.2,hazardBias:.05,tag:'PATTO DELL\'ORDINE',runGoalMult:1.12,autoExitDelay:7,objectiveHud:'GUERRA / ORDINE',
     milestones:{25:'Rete tattica al 25% — pattuglie in salita.',50:'Linea di fuoco centrale.',75:'Avamposto: ostili in convergenza.'}},
-  savigno:{pickupBias:.35,enemyBias:.02,hazardBias:-.04,tag:'CINTURA TARTUFERA',runGoalMult:.88,autoExitDelay:4.6,objectiveHud:'DEPOSITI',
-    milestones:{25:'Vena aromatica al 25% — depositi in vista.',50:'Cuore tartufero: raccogli le capsule.',75:'Ultimo tratto: chiudi l\'ispezione e rientra.'}}
+  savigno:{pickupBias:.35,enemyBias:.02,hazardBias:-.04,tag:'CINTURA TARTUFERA',runGoalMult:.88,autoExitDelay:4.6,objectiveHud:'CIRCUITO',
+    milestones:{25:'Primo vault in vista — avvicinati e premi E.',50:'Metà circuito: secondo deposito sulla scia.',75:'Ultimo sigillo: chiudi il Circuito e rientra.'}}
 };
 const SUBORBIT_PLANET_STYLE={
   // Palette allineate alle illustrazioni panoramiche Forbidden Planet
@@ -7813,7 +7828,7 @@ const SUBORBIT_PLANET_EVENTS={
   crespellano:['Segnaletica incompleta: rotta aggiornata a mano.'],
   calcara:['Canale amministrativo blindato: pedaggio non negoziabile.'],
   monteveglio:['Araldo della Rocca: "Onore o collisione".'],
-  savigno:['Mercato tartufi in pressione: quote quasi esaurite.','Ispezione depositi: le capsule aromatiche sono segnate sul radar.'],
+  savigno:['Mercato tartufi in pressione: quote quasi esaurite.','Circuito Depositi: vault aromatici sul radar — avvicinati e premi E.'],
   san_chierlo:['Laboratorio esterno: campioni aromatici confermati.'],
   zappolino:['Fortezza in allerta: droni d\'interdizione pronti.'],
   castelletto:['Broadcast locale: "Benzina aperta H24".']
@@ -7849,6 +7864,12 @@ function grantSuborbitLoot(sm,silent){
 }
 function trySuborbitInteract(){
   if(!SUBORBIT.active||GAME.state!=='suborbit')return false;
+  // Priorità: sigillo deposito (Circuito Depositi)
+  const dep=SUBORBIT.nearDeposit;
+  if(dep&&!dep.sealed){
+    sealSuborbitDeposit(dep);
+    return true;
+  }
   const p=SUBORBIT.nearProp;
   if(!p||!p.visible)return false;
   p.userData.wz=SUBORBIT.offset+SUBORBIT.propSpan*(.75+Math.random()*.5);
@@ -7857,6 +7878,142 @@ function trySuborbitInteract(){
   PS.credits+=10;
   notify('Recupero superficie +10 Cr',1200);
   return true;
+}
+function suborbitDepositNames(sm){
+  const id=sm&&sm.sd&&sm.sd.id;
+  const fac=sm&&sm.sd&&sm.sd.faction;
+  if(id==='savigno'||fac==='savigno')return['Vena Aromatica','Cella Fredda','Deposito Porcino','Sigillo Tartufero','Cantina Orbital'];
+  if(id==='bazzano'||fac==='bazzano')return['Magazzino Prime','Dogana Bassa','Silos Vino','Hangar Colli'];
+  if(id==='monteveglio'||fac==='monteveglio')return['Torrione','Scuderia Laser','Archivio Rocca','Forgia'];
+  if(id==='calcara'||fac==='calcara')return['Hangar IVA','Cassaforte','Nastro 7','Ufficio Pedaggi'];
+  if(id==='crespellano'||fac==='crespellano')return['Scaffale Male','Semaforo Ghost','Scuola Rovescia','Archivio Polvere'];
+  return['Deposito α','Deposito β','Deposito γ','Deposito δ','Deposito ε'];
+}
+function suborbitBuildDepositMesh(dep){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(
+    new THREE.CylinderGeometry(28,34,10,12),
+    suborbitSMat(0x4a5a68,0x1a2830,.2,.55,.55)
+  );
+  base.position.y=5;g.add(base);
+  const vault=new THREE.Mesh(
+    new THREE.CylinderGeometry(18,22,36,10),
+    suborbitSMat(0x3a6878,0x0a3040,.35,.4,.62)
+  );
+  vault.position.y=28;g.add(vault);
+  const dome=new THREE.Mesh(
+    new THREE.SphereGeometry(16,14,10,0,Math.PI*2,0,Math.PI*.55),
+    suborbitSMat(0x2a8898,0x22aacc,.55,.28,.7)
+  );
+  dome.position.y=48;g.add(dome);
+  const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(26,1.4,8,32),
+    new THREE.MeshBasicMaterial({color:0x66e8ff,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  ring.rotation.x=Math.PI/2;ring.position.y=14;g.add(ring);
+  const beacon=new THREE.Mesh(
+    new THREE.ConeGeometry(3.5,18,8),
+    new THREE.MeshBasicMaterial({color:0xa8fff0,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  beacon.position.y=62;g.add(beacon);
+  const aura=new THREE.Mesh(
+    new THREE.SphereGeometry(42,16,12),
+    new THREE.MeshBasicMaterial({color:0x44ccff,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  aura.position.y=24;g.add(aura);
+  g.userData.beacon=beacon;
+  g.userData.ring=ring;
+  g.userData.aura=aura;
+  g.visible=false;
+  scene.add(g);
+  dep.mesh=g;
+}
+function setupSuborbitDeposits(sm){
+  // Pulisci mesh precedenti
+  (SUBORBIT.deposits||[]).forEach(d=>{
+    if(d.mesh){scene.remove(d.mesh);suborbitDisposeGroupVisual(d.mesh);}
+  });
+  const names=suborbitDepositNames(sm);
+  const need=SUBORBIT.storyInspect?3:(sm&&sm.sd&&(sm.sd.id==='savigno'||sm.sd.faction==='savigno')?3:3);
+  SUBORBIT.depositsNeed=need;
+  SUBORBIT.depositsSealed=0;
+  SUBORBIT.deposits=[];
+  SUBORBIT.nearDeposit=null;
+  const goal=Math.max(14000,SUBORBIT.runGoal||28000);
+  // Depositi sparsi lungo la rotta, leggermente fuori asse
+  for(let i=0;i<need;i++){
+    const t=(i+1)/(need+0.35);
+    const dep={
+      id:'dep_'+i,
+      name:names[i%names.length],
+      wx:(i%2===0?-1:1)*(180+i*70),
+      wz:Math.round(goal*t*0.92),
+      sealed:false,
+      mesh:null
+    };
+    suborbitBuildDepositMesh(dep);
+    SUBORBIT.deposits.push(dep);
+  }
+  SUBORBIT.circuitMode=true;
+}
+function sealSuborbitDeposit(dep){
+  if(!dep||dep.sealed)return;
+  dep.sealed=true;
+  SUBORBIT.depositsSealed=(SUBORBIT.deposits.filter(d=>d.sealed).length);
+  PS.credits+=28;
+  grantSuborbitLoot(SUBORBIT.planet,false);
+  if(dep.mesh){
+    if(dep.mesh.userData.beacon)dep.mesh.userData.beacon.material.color.setHex(0x66ffaa);
+    if(dep.mesh.userData.ring)dep.mesh.userData.ring.material.color.setHex(0x88ffcc);
+    if(dep.mesh.userData.aura)dep.mesh.userData.aura.material.color.setHex(0x44ff99);
+  }
+  notify('Sigillo · '+dep.name+' ('+SUBORBIT.depositsSealed+'/'+SUBORBIT.depositsNeed+') +28 Cr',2400);
+  playChime('success');
+  tryVibrate(36);
+  if(typeof suborbitPushFloat==='function')suborbitPushFloat('SIGILLO','#8effc8');
+  // Completato il circuito
+  if(SUBORBIT.depositsSealed>=SUBORBIT.depositsNeed&&!SUBORBIT.corridorComplete){
+    SUBORBIT.corridorComplete=true;
+    const pf=SUBORBIT.profile||{};
+    SUBORBIT.autoExitRemaining=pf.autoExitDelay!=null?Math.min(4.2,pf.autoExitDelay):4.2;
+    notify('Circuito depositi completato — rientro automatico.',2800);
+    if(!SUBORBIT.corridorBonusTaken&&SUBORBIT.planet){
+      SUBORBIT.corridorBonusTaken=true;
+      const bonusCr=Math.floor(160+Math.random()*120);
+      PS.credits+=bonusCr;
+      notify('Bonus ispezione +'+bonusCr+' Cr',2200);
+    }
+  }
+}
+function updateSuborbitDeposits(){
+  SUBORBIT.nearDeposit=null;
+  let nearD=1e9;
+  const list=SUBORBIT.deposits||[];
+  for(const dep of list){
+    if(!dep.mesh)continue;
+    const ground=suborbitHeight(SUBORBIT.seed,dep.wx,dep.wz);
+    const dz=dep.wz-SUBORBIT.offset;
+    dep.mesh.position.set(SUBORBIT.anchor.x+dep.wx,SUBORBIT.anchor.y+ground,SUBORBIT.anchor.z+dz);
+    dep.mesh.visible=dz>-400&&dz<5200;
+    if(dep.mesh.userData.beacon){
+      dep.mesh.userData.beacon.rotation.y+=0.04;
+      dep.mesh.userData.beacon.position.y=62+Math.sin(SUBORBIT.time*3+(dep.wz*.001))*3;
+    }
+    if(dep.mesh.userData.ring)dep.mesh.userData.ring.rotation.z=SUBORBIT.time*0.8;
+    if(dep.sealed)continue;
+    const dx=dep.wx-SUBORBIT.x;
+    const ddz=dep.wz-(SUBORBIT.offset+40);
+    const d2=dx*dx+ddz*ddz;
+    // Raggio generoso: avvicinati e premi E
+    if(d2<nearD&&d2<380*380&&Math.abs(SUBORBIT.y-ground)<160){
+      nearD=d2;SUBORBIT.nearDeposit=dep;
+    }
+  }
+}
+function suborbitDepositsDone(){
+  const n=SUBORBIT.depositsNeed|0;
+  if(!n)return false;
+  return (SUBORBIT.depositsSealed|0)>=n;
 }
 function suborbitLoreEvent(sm){
   const sd=sm.sd||{};
@@ -8242,6 +8399,47 @@ function mkSuborbitChunk(){
   scene.add(m);
   return{mesh:m,pos:g.attributes.position,idx:1e9};
 }
+function suborbitBuildBossVisual(group,col){
+  if(!group)return;
+  suborbitDisposeGroupVisual(group);
+  const c=col!=null?col:0xff7744;
+  const hull=suborbitSMat(0x5a4038,c,.55,.38,.72);
+  const plate=suborbitSMat(0x8a6050,c,.4,.32,.68);
+  const core=new THREE.Mesh(new THREE.DodecahedronGeometry(16,0),hull.clone());
+  core.userData.role='hull';group.add(core);
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(10,14,28,12),hull.clone());
+  body.rotation.x=Math.PI/2;body.userData.role='hull';group.add(body);
+  const nose=new THREE.Mesh(new THREE.ConeGeometry(9,22,10),plate.clone());
+  nose.rotation.x=Math.PI/2;nose.position.z=-22;nose.userData.role='hull';group.add(nose);
+  for(const sx of[-1,1]){
+    const wing=new THREE.Mesh(new THREE.BoxGeometry(28,2.2,14),plate.clone());
+    wing.position.set(sx*18,0,2);wing.rotation.z=sx*-.25;wing.userData.role='hull';group.add(wing);
+    const tip=new THREE.Mesh(new THREE.ConeGeometry(3,12,6),hull.clone());
+    tip.rotation.z=sx*Math.PI/2;tip.position.set(sx*34,0,2);tip.userData.role='hull';group.add(tip);
+    const thr=new THREE.Mesh(
+      new THREE.ConeGeometry(4,16,10),
+      new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    thr.rotation.x=-Math.PI/2;thr.position.set(sx*12,0,22);group.add(thr);
+  }
+  const crown=new THREE.Mesh(
+    new THREE.TorusGeometry(20,1.4,8,36),
+    new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.75,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  crown.rotation.x=Math.PI/2;group.add(crown);
+  const crown2=crown.clone();crown2.scale.setScalar(1.35);crown2.material=crown.material.clone();crown2.material.opacity=.35;group.add(crown2);
+  const dome=new THREE.Mesh(
+    new THREE.SphereGeometry(7,14,12),
+    suborbitSMat(0x221008,c,1.1,.15,.9)
+  );
+  dome.position.set(0,6,-4);dome.userData.role='sensor';group.add(dome);
+  const aura=new THREE.Mesh(
+    new THREE.SphereGeometry(34,14,12),
+    new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  group.add(aura);
+  group.userData.bossAccent=c;
+}
 function ensureSuborbitTerrain(){
   if(!SUBORBIT.subBullets.length){
     for(let i=0;i<36;i++){
@@ -8303,21 +8501,7 @@ function ensureSuborbitTerrain(){
   }
   if(!SUBORBIT.boss){
     const bg=new THREE.Group();
-    const bm=new THREE.Mesh(
-      new THREE.DodecahedronGeometry(22,0),
-      new THREE.MeshStandardMaterial({color:0xff7744,emissive:0x662200,emissiveIntensity:.7,roughness:.4,metalness:.6})
-    );
-    bg.add(bm);
-    const crown=new THREE.Mesh(
-      new THREE.TorusGeometry(18,1.2,8,28),
-      new THREE.MeshBasicMaterial({color:0xffaa66,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false})
-    );
-    crown.rotation.x=Math.PI/2;bg.add(crown);
-    const aura=new THREE.Mesh(
-      new THREE.SphereGeometry(30,14,12),
-      new THREE.MeshBasicMaterial({color:0xff5522,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false})
-    );
-    bg.add(aura);
+    suborbitBuildBossVisual(bg,0xff7744);
     bg.visible=false;
     scene.add(bg);
     SUBORBIT.boss={mesh:bg,active:false,wx:0,wz:0,hp:0};
@@ -8353,8 +8537,8 @@ function resetSuborbitActors(){
   const storyInspect=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
   const savRun=SUBORBIT.planet&&SUBORBIT.planet.sd&&(SUBORBIT.planet.sd.id==='savigno'||SUBORBIT.planet.sd.faction==='savigno');
   if(storyInspect||savRun){
-    sk='pickup';need=storyInspect?3:2+((Math.random()*2)|0);rew=storyInspect?36:22+((Math.random()*14)|0);
-    lab=storyInspect?`Ispeziona: raccogli ${need} capsule`:`Raccogli ${need} capsule aromatiche`;
+    sk='pickup';need=storyInspect?2:2+((Math.random()*2)|0);rew=storyInspect?28:22+((Math.random()*14)|0);
+    lab=storyInspect?`Bonus: raccogli ${need} capsule`:`Raccogli ${need} capsule aromatiche`;
   }else if(roll<.36){sk='charger';need=2+((Math.random()*2)|0);rew=16+((Math.random()*16)|0);lab=`Abbatti ${need} Charger`;}
   else if(roll<.68){sk='swarm';need=4+((Math.random()*3)|0);rew=12+((Math.random()*12)|0);lab=`Elimina ${need} swarm`;}
   else{sk='pickup';need=3+((Math.random()*3)|0);rew=18+((Math.random()*14)|0);lab=`Raccogli ${need} container`;}
@@ -8366,9 +8550,14 @@ function resetSuborbitActors(){
   if(pfGoal.runGoal!=null)finalG=pfGoal.runGoal;
   else finalG=Math.round(procBase*gMult);
   // Cap. 4 / primo ispezione: rotta più corta e leggibile
-  const shortMul=storyInspect?0.72:(savRun?0.88:0.92);
-  SUBORBIT.runGoal=Math.max(11000,Math.round(finalG*shortMul));
+  const shortMul=storyInspect?0.68:(savRun?0.82:0.9);
+  SUBORBIT.runGoal=Math.max(12000,Math.round(finalG*shortMul));
   SUBORBIT.storyInspect=!!storyInspect;
+  // Circuito Depositi: obiettivo primario = sigilli, non solo %
+  setupSuborbitDeposits(SUBORBIT.planet);
+  // Meno spam nemici: i depositi sono il focus
+  SUBORBIT.spawnEnemyT*=1.35;
+  SUBORBIT.spawnHazardT*=1.25;
   applySuborbitActorLook();
 }
 function trackSideObjectiveKill(kind){
@@ -8512,82 +8701,169 @@ function suborbitBuildHazardVisual(h,geoId){
   ));
 }
 function suborbitFillDroneGroup(group,geoId,kind){
-  const hullM=suborbitSMat(0x5a6578,0x101820,.14,.42,.78);
-  const armM=suborbitSMat(0x3a4458,0x060a10,.1,.5,.82);
-  const plateM=suborbitSMat(0x7a8898,0x182028,.18,.35,.7);
+  const hullM=suborbitSMat(0x6a7588,0x182028,.22,.38,.82);
+  const armM=suborbitSMat(0x3a4458,0x080c14,.12,.48,.88);
+  const plateM=suborbitSMat(0x8a98a8,0x203040,.28,.3,.74);
+  const accent=kind==='charger'?0xff5522:(kind==='strafer'?0x44ccff:0xaa66ff);
+  // Fusoliera principale — silhouettes più leggibili
   let body;
-  if(geoId==='cube')body=new THREE.Mesh(new THREE.BoxGeometry(14,8,22),hullM.clone());
-  else if(geoId==='shard'){body=new THREE.Mesh(new THREE.CylinderGeometry(3.6,9.2,24,7),hullM.clone());body.rotation.x=.28;}
-  else if(geoId==='drone')body=new THREE.Mesh(new THREE.CylinderGeometry(8.2,6.8,12,14),hullM.clone());
-  else body=new THREE.Mesh(new THREE.CylinderGeometry(4.8,7.2,20,12),hullM.clone());
+  if(geoId==='cube'){
+    body=new THREE.Mesh(new THREE.BoxGeometry(16,10,26),hullM.clone());
+  }else if(geoId==='shard'){
+    body=new THREE.Mesh(new THREE.CylinderGeometry(2.8,10.5,28,8),hullM.clone());
+    body.rotation.x=.32;
+  }else if(geoId==='drone'){
+    body=new THREE.Mesh(new THREE.CylinderGeometry(10,7.5,11,16),hullM.clone());
+  }else{
+    // r128: niente CapsuleGeometry — cilindro a siluetta capsule
+    body=new THREE.Mesh(new THREE.CylinderGeometry(5.2,7.5,22,14),hullM.clone());
+  }
   body.userData.role='hull';group.add(body);
-  const nose=new THREE.Mesh(new THREE.ConeGeometry(geoId==='drone'?5.5:4.2,10,8),plateM.clone());
-  nose.rotation.x=Math.PI/2;nose.position.set(0,.2,-14);nose.userData.role='hull';group.add(nose);
-  const dome=new THREE.Mesh(new THREE.SphereGeometry(3.6,12,10),suborbitSMat(0x1a4060,0x1188cc,.55,.18,.92));
-  dome.position.set(0,2.4,-6.5);dome.scale.set(1.1,.55,1.25);dome.userData.role='sensor';group.add(dome);
-  const wing=new THREE.Mesh(new THREE.BoxGeometry(kind==='strafer'?34:22,1.15,9),armM.clone());
-  wing.position.set(0,-.6,1.2);wing.userData.role='hull';group.add(wing);
-  const fin=new THREE.Mesh(new THREE.BoxGeometry(1.1,7.5,6),armM.clone());
-  fin.position.set(0,4.2,3);fin.userData.role='hull';group.add(fin);
+  // Piastra dorsale
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(geoId==='drone'?18:12,1.2,16),plateM.clone());
+  plate.position.set(0,5.2,0);plate.userData.role='hull';group.add(plate);
+  // Muso / cono
+  const nose=new THREE.Mesh(new THREE.ConeGeometry(geoId==='drone'?6.5:5,12,10),plateM.clone());
+  nose.rotation.x=Math.PI/2;nose.position.set(0,.4,-16);nose.userData.role='hull';group.add(nose);
+  // Cabina / sensore
+  const dome=new THREE.Mesh(
+    new THREE.SphereGeometry(4.2,14,12),
+    suborbitSMat(0x163848,0x22aadd,.85,.12,.95)
+  );
+  dome.position.set(0,3.6,-5);dome.scale.set(1.25,.7,1.4);dome.userData.role='sensor';group.add(dome);
+  // Antenna / dish
+  const dish=new THREE.Mesh(
+    new THREE.SphereGeometry(3.2,10,8,0,Math.PI*2,0,Math.PI*.55),
+    suborbitSMat(0x2a3a48,0x114466,.4,.35,.7)
+  );
+  dish.position.set(0,7.2,2);dish.userData.role='hull';group.add(dish);
+  const ant=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,6,6),armM.clone());
+  ant.position.set(0,10.5,2);ant.userData.role='hull';group.add(ant);
+  // Ali
+  const wingW=kind==='strafer'?42:(kind==='charger'?28:26);
+  const wing=new THREE.Mesh(new THREE.BoxGeometry(wingW,1.4,11),armM.clone());
+  wing.position.set(0,-1.2,1);wing.userData.role='hull';group.add(wing);
+  // Alette + pannelli
   for(const sx of[-1,1]){
-    const boom=new THREE.Mesh(new THREE.CylinderGeometry(.7,.55,11,7),armM.clone());
-    boom.rotation.z=Math.PI/2;boom.position.set(sx*9.5,.4,4.5);boom.userData.role='hull';group.add(boom);
-    const nac=new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.6,6.5,10),hullM.clone());
-    nac.rotation.x=Math.PI/2;nac.position.set(sx*14.5,.3,4.5);nac.userData.role='hull';group.add(nac);
-    const glow=new THREE.Mesh(new THREE.CircleGeometry(2.1,12),new THREE.MeshBasicMaterial({
-      color:kind==='charger'?0xff5522:0x44ddff,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false
+    const tip=new THREE.Mesh(new THREE.BoxGeometry(2.2,7,8),armM.clone());
+    tip.position.set(sx*(wingW*0.42),1.5,2);tip.rotation.z=sx*-.35;tip.userData.role='hull';group.add(tip);
+    const panel=new THREE.Mesh(new THREE.BoxGeometry(4.5,.4,7),plateM.clone());
+    panel.position.set(sx*(wingW*0.22),-.2,-2);panel.userData.role='hull';group.add(panel);
+  }
+  const fin=new THREE.Mesh(new THREE.BoxGeometry(1.4,10,8),armM.clone());
+  fin.position.set(0,6.5,5);fin.userData.role='hull';group.add(fin);
+  // Nacelle + glow motori + scie
+  for(const sx of[-1,1]){
+    const boom=new THREE.Mesh(new THREE.CylinderGeometry(.85,.6,13,8),armM.clone());
+    boom.rotation.z=Math.PI/2;boom.position.set(sx*11,.2,5);boom.userData.role='hull';group.add(boom);
+    const nac=new THREE.Mesh(new THREE.CylinderGeometry(2.6,3.2,8,12),hullM.clone());
+    nac.rotation.x=Math.PI/2;nac.position.set(sx*(geoId==='drone'?16:15),.1,5);nac.userData.role='hull';group.add(nac);
+    const glow=new THREE.Mesh(new THREE.CircleGeometry(2.6,14),new THREE.MeshBasicMaterial({
+      color:accent,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false
     }));
-    glow.position.set(sx*14.5,.3,8);glow.userData.role='sensor';group.add(glow);
+    glow.position.set(sx*(geoId==='drone'?16:15),.1,9.2);glow.userData.role='sensor';group.add(glow);
+    const trail=new THREE.Mesh(
+      new THREE.ConeGeometry(2.2,12,10),
+      new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    trail.rotation.x=-Math.PI/2;trail.position.set(sx*(geoId==='drone'?16:15),.1,15);group.add(trail);
+    const trail2=new THREE.Mesh(
+      new THREE.ConeGeometry(1.2,18,8),
+      new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    trail2.rotation.x=-Math.PI/2;trail2.position.set(sx*(geoId==='drone'?16:15),.1,20);group.add(trail2);
+  }
+  // Luci di navigazione
+  for(const sx of[-1,1]){
+    const nav=new THREE.Mesh(
+      new THREE.SphereGeometry(1.1,8,8),
+      new THREE.MeshBasicMaterial({color:sx<0?0xff3344:0x44ff88,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    nav.position.set(sx*(wingW*0.48),-.2,4);group.add(nav);
   }
   if(kind==='charger'){
-    const ram=new THREE.Mesh(new THREE.ConeGeometry(3.4,12,6),suborbitSMat(0x884433,0xff2200,.45,.32,.5));
-    ram.rotation.x=Math.PI/2;ram.position.set(0,0,-18);ram.userData.role='hull';group.add(ram);
+    const ram=new THREE.Mesh(new THREE.ConeGeometry(4.2,16,7),suborbitSMat(0x884433,0xff2200,.7,.28,.55));
+    ram.rotation.x=Math.PI/2;ram.position.set(0,0,-22);ram.userData.role='hull';group.add(ram);
+    const jaw=new THREE.Mesh(new THREE.BoxGeometry(10,2.5,6),armM.clone());
+    jaw.position.set(0,-3.5,-12);jaw.userData.role='hull';group.add(jaw);
+    const blaze=new THREE.Mesh(
+      new THREE.SphereGeometry(6,10,8),
+      new THREE.MeshBasicMaterial({color:0xff4400,transparent:true,opacity:.2,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    blaze.position.set(0,0,-18);group.add(blaze);
   }
   if(kind==='strafer'){
     for(const sx of[-1,1]){
-      const gun=new THREE.Mesh(new THREE.CylinderGeometry(.45,.35,8,6),armM.clone());
-      gun.rotation.x=Math.PI/2;gun.position.set(sx*8,-1.2,-8);gun.userData.role='hull';group.add(gun);
+      const gun=new THREE.Mesh(new THREE.CylinderGeometry(.55,.4,11,8),armM.clone());
+      gun.rotation.x=Math.PI/2;gun.position.set(sx*10,-1.8,-10);gun.userData.role='hull';group.add(gun);
+      const muzzle=new THREE.Mesh(new THREE.SphereGeometry(1.1,8,8),new THREE.MeshBasicMaterial({color:0xaaffff,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));
+      muzzle.position.set(sx*10,-1.8,-16);muzzle.userData.role='sensor';group.add(muzzle);
     }
   }
   const ring=new THREE.Mesh(
-    new THREE.TorusGeometry(8.5,.35,8,28),
-    new THREE.MeshBasicMaterial({color:0x66eeff,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false})
+    new THREE.TorusGeometry(10,.4,8,32),
+    new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.4,blending:THREE.AdditiveBlending,depthWrite:false})
   );
   ring.rotation.x=Math.PI/2;ring.position.z=2;group.add(ring);
+  // Glow body soft
+  const halo=new THREE.Mesh(
+    new THREE.SphereGeometry(18,12,10),
+    new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  group.add(halo);
 }
 function suborbitFillCreatureGroup(group,geoId){
-  const skin=suborbitSMat(0x6a5088,0x281038,.42,.68,.28);
-  const limb=suborbitSMat(0x4a3868,0x140818,.28,.72,.22);
-  let coreG;
-  if(geoId==='cube'){
-    coreG=new THREE.BoxGeometry(11,11,11,2,2,2);
-  }else if(geoId==='shard'){
-    coreG=new THREE.ConeGeometry(8,16,6);
-  }else{
-    coreG=new THREE.IcosahedronGeometry(8.5,1);
-  }
-  const core=new THREE.Mesh(coreG,skin.clone());
+  const skin=suborbitSMat(0x7a5898,0x3a1858,.55,.62,.32);
+  const limb=suborbitSMat(0x4a3868,0x180828,.35,.7,.25);
+  const chitin=suborbitSMat(0x9a70b0,0x551188,.4,.48,.4);
+  let core;
+  if(geoId==='cube')core=new THREE.Mesh(new THREE.DodecahedronGeometry(10,0),skin.clone());
+  else if(geoId==='shard'){core=new THREE.Mesh(new THREE.ConeGeometry(9,18,7),skin.clone());core.rotation.x=.2;}
+  else core=new THREE.Mesh(new THREE.IcosahedronGeometry(9.5,1),skin.clone());
   core.userData.role='hull';group.add(core);
-  const skull=new THREE.Mesh(new THREE.SphereGeometry(5.2,12,10),skin.clone());
-  skull.position.set(0,2.2,-6.5);skull.scale.set(1.15,.8,1.25);skull.userData.role='hull';group.add(skull);
-  const tail=new THREE.Mesh(new THREE.ConeGeometry(2.8,13,5),skin.clone());
-  tail.rotation.x=Math.PI/2+2.35;tail.position.set(0,.8,10.5);tail.userData.role='hull';group.add(tail);
-  const aura=new THREE.Mesh(new THREE.SphereGeometry(13,12,10),new THREE.MeshBasicMaterial({color:0xaa44ff,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false}));
-  group.add(aura);
-  for(let i=0;i<6;i++){
-    const ang=(i/6)*Math.PI*2;
-    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.4,.28,11,6),limb.clone());
-    leg.rotation.x=.9+Math.sin(ang)*.25;
-    leg.position.set(Math.cos(ang)*4.8,-3.8,Math.sin(ang)*2.2);
-    leg.userData.role='hull';group.add(leg);
+  // Carapace dorsale stratificato
+  const shell=new THREE.Mesh(new THREE.SphereGeometry(8,12,10,0,Math.PI*2,0,Math.PI*.55),chitin.clone());
+  shell.position.set(0,4,-1);shell.scale.set(1.3,.7,1.5);shell.userData.role='hull';group.add(shell);
+  const shell2=new THREE.Mesh(new THREE.SphereGeometry(6.5,10,8,0,Math.PI*2,0,Math.PI*.5),chitin.clone());
+  shell2.position.set(0,5.5,3);shell2.scale.set(1.1,.55,1.2);shell2.userData.role='hull';group.add(shell2);
+  const skull=new THREE.Mesh(new THREE.SphereGeometry(6,14,12),skin.clone());
+  skull.position.set(0,2.8,-8);skull.scale.set(1.2,.85,1.35);skull.userData.role='hull';group.add(skull);
+  // Mandibole
+  for(const sx of[-1,1]){
+    const jaw=new THREE.Mesh(new THREE.ConeGeometry(1.6,7,6),limb.clone());
+    jaw.position.set(sx*3.2,-1.5,-12);jaw.rotation.z=sx*.5;jaw.rotation.x=1.1;jaw.userData.role='hull';group.add(jaw);
+    const fang=new THREE.Mesh(new THREE.ConeGeometry(.7,4,5),limb.clone());
+    fang.position.set(sx*2.4,-3.2,-14);fang.rotation.x=1.4;fang.userData.role='hull';group.add(fang);
   }
-  const mkEye=(x)=>{
-    const ey=new THREE.Mesh(new THREE.SphereGeometry(1.35,10,8),suborbitSMat(0x220811,0xff66cc,1.05,.12,.42));
-    ey.position.set(x,1.6,-5.8);ey.userData.role='sensor';group.add(ey);
+  const tail=new THREE.Mesh(new THREE.ConeGeometry(3.2,16,6),skin.clone());
+  tail.rotation.x=Math.PI/2+2.4;tail.position.set(0,1.2,12);tail.userData.role='hull';group.add(tail);
+  const stinger=new THREE.Mesh(new THREE.ConeGeometry(1.4,7,5),chitin.clone());
+  stinger.rotation.x=Math.PI/2+2.55;stinger.position.set(0,3.5,20);stinger.userData.role='hull';group.add(stinger);
+  // Spine dorsali
+  for(let i=0;i<5;i++){
+    const sp=new THREE.Mesh(new THREE.ConeGeometry(1.1,6+i,5),chitin.clone());
+    sp.position.set((i%2?-1:1)*2.2,7+i*0.4,-4+i*3);sp.userData.role='hull';group.add(sp);
+  }
+  const aura=new THREE.Mesh(new THREE.SphereGeometry(15,12,10),new THREE.MeshBasicMaterial({color:0xaa44ff,transparent:true,opacity:.14,blending:THREE.AdditiveBlending,depthWrite:false}));
+  group.add(aura);
+  const aura2=new THREE.Mesh(new THREE.SphereGeometry(22,10,8),new THREE.MeshBasicMaterial({color:0xff66cc,transparent:true,opacity:.06,blending:THREE.AdditiveBlending,depthWrite:false}));
+  group.add(aura2);
+  for(let i=0;i<8;i++){
+    const ang=(i/8)*Math.PI*2;
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.5,.3,13,7),limb.clone());
+    leg.rotation.x=.95+Math.sin(ang)*.2;
+    leg.position.set(Math.cos(ang)*5.5,-4.2,Math.sin(ang)*2.5);
+    leg.userData.role='hull';group.add(leg);
+    const claw=new THREE.Mesh(new THREE.ConeGeometry(.9,4,5),limb.clone());
+    claw.position.set(Math.cos(ang)*7.5,-9,Math.sin(ang)*3);claw.userData.role='hull';group.add(claw);
+  }
+  const mkEye=(x,y,s)=>{
+    const ey=new THREE.Mesh(new THREE.SphereGeometry(1.55*s,12,10),suborbitSMat(0x220811,0xff66cc,1.25,.1,.5));
+    ey.position.set(x,y,-7.2);ey.userData.role='sensor';group.add(ey);
+    const pupil=new THREE.Mesh(new THREE.SphereGeometry(.55*s,8,8),new THREE.MeshBasicMaterial({color:0xffe0ff}));
+    pupil.position.set(x,y,-8.4);group.add(pupil);
   };
-  mkEye(-2.2);mkEye(2.2);
-  const mand=new THREE.Mesh(new THREE.TorusKnotGeometry(2.2,.55,24,4),limb.clone());
-  mand.position.set(0,-1.2,-7);mand.rotation.x=.5;mand.userData.role='hull';group.add(mand);
+  mkEye(-2.5,2.2,1);mkEye(2.5,2.2,1);mkEye(0,3.4,1.15);mkEye(-1.2,1.2,.7);mkEye(1.2,1.2,.7);
 }
 function suborbitBuildEnemyVisual(e,geoId,kind){
   if(!e||!e.mesh)return;
@@ -8867,9 +9143,9 @@ function spawnSuborbitBoss(){
   SUBORBIT.boss.hitCd=0;
   SUBORBIT.boss.wx=(Math.random()-.5)*SUBORBIT.corridorHalf*.9;
   SUBORBIT.boss.wz=SUBORBIT.offset+1200;
+  const col=pf.bossColor||0xff7755;
+  suborbitBuildBossVisual(SUBORBIT.boss.mesh,col);
   SUBORBIT.boss.mesh.visible=true;
-  SUBORBIT.boss.mesh.material.color.setHex(pf.bossColor||0xff7755);
-  SUBORBIT.boss.mesh.material.emissive.setHex(pf.bossColor||0xff7755);
   notify(`MINACCIA ELITE: ${pf.bossName||'BOSS'} IN AVVICINAMENTO`,2200);
 }
 function updateSuborbitActors(dt){
@@ -9217,8 +9493,8 @@ function enterSuborbit(sm){
   GAME.state='suborbit';
   document.body.classList.add('suborbit-active');
   notify(SUBORBIT.storyInspect
-    ?('Ispezione suborbitale: '+sm.sd.name+' — raccogli capsule, completa ≥55%.')
-    :('Volo suborbitale: '+sm.sd.name+' — ≥55% della rotta fa contare il volo.'));
+    ?('Circuito Depositi · '+sm.sd.name+' — sigilla '+SUBORBIT.depositsNeed+' siti con E.')
+    :('Circuito Depositi · '+sm.sd.name+' — sigilla i depositi (E); ≥55% resta fallback.'));
   suborbitTelemetry('enter',{planet:sm.sd.id,pType:sm.sd.pType,story:!!SUBORBIT.storyInspect});
   setTimeout(()=>tryShowTutorialSuborbit(),420);
 }
@@ -9226,7 +9502,7 @@ function leaveSuborbit(opts){
   opts=opts||{};
   const sum=suborbitSnapshotSummary(opts);
   const wasDone=typeof StorySys!=='undefined'&&StorySys.flags&&!!StorySys.flags.suborbitDone;
-  if(sum&&(sum.completed||SUBORBIT.corridorComplete||sum.progressPct>=55)){
+  if(sum&&(sum.completed||SUBORBIT.corridorComplete||sum.depositsDone||sum.progressPct>=55)){
     if(typeof StorySys!=='undefined')StorySys.markSuborbit();
     sum.firstInspectUnlock=!wasDone;
     sum.storyInspect=!!SUBORBIT.storyInspect;
@@ -9242,6 +9518,10 @@ function leaveSuborbit(opts){
   SUBORBIT.enemies.forEach(e=>{e.active=false;e.mesh.visible=false;});
   SUBORBIT.pickups.forEach(p=>{p.active=false;p.mesh.visible=false;});
   SUBORBIT.hazards.forEach(h=>{h.active=false;h.mesh.visible=false;});
+  (SUBORBIT.deposits||[]).forEach(d=>{
+    if(d.mesh){scene.remove(d.mesh);suborbitDisposeGroupVisual(d.mesh);}
+  });
+  SUBORBIT.deposits=[];SUBORBIT.nearDeposit=null;SUBORBIT.depositsSealed=0;
   if(SUBORBIT.boss&&SUBORBIT.boss.mesh){SUBORBIT.boss.active=false;SUBORBIT.boss.mesh.visible=false;SUBORBIT.boss.hp=0;}
   SUBORBIT.subBullets.forEach(b=>{
     b.active=false;b.life=0;b._hitRx=38;b._hitRz=44;b.laneWorldY=null;
@@ -9347,7 +9627,7 @@ function updatePlanetSkim(dt){
       SUBORBIT.autoExitRemaining-=dt;
       if(SUBORBIT.autoExitRemaining<=0){
         SUBORBIT.autoExitRemaining=null;
-        notify('Corridoio superato — rientro in orbita bassa.',2200);
+        notify('Circuito depositi chiuso — rientro in orbita bassa.',2200);
         leaveSuborbit();
         return;
       }
@@ -9422,6 +9702,7 @@ function updatePlanetSkim(dt){
       SUBORBIT.loreEventT=9+Math.random()*9;
     }
     updateSuborbitTerrainVisual();
+    updateSuborbitDeposits();
     updateSuborbitSkyFollow();
     updateSuborbitActors(sdt);
     if((SUBORBIT.setPieceT||0)>0){SUBORBIT.setPieceT=Math.max(0,SUBORBIT.setPieceT-sdt);if(SUBORBIT.setPieceT<=0){SUBORBIT.setPieceT=0;SUBORBIT.setPieceKind=null;SUBORBIT.setPieceEdgeMul=1;}}
@@ -9442,9 +9723,11 @@ function updatePlanetSkim(dt){
     }
     if(bar){bar.style.display='block';if(fill)fill.style.width=Math.min(100,skimT*4.2)+'%';}
     if(lbl){
-      const useHint=SUBORBIT.nearProp?' · PROP':'';
+      const dep=SUBORBIT.nearDeposit&&!SUBORBIT.nearDeposit.sealed;
+      const useHint=dep?(' · E · '+SUBORBIT.nearDeposit.name):(SUBORBIT.nearProp?' · PROP':'');
+      const sealTxt=` · SIG ${SUBORBIT.depositsSealed|0}/${SUBORBIT.depositsNeed|0}`;
       lbl.style.display='block';
-      lbl.textContent=`${sm.sd.name.toUpperCase()} · ${pf.tag||'SUBORBITALE'} · SPD ${Math.round(SUBORBIT.speed)} · K ${SUBORBIT.kills} · RACC ${SUBORBIT.collected}${useHint}`;
+      lbl.textContent=`${sm.sd.name.toUpperCase()} · ${pf.tag||'SUBORBITALE'} · SPD ${Math.round(SUBORBIT.speed)} · K ${SUBORBIT.kills} · RACC ${SUBORBIT.collected}${sealTxt}${useHint}`;
     }
     // Obiettivo rotta + milestone (indipendente dal DOM HUD)
     const goalDist=SUBORBIT.runGoal||32000;
@@ -9500,7 +9783,7 @@ function updatePlanetSkim(dt){
       const hpC=playerShip.health>=55?'#66eeaa':playerShip.health>=28?'#ffcc66':'#ff6655';
       const enC=playerShip.energy>=45?'#88ccff':playerShip.energy>=18?'#ffbb77':'#ff6655';
       const routeBarCol=SUBORBIT.corridorComplete?'#66ffaa':'#9ec8ff';
-      const objLbl=(pf.objectiveHud||pf.tag||'CORRIDOIO').toString().slice(0,24);
+      const objLbl=(pf.objectiveHud||'CIRCUITO').toString().slice(0,24);
       const exitSec=SUBORBIT.autoExitRemaining!=null?Math.max(0,Math.ceil(SUBORBIT.autoExitRemaining)):0;
       const exitRow=SUBORBIT.corridorComplete&&SUBORBIT.autoExitRemaining!=null
         ?`<div style="font:10px var(--FM);color:#a8ffd0;margin:4px 0 2px;letter-spacing:.06em">ORBITA · uscita tra <span style="color:#dff">${exitSec}</span>s · ESC = attracco</div>`
@@ -9510,6 +9793,23 @@ function updatePlanetSkim(dt){
         ?`<div style="font:9px var(--FM);color:#c8e6ff;margin:3px 0 1px;letter-spacing:.05em;border-top:1px solid rgba(80,140,220,.25);padding-top:4px">`
         +`SECONDARIO · ${so.label} · <span style="color:#8ef">${so.prog||0}/${so.need}</span> · +${fmt(so.reward)} Cr</div>`
         :(so&&so.done?`<div style="font:9px var(--FM);color:#7dffa8;margin:3px 0 1px;opacity:.9">Secondario completato.</div>`:'');
+      const depNeed=SUBORBIT.depositsNeed|0;
+      const depSeal=SUBORBIT.depositsSealed|0;
+      const depDone=depNeed>0&&depSeal>=depNeed;
+      const nearDep=SUBORBIT.nearDeposit&&!SUBORBIT.nearDeposit.sealed?SUBORBIT.nearDeposit:null;
+      const nextOpen=(SUBORBIT.deposits||[]).find(d=>!d.sealed);
+      const depPct=depNeed?Math.min(100,(depSeal/depNeed)*100):0;
+      const depBarCol=depDone?'#66ffaa':'#7ee8ff';
+      const depPrompt=nearDep
+        ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 6px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">E · SIGILLA · ${(nearDep.name+'').toUpperCase()}</div>`
+        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 4px;letter-spacing:.06em">Prossimo vault · ${nextOpen.name}</div>`:'');
+      const depRow=`<div style="margin:5px auto 7px;max-width:min(92vw,400px);text-align:left">`
+        +`<div style="font:9px var(--FM);color:${depBarCol};letter-spacing:.08em;margin-bottom:3px">`
+        +(depDone?'CIRCUITO CHIUSO · ':'CIRCUITO DEPOSITI · ')
+        +`<span style="color:#dff">${depSeal}/${depNeed}</span> sigilli</div>`
+        +`<div style="height:7px;background:rgba(0,40,48,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,220,200,.45)">`
+        +`<div style="height:100%;width:${depPct}%;background:linear-gradient(90deg,#1a6655,#4affcc);box-shadow:0 0 10px rgba(80,255,200,.35);transition:width .18s ease"></div></div></div>`
+        +depPrompt;
       const gRunH=goalDist>40?SUBORBIT.offset/goalDist:0;
       const strainH=gRunH>=.55?1+.58*((Math.min(1,gRunH)-.55)/.45):1;
       SUBORBIT.hudStressVis=lerp(SUBORBIT.hudStressVis||1,strainH,0.14);
@@ -9519,8 +9819,8 @@ function updatePlanetSkim(dt){
       const introRow=SUBORBIT.time<3.4
         ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55)">${
             SUBORBIT.storyInspect
-              ?'ISPEZIONE DEPOSITI · raccogli capsule · ≥55% della rotta'
-              :'INGRESSO CORRIDOIO · '+(sm.sd.name+'').toUpperCase()+' · ≥55% conta'
+              ?'CIRCUITO DEPOSITI · sigilla i vault con E'
+              :'CIRCUITO DEPOSITI · '+(sm.sd.name+'').toUpperCase()+' · E = sigillo'
           }</div>`
         :'';
       const tipRow=SUBORBIT.loadingTip?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:420px;margin-left:auto;margin-right:auto;font-style:italic">${SUBORBIT.loadingTip}</div>`:'';
@@ -9532,14 +9832,15 @@ function updatePlanetSkim(dt){
         +`<span style="color:${enC}">EN ${Math.round(playerShip.energy)}%</span>`
         +`<span style="color:#eed588">${fmt(PS.credits)}</span></div>`
         +`${exitRow}`
+        +`${depRow}`
         +`${soRow}`
         +`<div style="margin:5px auto 7px;max-width:min(92vw,400px);text-align:left">`
         +`<div style="font:9px var(--FM);color:${routeBarCol};letter-spacing:.08em;margin-bottom:3px">`
-        +(SUBORBIT.corridorComplete?'ROTTA COMPLETATA · ':'OBIETTIVO · ')
+        +(SUBORBIT.corridorComplete?'ROTTA COMPLETATA · ':'AVANZAMENTO · ')
         +`${objLbl} · <span style="color:#dff">${routePct.toFixed(0)}%</span> · ~${Math.round(goalDist/100)/10} km</div>`
-        +`<div style="height:7px;background:rgba(0,32,72,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,170,240,.45)">`
-        +`<div style="height:100%;width:${routePct}%;background:linear-gradient(90deg,#1a5599,#4af0ff);box-shadow:0 0 10px rgba(80,220,255,.35);transition:width .18s ease"></div></div></div>`
-        +`<div style="opacity:.88;margin-bottom:3px;letter-spacing:.05em;color:#b8d8ff;font-size:8px">WASD · SPAZIO fuoco · F trazione (più vicino) · V controlli · ESC attracco</div>`
+        +`<div style="height:5px;background:rgba(0,32,72,.72);border-radius:4px;overflow:hidden;border:1px solid rgba(90,170,240,.35)">`
+        +`<div style="height:100%;width:${routePct}%;background:linear-gradient(90deg,#1a5599,#4af0ff);box-shadow:0 0 8px rgba(80,220,255,.25);transition:width .18s ease"></div></div></div>`
+        +`<div style="opacity:.88;margin-bottom:3px;letter-spacing:.05em;color:#b8d8ff;font-size:8px">WASD · SPAZIO fuoco · F trazione · E sigillo · V controlli · ESC attracco</div>`
         +`<span style="${altWarn}">ALT ${altAbove}m</span> · `
         +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span> · `
         +`<span style="color:${thrCol}">REG ${thrPct}%</span> · `
@@ -12134,10 +12435,10 @@ function buildDock(st){
     subBtn.style.display=show?'inline-block':'none';
     if(show){
       const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
-      subBtn.textContent=needsStory?'ISPEZIONE SUBORBITALE':'VOLO SUBORBITALE';
+      subBtn.textContent=needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE';
       subBtn.title=needsStory
-        ?'Ispeziona i depositi (≥55% rotta). Serve per Il Prezzo del Sigillo.'
-        :'Corridoio atmosferico: raccolta, combattimento leggero, rientro con ESC.';
+        ?'Sigilla 3 depositi (E). Serve per Il Prezzo del Sigillo.'
+        :'Circuito Depositi: sigilla i vault, combattimento leggero, ESC per uscire.';
       subBtn.style.borderColor=needsStory?'rgba(120,220,160,.55)':'';
       subBtn.style.boxShadow=needsStory?'0 0 12px rgba(80,180,120,.25)':'none';
     }
