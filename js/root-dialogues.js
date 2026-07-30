@@ -85,7 +85,7 @@
         nodes: {
           z1: {
             speaker: 'npc',
-            text: 'Zvan. Non «funzionario»: Zvan. Sei secco come un arimanno che trasloca ogni sei mesi, solo che tu hai traslocato di pianeta. Fatti guardare. No, fermo lì: se ti muovi sembri uno che deve andare a una riunione.',
+            text: 'Zvan. Non «funzionario»: Zvan. Fatti guardare — no, fermo lì, che se ti muovi sembri uno che deve correre a una riunione. Sei secco come un arimanno che cambia casa ogni sei mesi, solo che tu hai cambiato pianeta. La tua roba te l\'ho tenuta in cantina: due scatole. Una l\'ho buttata l\'anno scorso, perché a un certo punto uno si stufa.',
             choices: [
               { label: '[ZVAN] "Non so più con che nome presentarmi, qui."', next: 'z2' },
               { label: '[ZVAN] "Non sono tornato. Mi hanno rispedito."', next: 'z2b' }
@@ -103,10 +103,10 @@
           },
           z3: {
             speaker: 'npc',
-            text: 'Allora siediti in cortile e sta\' fermo cinque minuti, che il Patto non scappa. Di Imperium non me ne importa un pananai. Ti chiedo solo se lo spazio ti ha congelato la lingua o soltanto la voglia. E se ti mandano qui perché lassù le casate si mordono, ricordati: noi siamo il patio di servizio dell\'Impero. Non è una metafora, è proprio l\'indirizzo.',
+            text: 'Allora siediti in cortile e sta\' fermo cinque minuti, che il Patto non scappa. Di Imperium non me ne importa un pananai: ti chiedo solo se lo spazio ti ha congelato la lingua o soltanto la voglia. E se ti mandano qui perché lassù le casate si mordono, ricordati che noi siamo il patio di servizio dell\'Impero — non è una metafora, è proprio l\'indirizzo. Prima di ripartire scendi in cantina a prenderti la scatola rimasta. Non l\'ho aperta. Non per discrezione: avevo paura che dentro non ci fosse più niente di tuo.',
             choices: [
-              { label: '[RESTA] "Rimparo a dire Zvanino senza vergognarmi." (+rep)', next: null, fx: { rep: { bazzano: 6 }, note: 'Zia Ornella ti mette in tasca un fazzoletto stirato. Sa di sapone e di rimprovero.', lore: 'periferia' } },
-              { label: '[PARTE] "Il Patto non aspetta."', next: null, fx: { note: 'Non ti trattiene. Le zie capiscono subito quando uno è già partito da un pezzo.' } }
+              { label: '[RESTA] "Apriamola insieme." (+rep)', next: null, fx: { rep: { bazzano: 6 }, note: 'Dentro: un quaderno, due biglie, una foto storta del cortile. La seconda scatola, dice Ornella, non l\'aveva buttata: l\'aveva nascosta.', lore: 'periferia' } },
+              { label: '[PARTE] "Il Patto non aspetta."', next: null, fx: { note: 'Non ti trattiene. Le zie capiscono subito quando uno è già partito da un pezzo. La scatola resta in cantina.' } }
             ]
           }
         }
@@ -167,7 +167,7 @@
         nodes: {
           s1: {
             speaker: 'zvan',
-            text: 'Mi guardo e vedo prima l\'uniforme, poi la faccia. Il distintivo col pianeta e l\'anello: a Imperium sembrava un\'identità, qui sembra un cappotto preso all\'attaccapanni sbagliato.',
+            text: 'L\'ispettore mi ha appena dato del «lei» per venti minuti di fila, e sono venuto qui a sciacquarmi la faccia. Nello specchio vedo prima l\'uniforme e poi me. Il distintivo col pianeta e l\'anello: a Imperium sembrava un\'identità, qui sembra un cappotto preso all\'attaccapanni sbagliato.',
             choices: [
               { label: '[AMMETTI] "Sono ospite dove sono nato."', next: 's2' },
               { label: '[NEGA] "Sono ancora di qui. Lascia st— …no."', next: 's2b' }
@@ -205,33 +205,33 @@
         faction: 'crespellano',
         gender: 'f',
         portrait: 'sprites/faces/roots/lia.png',
-        blurb: 'Stesso cognome, stessa coda allo sportello. Lei non è mai partita e non te lo rinfaccia. Quasi.',
+        blurb: 'Stesso cognome, stesso sportello. Quando chiamano «Marìa», in sala si alzano in due.',
         start: 'c1',
         nodes: {
           c1: {
             speaker: 'npc',
-            text: 'Zvan. Noi il semaforo lo aspettiamo dal 2003 e tu arrivi con una busta nera. Qui buste nere non ne sono mai arrivate: arriva modulistica, e la modulistica è beige. Allora: sei venuto per il Patto, o Imperium ti ha usato come corriere della nostalgia?',
+            text: 'Hanno chiamato «Marìa» allo sportello e ci siamo alzati in due. Non succedeva dal funerale del nonno. Siediti, cugino: tu hai il quarantasette, io il quarantotto, e sono le undici passate. Allora: sei qui per il Patto, o sei qui perché ti hanno spedito e tanto valeva passare?',
             choices: [
-              { label: '[ZVAN] "Per tutti e due. E non so quale pesa di più."', next: 'c2' },
-              { label: '[DIALETTO] "Taproblem… no. Ecco: questo non è taproblem."', next: 'c2b' }
+              { label: '[ZVAN] "Per il Patto. Il resto non era in agenda."', next: 'c2' },
+              { label: '[DIALETTO] "Taproblem… cioè no. Ecco, questo non è taproblem."', next: 'c2b' }
             ]
           },
           c2: {
             speaker: 'zvan',
-            text: 'A Imperium dicevano che Crespellano produce «niente». Ridevo anch\'io, in mensa, insieme agli altri. Poi ho capito che il niente era l\'unica cosa che non riuscivano a comprare. Io invece mi sono venduto a rate, un livello alla volta.',
+            text: 'Per il Patto, sì. Anche se a Imperium, quando dicevo che venivo di qui, mi chiedevano dove fosse. Vent\'anni a spiegare il mio indirizzo, e stamattina ho dovuto chiedere indicazioni per arrivare a un archivio dove mi portava la zia in bicicletta.',
             choices: [{ label: '[ASCOLTA]', next: 'c3' }]
           },
           c2b: {
             speaker: 'npc',
-            text: 'Bravo, ti sei corretto da solo. «Taproblem» in bocca tua suona tradotto dall\'imperiale, con la nota a piè di pagina. Come quelli che vengono in gita, dicono tavò e si sentono del posto. Tu non sei un turista, Zvan: sei un reduce del marmo. È peggio, però almeno è roba tua.',
+            text: 'Fermati lì. «Taproblem» detto da te ha le note a piè di pagina. Non è colpa tua: a furia di parlare imperiale ti è rimasto l\'accento della modulistica. Almeno tu ci provi. Quelli che vengono in gita dicono tavò due volte e si sentono del posto.',
             choices: [{ label: '[ZVAN] "Allora insegnami a sbagliare di nuovo, ma in dialetto."', next: 'c3' }]
           },
           c3: {
             speaker: 'npc',
-            text: 'Le radici non tornano con un capitolo: tornano stando in fila. Se ti sei stufato di Imperium, buon per te; se no vai a firmare, che io aspetto il verde e ho tutto il tempo. Ah, se ti interessano le voci: lassù le casate maggiori si scannano nei corridoi e i nostri fascicoli li leggono come l\'inventario di un magazzino di periferia. Il magazzino saremmo noi.',
+            text: 'Facciamo così. Il fascicolo che cerchi nella sala grande non c\'è: sta nell\'ala che hanno chiuso quando è venuto giù il soffitto, quella che sui registri risulta «classificata male». Male è un complimento: vuol dire che chi archiviava aveva paura di scrivere bene. La chiave ce l\'ho io perché nessuno me l\'ha mai chiesta indietro in undici anni. Te la do, però aspetti il turno con me. E intanto ti spiego perché lassù le casate si scannano nei corridoi e i nostri fascicoli li leggono come l\'inventario di un magazzino di periferia. Il magazzino, ovviamente, siamo noi.',
             choices: [
-              { label: '[RESTA IN FILA] (+rep Crespellano)', next: null, fx: { rep: { crespellano: 5 }, note: 'Lia ti lascia una chiave dell\'archivio «classificato male». Qui «male» è un complimento.', lore: 'casate_rumore' } },
-              { label: '[VAI]', next: null, fx: { note: 'Non ti saluta da funzionario. Solo: «Zvan.» E torna a guardare il semaforo.' } }
+              { label: '[RESTA IN FILA] "Quarantasette. Aspetto." (+rep Crespellano)', next: null, fx: { rep: { crespellano: 5 }, note: 'Tre ore di coda e vent\'anni raccontati male. Lia ti lascia in mano la chiave dell\'ala «classificata male».', lore: 'casate_rumore' } },
+              { label: '[VAI] "Ho una finestra orbitale fra venti minuti."', next: null, fx: { note: 'Lia si rimette la chiave in tasca. Non ti saluta da funzionario: dice «Zvan», e torna a fissare il display dei turni.' } }
             ]
           }
         }
@@ -254,7 +254,7 @@
         nodes: {
           k1: {
             speaker: 'npc',
-            text: 'Marìa. Settimo livello. Hai portato il pezzo e vuoi il timbro. Ti ricordi quando i timbri erano pananai, roba da ridere in fondo alla classe? Adesso sei pananai con la tredicesima. Complimenti sinceri, giuro.',
+            text: 'Marìa. Settimo livello. Hai portato il pezzo e adesso vuoi il timbro. Guardaci bene: da ragazzi staccavamo i cartelli stradali per ridere, oggi i cartelli li timbro io e tu li firmi. Pananai in due, con la tredicesima. Complimenti sinceri a tutti e due.',
             choices: [
               { label: '[ZVAN] "Lo so di essere diventato quello che prendevamo in giro."', next: 'k2' },
               { label: '[DIFESA] "Senza Imperium quest\'anello si spegne."', next: 'k2b' }
@@ -298,7 +298,7 @@
         nodes: {
           m1: {
             speaker: 'npc',
-            text: 'Zvan. Che le frecce di luce siano laser lo sapevamo già a otto anni: lo diceva tuo cugino e noi gli davamo dell\'endàvs. Poi tu sei partito per chiamarle «sistemi d\'arma» e io sono rimasta a chiamarle promesse. Secondo te chi dei due ha smesso di giocare?',
+            text: 'Zvan. Che le frecce di luce fossero laser lo sapevamo già a otto anni: lo diceva il figlio del fabbro e noi gli davamo dell\'endàvs per il gusto di non credergli. Poi tu sei partito per chiamarle «sistemi d\'arma» e io sono rimasta a chiamarle promesse. Secondo te chi dei due ha smesso di giocare?',
             choices: [
               { label: '[ZVAN] "Io. Ho scambiato il gioco con il grado."', next: 'm2' },
               { label: '[ZVAN] "Siamo cresciuti in direzioni diverse."', next: 'm2b' }
