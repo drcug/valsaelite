@@ -271,11 +271,27 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
 
 /* Story / Mission ticker — top-left, fuori dal radar centrale e dalle barre HUD */
 #mtick{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));transform:none;
-  background:var(--panel);border:1px solid rgba(130,60,200,.3);border-radius:5px;
-  padding:4px 10px;font-family:var(--FM);font-size:10px;color:#bb77ff;
-  z-index:12;pointer-events:none;display:none;text-align:left;max-width:min(38vw,220px);
-  white-space:normal;line-height:1.35;overflow:hidden;text-overflow:ellipsis;
-  max-height:4.2em}
+  z-index:12;pointer-events:none;font:9px var(--FM);letter-spacing:.08em;color:#9ec8e8;
+  background:rgba(4,12,28,.72);border:1px solid rgba(80,140,200,.35);border-radius:6px;padding:4px 9px;
+  max-width:min(46vw,280px);line-height:1.35;text-shadow:0 1px 2px #000}
+#story-obj{position:fixed;top:max(36px,calc(env(safe-area-inset-top) + 28px));left:max(8px,env(safe-area-inset-left));
+  z-index:12;pointer-events:none;font:10px var(--FD);letter-spacing:.1em;color:#ffe8b0;
+  background:linear-gradient(90deg,rgba(40,28,8,.88),rgba(20,14,4,.72));border:1px solid rgba(255,200,90,.4);
+  border-radius:6px;padding:5px 10px;max-width:min(62vw,340px);line-height:1.35;
+  box-shadow:0 0 16px rgba(255,160,40,.12);display:none}
+#story-obj.show{display:block}
+#story-obj .so-lab{font-size:8px;color:#c8a060;letter-spacing:.14em;margin-bottom:2px}
+body.suborbit-active #story-obj{display:none!important}
+.dk-story-brief{margin:0 0 10px;padding:8px 11px;border-radius:8px;border:1px solid rgba(255,190,80,.4);
+  background:linear-gradient(165deg,rgba(48,32,8,.55),rgba(20,14,6,.7));font-family:var(--FM)}
+.dk-story-brief .dk-sb-lab{font:8px var(--FD);letter-spacing:.14em;color:#e8c070;margin-bottom:3px}
+.dk-story-brief .dk-sb-txt{font-size:11px;color:#f0e0c0;line-height:1.4}
+.diary-check{list-style:none;margin:8px 0 0;padding:0}
+.diary-check li{font:10px var(--FM);margin:3px 0;letter-spacing:.04em}
+.diary-check li.ok{color:#6edda8}
+.diary-check li.todo{color:#d4c090}
+@keyframes storyStuckPulse{0%,100%{box-shadow:0 0 12px rgba(255,180,40,.35)}50%{box-shadow:0 0 22px rgba(255,200,60,.65)}}
+#ldck-suborbit.story-stuck-pulse{animation:storyStuckPulse 1.2s ease-in-out infinite}
 
 /* Story chapter banner — fullscreen overlay; stile in game-extras.css */
 #story-banner{display:none;position:fixed;inset:0;z-index:125;align-items:center;justify-content:center;pointer-events:auto}
@@ -726,6 +742,7 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
   #radar{top:6px;width:72px;height:72px}
   #rcv{width:72px !important;height:72px !important}
   #mtick{top:max(8px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));max-width:min(42vw,180px);font-size:9px;padding:3px 8px}
+  #story-obj{top:max(34px,calc(env(safe-area-inset-top) + 26px));left:max(6px,env(safe-area-inset-left));max-width:min(78vw,300px);font-size:9px;padding:4px 8px}
   #notif{bottom:max(148px,24vh);z-index:28}
   #smsg{bottom:max(190px,30vh);z-index:29}
   #dlg{bottom:max(115px,17vh);max-width:94vw;max-height:min(32vh,260px)}
@@ -983,6 +1000,7 @@ body.suborbit-active #smsg{
 
 <div id="radar"><canvas id="rcv" width="100" height="100"></canvas></div>
 <div id="mtick"></div>
+<div id="story-obj" aria-live="polite"></div>
 
 <!-- Navigation arrow overlay -->
 <div id="navarrow" style="display:block;position:fixed;inset:0;z-index:9;pointer-events:none">
@@ -1128,6 +1146,7 @@ body.suborbit-active #smsg{
     <div><span style="color:#77ccff">▲</span> Tu &nbsp;·&nbsp; <span style="color:#88aaff">●</span> Pianeta/staz.</div>
     <div><span style="color:#ff9a50">◇</span> Space Hulk &nbsp;·&nbsp; <span style="color:#cc55ff">○</span> Anomalia</div>
     <div><span style="color:#66eeff">━</span> Corsia &nbsp;·&nbsp; <span style="color:#88ffaa">R</span> Radici</div>
+    <div><span style="color:#ffcc66">★</span> Destinazione trama &nbsp;·&nbsp; <span style="color:#ffe08a">STORIA</span> missione</div>
     <div style="opacity:.7;margin-top:4px">Tasti <kbd style="border:1px solid #456;padding:0 3px;border-radius:2px">1–7</kbd> filtri · doppio click = naviga</div>
   </div>
   <div style="position:absolute;bottom:14px;right:14px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#334455;text-align:right;pointer-events:none">
@@ -1348,7 +1367,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · vista zoomata che segue Zvan · nave = pezzi blueprint · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
-    <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
+    <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario (checklist) · obiettivo fisso in alto a sinistra · mappa/radar: ★ destinazione · tab Missioni: badge STORIA</span></div>
     <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd> (3 sigilli). <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> rientro in stazione. Cap.4 si sblocca solo col Circuito completo. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
@@ -1368,6 +1387,7 @@ body.suborbit-active #smsg{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="js/assets.js"></script>
 <script src="js/story-sys.js"></script>
+<script src="js/story-guide.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/gameplay-polish.js"></script>
@@ -2105,6 +2125,10 @@ function advanceStory(ch){
       st.missionsList.unshift(m);
     }
   }
+  if(typeof StoryGuide!=='undefined'){
+    StoryGuide.noteCap4Enter();
+    setTimeout(()=>StoryGuide.radioForObjective(),900);
+  }
   if(ch===1){
     STORY_BANNER._afterClose.push(()=>setTimeout(()=>tryShowTutorialChain(),400));
   }
@@ -2197,7 +2221,9 @@ function renderDiaryContent(){
         extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
       }
     }
-    html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p><div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
+    html+=`<div class="diary-ch ${cls}"><h3>Capitolo ${step} · ${ch.title}</h3><p class="dm">${ch.intro}</p><p class="dm"><strong>${m.title}</strong><br>${m.desc}</p>`
+      +(active&&typeof StoryGuide!=='undefined'?StoryGuide.checklistHtml(step):'')
+      +`<div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
   });
   if(STORY.won){
     html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso ha ripreso a girare. Restano epilogo e missioni sandbox, se vuoi continuare a volare.</p></div>'+html;
@@ -5815,7 +5841,18 @@ class Ship{
       if(!this._recentHitT||this._recentHitT<=0)PS.shieldHp=Math.min(PS.shieldMax,PS.shieldHp+regen*dt);
       else this._recentHitT-=dt;
     }
-    if(this._hitFlash>0)this._hitFlash-=dt;
+    if(this._hitFlash>0){
+      this._hitFlash-=dt;
+      if(this._hitFlash<=0&&this.mesh){
+        this.mesh.traverse(o=>{
+          if(!o.isMesh||!o.material)return;
+          const mats=Array.isArray(o.material)?o.material:[o.material];
+          mats.forEach(mt=>{
+            if(mt&&mt.emissive&&mt.userData&&mt.userData._emBase!=null)mt.emissiveIntensity=mt.userData._emBase;
+          });
+        });
+      }
+    }
     if(this.fireCooldown>0)this.fireCooldown-=dt;
     if(this._burstLeft>0&&this.fireCooldown<=0){
       this._emitProjectile();this._burstLeft--;
@@ -6001,7 +6038,19 @@ class Ship{
         }
       }
     }else{
-      this._hitFlash=0.22;
+      this._hitFlash=0.28;
+      // Flash emissivo breve sullo scafo colpito
+      if(this.mesh){
+        this.mesh.traverse(o=>{
+          if(!o.isMesh||!o.material)return;
+          const mats=Array.isArray(o.material)?o.material:[o.material];
+          mats.forEach(mt=>{
+            if(!mt||!mt.emissive)return;
+            if(mt.userData._emBase==null)mt.userData._emBase=mt.emissiveIntensity||0;
+            mt.emissiveIntensity=Math.min(2.2,(mt.userData._emBase||0)+1.6);
+          });
+        });
+      }
     }
     if(this.health===0)this.die();
   }
@@ -6161,6 +6210,7 @@ function updateProjs(dt){
               m.killsDone=(m.killsDone||0)+1;
               RUN_STATS.kills++;
               notify('Nave '+(FACTIONS[ns.faction]?.short||ns.faction)+' abbattuta! ('+m.killsDone+'/'+m.killsNeeded+')');
+              if(ns.faction==='calcara'&&typeof StoryGuide!=='undefined')StoryGuide.onAction('kill_calcara');
               if(m.killsDone>=m.killsNeeded){
                 if(m.waves){
                   m.wavesDone=(m.wavesDone||0)+1;
@@ -7009,6 +7059,7 @@ function completeLanding(){
   document.getElementById('radar').style.display='none';
   document.getElementById('mtick').style.display='none';
   document.body.classList.add('docked-ui');
+  if(typeof StoryGuide!=='undefined')StoryGuide.onDock(GAME.dockedSt);
   if(typeof saveGame==='function')saveGame(true);
   if(typeof playCombatSfx==='function')playCombatSfx('dock');
   tryShowTutorialDock();
@@ -9641,6 +9692,7 @@ function leaveSuborbit(opts){
           document.getElementById('radar').style.display='none';
           document.getElementById('mtick').style.display='none';
           buildDock(st);
+          if(typeof StoryGuide!=='undefined')StoryGuide.onDock(st);
           return;
         }
       }
@@ -9658,6 +9710,7 @@ function leaveSuborbit(opts){
       document.getElementById('radar').style.display='none';
       document.getElementById('mtick').style.display='none';
       buildDock(st);
+      if(typeof StoryGuide!=='undefined')StoryGuide.onDock(st);
       return;
     }
   }
@@ -12560,10 +12613,21 @@ function buildDock(st){
     }
   }
   const tabs=document.getElementById('dktbs'),panels=document.getElementById('dkpns');
+  // Briefing trama sotto la descrizione
+  const dkdc=document.getElementById('dkdc');
+  if(dkdc&&typeof StoryGuide!=='undefined'){
+    let brief=document.getElementById('dk-story-brief');
+    if(brief)brief.remove();
+    const html=StoryGuide.dockBriefHtml();
+    if(html){
+      dkdc.insertAdjacentHTML('afterend',html);
+    }
+  }
   const subBtn=document.getElementById('ldck-suborbit');
   if(subBtn){
     const show=SKIM_TYPES.includes(sd.pType);
     subBtn.style.display=show?'inline-block':'none';
+    subBtn.classList.remove('story-stuck-pulse');
     if(show){
       const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
       subBtn.textContent=needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE';
@@ -12572,6 +12636,14 @@ function buildDock(st){
         :'Circuito Depositi: 3 vault da sigillare, poi rientro in stazione.';
       subBtn.style.borderColor=needsStory?'rgba(120,220,160,.55)':'';
       subBtn.style.boxShadow=needsStory?'0 0 12px rgba(80,180,120,.25)':'none';
+      if(needsStory&&typeof StoryGuide!=='undefined'){
+        const g=StorySys.flags&&StorySys.flags.guide;
+        if(g&&g.stuckAt&&Date.now()-g.stuckAt<180000){
+          subBtn.classList.add('story-stuck-pulse');
+          subBtn.style.borderColor='rgba(255,200,80,.85)';
+          subBtn.style.boxShadow='0 0 18px rgba(255,180,40,.45)';
+        }
+      }
     }
   }
   const retainTab=typeof GAME!=='undefined'&&GAME.dockActiveTab?GAME.dockActiveTab:null;
@@ -12595,6 +12667,8 @@ function buildDock(st){
       const n=(RootDialogues.availableEncounters(sd.id)||[]).length;
       if(n>0){lbl='RADICI';btn.innerHTML='RADICI <span class="tab-badge">'+n+'</span>';}
       else btn.textContent=lbl;
+    }else if(td.id==='missions'&&typeof StoryGuide!=='undefined'&&StoryGuide.hasActiveStoryOnStation(sd.id)){
+      btn.innerHTML='MISSIONI <span class="tab-badge" style="background:rgba(255,200,80,.25);border-color:rgba(255,200,80,.5);color:#ffe08a">STORIA</span>';
     }else btn.textContent=lbl;
     btn.addEventListener('click',()=>switchTab(td.id,st));tabs.appendChild(btn);
     const div=document.createElement('div');div.className='dkp';div.id='dp_'+td.id;panels.appendChild(div);
@@ -14002,17 +14076,33 @@ function drawMap(){
     ctx.lineWidth=isSel?2.5:isNav?2:1.2;ctx.stroke();
     // Pulse ring for nav target
     if(isNav){const pulse=Date.now()*.003;const pr=r+6+Math.sin(pulse)*4;ctx.beginPath();ctx.arc(x,y,pr,0,Math.PI*2);ctx.strokeStyle='#00ffcc44';ctx.lineWidth=1.5;ctx.stroke();}
+    // STORIA waypoint / badge
+    const storyHere=typeof StoryGuide!=='undefined'&&StoryGuide.hasActiveStoryOnStation(sm.sd.id);
+    const wp=typeof StoryGuide!=='undefined'?StoryGuide.getWaypoint():null;
+    const isStoryWp=wp&&wp.sid===sm.sd.id;
+    if(isStoryWp){
+      const pulse=Date.now()*.004;const pr=r+10+Math.sin(pulse)*5;
+      ctx.beginPath();ctx.arc(x,y,pr,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,200,80,.75)';ctx.lineWidth=2.2;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,pr+5,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,220,120,.28)';ctx.lineWidth=1;ctx.stroke();
+    }
     // Label (only when zoom > threshold)
     if(MAP.zoom>.35||sm.sd.pR>400){
       const fontSize=Math.round(cl(9*MAP.zoom,8,14));
       ctx.font=`bold ${fontSize}px Rajdhani`;ctx.textAlign='center';
-      ctx.fillStyle=isSel?'#ffffff':col;
+      ctx.fillStyle=isSel?'#ffffff':(isStoryWp?'#ffe08a':col);
       ctx.fillText(sm.sd.name.toUpperCase(),x,y-r-5);
       // Rep badge
       const rv=rep[sm.sd.faction]||0;
       const rc=rv>20?'#33dd77':rv>0?'#88ccff':rv<-20?'#ff4433':'#ffbb44';
       ctx.fillStyle=rc;ctx.font=`${Math.round(fontSize*.8)}px Share Tech Mono`;
       ctx.fillText((rv>0?'+':'')+rv,x,y+r+fontSize);
+      if(storyHere||isStoryWp){
+        ctx.fillStyle='#ffe08a';
+        ctx.font=`bold ${Math.round(fontSize*.8)}px Rajdhani`;
+        ctx.fillText('STORIA',x,y-r-5-fontSize);
+      }
       if(typeof RootDialogues!=='undefined'){
         const av=(RootDialogues.availableEncounters(sm.sd.id)||[]).length;
         if(av>0){
@@ -14044,6 +14134,21 @@ function drawMap(){
       ctx.setLineDash([6,8]);ctx.strokeStyle='rgba(0,255,200,.35)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(dx,dy);ctx.stroke();
       ctx.setLineDash([]);
+    }
+  }
+  // Story waypoint line
+  if(typeof StoryGuide!=='undefined'){
+    const wp=StoryGuide.getWaypoint();
+    if(wp){
+      const {x:dx,y:dy}=worldToMap(wp.x,wp.z);
+      ctx.setLineDash([4,7]);ctx.strokeStyle='rgba(255,200,80,.55)';ctx.lineWidth=1.8;
+      ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(dx,dy);ctx.stroke();
+      ctx.setLineDash([]);
+      if(wp.hulk){
+        ctx.fillStyle='rgba(255,220,100,.95)';
+        ctx.font=`bold ${Math.round(9*MAP.zoom)}px Rajdhani`;ctx.textAlign='center';
+        ctx.fillText('★ '+(wp.label||'HULK'),dx,dy-12);
+      }
     }
   }
   ctx.textAlign='left';
@@ -14252,6 +14357,10 @@ function drawRadar(){
     if(!clipR(ax,ay))return;
     const px=cl(ax,4,W-4),py=cl(ay,4,W-4);
     ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,3.6,0,Math.PI*2);ctx.fill();
+    if(typeof StoryGuide!=='undefined'&&StoryGuide.hasActiveStoryOnStation(sm.sd.id)){
+      ctx.strokeStyle='rgba(255,200,80,.9)';ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.arc(px,py,5.5,0,Math.PI*2);ctx.stroke();
+    }
   });
   SPACE_ANOMALIES.forEach(an=>{
     const rx=(an.x-playerShip.mesh.position.x)*sc;
@@ -14323,6 +14432,34 @@ function drawRadar(){
   });
   ctx.fillStyle='#77ccff';ctx.beginPath();ctx.arc(cx,cy,4.2,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='rgba(119,204,255,.72)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,4.2,0,Math.PI*2);ctx.stroke();
+  // Freccia verso waypoint trama (anche oltre il raggio radar)
+  if(typeof StoryGuide!=='undefined'&&playerShip&&playerShip.mesh){
+    const wp=StoryGuide.getWaypoint();
+    if(wp){
+      const dx=wp.x-playerShip.mesh.position.x;
+      const dz=wp.z-playerShip.mesh.position.z;
+      const dist=Math.hypot(dx,dz)||1;
+      const ang=Math.atan2(dx,dz);
+      const edgeR=Rmax-3;
+      const onRadar=dist*sc<=edgeR;
+      const ex=cx+Math.sin(ang)*(onRadar?Math.min(edgeR,dist*sc):edgeR);
+      const ey=cy+Math.cos(ang)*(onRadar?Math.min(edgeR,dist*sc):edgeR);
+      ctx.save();
+      ctx.translate(ex,ey);
+      ctx.rotate(ang);
+      ctx.fillStyle='rgba(255,210,90,.95)';
+      ctx.beginPath();
+      ctx.moveTo(0,-5);ctx.lineTo(4,4);ctx.lineTo(0,1.5);ctx.lineTo(-4,4);ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      if(!onRadar){
+        ctx.strokeStyle='rgba(255,200,80,.35)';
+        ctx.setLineDash([2,3]);
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -14428,6 +14565,19 @@ function updateHUD(){
   mt.textContent=tickParts.join(' · ');
   const showTick=tickParts.length>0&&!(GAME.state==='suborbit'&&SUBORBIT.active);
   mt.style.display=showTick?'block':'none';
+  // Obiettivo trama fisso
+  const so=document.getElementById('story-obj');
+  if(so){
+    const flyOk=(GAME.state==='flying'||GAME.state==='dialogue')&&!(GAME.state==='suborbit'&&SUBORBIT.active)&&GAME.state!=='gameover'&&GAME.state!=='docked';
+    if(flyOk&&typeof StoryGuide!=='undefined'){
+      const obj=StoryGuide.getObjective();
+      if(obj.line&&obj.kind!=='done'){
+        so.innerHTML='<div class="so-lab">OBIETTIVO TRAMA</div>'+obj.line;
+        so.classList.add('show');
+      }else{so.classList.remove('show');so.innerHTML='';}
+    }else{so.classList.remove('show');}
+  }
+  if(typeof StoryGuide!=='undefined')StoryGuide.tick(1/30);
   smeshes.forEach(sm=>{if(sm.mesh._dr){const n=GAME.nearSt&&GAME.nearSt.sd.id===sm.sd.id;sm.mesh._dr.material.opacity=n?0.45+Math.sin(Date.now()*.01)*.18:0.13;}});
   const ov=document.getElementById('hud-overlay');
   const subOr=GAME.state==='suborbit'&&SUBORBIT.active;

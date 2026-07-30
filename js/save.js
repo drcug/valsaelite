@@ -56,7 +56,13 @@
       storyFlags:global.StorySys&&global.StorySys.flags?{
         suborbitDone:!!global.StorySys.flags.suborbitDone,
         hulkBoarded:!!global.StorySys.flags.hulkBoarded,
-        boardingsTotal:global.StorySys.flags.boardingsTotal|0
+        boardingsTotal:global.StorySys.flags.boardingsTotal|0,
+        guide:global.StorySys.flags.guide?{
+          radioAt:global.StorySys.flags.guide.radioAt|0,
+          stuckAt:global.StorySys.flags.guide.stuckAt|0,
+          cap4Since:global.StorySys.flags.guide.cap4Since|0,
+          actionBeats:Object.assign({},global.StorySys.flags.guide.actionBeats||{})
+        }:null
       }:null,
       storyMissions:storyMissionSnap(global.STORY),
       rep:{...global.rep},
@@ -136,6 +142,12 @@
       global.StorySys.flags.suborbitDone=!!data.storyFlags.suborbitDone;
       global.StorySys.flags.hulkBoarded=!!data.storyFlags.hulkBoarded;
       global.StorySys.flags.boardingsTotal=data.storyFlags.boardingsTotal|0;
+      if(data.storyFlags.guide){
+        global.StorySys.flags.guide=Object.assign({
+          radioAt:0,stuckAt:0,cap4Since:0,actionBeats:{}
+        },data.storyFlags.guide);
+        if(!global.StorySys.flags.guide.actionBeats)global.StorySys.flags.guide.actionBeats={};
+      }
     }
     Object.assign(global.rep,data.rep||{});
     if(data.bpGrid)global.bpGrid=data.bpGrid.map(row=>[...row]);

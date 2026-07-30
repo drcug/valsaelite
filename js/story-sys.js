@@ -40,11 +40,19 @@
 
     markSuborbit() {
       this.flags.suborbitDone = true;
+      if (global.StoryGuide && typeof global.StoryGuide.onAction === 'function') {
+        global.StoryGuide.onAction('circuit');
+      }
     },
 
     markBoarding(kind) {
       this.flags.boardingsTotal++;
-      if (kind === 'hulk') this.flags.hulkBoarded = true;
+      if (kind === 'hulk') {
+        this.flags.hulkBoarded = true;
+        if (global.StoryGuide && typeof global.StoryGuide.onAction === 'function') {
+          global.StoryGuide.onAction('hulk');
+        }
+      }
     },
 
     /** Grant mission cargo into inventory on accept (top-up to required qty). */
