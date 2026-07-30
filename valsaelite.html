@@ -1341,7 +1341,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Cantiere</span><span><kbd>Esc</kbd> annulla · <kbd>Z</kbd> undo · <kbd>E</kbd> gomma · <kbd>1–9</kbd> palette · <kbd>Q</kbd> deseleziona · Piazza/Gomma</span></div>
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
-    <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · nave = recupero pezzi blueprint (niente mostri) · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
+    <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · vista zoomata che segue Zvan · nave = pezzi blueprint · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario · missioni [STORIA] in tab Missioni all'attracco</span></div>
     <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd> (3 sigilli). <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> rientro in stazione. Cap.4 si sblocca solo col Circuito completo. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
@@ -9874,6 +9874,8 @@ const BOARDING={
   exitCell:null,
   timer:0, introT:0, outroT:0, flashT:0, outcome:null,
   seed:0, reward:0, lootTable:null,
+  // Camera: zoom fisso + scrolling sul giocatore (soprattutto mobile).
+  camOx:null,camOy:null,_camInit:false,_camTw:0,
   // Input (riutilizza INP left/right/thrust/boost/fire).
   _lastInp:{l:0,r:0,u:0,d:0,fire:0},
   _ptrBound:false,_ptrActive:false,_ptrX:0,_ptrY:0,
@@ -9888,12 +9890,53 @@ function boardingPushParticle(p){
   while(BOARDING.particles.length>cap)BOARDING.particles.shift();
 }
 function boardingGridXY(cv){
+  // Legacy fit-to-map (non usato dal render iso); tenuto per compat.
   const W=cv.clientWidth||cv.width, H=cv.clientHeight||cv.height;
   const tile=Math.max(20,Math.min(48,Math.floor(Math.min(W/BOARDING.cols,H/BOARDING.rows))));
   BOARDING.tile=tile;
   const ox=Math.floor((W-tile*BOARDING.cols)/2);
   const oy=Math.floor((H-tile*BOARDING.rows)/2);
   return {tile,ox,oy,W,H};
+}
+/** Tile zoomato: non ritaglia tutta la mappa nello schermo (mobile: ~5–6 diamanti in vista). */
+function boardingZoomTile(W,H){
+  const short=Math.min(W,H)||360;
+  const coarse=(typeof window!=='undefined')&&(('ontouchstart' in window)||(navigator&&(navigator.maxTouchPoints|0)>0));
+  if(coarse||short<720){
+    return Math.max(54,Math.min(86,Math.floor(short/5.8)));
+  }
+  return Math.max(46,Math.min(74,Math.floor(short/9.2)));
+}
+function boardingCameraTarget(W,H,tw,th){
+  const p=BOARDING.player;
+  const fx=(p&&p.sx!=null?p.sx:1)+0.5;
+  const fy=(p&&p.sy!=null?p.sy:1)+0.5;
+  // Leggermente sopra il centro: lascia spazio a muri/HUD touch in basso
+  const lookY=H*0.44;
+  return{
+    ox:W*0.5-(fx-fy)*tw*0.5,
+    oy:lookY-(fx+fy)*th*0.5
+  };
+}
+function updateBoardingCamera(dt,cv){
+  if(!cv||!BOARDING.map)return;
+  const W=cv.clientWidth||cv.width, H=cv.clientHeight||cv.height;
+  const tw=boardingZoomTile(W,H);
+  const th=tw*0.54;
+  BOARDING._camTw=tw;
+  const want=boardingCameraTarget(W,H,tw,th);
+  if(!BOARDING._camInit||BOARDING.camOx==null||BOARDING.camOy==null){
+    BOARDING.camOx=want.ox;BOARDING.camOy=want.oy;BOARDING._camInit=true;
+    return;
+  }
+  const a=Math.min(1,(dt||0.016)*8.2);
+  BOARDING.camOx+=(want.ox-BOARDING.camOx)*a;
+  BOARDING.camOy+=(want.oy-BOARDING.camOy)*a;
+}
+function boardingIsoOnScreen(gx,gy,iso,pad){
+  const pt=isoPt(gx,gy,iso);
+  const p=pad!=null?pad:iso.tw*2.4;
+  return pt.x>-p&&pt.x<iso.W+p&&pt.y>-p&&pt.y<iso.H+p+iso.wallH;
 }
 function boardingSeedRnd(){
   // Mulberry32 — seedato per mappe riproducibili per run.
@@ -10191,10 +10234,14 @@ function enterBoarding(opts){
   BOARDING.introT=.52;
   BOARDING.outroT=0;
   BOARDING.flashT=.22;
+  BOARDING.camOx=null;BOARDING.camOy=null;BOARDING._camInit=false;BOARDING._camTw=0;
   GAME.state='boarding';
   document.body.classList.add('boarding-active');
   document.body.classList.toggle('boarding-hulk',BOARDING.kind==='hulk');
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='block';
+  // Snap camera subito sul giocatore
+  const cv0=document.getElementById('boarding-cv');
+  if(cv0)updateBoardingCamera(1,cv0);
   notify(BOARDING.kind==='hulk'
     ?'Abbordaggio HULK: corridoi contaminati. I mostri? Mutazioni da macguffinium nelle anomalie.'
     :'Abbordaggio nave: equipaggio fuori combattimento. Recupera pezzi per il blueprint.',2400);
@@ -10209,6 +10256,7 @@ function leaveBoarding(opts){
   INP.left=INP.right=INP.thrust=INP.boost=INP.fire=false;
   BOARDING._ptrActive=false;
   BOARDING.selectTarget=null;
+  BOARDING.camOx=null;BOARDING.camOy=null;BOARDING._camInit=false;BOARDING._camTw=0;
   document.body.classList.remove('boarding-active');
   document.body.classList.remove('boarding-hulk');
   const hud=document.getElementById('boarding-hud');if(hud)hud.style.display='none';
@@ -10389,12 +10437,13 @@ function boardingPickTargetAt(mx,my){
   const iso=boardingIsoXY(cv);
   const th=iso.th;
   let best=null,bestD=1e15;
+  const hitR=Math.max(56,iso.tw*1.15);
+  const maxD=hitR*hitR;
   const consider=(gx,gy,ref,type)=>{
     const pt=isoPt(gx,gy,iso);
     const sy=pt.y+th*0.58;
     const dx=pt.x-mx, dy=sy-my;
     const d=dx*dx+dy*dy;
-    const maxD=68*68;
     if(d<bestD&&d<maxD){bestD=d;best={type,ref};}
   };
   for(const e of BOARDING.enemies)if(e.alive)consider(e.sx+0.5,e.sy+0.5,e,'enemy');
@@ -10435,6 +10484,7 @@ function updateBoarding(dt){
   BOARDING.timer+=dt;
   const p=BOARDING.player;
   const cv=document.getElementById('boarding-cv');
+  if(cv)updateBoardingCamera(dt,cv);
   const aimSmKey=Math.min(1,dt*72);
   const aimSmPtr=Math.min(1,dt*38);
   if(cv&&BOARDING._ptrActive){
@@ -10690,8 +10740,8 @@ function updateBoarding(dt){
       :'';
     const enemiesLeft=BOARDING.enemies.filter(e=>e.hp>0).length;
     const hint=isHulk
-      ?('Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> 8 dir. · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · raccolta a contatto · <strong>Esc</strong> ritiro.')
-      :('<strong>Nessun ostile</strong> · recupera le casse · <strong>WASD</strong> 8 dir. · raccolta a contatto · all\'uscita: pezzi blueprint · <strong>Esc</strong> ritiro.');
+      ?('Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · <strong>Esc</strong> ritiro.')
+      :('<strong>Nessun ostile</strong> · casse a contatto · <strong>WASD</strong> · uscita = pezzi blueprint · <strong>Esc</strong> ritiro.');
     hud.innerHTML=
       '<div class="bh-title">'+title+'</div>'
       +'<div class="bh-phase'+(doneObj?' exit':'')+'">'+phase+'</div>'
@@ -11038,18 +11088,17 @@ function drawProp(ctx,px,py,tile,kind,rot,ph,big){
   }
   ctx.restore();
 }
-// Isometric helpers.
+// Isometric helpers — zoom + camera sul giocatore (scrolling).
 function boardingIsoXY(cv){
   const W=cv.clientWidth||cv.width, H=cv.clientHeight||cv.height;
-  const C=BOARDING.cols, R=BOARDING.rows;
-  let tw=Math.min(W/(C+R)*1.95, H/(C+R)*2.8);
-  tw=Math.max(22,Math.min(74,tw));
+  const tw=BOARDING._camTw||boardingZoomTile(W,H);
   const th=tw*0.54;
   const wallH=th*1.9;
-  const boardW=(C+R)*tw*0.5;
-  const boardH=(C+R)*th*0.5;
-  const ox=W*0.5 - boardW*0.5 + R*tw*0.5;
-  const oy=H*0.5 - boardH*0.5;
+  let ox=BOARDING.camOx, oy=BOARDING.camOy;
+  if(ox==null||oy==null){
+    const want=boardingCameraTarget(W,H,tw,th);
+    ox=want.ox;oy=want.oy;
+  }
   BOARDING.tile=tw;
   return {tw,th,wallH,ox,oy,W,H};
 }
@@ -11343,10 +11392,11 @@ function drawBoarding(){
     }
   }
   const isHulk=BOARDING.kind==='hulk';
-  // 1) Floors (all at once, below everything).
+  // 1) Floors (all at once, below everything) — solo tile in viewport.
   for(let y=0;y<R;y++){
     for(let x=0;x<C;x++){
       if(map[y][x]===0){
+        if(!boardingIsoOnScreen(x,y,iso))continue;
         const dist=Math.abs(x-p.sx)+Math.abs(y-p.sy);
         const lit=cl(.28-dist*.03,.07,.38);
         drawIsoFloor(ctx,x,y,iso,isHulk,lit);
@@ -11354,7 +11404,10 @@ function drawBoarding(){
     }
   }
   // 2) Decals on floor.
-  for(const d of BOARDING.decals||[]){drawIsoDecal(ctx,d,iso);}
+  for(const d of BOARDING.decals||[]){
+    if(!boardingIsoOnScreen(d.x,d.y,iso))continue;
+    drawIsoDecal(ctx,d,iso);
+  }
   // 3) Exit glow on floor.
   const objDone=BOARDING.objective.collected>=BOARDING.objective.needed;
   if(objDone){
@@ -11374,14 +11427,33 @@ function drawBoarding(){
   const ops=[];
   for(let y=0;y<R;y++){
     for(let x=0;x<C;x++){
-      if(map[y][x]===1)ops.push({d:x+y+0.4,type:'wall',x,y});
+      if(map[y][x]===1){
+        if(!boardingIsoOnScreen(x,y,iso))continue;
+        ops.push({d:x+y+0.4,type:'wall',x,y});
+      }
     }
   }
-  for(const pr of BOARDING.props||[])ops.push({d:pr.x+pr.y+0.3,type:'prop',data:pr});
-  for(const h of BOARDING.hazards)ops.push({d:h.x+h.y+0.35,type:'hazard',data:h});
-  for(const k of BOARDING.pickups)ops.push({d:k.x+k.y+0.35,type:'pickup',data:k});
-  for(const c of BOARDING.corpses||[])ops.push({d:c.x+c.y+0.25,type:'corpse',data:c});
-  for(const e of BOARDING.enemies){if(e.alive)ops.push({d:e.sx+e.sy+0.3,type:'enemy',data:e});}
+  for(const pr of BOARDING.props||[]){
+    if(!boardingIsoOnScreen(pr.x,pr.y,iso))continue;
+    ops.push({d:pr.x+pr.y+0.3,type:'prop',data:pr});
+  }
+  for(const h of BOARDING.hazards){
+    if(!boardingIsoOnScreen(h.x,h.y,iso))continue;
+    ops.push({d:h.x+h.y+0.35,type:'hazard',data:h});
+  }
+  for(const k of BOARDING.pickups){
+    if(!boardingIsoOnScreen(k.x,k.y,iso))continue;
+    ops.push({d:k.x+k.y+0.35,type:'pickup',data:k});
+  }
+  for(const c of BOARDING.corpses||[]){
+    if(!boardingIsoOnScreen(c.x,c.y,iso))continue;
+    ops.push({d:c.x+c.y+0.25,type:'corpse',data:c});
+  }
+  for(const e of BOARDING.enemies){
+    if(!e.alive)continue;
+    if(!boardingIsoOnScreen(e.sx,e.sy,iso,iso.tw*3))continue;
+    ops.push({d:e.sx+e.sy+0.3,type:'enemy',data:e});
+  }
   ops.push({d:p.sx+p.sy+0.3,type:'player'});
   // Exit arrow (above floor)
   if(objDone)ops.push({d:BOARDING.exitCell.x+BOARDING.exitCell.y+0.31,type:'exitArrow'});
