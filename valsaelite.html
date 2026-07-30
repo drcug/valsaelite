@@ -224,15 +224,15 @@ body.boarding-hulk .btouch-pad button{
 body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba(60,10,8,.88)}
 
 /* Cinematic Space Hulk (tuta / fuga / vittoria) */
-#hulk-cine{display:none;position:fixed;inset:0;z-index:205;background:rgba(2,0,0,.92);backdrop-filter:blur(8px);
+#hulk-cine{display:none;position:fixed;inset:0;z-index:205;background:rgba(2,0,0,.94);backdrop-filter:blur(8px);
   align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));
   pointer-events:auto}
 #hulk-cine.show{display:flex !important}
-#hulk-cine .hc-panel{width:min(720px,96vw);max-height:min(92vh,900px);overflow:auto;border:1px solid rgba(180,70,50,.55);
+#hulk-cine .hc-panel{width:min(760px,96vw);max-height:min(94vh,920px);overflow:auto;border:1px solid rgba(180,70,50,.55);
   border-radius:10px;background:linear-gradient(180deg,rgba(28,8,6,.96),rgba(8,2,2,.94));
   box-shadow:0 0 40px rgba(120,20,10,.35),inset 0 0 40px rgba(80,0,0,.15);padding:0 0 16px}
-#hulk-cine .hc-art{display:block;width:100%;max-height:min(48vh,420px);object-fit:cover;border-bottom:1px solid rgba(180,70,50,.4);
-  background:#120404}
+#hulk-cine .hc-art{display:block;width:100%;min-height:min(34vh,260px);max-height:min(52vh,460px);object-fit:cover;
+  border-bottom:1px solid rgba(180,70,50,.4);background:#120404}
 #hulk-cine .hc-body{padding:14px 18px 0;font-family:var(--FM)}
 #hulk-cine .hc-label{font:700 10px var(--FD);letter-spacing:.22em;color:#c86840;margin-bottom:6px}
 #hulk-cine .hc-title{font:700 20px/1.2 var(--FD);letter-spacing:.12em;color:#ffe8d8;margin-bottom:8px}
@@ -240,6 +240,7 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
 #hulk-cine .hc-ok{display:block;width:calc(100% - 36px);margin:0 18px;padding:12px;font-family:var(--FD);font-weight:700;
   letter-spacing:.16em;background:linear-gradient(180deg,#a04828,#702818);color:#fff;border:none;border-radius:8px;cursor:pointer}
 #hulk-cine .hc-ok:hover{filter:brightness(1.08)}
+#hulk-cine .hc-ok:disabled{opacity:.55;cursor:wait;filter:none}
 
 /* ─ Landing title ─ */
 #land-title{
@@ -2070,32 +2071,68 @@ const HULK_CINE={
     ok:'CONTINUA'
   },
   _onDone:null,
-  open:false
+  open:false,
+  readyAt:0
 };
 function showHulkCine(kind,onDone){
   const cfg=HULK_CINE[kind]||HULK_CINE.suit;
   const el=document.getElementById('hulk-cine');
   if(!el){if(typeof onDone==='function')onDone();return;}
+  // Evita di riaprire mentre è già in scena (doppio tap sul prompt abbordaggio).
+  if(HULK_CINE.open&&kind==='suit'){
+    if(typeof onDone==='function')HULK_CINE._onDone=onDone;
+    return;
+  }
   const art=document.getElementById('hulk-cine-art');
   const lab=document.getElementById('hulk-cine-label');
   const tit=document.getElementById('hulk-cine-title');
   const txt=document.getElementById('hulk-cine-text');
   const ok=document.getElementById('hulk-cine-ok');
-  if(art){art.src=cfg.art;art.alt=cfg.title;}
+  if(art){
+    // Forza reload visibile: senza questo, su alcuni browser src uguale non ridisegna.
+    const src=cfg.art+(cfg.art.indexOf('?')>=0?'&':'?')+'v=2';
+    art.alt=cfg.title||'Space Hulk';
+    art.style.opacity='0';
+    const reveal=()=>{art.style.transition='opacity .25s ease';art.style.opacity='1';};
+    art.onload=reveal;
+    art.onerror=()=>{art.style.opacity='1';art.style.minHeight='180px';};
+    if(art.getAttribute('src')!==src)art.src=src;
+    else if(art.complete&&art.naturalWidth)reveal();
+    else art.src=src;
+  }
   if(lab)lab.textContent=cfg.label;
   if(tit)tit.textContent=cfg.title;
   if(txt)txt.textContent=cfg.text;
-  if(ok)ok.textContent=cfg.ok||'CONTINUA';
+  if(ok){
+    ok.textContent=cfg.ok||'CONTINUA';
+    ok.disabled=true;
+    ok.setAttribute('aria-disabled','true');
+  }
   HULK_CINE._onDone=typeof onDone==='function'?onDone:null;
   HULK_CINE.open=true;
+  // Blocca click/touch residui dal pulsante ABBORDA (stesso punto dello schermo).
+  HULK_CINE.readyAt=performance.now()+650;
   el.classList.add('show');
   if(typeof setPausedReason==='function')setPausedReason('story',true);
   document.body.classList.add('story-open');
+  // Nascondi prompt abbordaggio sotto il cine
+  const bp=document.getElementById('boarding-prompt');
+  if(bp)bp.style.display='none';
+  setTimeout(()=>{
+    if(!HULK_CINE.open)return;
+    if(ok){
+      ok.disabled=false;
+      ok.removeAttribute('aria-disabled');
+      try{ok.focus({preventScroll:true});}catch(_){}
+    }
+  },650);
 }
-function hideHulkCine(){
+function hideHulkCine(force){
+  if(!force&&performance.now()<HULK_CINE.readyAt)return;
   const el=document.getElementById('hulk-cine');
   if(el)el.classList.remove('show');
   HULK_CINE.open=false;
+  HULK_CINE.readyAt=0;
   document.body.classList.remove('story-open');
   if(typeof setPausedReason==='function')setPausedReason('story',false);
   const cb=HULK_CINE._onDone;
@@ -2107,7 +2144,13 @@ function hideHulkCine(){
   if(!ok)return;
   ok.addEventListener('click',e=>{
     e.preventDefault();e.stopPropagation();
-    hideHulkCine();
+    if(ok.disabled||performance.now()<HULK_CINE.readyAt)return;
+    hideHulkCine(true);
+  });
+  // Backdrop: non chiude (come story banner). Evita dismiss da touch fantasma.
+  const wrap=document.getElementById('hulk-cine');
+  if(wrap)wrap.addEventListener('click',e=>{
+    if(e.target===wrap){e.preventDefault();e.stopPropagation();}
   });
 })();
 
@@ -10261,7 +10304,8 @@ function buildBoardingMap(kind){
   BOARDING.enemies.length=0;BOARDING.pickups.length=0;BOARDING.hazards.length=0;BOARDING.shots.length=0;
   const used=[{x:sp.x,y:sp.y},{x:ex,y:ey}];
   // Nemici solo sullo SPACE HULK (mutazioni). Nave disabilitata = recupero pezzi, senza mostri.
-  const eN=big?5:0;
+  // Difficoltà alleggerita: meno mutanti, meno aggressivi.
+  const eN=big?3:0;
   for(let i=0;i<eN;i++){
     const cell=boardingPickFromReach(reach,rnd,used,3);
     used.push(cell);
@@ -10271,7 +10315,7 @@ function buildBoardingMap(kind){
     const weaponKinds=['blaster','rifle','cleaver','claw'];
     const weapon=weaponKinds[Math.floor(rnd()*weaponKinds.length)];
     BOARDING.enemies.push({
-      x:cell.x,y:cell.y,sx:cell.x,sy:cell.y,hp:2,cd:.4+rnd()*.8,mv:rnd()*2,
+      x:cell.x,y:cell.y,sx:cell.x,sy:cell.y,hp:1,cd:1.1+rnd()*1.2,mv:rnd()*2,
       dir:Math.floor(rnd()*4),face:1,alive:true,
       kind:big?'ghoul':'guard',species,weapon,
       size:.9+rnd()*.35, walk:rnd()*Math.PI*2, bob:rnd()*Math.PI*2,
@@ -10293,8 +10337,8 @@ function buildBoardingMap(kind){
       BOARDING.objective={type:'generator',collected:0,needed:2,label:'Disattiva 2 generatori (casse rosse).'};
       BOARDING.reward=Math.round(ECON.hulkBase*1.15);
     }else if(or>.38){
-      BOARDING.objective={type:'rescue',collected:0,needed:1,label:'Recupera il superstite — O2 critico!'};
-      BOARDING._o2Mul=1.55;
+      BOARDING.objective={type:'rescue',collected:0,needed:1,label:'Recupera il superstite — O2 un po\' più basso.'};
+      BOARDING._o2Mul=1.18;
       BOARDING.reward=Math.round(ECON.hulkBase*1.08);
     }
   }
@@ -10332,8 +10376,8 @@ function buildBoardingMap(kind){
   BOARDING.flashes=[];
   // Hazards (solo hulk): celle "fuoco" raggiungibili, lontano dallo spawn.
   if(big){
-    for(let i=0;i<3;i++){
-      const cell=boardingPickFromReach(reach,rnd,[{x:sp.x,y:sp.y},{x:ex,y:ey}],3);
+    for(let i=0;i<2;i++){
+      const cell=boardingPickFromReach(reach,rnd,[{x:sp.x,y:sp.y},{x:ex,y:ey}],4);
       BOARDING.hazards.push({x:cell.x,y:cell.y,ph:rnd()*Math.PI*2});
     }
   }
@@ -10691,13 +10735,13 @@ function updateBoarding(dt){
     h.ph+=dt*2.5;
     const hdx=p.sx-(h.x+0.5),hdy=p.sy-(h.y+0.5);
     if(hdx*hdx+hdy*hdy<0.52*0.52&&Math.sin(h.ph)>.2){
-      p.hp=Math.max(0,p.hp-18*dt);
+      p.hp=Math.max(0,p.hp-9*dt);
     }
   }
-  // O2 drain nei hulk, se fuori player spawn area.
+  // O2 drain nei hulk (alleggerito: c'è tempo per esplorare).
   if(BOARDING.kind==='hulk'){
-    p.o2=Math.max(0,p.o2-1.75*dt*(BOARDING._o2Mul||1));
-    if(p.o2<=0)p.hp=Math.max(0,p.hp-16*dt);
+    p.o2=Math.max(0,p.o2-0.85*dt*(BOARDING._o2Mul||1));
+    if(p.o2<=0)p.hp=Math.max(0,p.hp-7*dt);
   }
   // Enemies patrol + fire.
   const eLerpK=Math.min(1,dt*16);
@@ -10738,8 +10782,8 @@ function updateBoarding(dt){
     e.cd-=dt;
     const dist=Math.abs(e.x-p.x)+Math.abs(e.y-p.y);
     const alx=Math.abs((e.sx+0.5)-(p.sx+0.5)),aly=Math.abs((e.sy+0.5)-(p.sy+0.5));
-    if(e.cd<=0&&dist<=6&&(alx<0.42||aly<0.42)){
-      e.cd=.92+Math.random()*.55;
+    if(e.cd<=0&&dist<=5&&(alx<0.42||aly<0.42)){
+      e.cd=1.35+Math.random()*.75;
       let ssx=p.x-e.x, ssy=p.y-e.y;
       const esl=Math.hypot(ssx,ssy);
       if(esl<.01){ssx=Math.sign(e.face||1);ssy=0;}
@@ -10752,7 +10796,7 @@ function updateBoarding(dt){
     }
     const melD=Math.hypot(e.sx-p.sx,e.sy-p.sy);
     if(melD<0.58){
-      p.hp=Math.max(0,p.hp-24*dt);
+      p.hp=Math.max(0,p.hp-12*dt);
       p.hit=1;
     }
   }
@@ -10814,7 +10858,7 @@ function updateBoarding(dt){
     } else {
       const dHit=s.x-(p.sx+0.5),dHitY=s.y-(p.sy+0.5);
       if(dHit*dHit+dHitY*dHitY<0.36*0.36){
-        p.hp=Math.max(0,p.hp-9);
+        p.hp=Math.max(0,p.hp-7);
         p.hit=1;
         BOARDING.flashT=Math.max(BOARDING.flashT,.18);
         for(let k=0;k<8;k++){
@@ -11229,7 +11273,7 @@ function boardingIsoXY(cv){
   const W=cv.clientWidth||cv.width, H=cv.clientHeight||cv.height;
   const tw=BOARDING._camTw||boardingZoomTile(W,H);
   const th=tw*0.54;
-  const wallH=th*1.9;
+  const wallH=th*1.45;
   let ox=BOARDING.camOx, oy=BOARDING.camOy;
   if(ox==null||oy==null){
     const want=boardingCameraTarget(W,H,tw,th);
@@ -11599,31 +11643,55 @@ function drawBoarding(){
     if(op.type==='wall'){
       const wdx=op.x-p.sx, wdy=op.y-p.sy;
       const cheb=Math.max(Math.abs(wdx),Math.abs(wdy));
-      const adjacent=cheb<=1;
-      const occluding=(op.x+op.y)>(pDepth+0.42)&&Math.abs(wdx)<=2&&Math.abs(wdy)<=2;
-      let a=1;
-      if(adjacent)a=0.44;
-      else if(occluding)a=0.3;
-      ctx.globalAlpha=a;
-      drawIsoWall(ctx,op.x,op.y,iso,isHulk,map);
-      ctx.globalAlpha=1;
-      if(a<.98){
+      const manh=Math.abs(wdx)+Math.abs(wdy);
+      const occluding=(op.x+op.y)>(pDepth+0.15)&&manh<=8;
+      // Vicino: niente volume pieno (nasconde tutto) → solo wireframe basso.
+      // Lontano: volume pieno, eventualmente smorzato se occlude.
+      const ghost=cheb<=6||(occluding&&cheb<=8);
+      const savedWallH=iso.wallH;
+      if(cheb<=1)iso.wallH=savedWallH*0.38;
+      else if(cheb<=2)iso.wallH=savedWallH*0.5;
+      else if(cheb<=3)iso.wallH=savedWallH*0.58;
+      else if(cheb<=4)iso.wallH=savedWallH*0.68;
+      else if(cheb<=6)iso.wallH=savedWallH*0.8;
+      else if(occluding&&cheb<=8)iso.wallH=savedWallH*0.9;
+
+      if(!ghost){
+        ctx.globalAlpha=1;
+        drawIsoWall(ctx,op.x,op.y,iso,isHulk,map);
+      }else{
+        // Alone volume leggero sotto il wireframe (quasi invisibile).
+        let a=cheb<=1?0.04:cheb<=2?0.06:cheb<=3?0.09:cheb<=4?0.12:cheb<=6?0.18:0.28;
+        if(occluding)a*=0.65;
+        ctx.globalAlpha=a;
+        drawIsoWall(ctx,op.x,op.y,iso,isHulk,map);
+        ctx.globalAlpha=1;
         const topV=isoPt(op.x,op.y,iso);
         const tw2=iso.tw, th2=iso.th, h2=iso.wallH;
         const up=-h2;
         const rx=topV.x+tw2*.5, ry=topV.y+th2*.5;
         const lx=topV.x-tw2*.5, ly=topV.y+th2*.5;
         const bx=topV.x, by=topV.y+th2;
-        ctx.strokeStyle=isHulk?'rgba(255,180,90,.5)':'rgba(160,210,255,.5)';
-        ctx.lineWidth=adjacent?1.35:1.1;
+        const edge=isHulk?'rgba(255,210,130,':'rgba(170,220,255,';
+        ctx.lineWidth=cheb<=2?2.2:cheb<=4?1.7:1.35;
+        ctx.strokeStyle=edge+(cheb<=2?'.9)':cheb<=4?'.72)':'.55)');
         ctx.beginPath();
-        ctx.moveTo(topV.x,topV.y+up);
-        ctx.lineTo(rx,ry+up);
-        ctx.lineTo(bx,by+up);
-        ctx.lineTo(lx,ly+up);
-        ctx.closePath();
-        ctx.stroke();
+        ctx.moveTo(topV.x,topV.y+up);ctx.lineTo(rx,ry+up);ctx.lineTo(bx,by+up);ctx.lineTo(lx,ly+up);
+        ctx.closePath();ctx.stroke();
+        // Montanti verticali
+        ctx.lineWidth=1.15;
+        ctx.strokeStyle=edge+(cheb<=2?'.55)':'.38)');
+        ctx.beginPath();ctx.moveTo(topV.x,topV.y);ctx.lineTo(topV.x,topV.y+up);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo(rx,ry+up);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(lx,ly+up);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,by+up);ctx.stroke();
+        // Base a pavimento
+        ctx.strokeStyle=edge+'.32)';
+        ctx.beginPath();
+        ctx.moveTo(topV.x,topV.y);ctx.lineTo(rx,ry);ctx.lineTo(bx,by);ctx.lineTo(lx,ly);
+        ctx.closePath();ctx.stroke();
       }
+      iso.wallH=savedWallH;
     }else if(op.type==='prop'){
       drawIsoProp(ctx,op.data,iso,isHulk,t);
     }else if(op.type==='hazard'){
@@ -12374,12 +12442,16 @@ function updateNearHulkScan(dt){
 }
 function tryBoardingTrigger(){
   if(GAME.state!=='flying'){notify('Abbordaggio solo in volo.',1400);return false;}
+  if(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)return false;
   // Usa il target memorizzato dal prompt, altrimenti cerca di nuovo
   let hulk=BOARDING._promptHulk||findNearHulk(1400);
   if(hulk&&hulk.looted)hulk=null;
   if(!hulk)hulk=findNearHulk(1400);
   if(hulk){
     BOARDING._promptHulk=null;
+    // Nascondi subito il prompt: altrimenti il touch/click successivo colpisce ABBORDA del cine.
+    const bp=document.getElementById('boarding-prompt');
+    if(bp)bp.style.display='none';
     if(typeof showHulkCine==='function'){
       showHulkCine('suit',()=>enterBoarding({kind:'hulk',hulk}));
     }else{
@@ -12397,9 +12469,10 @@ function tryBoardingTrigger(){
   return false;
 }
 function updateBoardingPrompt(){
-  if(GAME.state!=='flying'){
+  if(GAME.state!=='flying'||(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)){
     const el=document.getElementById('boarding-prompt');
     if(el)el.style.display='none';
+    if(typeof HULK_CINE!=='undefined'&&HULK_CINE.open)return;
     BOARDING._promptHulk=null;BOARDING._promptNpc=null;
     return;
   }

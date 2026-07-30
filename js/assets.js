@@ -102,6 +102,11 @@
   function preloadAll() {
     Object.values(STORY_ART).forEach(preload);
     Object.values(PLANET_PANO).forEach(preload);
+    [
+      'sprites/story/hulk/hulk-suit-up.jpg',
+      'sprites/story/hulk/hulk-escape-pod.jpg',
+      'sprites/story/hulk/hulk-victory.jpg'
+    ].forEach(preload);
   }
 
   global.STORY_ART = STORY_ART;
