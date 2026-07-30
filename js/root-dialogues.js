@@ -17,55 +17,55 @@
         faction: 'bazzano',
         gender: 'f',
         portrait: 'sprites/faces/roots/palmira.png',
-        blurb: 'Palmira dell\'asilo dalle suore. Ti chiama ancora Zvanino, distintivo o no.',
+        blurb: 'Palmira dell\'asilo. Ti chiama Zvanino da quarant\'anni e non ha intenzione di smettere adesso.',
         start: 'n1',
         nodes: {
           n1: {
             speaker: 'npc',
-            text: 'Zvanino? Ma guarda un po\'. L\'ultima volta ti tenevo per la manina nel cortile delle suore, e adesso sbuchi in uniforme. Siediti, tavò. Una bottiglia. E quel distintivo lascialo sul gancio: qui non serve.',
+            text: 'Zvanino. Ho sentito il portello e ho pensato: o è la caldaia, o è il figlio della Rina. Era la caldaia. Poi sei entrato tu. Siediti. E stacca quel coso che ti lampeggia sul petto, che così non si capisce se sei un funzionario o il semaforo che a Crespellano aspettano dal 2003.',
             choices: [
-              { label: '[PROVI] "Taproblem… sto bene."', next: 'n2a' },
-              { label: '[UFFICIALE] "Funzionario Marìa. Missione di servizio."', next: 'n2b' },
-              { label: '[SILENZIO] Le stringi la mano.', next: 'n2c' }
+              { label: '[DIALETTO] "Taproblem, Palmira. Sto bene."', next: 'n2a' },
+              { label: '[UFFICIALE] "Funzionario Marìa. Settimo livello."', next: 'n2b' },
+              { label: '[SILENZIO] Ti siedi e basta.', next: 'n2c' }
             ]
           },
           n2a: {
             speaker: 'npc',
-            text: 'Hai detto «taproblem» come chi lo ha letto sul dizionario. Va bene lo stesso: almeno ci hai provato. All\'asilo nessuno ti chiamava «il bambino del Mulino». Eri Zvanino, punto. Adesso ti guardi intorno come un ospite in casa propria.',
+            text: '«Taproblem.» L\'hai detto come si legge un codice fiscale. Taproblem si dice di sfuggita, mentre versi, senza guardare in faccia nessuno. Tu ci hai messo la maiuscola. Va bene lo stesso: hai provato. All\'asilo non eri «il bambino del Mulino», eri Zvanino e stop. Adesso entri in casa tua e bussi.',
             choices: [
-              { label: '[ZVAN] "Ho paura di non capire più casa."', next: 'n3' },
-              { label: '[ZVAN] "Ho avuto fretta di sembrare importante."', next: 'n3b' }
+              { label: '[ZVAN] "Ho dimenticato come si sta seduti, qui."', next: 'n3' },
+              { label: '[ZVAN] "Avevo fretta di diventare qualcuno. Ci sono riuscito."', next: 'n3b' }
             ]
           },
           n2b: {
             speaker: 'npc',
-            text: '«Funzionario Marìa». Una volta scendevi di corsa dai compiti di catechismo, adesso parli da ufficio. Le suore riderebbero — e poi ti darebbero ancora una merenda. Siediti.',
+            text: 'Settimo livello. Bene. Io sono Palmira, primo banco, fila delle suore. Una volta scendevi di corsa dal catechismo per fregare il pane; adesso parli come una circolare con le note a piè di pagina. Suor Geltrude riderebbe fino alle lacrime e poi ti darebbe la merenda lo stesso. Siediti.',
             choices: [
-              { label: '[ZVAN] "Forse il titolo mi è restato addosso."', next: 'n3' },
-              { label: '[ZVAN] "Sotto l\'armatura ho ancora sete di vino."', next: 'n3' }
+              { label: '[ZVAN] "Il grado mi si è appiccicato addosso come una crosta."', next: 'n3' },
+              { label: '[ZVAN] "Sotto la divisa ho ancora sete."', next: 'n3' }
             ]
           },
           n2c: {
             speaker: 'npc',
-            text: 'Muti, eh? Come quando suor Geltrude ti chiedeva della merenda e restavi lì senza fiato. Qui il silenzio sta bene così. A Imperium lo chiamavano protocollo — due mestieri diversi, Zvanino.',
-            choices: [{ label: '[ZVAN] "Il protocollo mi ha tenuto in piedi. Qui mi fa male."', next: 'n3' }]
+            text: 'Muto. Come quando ti chiedevano chi aveva preso la merenda e tu diventavi un mobile. Qui il silenzio va bene, fa arredamento. A Imperium invece lo chiamano riservatezza e ci mettono sopra un timbro. Due mestieri diversi, Zvanino.',
+            choices: [{ label: '[ZVAN] "Il silenzio mi ha tenuto in piedi vent\'anni. Qui mi suona sbagliato."', next: 'n3' }]
           },
           n3: {
             speaker: 'zvan',
-            text: 'Palmira, a Imperium ogni corridoio aveva un numero. Qui ogni odore ha un nome. Ricordo meglio i numeri. Tornare significa avere ancora la chiave di casa e non sapere dove mettere i piedi — come quando ci perdevamo dietro la cappella.',
+            text: 'Palmira, a Imperium ogni corridoio ha un numero. Qui ogni odore ha un cognome. Ho passato vent\'anni a imparare i numeri. Stamattina in porto ho salutato uno convinto che fosse tuo fratello: era un distributore di caffè. Tornare è questo — hai ancora la chiave giusta e la porta l\'hanno spostata.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n3b: {
             speaker: 'zvan',
-            text: 'Ho detto «fretta» e mi è venuto il senso di colpa. Casa non aspettava: ero io che volevo sembrare qualcuno nei corridoi di marmo. Tu restavi qui. Io no.',
+            text: 'Fretta, sì. Non è che casa mi avesse cacciato: è che il marmo faceva più rumore. Tu sei rimasta e sai ancora come si chiama il cane del fornaio. Io ho imparato la differenza fra allegato A e allegato B. Indovina quale delle due serve stasera.',
             choices: [{ label: '[ASCOLTA]', next: 'n4' }]
           },
           n4: {
             speaker: 'npc',
-            text: 'Allora ascoltami bene: non ti chiedo di tornare bambino. Ti chiedo di non fare il satellite dopo nove ore di burocrazia. Siediti. Bevi. Se la testa gira, pazienza — serve tempo, non bollettini. E stai attento: da Imperium arrivano voci di casate che si azzannano. Qui siamo periferia. Per ora.',
+            text: 'Allora ascolta, che poi entra gente e non si sente più niente. Non ti chiedo di tornare bambino: quello è tarenz\'la psiche, roba che non si fa. Ti chiedo di non startene lì con la faccia da satellite dopo nove ore di burocrazia. Bevi. Se ti gira la testa, pazienza: qui il tempo non si consegna in triplice copia. E tieni gli occhi aperti, che da Imperium dicono che le casate grosse si azzannano. Noi siamo periferia. Per adesso.',
             choices: [
-              { label: '[RESTA] Bevi in silenzio. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Hai lasciato l\'armatura sul bancone, per una sera. Palmira sorride come al cortile delle suore.', lore: 'casate_rumore' } },
-              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: 'Palmira scuote la testa: «Sei ancora in orbita, Zvanino. Lascia stare il resto.»' } }
+              { label: '[RESTA] Bevi e lasci l\'armatura sul bancone. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 4 }, note: 'Palmira ti riempie il bicchiere senza chiedere. Come al cortile, quando la merenda la decideva lei.', lore: 'casate_rumore' } },
+              { label: '[FUGGI] "Devo… coordinare."', next: null, fx: { note: '«Coordinare.» Palmira scuote la testa: «Sei ancora in orbita, Zvanino. Scendi a priori, tanto lassù non c\'è nichita.»' } }
             ]
           }
         }
@@ -80,33 +80,33 @@
         faction: 'bazzano',
         gender: 'f',
         portrait: 'sprites/faces/roots/ornella.png',
-        blurb: 'Ti ha visto partire. Non ti ha mai scritto: «prima scendi a terra», diceva.',
+        blurb: 'Ti ha visto partire e non ti ha mai scritto. «Prima scendi a terra», diceva. Sono vent\'anni che aspetta il pianerottolo.',
         start: 'z1',
         nodes: {
           z1: {
             speaker: 'npc',
-            text: 'Zvan. Non «funzionario». Zvan. Sei magro come chi cambia casa ogni anno — solo che tu hai cambiato pianeta. Ho paura di non riconoscerti, nient\'altro.',
+            text: 'Zvan. Non «funzionario»: Zvan. Sei secco come un arimanno che trasloca ogni sei mesi, solo che tu hai traslocato di pianeta. Fatti guardare. No, fermo lì: se ti muovi sembri uno che deve andare a una riunione.',
             choices: [
-              { label: '[ZVAN] "Non so più come chiamarmi qui."', next: 'z2' },
-              { label: '[ZVAN] "Mi hanno mandato. Non sono tornato: mi hanno rispedito."', next: 'z2b' }
+              { label: '[ZVAN] "Non so più con che nome presentarmi, qui."', next: 'z2' },
+              { label: '[ZVAN] "Non sono tornato. Mi hanno rispedito."', next: 'z2b' }
             ]
           },
           z2: {
             speaker: 'zvan',
-            text: 'A Imperium il mio nome era un livello. Settimo. Qui era un diminutivo. In mezzo c\'è un vuoto: al posto dei parenti ho messo i rapporti.',
+            text: 'A Imperium il mio nome era un livello: settimo. Qui era un diminutivo. In mezzo ci sono vent\'anni di niente, e il niente l\'ho riempito di rapporti. Sono l\'unico Marìa che deve aprire la mappa per trovare il cimitero di famiglia.',
             choices: [{ label: '[ASCOLTA]', next: 'z3' }]
           },
           z2b: {
             speaker: 'npc',
-            text: 'Rispedito. Come un pacco. Hai mai pianto senza verbale? Perché se no, Zvan, sei rovinato — e non nel senso buono, quello del prosciutto.',
-            choices: [{ label: '[ZVAN] "Ho pianto. In un bagno di pietra. Nessuno ha firmato."', next: 'z3' }]
+            text: 'Rispedito. Come un pacco senza francobollo. Allora dimmi una cosa, e non farmi la faccia da modulo: hai mai pianto senza allegare niente? Perché se no sei rovinato, Zvan. E non nel senso buono, quello tost al prosciutto.',
+            choices: [{ label: '[ZVAN] "Ho pianto in un bagno di pietra. Nessuno ha controfirmato."', next: 'z3' }]
           },
           z3: {
             speaker: 'npc',
-            text: 'Allora resta. Siediti per il cortile, lascia stare il Patto un minuto. Se ti gira la testa, restiamo finché capisci. Io non ti chiedo Imperium. Ti chiedo se lo spazio ti ha congelato la lingua o solo la voglia. E se ti mandano qui perché lassù le casate litigano, ricorda: noi siamo il patio di servizio dell\'Impero — un indirizzo, più che una metafora.',
+            text: 'Allora siediti in cortile e sta\' fermo cinque minuti, che il Patto non scappa. Di Imperium non me ne importa un pananai. Ti chiedo solo se lo spazio ti ha congelato la lingua o soltanto la voglia. E se ti mandano qui perché lassù le casate si mordono, ricordati: noi siamo il patio di servizio dell\'Impero. Non è una metafora, è proprio l\'indirizzo.',
             choices: [
-              { label: '[RESTA] "Insegno a dire di nuovo Zvanino." (+rep)', next: null, fx: { rep: { bazzano: 6 }, note: 'Zia Ornella ti lascia un fazzoletto. Puzza di sapone locale.', lore: 'periferia' } },
-              { label: '[PARTE] "Il Patto non aspetta."', next: null, fx: { note: 'Lei non ti ferma. Le zie sanno quando un figlio è già partito.' } }
+              { label: '[RESTA] "Rimparo a dire Zvanino senza vergognarmi." (+rep)', next: null, fx: { rep: { bazzano: 6 }, note: 'Zia Ornella ti mette in tasca un fazzoletto stirato. Sa di sapone e di rimprovero.', lore: 'periferia' } },
+              { label: '[PARTE] "Il Patto non aspetta."', next: null, fx: { note: 'Non ti trattiene. Le zie capiscono subito quando uno è già partito da un pezzo.' } }
             ]
           }
         }
@@ -122,33 +122,33 @@
         faction: 'bazzano',
         gender: 'f',
         portrait: 'sprites/faces/roots/palmira.png',
-        blurb: 'Ti annusa come al cortile. Dice che hai portato il fetore dello hulk in porto.',
+        blurb: 'Ti annusa come faceva al cortile. Dice che hai portato l\'odore di uno hulk dentro l\'osteria.',
         start: 'h1',
         nodes: {
           h1: {
             speaker: 'npc',
-            text: 'Zvanino, puzzi di corridoio che cammina. Sudore di viaggio? Macché: macguffinium. Hai messo piede in uno hulk, eh? Porta quel fetore fuori dall\'osteria — oppure siediti e raccontami cosa hai visto, senza inventare mostri da manifesto.',
+            text: 'Zvanino, puzzi di corridoio che cammina. E non è sudore da viaggio, quello lo conosco ed è onesto. Questo è macguffinium. Sei entrato in uno hulk, eh? Allora o porti fuori il fetore, o ti siedi e me lo racconti — ma senza mostri da manifesto, che quelli li vedo già in televisione.',
             choices: [
-              { label: '[ZVAN] "Erano persone. Una volta."', next: 'h2' },
-              { label: '[ZVAN] "Ho preso pezzi. Niente di più."', next: 'h2b' }
+              { label: '[ZVAN] "Erano persone. Prima."', next: 'h2' },
+              { label: '[ZVAN] "Ho preso pezzi. Fine."', next: 'h2b' }
             ]
           },
           h2: {
             speaker: 'zvan',
-            text: 'Dentro non c\'era silenzio. C\'erano cose che un tempo avevano nome. Io ho recuperato documenti e pezzi. Ho portato anche l\'odore. Scusa.',
+            text: 'Dentro non c\'è silenzio: c\'è un rumore lento. Cose che una volta avevano un nome sul contratto d\'imbarco. Io ho recuperato documenti, tre moduli e l\'odore. Per l\'odore chiedo scusa.',
             choices: [{ label: '[ASCOLTA]', next: 'h3' }]
           },
           h2b: {
             speaker: 'npc',
-            text: 'Pezzi. Sempre pezzi. Meglio pezzi che bugie. Ma se hai visto i mutati e fingi di no, il Mulino te lo legge in faccia — e io pure.',
-            choices: [{ label: '[ZVAN] "Li ho visti. Non li dimentico."', next: 'h3' }]
+            text: 'Pezzi. Sempre pezzi. Almeno i pezzi non raccontano storie. Però se hai visto i mutati e fai finta di niente si nota: hai la faccia di uno che ha tirato il cordolo del cesso e adesso spiega che non è stato lui.',
+            choices: [{ label: '[ZVAN] "Li ho visti. Non se ne vanno."', next: 'h3' }]
           },
           h3: {
             speaker: 'npc',
-            text: 'Allora ascolta, tavò: le navi morte ti danno ferro. Gli hulk ti danno incubi. Non confonderli. E lava la tuta prima di tornare dalle suore — anche se loro non ci sono più.',
+            text: 'Allora imparala, questa, tavò: la nave morta ti dà ferro, lo hulk ti dà i sogni sbagliati. Confonderli è tabrein in cupola. E lava la tuta prima di passare dall\'asilo. Sì, lo so che le suore non ci sono più. Lavala lo stesso.',
             choices: [
-              { label: '[RESTA] Bevi. Lascia che l\'odore passi. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Palmira ti passa un panno. Puzza di sapone e di casa.', lore: 'hulk_visited' } },
-              { label: '[PARTE] "Devo tornare al relitto."', next: null, fx: { note: '«Allora porta armi — e pietà.»', lore: 'hulk_mutazioni' } }
+              { label: '[RESTA] Bevi finché l\'odore non passa. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Palmira ti passa uno straccio pulito. Sa di sapone, che qui vuol dire casa.', lore: 'hulk_visited' } },
+              { label: '[PARTE] "Devo tornare al relitto."', next: null, fx: { note: '«Allora porta armi. E un po\' di pietà, che pesa meno.»', lore: 'hulk_mutazioni' } }
             ]
           }
         }
@@ -161,33 +161,33 @@
         npcTitle: 'TU · BAZZANO',
         npcSeed: 1,
         faction: 'bazzano',
-        blurb: 'Nessuno di fronte: solo il tuo riflesso.',
+        blurb: 'Nessuno davanti. Solo tu e uno specchio che non ha mai imparato la burocrazia.',
         start: 's1',
         playerOnly: true,
         nodes: {
           s1: {
             speaker: 'zvan',
-            text: 'Mi guardo e vedo l\'uniforme. Il distintivo del pianeta con l\'anello. A Imperium mi sembrava un\'identità. Qui sembra un vestito prestato.',
+            text: 'Mi guardo e vedo prima l\'uniforme, poi la faccia. Il distintivo col pianeta e l\'anello: a Imperium sembrava un\'identità, qui sembra un cappotto preso all\'attaccapanni sbagliato.',
             choices: [
-              { label: '[AMMETTI] "Sono estraneo al mio posto."', next: 's2' },
-              { label: '[NEGHI] "Sono ancora di qui. Lasci— …no."', next: 's2b' }
+              { label: '[AMMETTI] "Sono ospite dove sono nato."', next: 's2' },
+              { label: '[NEGA] "Sono ancora di qui. Lascia st— …no."', next: 's2b' }
             ]
           },
           s2: {
             speaker: 'zvan',
-            text: 'Estraneo. Non perché mi caccino: perché misuro tutto in procedure. Il vino ha bisogno di un verbale? Il Mulino di un allegato? Sto redigendo il ritorno.',
+            text: 'Ospite. Non perché mi caccino: perché misuro tutto in procedure. Il vino ha bisogno di un verbale? Il Mulino di un allegato? Sto istruendo la pratica del mio stesso ritorno, e ovviamente manca un timbro.',
             choices: [{ label: '[CONTINUA]', next: 's3' }]
           },
           s2b: {
             speaker: 'zvan',
-            text: 'Non riesco nemmeno a finire «lascia stare». La negazione mi esce a metà, come uno che ha dimenticato come si dice no in casa propria.',
+            text: 'Non riesco nemmeno a finirla. Mi esce mezza negazione, come uno che ha dimenticato dove si attacca il «ta». Qui il no lo metti davanti alla parola e via; io lo metto in fondo a un modulo, dentro un riquadro grigio, con la data.',
             choices: [{ label: '[CONTINUA]', next: 's3' }]
           },
           s3: {
             speaker: 'zvan',
-            text: 'Ora ho capito perché Imperium tiene il Patto dritto: se Valsamoggio si spezza, le anomalie diventano campo di battaglia. E se lì c\'è davvero macguffinium — materia a nove dimensioni — le grandi casate scenderanno qui a mordersi. L\'Impero potrebbe non reggere quella guerra. Il mio lavoro da cortile è tenere il Mulino in piedi.',
+            text: 'E adesso capisco perché Imperium tiene in piedi il Patto. Se Valsamoggia si spacca, le anomalie diventano campo aperto; e se là sotto c\'è davvero macguffinium — materia a nove dimensioni — le casate grandi scendono qui a mordersi, e l\'Impero quella guerra non la regge. Tutto questo, e il mio compito è far girare un mulino. Va bene. È l\'unica pratica che non ho voglia di archiviare.',
             choices: [
-              { label: '[CHIUDI GLI OCCHI]', next: null, fx: { note: 'Hai scritto qualcosa di vero senza timbro.', mark: 'root_mirror', lore: 'macguffinium_capito' } }
+              { label: '[CHIUDI GLI OCCHI]', next: null, fx: { note: 'Hai pensato una cosa vera senza allegarla a niente.', mark: 'root_mirror', lore: 'macguffinium_capito' } }
             ]
           }
         }
@@ -205,33 +205,33 @@
         faction: 'crespellano',
         gender: 'f',
         portrait: 'sprites/faces/roots/lia.png',
-        blurb: 'Stesso cognome. Stessa coda alle pratiche. Lei non è mai partita.',
+        blurb: 'Stesso cognome, stessa coda allo sportello. Lei non è mai partita e non te lo rinfaccia. Quasi.',
         start: 'c1',
         nodes: {
           c1: {
             speaker: 'npc',
-            text: 'Zvan. Il semaforo aspetta dal 2003 e tu torni con una busta nera. Qui nessuno ha mai ricevuto una busta nera — solo modulistica. Sei venuto per il Patto, o perché Imperium ti ha messo in mano un corriere di nostalgia?',
+            text: 'Zvan. Noi il semaforo lo aspettiamo dal 2003 e tu arrivi con una busta nera. Qui buste nere non ne sono mai arrivate: arriva modulistica, e la modulistica è beige. Allora: sei venuto per il Patto, o Imperium ti ha usato come corriere della nostalgia?',
             choices: [
-              { label: '[ZVAN] "Per entrambi. E non so quale dei due mi pesi di più."', next: 'c2' },
-              { label: '[DIALETTO] "Taproblem… no. Non è taproblem."', next: 'c2b' }
+              { label: '[ZVAN] "Per tutti e due. E non so quale pesa di più."', next: 'c2' },
+              { label: '[DIALETTO] "Taproblem… no. Ecco: questo non è taproblem."', next: 'c2b' }
             ]
           },
           c2: {
             speaker: 'zvan',
-            text: 'A Imperium dicevano che Crespellano produce «niente». Ridevo. Poi ho capito: il niente era l\'unica cosa che non potevano comprare. Io invece mi sono venduto a pezzi di grado.',
+            text: 'A Imperium dicevano che Crespellano produce «niente». Ridevo anch\'io, in mensa, insieme agli altri. Poi ho capito che il niente era l\'unica cosa che non riuscivano a comprare. Io invece mi sono venduto a rate, un livello alla volta.',
             choices: [{ label: '[ASCOLTA]', next: 'c3' }]
           },
           c2b: {
             speaker: 'npc',
-            text: 'Hai ragione a correggerti. «Taproblem» detto da te suona tradotto — come i turisti che dicono tavò e si credono simpatici. Tu non sei turista. Sei un reduce del marmo.',
-            choices: [{ label: '[ZVAN] "Insegnami di nuovo a sbagliare in dialetto."', next: 'c3' }]
+            text: 'Bravo, ti sei corretto da solo. «Taproblem» in bocca tua suona tradotto dall\'imperiale, con la nota a piè di pagina. Come quelli che vengono in gita, dicono tavò e si sentono del posto. Tu non sei un turista, Zvan: sei un reduce del marmo. È peggio, però almeno è roba tua.',
+            choices: [{ label: '[ZVAN] "Allora insegnami a sbagliare di nuovo, ma in dialetto."', next: 'c3' }]
           },
           c3: {
             speaker: 'npc',
-            text: 'Le radici non tornano con un capitolo: tornano restando in fila. Se ti sei stufato di Imperium, bene. Altrimenti torna a firmare. Io aspetto il verde. E se ti interessano le voci: lassù le casate maggiori si fanno la guerra nei corridoi. Qui leggono i nostri fascicoli come se fossimo un magazzino di periferia.',
+            text: 'Le radici non tornano con un capitolo: tornano stando in fila. Se ti sei stufato di Imperium, buon per te; se no vai a firmare, che io aspetto il verde e ho tutto il tempo. Ah, se ti interessano le voci: lassù le casate maggiori si scannano nei corridoi e i nostri fascicoli li leggono come l\'inventario di un magazzino di periferia. Il magazzino saremmo noi.',
             choices: [
-              { label: '[RESTA IN FILA] (+rep Crespellano)', next: null, fx: { rep: { crespellano: 5 }, note: 'Lia ti lascia una chiave dell\'archivio «classificato male».', lore: 'casate_rumore' } },
-              { label: '[VAI]', next: null, fx: { note: 'Lei non ti saluta in ufficiale. Solo: «Zvan.»' } }
+              { label: '[RESTA IN FILA] (+rep Crespellano)', next: null, fx: { rep: { crespellano: 5 }, note: 'Lia ti lascia una chiave dell\'archivio «classificato male». Qui «male» è un complimento.', lore: 'casate_rumore' } },
+              { label: '[VAI]', next: null, fx: { note: 'Non ti saluta da funzionario. Solo: «Zvan.» E torna a guardare il semaforo.' } }
             ]
           }
         }
@@ -249,33 +249,33 @@
         faction: 'calcara',
         gender: 'm',
         portrait: 'sprites/faces/roots/dario.png',
-        blurb: 'Da ragazzi rubavate bollette per ridere. Ora lui stampa verità.',
+        blurb: 'Da ragazzi rubavate i cartelli stradali per ridere. Adesso lui i cartelli li timbra.',
         start: 'k1',
         nodes: {
           k1: {
             speaker: 'npc',
-            text: 'Marìa. Settimo livello. Hai portato il pezzo e vuoi il timbro. Una volta i timbri ti sembravano pananai — cose da ridere. Adesso sei pananai con lo stipendio. Congratulazioni.',
+            text: 'Marìa. Settimo livello. Hai portato il pezzo e vuoi il timbro. Ti ricordi quando i timbri erano pananai, roba da ridere in fondo alla classe? Adesso sei pananai con la tredicesima. Complimenti sinceri, giuro.',
             choices: [
-              { label: '[ZVAN] "So di essere diventato ciò che odiavo."', next: 'k2' },
-              { label: '[DIFESA] "Senza Imperium questo anello collassa."', next: 'k2b' }
+              { label: '[ZVAN] "Lo so di essere diventato quello che prendevamo in giro."', next: 'k2' },
+              { label: '[DIFESA] "Senza Imperium quest\'anello si spegne."', next: 'k2b' }
             ]
           },
           k2: {
             speaker: 'zvan',
-            text: 'A Imperium mi hanno insegnato che l\'ufficialità tiene insieme le cose. Qui vedo che l\'ordine si vende a pezzi. Porto il distintivo di chi firma. Mi tiene in piedi e mi fa male allo stesso tempo.',
+            text: 'A Imperium mi hanno insegnato che l\'ufficialità tiene insieme le cose. Qui vedo che l\'ordine si vende al chilo, con lo sconto quantità. Porto il distintivo di chi firma: mi tiene dritto e intanto mi preme sullo stomaco.',
             choices: [{ label: '[ASCOLTA]', next: 'k3' }]
           },
           k2b: {
             speaker: 'npc',
-            text: 'Collassa, dici. Prova a dire «è tutto a posto» senza sembrare un manuale. Non ci riesci. La macchina che non funziona, adesso, sei tu.',
-            choices: [{ label: '[ZVAN] "Allora aiutami a ripararla — senza fattura."', next: 'k3' }]
+            text: 'Si spegne, dici. Allora prova a dirmi «è tutto a posto» senza sembrare un libretto d\'istruzioni. Non ci riesci. Tavalvol apr, Zvan: stavolta la macchina che non parte sei tu.',
+            choices: [{ label: '[ZVAN] "Allora aiutami a rimetterla in moto. Senza fattura."', next: 'k3' }]
           },
           k3: {
             speaker: 'npc',
-            text: 'Senza fattura non esisto. Ti do un consiglio non timbrato: non firmare ciò che non puoi difendere a Bazzano, a voce alta, da ubriaco. E occhio alle casate: a Calcara arrivano già intermediari che cercano «anomalie». Parlano di materia strana, nove dimensioni, macguffinium. Se è vero, questo sistema smette di essere patio di servizio.',
+            text: 'Senza fattura io non esisto, lo sai com\'è. Però ti do un consiglio non protocollato: non firmare niente che non ti va di difendere a Bazzano, a voce alta, alla terza bottiglia. E tieni d\'occhio le casate, che qui arrivano già intermediari a chiedere «rilevazioni sulle anomalie». Materia strana, nove dimensioni, macguffinium. Se è vero, smettiamo di essere il patio di servizio e diventiamo il cortile dove ci si mena.',
             choices: [
-              { label: '[ACCETTA IL COLPO] (+rep Calcara piccola)', next: null, fx: { rep: { calcara: 3 }, note: 'Dario ti offre un silenzio onesto. È raro qui.', lore: 'macguffinium_voce' } },
-              { label: '[VAI VIA UFFICIALE]', next: null, fx: { rep: { calcara: -2 }, note: 'Hai chiuso come un verbale. Lui ti ha segnato: estraneo.' } }
+              { label: '[ACCETTA IL COLPO] (+rep Calcara piccola)', next: null, fx: { rep: { calcara: 3 }, note: 'Dario ti regala un silenzio onesto. Da queste parti è merce rara.', lore: 'macguffinium_voce' } },
+              { label: '[VAI VIA UFFICIALE]', next: null, fx: { rep: { calcara: -2 }, note: 'Hai chiuso la conversazione come un verbale. Lui ti ha protocollato: forestiero.' } }
             ]
           }
         }
@@ -293,12 +293,12 @@
         faction: 'monteveglio',
         gender: 'f',
         portrait: 'sprites/faces/roots/serafina.png',
-        blurb: 'Insieme giocavate a essere cavalieri. Lei ha continuato. Tu sei andato al marmo.',
+        blurb: 'Da bambini giocavate ai cavalieri. Lei ha continuato sul serio; tu hai preso il marmo.',
         start: 'm1',
         nodes: {
           m1: {
             speaker: 'npc',
-            text: 'Zvan. Le frecce di luce sono laser — lo sapevamo anche da bambini. Tu sei partito per chiamarle «sistemi d\'arma». Io sono rimasta a chiamarle promesse. Chi di noi ha lasciato il gioco?',
+            text: 'Zvan. Che le frecce di luce siano laser lo sapevamo già a otto anni: lo diceva tuo cugino e noi gli davamo dell\'endàvs. Poi tu sei partito per chiamarle «sistemi d\'arma» e io sono rimasta a chiamarle promesse. Secondo te chi dei due ha smesso di giocare?',
             choices: [
               { label: '[ZVAN] "Io. Ho scambiato il gioco con il grado."', next: 'm2' },
               { label: '[ZVAN] "Siamo cresciuti in direzioni diverse."', next: 'm2b' }
@@ -306,20 +306,20 @@
           },
           m2: {
             speaker: 'zvan',
-            text: 'A Imperium il gioco si chiama inefficienza. Qui il gioco è governo. Io sto in mezzo: niente armatura vera, niente divertimento. Solo missione.',
+            text: 'A Imperium il gioco si chiama inefficienza e ha un codice di spesa. Qui il gioco è governo, con l\'elmo e tutto il resto. Io sto in mezzo: niente armatura vera, niente divertimento vero. Solo la missione, e un cavallo che è un\'astronave.',
             choices: [{ label: '[ASCOLTA]', next: 'm3' }]
           },
           m2b: {
             speaker: 'npc',
-            text: '«Direzioni diverse» suona da rapporto. Da noi si diceva: hai asportato il parrucchino — hai detto una stronzata elegante. Torna a sporcarti. Torna a ridere senza verbale.',
-            choices: [{ label: '[ZVAN] "Insegnami una risata senza protocollo."', next: 'm3' }]
+            text: '«Direzioni diverse.» Rrigore. Si sente da qui, Zvan: hai appena asportato il parrucchino con la voce da conferenza stampa. Torna a sporcarti. Torna a ridere senza mettere la data in alto a destra.',
+            choices: [{ label: '[ZVAN] "Insegnami una risata senza numero di protocollo."', next: 'm3' }]
           },
           m3: {
             speaker: 'npc',
-            text: 'Resta stanotte alla Rocca. Non come funzionario: come quello che perdeva al LARP e mentiva sul punteggio. Prima dimmi il tuo nome senza livello. E se vedi arrivare una nave enorme, più grossa di uno hulk: è il Palazzo Beghelli. Dominavano Valsamoggio quando eravamo bambini. Ora sono una casata minore. Possono aiutarti, se hai le connessioni giuste. Di solito finisce in cortesia e poco altro.',
+            text: 'Resta stanotte alla Rocca. Non da funzionario: da quello che perdeva al torneo e barava sul punteggio, che eri tu e lo sai benissimo. Prima però dimmi il tuo nome senza livello attaccato. Ah, e se vedi una firma radar enorme, più grossa di uno hulk, è il Palazzo Beghelli: comandavano quando andavamo a scuola, adesso sono casata minore. Ti aiutano, se hai le conoscenze giuste. Aiuto nel senso di: molta cortesia e un caffè.',
             choices: [
-              { label: '[DICI] "Zvan. Solo Zvan." (+rep Monteveglio)', next: null, fx: { rep: { monteveglio: 6 }, note: 'Serafina ti passa un elmo troppo stretto. Ti sta ridicolo — e lo sa.', lore: 'beghelli_voce' } },
-              { label: '[DICI] "Funzionario Marìa."', next: null, fx: { note: 'Lei inchina la testa come a un ospite.' } }
+              { label: '[DICI] "Zvan. Solo Zvan." (+rep Monteveglio)', next: null, fx: { rep: { monteveglio: 6 }, note: 'Serafina ti calca in testa un elmo di due taglie sbagliate. Ti sta ridicolo, e lo sa.', lore: 'beghelli_voce' } },
+              { label: '[DICI] "Funzionario Marìa."', next: null, fx: { note: 'Chinando la testa, ti tratta da ospite. Nessuno inchina la testa agli amici.' } }
             ]
           }
         }
@@ -337,33 +337,33 @@
         faction: 'savigno',
         gender: 'm',
         portrait: 'sprites/faces/roots/remo.png',
-        blurb: 'Parla poco. Giudica dall\'aroma.',
+        blurb: 'Parla poco e giudica dall\'aroma. Con lui hai sempre avuto la pagella bassa.',
         start: 'v1',
         nodes: {
           v1: {
             speaker: 'npc',
-            text: 'Zantic lo spazio, eh? Tu puzzi di sterilizzazione. Non di tartufo. Il sapore di casa lo ricordi, o l\'hai archiviato sotto «tradizione locale»?',
+            text: 'Zantic, lo spazio, eh? Si vede. Tu puzzi di sterilizzazione, non di tartufo. Dimmi la verità: il sapore di casa te lo ricordi, o l\'hai archiviato sotto «tradizioni locali, cartella tre»?',
             choices: [
-              { label: '[ZVAN] "Lo ricordo. Mi fa paura assaggiarlo."', next: 'v2' },
+              { label: '[ZVAN] "Me lo ricordo. Ho paura di riprovarlo."', next: 'v2' },
               { label: '[ZVAN] "Porto tre chili. È il prezzo del sigillo."', next: 'v2b' }
             ]
           },
           v2: {
             speaker: 'zvan',
-            text: 'A Imperium il cibo non aveva parenti. Qui ogni piatto ha un morto e un vivo. Ho mangiato vent\'anni senza genealogia. Ora tremo davanti a tre chili di verità.',
+            text: 'A Imperium il cibo non aveva parenti: arrivava, si mangiava, si smaltiva. Qui ogni piatto ha dentro un vivo e un morto. Ho mangiato vent\'anni senza genealogia, e adesso tremo davanti a un barattolo.',
             choices: [{ label: '[ASCOLTA]', next: 'v3' }]
           },
           v2b: {
             speaker: 'npc',
-            text: 'Il prezzo. Parli da compratore. Va bene: compra. Ma se non senti l\'aroma, stai solo firmando.',
-            choices: [{ label: '[ZVAN] "Allora fammi sentire."', next: 'v3' }]
+            text: '«Prezzo.» Parli da compratore. Va bene, compra: i soldi non hanno mai offeso nessuno. Ma se non senti l\'aroma stai solo firmando, e le firme, qui, non si mangiano.',
+            choices: [{ label: '[ZVAN] "Allora fammelo sentire."', next: 'v3' }]
           },
           v3: {
             speaker: 'npc',
-            text: 'Assaggia. Se ti viene l\'acqua agli occhi, sei ancora di qui. Se no, torna a Imperium e lascia il Mulino a chi puzza di terra. E ascolta: nelle anomalie del sistema qualcosa non torna. Odore metallico, luce sbagliata. Dicono macguffinium. Se le casate maggiori lo fiutano, qui arriva la guerra. Per questo il Patto deve reggere.',
+            text: 'Assaggia. Se ti vengono gli occhi lucidi sei ancora di qui; se no torna a Imperium e lascia il Mulino a chi puzza di terra. Un\'altra cosa, poi sto zitto per un anno: nelle anomalie qualcosa non torna. Odore di metallo, luce storta. Dicono macguffinium. Se le casate grosse lo fiutano, qui arriva la guerra. Ecco perché il Patto deve reggere. Adesso assaggia, che si scalda.',
             choices: [
-              { label: '[ASSAGGI] (+rep Savigno)', next: null, fx: { rep: { savigno: 5 }, note: 'L\'aroma ti apre un cassetto che credevi vuoto.', lore: 'macguffinium_voce' } },
-              { label: '[RIFIUTI]', next: null, fx: { note: 'Remo non insiste. Chiude il barattolo.' } }
+              { label: '[ASSAGGI] (+rep Savigno)', next: null, fx: { rep: { savigno: 5 }, note: 'L\'aroma ti apre un cassetto che credevi vuoto. Dentro c\'è un cortile e una domenica.', lore: 'macguffinium_voce' } },
+              { label: '[RIFIUTI]', next: null, fx: { note: 'Remo non insiste. Chiude il barattolo e ti guarda come si guarda una pratica sospesa.' } }
             ]
           }
         }
@@ -381,33 +381,33 @@
         faction: 'castelletto',
         gender: 'f',
         portrait: 'sprites/faces/roots/vera.png',
-        blurb: 'Anche lei è partita — ma non per Imperium. Per non scegliere fazione.',
+        blurb: 'È partita anche lei, ma non per Imperium: per non dover scegliere una bandiera.',
         start: 'e1',
         nodes: {
           e1: {
             speaker: 'npc',
-            text: 'Zvan Marìa. Ti riconosco dal modo in cui ordini il caffè: come una richiesta di autorizzazione. Io sono scappata dalle fazioni. Tu sei scappato dentro Imperium. Due fughe. Stessa nostalgia.',
+            text: 'Zvan Marìa. Ti ho riconosciuto da come hai ordinato il caffè: sembrava una richiesta di autorizzazione in bollo. Io sono scappata dalle fazioni, tu sei scappato dentro Imperium. Due fughe, stessa nostalgia, due caffè pessimi.',
             choices: [
-              { label: '[ZVAN] "Almeno tu hai scelto. Io sono stato assegnato."', next: 'e2' },
-              { label: '[ZVAN] "Nostalgia. Parola che nei rapporti non esiste."', next: 'e2b' }
+              { label: '[ZVAN] "Tu almeno hai scelto. Io sono stato assegnato."', next: 'e2' },
+              { label: '[ZVAN] "Nostalgia. Nei rapporti quella voce non esiste."', next: 'e2b' }
             ]
           },
           e2: {
             speaker: 'zvan',
-            text: 'Assegnato, sì. Come un modulo. Ora mi chiedono di tenere insieme un sistema che conosco a memoria e che non riconosco più.',
+            text: 'Assegnato come un modulo a un ufficio. E adesso mi chiedono di tenere insieme un sistema che so a memoria e che non riconosco: conosco la posizione di ogni stazione e non so più chi ci abita dentro.',
             choices: [{ label: '[ASCOLTA]', next: 'e3' }]
           },
           e2b: {
             speaker: 'npc',
-            text: 'Nei rapporti non esiste. Sulle navi sì. Bevi. Il caffè qui sa di metallo: ti ricorda Imperium senza farti mentire.',
+            text: 'Nei rapporti no, sulle navi sì. Bevi. Il caffè qui sa di metallo: ti ricorda Imperium e ti risparmia la fatica di mentire.',
             choices: [{ label: '[ZVAN] "Bevo. E ascolto."', next: 'e3' }]
           },
           e3: {
             speaker: 'npc',
-            text: 'Se vuoi un favore dai Beghelli, passa dal Palazzo quando entra in sistema: una nave da casata, più grande di uno space hulk. Una volta comandavano qui. Ora sono secondari. Possono spingere una pratica, spostare una scorta, farti un\'introduzione. Poi ti lasciano da solo. Con le giuste connessioni ottieni poco. Senza, niente. E ricorda: Imperium vuole il Patto perché sa che sotto le anomalie potrebbe esserci macguffinium. Se Valsamoggio si spacca, la guerra galattica parte da qui.',
+            text: 'Se ti serve un favore dai Beghelli, passa dal Palazzo quando entra in sistema: nave da casata, più grossa di uno hulk. Una volta comandavano qui, adesso sono secondari. Ti spostano una pratica, una scorta leggera, un\'introduzione — poi ti lasciano lì in mezzo. Con le conoscenze giuste ottieni poco; senza conoscenze ottieni nichita. E ricordati perché Imperium tiene al Patto: sotto le anomalie potrebbe esserci macguffinium. Se Valsamoggia si spacca, la guerra galattica comincia dal nostro parcheggio.',
             choices: [
-              { label: '[PAGHI E RESTI] (+rep)', next: null, fx: { credits: -20, rep: { bazzano: 2 }, note: 'Il caffè sa di metallo. Lo noti senza fingere.', lore: 'beghelli_voce' } },
-              { label: '[PAGHI E VAI]', next: null, fx: { credits: -20, note: 'Il caffè sa di metallo. Come Imperium. Lo noti solo ora.' } }
+              { label: '[PAGHI E RESTI] (+rep)', next: null, fx: { credits: -20, rep: { bazzano: 2 }, note: 'Il caffè sa di metallo e tu lo bevi lo stesso, senza fare la faccia da rapporto.', lore: 'beghelli_voce' } },
+              { label: '[PAGHI E VAI]', next: null, fx: { credits: -20, note: 'Il caffè sa di metallo. Come Imperium. Te ne accorgi solo adesso, sulla porta.' } }
             ]
           }
         }
