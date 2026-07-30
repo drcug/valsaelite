@@ -10,17 +10,17 @@
     circuit: {
       id: 'azione_circuito',
       title: 'Il Circuito ha parlato',
-      body: 'Tre vault, tre sigilli, e le mani sporche di brina. A Savigno il Consiglio adesso ti considera abbastanza figlio di casa da darti «Il Prezzo del Sigillo» — e i tartufi da mettere in stiva. Zio Remo non dirà niente, che per lui è un applauso.'
+      body: 'Il terzo sigillo scatta e il deposito torna stabile. Dal Consiglio arriva un messaggio di due parole: «Può bastare.» Da Savigno è quasi entusiasmo. Ora puoi chiedere il frammento; prima, però, asciugati le mani.'
     },
     hulk: {
       id: 'azione_hulk',
       title: 'Hai respirato lo hulk',
-      body: 'Sei uscito, ma l\'odore è rimasto nella tuta e nella testa. Il macguffinium non è una storia da osteria: riscrive chi resta dentro troppo a lungo. Le carte del Patto che cercavi, adesso, te le sei guadagnate a peso.'
+      body: 'Il portello si chiude e resti ad ascoltare il tuo respiro. Hai i documenti. Sulla prima pagina c\'è l\'elenco dell\'equipaggio dello hulk; riconosci alcuni nomi dai corridoi. Decidi che leggerai il resto dopo esserti tolto la tuta.'
     },
     kill_calcara: {
       id: 'azione_calcara_kill',
       title: 'Frecce contro Calcara',
-      body: 'Alla Rocca hanno visto il colpo, e alla Rocca guardano sempre. Monteveglio i timbri non li chiede: chiede prove nel vuoto. Vai avanti finché il Torneo non è chiuso, poi presentati dal Castellano senza scuse pronte.'
+      body: 'La Rocca conferma il colpo. «Uno su tre», dice Serafina. Poi aggiunge, fuori protocollo: «Bel tiro.» È il complimento più breve ricevuto da quando sei tornato, e forse il più sincero.'
     }
   };
 
@@ -304,7 +304,7 @@
     if (elapsed < STUCK_CAP4_MS) return;
     if (Date.now() - (g.stuckAt || 0) < 120000) return;
     g.stuckAt = Date.now();
-    radio('Fermo sul Cap.4? Attracca e apri CIRCUITO DEPOSITI: tre sigilli con E, poi si torna a bere.', true);
+    radio('Cap.4: attracca e apri CIRCUITO DEPOSITI. Sigilla i tre vault con E; Savigno parlerà soltanto dopo.', true);
     // Evidenzia bottone se in dock
     try {
       const btn = document.getElementById('ldck-suborbit');
@@ -320,9 +320,9 @@
     noteCap4Enter();
     const obj = getObjective();
     if (obj.kind === 'circuit') {
-      radio('Savigno aspetta i sigilli, non le firme: VOLO SUBORBITALE, Circuito Depositi.', false);
+      radio('A Savigno serve il Circuito Depositi: entra in VOLO SUBORBITALE e sigilla i tre vault.', false);
     } else if (obj.kind === 'accept' && st && st.sd && obj.sid === st.sd.id) {
-      radio('La missione di trama la puoi accettare qui, tab Missioni. Nessuna coda, per una volta.', false);
+      radio('La missione di trama è disponibile qui, nella tab Missioni.', false);
     } else if (obj.kind === 'mission' && st && st.sd && (obj.sid === st.sd.id)) {
       radio('Sei arrivato dove dovevi: controlla la consegna nel tab Missioni.', false);
     } else {
