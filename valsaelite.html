@@ -159,6 +159,12 @@ body.boarding-active #boarding-touch{display:flex}
   background:linear-gradient(180deg,rgba(5,16,34,.88),rgba(4,10,20,.74));
   border:1px solid rgba(110,190,255,.45);border-radius:11px;padding:9px 13px;letter-spacing:.11em;
   max-width:400px;width:66vw;box-shadow:0 0 28px rgba(70,170,255,.2),inset 0 0 20px rgba(140,220,255,.08)}
+@media(max-width:700px),(pointer:coarse){
+  #boarding-hud{left:8px;top:max(8px,env(safe-area-inset-top));width:auto;max-width:min(72vw,280px);padding:7px 10px;font-size:10px}
+  #boarding-hud .bh-title{font-size:11px;letter-spacing:.12em;margin-bottom:1px}
+  #boarding-hud .bh-hint{display:none}
+  #boarding-hud .bh-obj{font-size:10px;margin-top:5px}
+}
 body.boarding-active #boarding-hud{display:block}
 #boarding-hud .bh-title{font-family:var(--FD);font-size:13px;font-weight:700;color:#f8fdff;letter-spacing:.17em;margin-bottom:2px}
 #boarding-hud .bh-phase{font-size:9px;letter-spacing:.14em;color:#7ec8ff;margin-bottom:6px;font-weight:700}
@@ -4694,6 +4700,47 @@ function getP(){
   return null;
 }
 function boom(pos,col,n,sp){n=n||60;sp=sp||1;for(let i=0;i<n;i++){const p=getP();if(!p)break;const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1),spd=(20+Math.random()*130)*sp;const v=new THREE.Vector3(spd*Math.sin(ph)*Math.cos(th),spd*Math.sin(ph)*Math.sin(th),spd*Math.cos(ph));const r=Math.random();const c=r>.7?0xffffaa:r>.4?0xff8800:col;p.spawn(pos.clone(),v,c,.5+Math.random()*1.3,3+Math.random()*5);}}
+/** Esplosione da impatto su nave (colpi / missili / crit) — più leggibile dei soli spark. */
+function shipHitExplosion(pos,col,opts){
+  if(!pos)return;
+  opts=opts||{};
+  const crit=!!opts.crit;
+  const missile=!!opts.missile;
+  const death=!!opts.death;
+  const reduce=document.body.classList.contains('reduced-motion');
+  const mul=reduce?0.45:1;
+  const nCore=Math.round((death?55:(missile?38:(crit?30:20)))*mul);
+  const nOuter=Math.round((death?90:(missile?55:(crit?42:28)))*mul);
+  const spdMul=death?1.85:(missile?1.4:(crit?1.2:1));
+  const base=col!=null?col:0xff5522;
+  // Nucleo caldo
+  for(let i=0;i<nCore;i++){
+    const p=getP();if(!p)break;
+    const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
+    const spd=(35+Math.random()*160)*spdMul;
+    const v=new THREE.Vector3(spd*Math.sin(ph)*Math.cos(th),spd*Math.sin(ph)*Math.sin(th)*.7,spd*Math.cos(ph));
+    const c=i%5===0?0xffffff:(i%3===0?0xffe088:0xff6622);
+    p.spawn(pos.clone().add(new THREE.Vector3((Math.random()-.5)*2,(Math.random()-.5)*1.5,(Math.random()-.5)*2)),v,c,.28+Math.random()*.45,4+Math.random()*7);
+  }
+  // Anello / flash ampio
+  const flashN=Math.round((death?10:(crit||missile?7:5))*mul);
+  for(let i=0;i<flashN;i++){
+    const p=getP();if(!p)break;
+    p.spawn(
+      pos.clone(),
+      new THREE.Vector3((Math.random()-.5)*18,(Math.random()-.5)*12,(Math.random()-.5)*18),
+      i%2?0xffffcc:base,
+      .18+Math.random()*.22,
+      (death?16:10)+Math.random()*(death?22:14)
+    );
+  }
+  // Scorie / frammenti
+  boom(pos,base,nOuter,spdMul*(reduce?.7:1));
+  if(typeof playTone==='function'&&!opts.silent){
+    playTone(death?70:(missile?110:160),.06+ (crit?.04:0),.05,'sawtooth');
+    if(crit||missile||death)setTimeout(()=>playTone(death?45:90,.1,.04,'triangle'),40);
+  }
+}
 
 // ─────────────────────────────────────────────────
 // ENVIRONMENT
@@ -5961,7 +6008,9 @@ class Ship{
   die(){
     this.alive=false;
     if(typeof playCombatSfx==='function')playCombatSfx('explode');
-    boom(this.mesh.position,this.isPlayer?0x0055ff:0xff3300,220,2.2);scene.remove(this.mesh);
+    if(typeof shipHitExplosion==='function')shipHitExplosion(this.mesh.position,this.isPlayer?0x4488ff:0xff3300,{death:true,silent:true});
+    else boom(this.mesh.position,this.isPlayer?0x0055ff:0xff3300,220,2.2);
+    scene.remove(this.mesh);
     if(this.isPlayer)triggerGameOver();
   }
 }
@@ -6061,10 +6110,15 @@ function updateProjs(dt){
     }
     pr.mesh.position.addScaledVector(pr.velocity,dt);
     let hit=false;
+    let shipBoom=false;
     if(pr.owner!=='player'&&playerShip.alive){
       if(pr.mesh.position.distanceToSquared(playerShip.mesh.position)<playerShip.radius*playerShip.radius){
         const threat=(typeof StorySys!=='undefined')?StorySys.hostileDmgMul():1;
         playerShip.takeDamage(Math.round((7+Math.round(rnd(0,6)))*threat));hit=true;
+        if(typeof shipHitExplosion==='function'){
+          shipHitExplosion(pr.mesh.position.clone().lerp(playerShip.mesh.position,.35),0xff6633,{crit:false,silent:true});
+          shipBoom=true;
+        }
       }
     }
     if(!hit&&pr.owner==='player'){
@@ -6083,12 +6137,18 @@ function updateProjs(dt){
           if(mirOk||isCrit)pulseHitConfirm(isCrit);
           if(typeof playCombatSfx==='function')playCombatSfx(factionHitSfx(ns.faction));
           if(typeof spawnCombatFloater==='function')spawnCombatFloater(ns.ship.mesh.position,dmg,!!ns._critPop);
-          // Hit spark coerente: colore per fazione del bersaglio.
+          // Esplosione d'impatto sul bersaglio
           const hitCol=(NCOLORS[ns.faction]||NCOLORS.pirate).a;
-          for(let s=0;s<(ns._critPop?8:5);s++){
-            const sp=getP();if(!sp)break;
-            const v=new THREE.Vector3((Math.random()-.5)*48,(Math.random()-.5)*32,(Math.random()-.5)*48);
-            sp.spawn(pr.mesh.position.clone(),v,ns._critPop?0xffe088:hitCol,.14,1.8);
+          const impactPos=pr.mesh.position.clone().lerp(ns.ship.mesh.position,.4);
+          if(typeof shipHitExplosion==='function'){
+            shipHitExplosion(impactPos,isCrit?0xffe088:hitCol,{crit:!!isCrit,missile:pr.kind==='missile',silent:true});
+            shipBoom=true;
+          }else{
+            for(let s=0;s<(ns._critPop?8:5);s++){
+              const sp=getP();if(!sp)break;
+              const v=new THREE.Vector3((Math.random()-.5)*48,(Math.random()-.5)*32,(Math.random()-.5)*48);
+              sp.spawn(pr.mesh.position.clone(),v,ns._critPop?0xffe088:hitCol,.14,1.8);
+            }
           }
           if(typeof playTone==='function')playTone(ns._critPop?920:640,.02,.03,'square');
           ns._critPop=0;
@@ -6132,7 +6192,10 @@ function updateProjs(dt){
     }
     if(!hit&&pr.mesh.position.lengthSq()<SUN_R*SUN_R)hit=true;
     if(!hit){for(const sm of smeshes){if(pr.mesh.position.distanceToSquared(sm.mesh.position)<sm.sd.pR*sm.sd.pR){hit=true;break;}}}
-    if(hit){boom(pr.mesh.position,pr.owner==='player'?0x00ffff:0xff3300,13,.4);disposeProjTrail(pr);scene.remove(pr.mesh);PROJS.splice(i,1);}
+    if(hit){
+      if(!shipBoom)boom(pr.mesh.position,pr.owner==='player'?0x00ffff:0xff3300,13,.4);
+      disposeProjTrail(pr);scene.remove(pr.mesh);PROJS.splice(i,1);
+    }
   }
 }
 
