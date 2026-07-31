@@ -71,6 +71,90 @@
         }
       },
       {
+        id: 'root_bazz_padre',
+        minChapter: 2,
+        title: 'Circolo parrocchiale — tavolo in fondo',
+        npcName: 'Arturo Marìa',
+        npcTitle: 'PADRE · BAZZANO',
+        npcSeed: 4426,
+        faction: 'bazzano',
+        gender: 'm',
+        blurb: 'Tuo padre non ti ha ancora abbracciato. In compenso ha già preparato tre battute sulla divisa.',
+        start: 'p1',
+        nodes: {
+          p1: {
+            speaker: 'npc',
+            text: 'Oh, è arrivato il ministero. Gigi, tira dentro la pancia: magari il signor funzionario la mette a verbale. Ciao, Zvan. Ti avrei chiamato, ma immagino che a Imperium i padri debbano prendere appuntamento.',
+            choices: [
+              { label: '[ZVAN] "Ciao, papà. Potevi chiamarmi e basta."', next: 'p2' },
+              { label: '[ZVAN] "Sono venuto per vederti, non per ispezionarti."', next: 'p2' }
+            ]
+          },
+          p2: {
+            speaker: 'npc',
+            speakerName: 'Gigi Malaguti',
+            npcTitle: 'CANDIDATO PERMANENTE · AMICO DI ARTURO',
+            npcSeed: 4438,
+            text: 'Zvanino, bella giacca. L\'Impero veste bene chi gli tiene il secchio. Io invece torno a candidarmi sindaco: l\'ultima volta ho preso il nove virgola otto. Meno del dieci, sì, ma tutto voto vero. E quest\'anno ho già trovato chi stampa i manifesti senza fattura.',
+            choices: [
+              { label: '[ZVAN] "Coerenza e contabilità, vedo."', next: 'p3' },
+              { label: '[ZVAN] "Papà, lo lasci parlare così di me?"', next: 'p3b' }
+            ]
+          },
+          p3: {
+            speaker: 'npc',
+            speakerName: 'Arturo Marìa',
+            npcTitle: 'PADRE · BAZZANO',
+            npcSeed: 4426,
+            text: 'Gigi scherza. Lui almeno dice le cose in faccia. Non ha bisogno di venti piani di marmo e un timbro per sentirsi importante. Poi il nove virgola otto, con quello che spendono gli altri, vale come una vittoria morale.',
+            choices: [{ label: '[ZVAN] "Una vittoria morale non apre il municipio."', next: 'p4' }]
+          },
+          p3b: {
+            speaker: 'npc',
+            speakerName: 'Arturo Marìa',
+            npcTitle: 'PADRE · BAZZANO',
+            npcSeed: 4426,
+            text: 'Adesso non si può più scherzare? Gigi ti conosce da quando eri un cinno. Se una battuta ti fa male, figurati quando scopri cosa pensano davvero di voi funzionari.',
+            choices: [{ label: '[ZVAN] "Allora dimmelo tu, cosa pensi."', next: 'p4' }]
+          },
+          p4: {
+            speaker: 'npc',
+            speakerName: 'Arturo Marìa',
+            npcTitle: 'PADRE · BAZZANO',
+            npcSeed: 4426,
+            text: 'Penso quello che don Ermes ci mostra ogni giovedì. L\'Imperatore non è più un uomo: è un resto attaccato alle macchine del Trono d\'Oro. Ha abusato del macguffinium per vivere più a lungo e spingere il potere psionico fin dove non doveva. Adesso tiene insieme l\'Impero perché nessuno ha il coraggio di staccare la spina. E voi, sotto, firmate che va tutto bene.',
+            choices: [
+              { label: '[AMMETTI] "Su questo, in gran parte, hai ragione."', next: 'p5' },
+              { label: '[ATTACCA] "E don Ermes come lo saprebbe?"', next: 'p5b' }
+            ]
+          },
+          p5: {
+            speaker: 'zvan',
+            text: 'L\'Imperatore è un resto umano ipermutato. Le macchine lo tengono vivo e il macguffinium ha aumentato la sua forza psionica mentre gli portava via quasi tutto il resto. Nei testi ufficiali lo chiamano sacrificio. Cambiare il nome non cambia il corpo. Ma don Ermes prende quella verità e ci attacca qualunque paura; Gigi ci attacca una candidatura.',
+            choices: [{ label: '[GUARDA TUO PADRE] "Questo lo pensi tu, o lo pensi perché lui ti ascolta?"', next: 'p6' }]
+          },
+          p5b: {
+            speaker: 'npc',
+            speakerName: 'Gigi Malaguti',
+            npcTitle: 'CANDIDATO PERMANENTE · AMICO DI ARTURO',
+            npcSeed: 4438,
+            text: 'Eccolo, il metodo imperiale: se non puoi smentire una cosa, chiedi il protocollo. Don Ermes ha fonti. Io ho contatti. Quando sarò sindaco renderemo tutto pubblico, tranne le donazioni: quelle sono riservate per sicurezza.',
+            choices: [{ label: '[ZVAN] "Papà, senti la frase che ha appena detto?"', next: 'p6' }]
+          },
+          p6: {
+            speaker: 'npc',
+            speakerName: 'Arturo Marìa',
+            npcTitle: 'PADRE · BAZZANO',
+            npcSeed: 4426,
+            text: 'Sento che sei tornato da mezz\'ora e già fai l\'interrogatorio. Però va bene, hai vinto tu: io sono il vecchio ignorante e tu quello che sa come funziona il mostro. Dev\'essere una bella soddisfazione tenergli aperta la bocca.',
+            choices: [
+              { label: '[FERMO] "Non ho vinto. Volevo parlare con mio padre."', next: null, fx: { rep: { bazzano: 2 }, note: 'Arturo guarda Gigi prima di rispondere. Gigi ha già ripreso a parlare della campagna elettorale.', lore: 'imperatore_trono_oro' } },
+              { label: '[VAI] "Quando vorrai parlare senza pubblico, chiamami."', next: null, fx: { note: 'Tuo padre alza le spalle. La battuta successiva gli muore in bocca, ma troppo tardi.', lore: 'imperatore_trono_oro' } }
+            ]
+          }
+        }
+      },
+      {
         id: 'root_bazz_zia',
         minChapter: 3,
         title: 'Cortile dietro il Mulino',
@@ -149,6 +233,65 @@
             choices: [
               { label: '[RESTA] Resti a bere in silenzio. (+rep)', next: null, fx: { rep: { bazzano: 5 }, note: 'Palmira ti lascia uno straccio e smette di fare domande. Il sapone copre quasi l\'odore.', lore: 'hulk_visited' } },
               { label: '[PARTE] "Devo tornare al relitto."', next: null, fx: { note: '«Allora porta armi. E un po\' di pietà, che pesa meno.»', lore: 'hulk_mutazioni' } }
+            ]
+          }
+        }
+      },
+      {
+        id: 'root_bazz_padre_ritorno',
+        minChapter: 6,
+        requireSeen: 'root_bazz_padre',
+        requireHulkBoarded: true,
+        title: 'Garage di casa — senza pubblico',
+        npcName: 'Arturo Marìa',
+        npcTitle: 'PADRE · BAZZANO',
+        npcSeed: 4426,
+        faction: 'bazzano',
+        gender: 'm',
+        blurb: 'Gigi non c\'è. Tuo padre, senza qualcuno da impressionare, sembra più vecchio e meno sicuro.',
+        start: 'r1',
+        nodes: {
+          r1: {
+            speaker: 'npc',
+            text: 'Gigi è alla riunione della lista. Sono in sette, ma quattro sono candidati sindaco, quindi finiranno tardi. Ho saputo dello hulk. Bravo. L\'Impero manda mio figlio dentro una bara mutata e poi magari gli dà anche una medaglia di latta.',
+            choices: [
+              { label: '[ZVAN] "Sono venuto perché avevi ragione sull\'Imperatore."', next: 'r2' },
+              { label: '[ZVAN] "Anche senza Gigi devi prendermi in giro?"', next: 'r2b' }
+            ]
+          },
+          r2: {
+            speaker: 'zvan',
+            text: 'I documenti dello hulk confermano l\'abuso di macguffinium. L\'Imperatore ha allungato la vita e il potere psionico finché del suo corpo è rimasto qualcosa che le macchine del Trono d\'Oro possono ancora usare. Non è propaganda. È il fondamento dell\'Impero, ed è marcio.',
+            choices: [{ label: '[CONTINUA]', next: 'r3' }]
+          },
+          r2b: {
+            speaker: 'npc',
+            text: 'Se non faccio una battuta poi bisogna dire le cose vere. Non sono mai stato bravo. Tua madre parlava; io aspettavo che passasse. Con Gigi è più facile: lui ride, io gli do ragione e per cinque minuti mi sento uno con delle idee.',
+            choices: [{ label: '[ZVAN] "Allora proviamo senza battute."', next: 'r3' }]
+          },
+          r3: {
+            speaker: 'npc',
+            text: 'E tu porti ancora quella divisa. Questo non lo capisco. Se sai che è marcio, perché lo tieni in piedi? Ogni volta che ti guardo vedo uno bravo che ha scelto di diventare l\'ingranaggio giusto nella macchina sbagliata.',
+            choices: [{ label: '[ZVAN] "È proprio questo che non riesco a riconciliare."', next: 'r4' }]
+          },
+          r4: {
+            speaker: 'zvan',
+            text: 'L\'Impero sta in piedi grazie a gente come me. È un\'accusa ed è anche un fatto: qualcuno tiene aperte le rotte, distribuisce ossigeno, impedisce a una casata di comprarsi un pianeta. Facendolo, però, teniamo in piedi anche il Trono e tutto ciò che divora. Mi dico che, se me ne vado, firmerà qualcuno peggiore. Forse è responsabilità. Forse è la mia versione elegante della paura.',
+            choices: [{ label: '[GUARDALO] "Ma tu non odi soltanto l\'Impero. Odi me."', next: 'r5' }]
+          },
+          r5: {
+            speaker: 'npc',
+            text: 'Ti ho odiato perché sei partito e hai fatto una scelta. Io sono rimasto qui a lamentarmi con don Ermes e ad applaudire Gigi, che perde ogni elezione e ogni volta riesce a farmi sentire dalla parte dei furbi. Quando ti prendeva in giro gli davo ragione perché volevo che ammirasse me. Mio figlio era il prezzo più comodo. Sì, è stato da codardo.',
+            choices: [
+              { label: '[RESTA] "Non ti assolvo. Ma resto qui un po\'."', next: 'r6' },
+              { label: '[ESCI] "Dirlo non basta. Però è la prima cosa vera."', next: null, fx: { note: 'Arturo annuisce senza cercare una battuta. La porta del garage resta aperta.', lore: 'padre_ferita_aperta' } }
+            ]
+          },
+          r6: {
+            speaker: 'npc',
+            text: 'Va bene. Non ti chiedo di perdonare l\'Impero, e non ti chiedo di perdonare me stasera. Mi aiuti con questa mensola? Pende da quando sei partito. Ho sempre detto che era il muro.',
+            choices: [
+              { label: '[AIUTALO] Raddrizzate la mensola. (+rep Bazzano)', next: null, fx: { rep: { bazzano: 7 }, note: 'La mensola era storta. Anche il muro, un poco. Per una volta avete ragione entrambi.', lore: 'padre_riconciliato' } }
             ]
           }
         }
@@ -457,6 +600,7 @@
     return encountersForStation(stId).filter((e) => {
       if (isSeen(e.id)) return false;
       if ((e.minChapter || 1) > ch && !(global.STORY && global.STORY.won)) return false;
+      if (e.requireSeen && !isSeen(e.requireSeen)) return false;
       if (e.requireHulkBoarded && !(global.StorySys && global.StorySys.flags && global.StorySys.flags.hulkBoarded)) return false;
       return true;
     });
@@ -507,11 +651,14 @@
     return global.document && global.document.getElementById(id);
   }
 
-  function drawPortraits(enc, speaker) {
+  function drawPortraits(enc, speaker, node) {
     const zvanCv = el('root-zvan-cv');
     const npcCv = el('root-npc-cv');
     const zvanWrap = el('root-zvan-wrap');
     const npcWrap = el('root-npc-wrap');
+    const npcName = (node && node.speakerName) || enc.npcName;
+    const npcFaction = (node && node.faction) || enc.faction;
+    const npcGender = (node && node.gender) || enc.gender;
     if (zvanCv && typeof global.PortraitRenderer !== 'undefined') {
       global.PortraitRenderer.drawPlayer(zvanCv);
     }
@@ -522,11 +669,11 @@
       if (enc.playerOnly) {
         global.PortraitRenderer.drawPlayer(npcCv);
       } else {
-        global.PortraitRenderer.drawCanvas(npcCv, enc.npcSeed || 1, enc.faction || 'bazzano', {
-          name: enc.npcName,
-          gender: enc.gender === 'f' ? 'f' : (enc.gender === 'm' ? 'm' : undefined),
-          kind: enc.faction === 'pirate' ? 'pirate' : undefined,
-          portraitPath: enc.portrait || null
+        global.PortraitRenderer.drawCanvas(npcCv, (node && node.npcSeed) || enc.npcSeed || 1, npcFaction || 'bazzano', {
+          name: npcName,
+          gender: npcGender === 'f' ? 'f' : (npcGender === 'm' ? 'm' : undefined),
+          kind: npcFaction === 'pirate' ? 'pirate' : undefined,
+          portraitPath: (node && node.portrait) || enc.portrait || null
         });
       }
     }
@@ -545,20 +692,26 @@
     }
     active.nodeId = nodeId;
     const speaker = node.speaker || 'npc';
-    drawPortraits(enc, speaker);
+    drawPortraits(enc, speaker, node);
 
     const nameEl = el('root-speaker-name');
     const typeEl = el('root-speaker-type');
     const textEl = el('root-text');
     const choicesEl = el('root-choices');
+    const nodeNpcName = node.speakerName || enc.npcName;
     if (nameEl) {
-      nameEl.textContent = speaker === 'zvan' ? 'ZVAN MARÌA' : (enc.playerOnly ? 'ZVAN MARÌA' : enc.npcName);
-      nameEl.style.color = speaker === 'zvan' ? '#c8ddd8' : (global.FACTIONS && global.FACTIONS[enc.faction] ? global.FACTIONS[enc.faction].color : '#aaccee');
+      nameEl.textContent = speaker === 'zvan' ? 'ZVAN MARÌA' : (enc.playerOnly ? 'ZVAN MARÌA' : nodeNpcName);
+      const nodeFaction = node.faction || enc.faction;
+      nameEl.style.color = speaker === 'zvan' ? '#c8ddd8' : (global.FACTIONS && global.FACTIONS[nodeFaction] ? global.FACTIONS[nodeFaction].color : '#aaccee');
     }
     if (typeEl) {
       typeEl.textContent = speaker === 'zvan'
         ? 'FUNZIONARIO VII · DI RITORNO'
-        : (enc.npcTitle || 'INCONTRO');
+        : (node.npcTitle || enc.npcTitle || 'INCONTRO');
+    }
+    const npcLbl = el('root-npc-wrap') && el('root-npc-wrap').querySelector('.root-port-lbl');
+    if (npcLbl) {
+      npcLbl.textContent = enc.playerOnly ? 'SPECCHIO' : String(nodeNpcName || 'INCONTRO').split(' ')[0].toUpperCase();
     }
     if (textEl) {
       textEl.textContent = node.text || '';
@@ -660,11 +813,18 @@
     all.forEach((enc) => {
       const done = isSeen(enc.id);
       const locked = (enc.minChapter || 1) > ((global.STORY && global.STORY.chapter) || 0) && !(global.STORY && global.STORY.won);
-      const can = !done && !locked;
+      const missingSeen = !!(enc.requireSeen && !isSeen(enc.requireSeen));
+      const missingHulk = !!(enc.requireHulkBoarded && !(global.StorySys && global.StorySys.flags && global.StorySys.flags.hulkBoarded));
+      const gated = missingSeen || missingHulk;
+      const can = !done && !locked && !gated;
       html += '<div class="ic" style="align-items:flex-start' + (done ? ';opacity:.7' : '') + '">';
       html += '<div class="in2"><div class="nm">' + enc.npcName + (done ? ' · vissuto' : '') + '</div>';
       html += '<div class="dc">' + enc.blurb + '</div>';
-      html += '<div class="mr">' + enc.title + (locked ? ' · sblocca dal cap. ' + enc.minChapter : '') + '</div></div>';
+      html += '<div class="mr">' + enc.title
+        + (locked ? ' · sblocca dal cap. ' + enc.minChapter : '')
+        + (!locked && missingSeen ? ' · prima affronta l\'incontro precedente' : '')
+        + (!locked && !missingSeen && missingHulk ? ' · torna dopo uno Space Hulk' : '')
+        + '</div></div>';
       if (can) {
         html += '<button class="db hi2" onclick="openRootEncounter(\'' + enc.id + '\',\'' + st.sd.id + '\')">PARLA</button>';
       } else if (done) {

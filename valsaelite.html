@@ -1836,7 +1836,7 @@ const STORY = {
   won:false,   // true dopo triggerVictory (Patto restaurato)
   playerName:'Zvan Marìa',
   playerTitle:'Funzionario di settimo livello · Impero Galattico',
-  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Hai lasciato Valsamoggia vent\'anni fa e da allora hai imparato a scrivere rapporti impeccabili per persone che li leggono a metà. Ora il Patto del Molino è stato spezzato e le cinque fazioni rischiano di trascinare con sé l\'intero anello orbitale. Imperium manda te perché sei nato lì. Nessuno ha chiesto se sei ancora di lì. Dovrai recuperare i frammenti, trattare con vecchi rancori e ricordarti come si parla senza un verbale davanti. Intanto le grandi casate osservano le anomalie ai margini del sistema. Finché il Mulino gira, Valsamoggia è periferia. Se si ferma, diventa interessante. E non nel senso buono.',
+  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Hai lasciato Valsamoggia vent\'anni fa e da allora hai imparato a scrivere rapporti impeccabili per persone che li leggono a metà. Tuo padre, intanto, ha smesso quasi del tutto di chiamarti: quando lo fa, parla dell\'Impero più che di te. Ora il Patto del Molino è stato spezzato e le cinque fazioni rischiano di trascinare con sé l\'intero anello orbitale. Imperium manda te perché sei nato lì. Nessuno ha chiesto se sei ancora di lì. Dovrai recuperare i frammenti, trattare con vecchi rancori e ricordarti come si parla senza un verbale davanti. Intanto le grandi casate osservano le anomalie ai margini del sistema. Finché il Mulino gira, Valsamoggia è periferia. Se si ferma, diventa interessante. E non nel senso buono.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
@@ -2307,6 +2307,9 @@ function renderDiaryContent(){
     if(PS.loreFlags.nave_vs_hulk)bits.push('In osteria lo dicono chiaro: nave morta dà pezzi, hulk dà incubi. Non confondere i due.');
     if(PS.loreFlags.dialetto_ripasso)bits.push('Ripasso di bazzanese fatto via radio, da adulto: il «ta-» davanti nega tutto (taproblem, tavò, taebol), la «û» in fondo pure (bello-û = brutto), «toronto» chiude la questione, «ega» vuol dire che non c\'è, «nichita» è nessuno.');
     if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
+    if(PS.loreFlags.imperatore_trono_oro)bits.push('L\'Imperatore è un resto umano ipermutato, mantenuto dalle macchine del Trono d\'Oro: il macguffinium gli ha dato longevità e potere psionico al prezzo della sua umanità. Tuo padre aveva ragione su questo; non su tutto ciò che Gigi e don Ermes costruiscono attorno alla verità.');
+    if(PS.loreFlags.padre_riconciliato)bits.push('Arturo ha ammesso di averti ferito per compiacere Gigi e sentirsi coraggioso. Non lo hai assolto, ma avete cominciato a parlare senza pubblico.');
+    if(PS.loreFlags.padre_ferita_aperta)bits.push('Arturo ha ammesso la propria codardia e il bisogno dell\'approvazione di Gigi. La ferita fra voi resta aperta, ma almeno adesso ha un nome.');
     if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli, un tempo dominante e ora minore, può offrire un aiuto limitato dal Palazzo.');
     if(bits.length){
       html+='<div class="diary-ch done"><h3>Cosa hai scoperto</h3><p class="dm">'+bits.join(' ')+'</p><div class="dst">Lore raccolta giocando · dialoghi, osterie, interludi.</div></div>';
@@ -2475,6 +2478,8 @@ const TAVERN = {
     {s:'Corriere in pausa',        t:'"Le casate hanno iniziato a chiedere delle anomalie. Quando uno di Imperium fa una domanda gentile, controlla se ha già parcheggiato la flotta."'},
     {s:'Tecnico di hangar',        t:'"Da una nave morta prendi pezzi. Da uno hulk prendi pezzi e poi non dormi. Il secondo servizio non è incluso nel preventivo."'},
     {s:'Ex compagna di banco',     t:'"Zvanino è tornato. Da piccolo mentiva guardando le scarpe; adesso guarda il distintivo. Il resto è uguale."'},
+    {s:'Socio del circolo',         t:'"Arturo parla dell\'Impero ogni giovedì con don Ermes e gli amici. Quando entra Gigi, però, controlla sempre se sta dicendo la cosa giusta."'},
+    {s:'Scrutatrice comunale',      t:'"Gigi si ricandida. Dice che il nove virgola otto per cento è una base solida. Certo: anche il pavimento è una base solida, ma non lo eleggiamo sindaco."'},
   ],
   crespellano:[
     {s:'Assessore in pausa',       t:'"L\'officina è approvata dal 2019. Manca il terreno, il progetto e l\'officina. Per il resto siamo avanti."'},
