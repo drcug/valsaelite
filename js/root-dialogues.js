@@ -79,6 +79,7 @@
         npcSeed: 4426,
         faction: 'bazzano',
         gender: 'm',
+        portrait: 'sprites/faces/roots/arturo.png',
         blurb: 'Tuo padre non ti ha ancora abbracciato. In compenso ha già preparato tre battute sulla divisa.',
         start: 'p1',
         nodes: {
@@ -95,6 +96,8 @@
             speakerName: 'Gigi Malaguti',
             npcTitle: 'CANDIDATO PERMANENTE · AMICO DI ARTURO',
             npcSeed: 4438,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/gigi.png',
             text: 'Zvanino, bella giacca. L\'Impero veste bene chi gli tiene il secchio. Io invece torno a candidarmi sindaco: l\'ultima volta ho preso il nove virgola otto. Meno del dieci, sì, ma tutto voto vero. E quest\'anno ho già trovato chi stampa i manifesti senza fattura.',
             choices: [
               { label: '[ZVAN] "Coerenza e contabilità, vedo."', next: 'p3' },
@@ -106,6 +109,8 @@
             speakerName: 'Arturo Marìa',
             npcTitle: 'PADRE · BAZZANO',
             npcSeed: 4426,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/arturo.png',
             text: 'Gigi scherza. Lui almeno dice le cose in faccia. Non ha bisogno di venti piani di marmo e un timbro per sentirsi importante. Poi il nove virgola otto, con quello che spendono gli altri, vale come una vittoria morale.',
             choices: [{ label: '[ZVAN] "Una vittoria morale non apre il municipio."', next: 'p4' }]
           },
@@ -114,6 +119,8 @@
             speakerName: 'Arturo Marìa',
             npcTitle: 'PADRE · BAZZANO',
             npcSeed: 4426,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/arturo.png',
             text: 'Adesso non si può più scherzare? Gigi ti conosce da quando eri un cinno. Se una battuta ti fa male, figurati quando scopri cosa pensano davvero di voi funzionari.',
             choices: [{ label: '[ZVAN] "Allora dimmelo tu, cosa pensi."', next: 'p4' }]
           },
@@ -122,10 +129,12 @@
             speakerName: 'Arturo Marìa',
             npcTitle: 'PADRE · BAZZANO',
             npcSeed: 4426,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/arturo.png',
             text: 'Penso quello che don Ermes ci mostra ogni giovedì. L\'Imperatore non è più un uomo: è un resto attaccato alle macchine del Trono d\'Oro. Ha abusato del macguffinium per vivere più a lungo e spingere il potere psionico fin dove non doveva. Adesso tiene insieme l\'Impero perché nessuno ha il coraggio di staccare la spina. E voi, sotto, firmate che va tutto bene.',
             choices: [
               { label: '[AMMETTI] "Su questo, in gran parte, hai ragione."', next: 'p5' },
-              { label: '[ATTACCA] "E don Ermes come lo saprebbe?"', next: 'p5b' }
+              { label: '[ATTACCA] "E don Ermes come lo saprebbe?"', next: 'p5e' }
             ]
           },
           p5: {
@@ -133,11 +142,26 @@
             text: 'L\'Imperatore è un resto umano ipermutato. Le macchine lo tengono vivo e il macguffinium ha aumentato la sua forza psionica mentre gli portava via quasi tutto il resto. Nei testi ufficiali lo chiamano sacrificio. Cambiare il nome non cambia il corpo. Ma don Ermes prende quella verità e ci attacca qualunque paura; Gigi ci attacca una candidatura.',
             choices: [{ label: '[GUARDA TUO PADRE] "Questo lo pensi tu, o lo pensi perché lui ti ascolta?"', next: 'p6' }]
           },
+          p5e: {
+            speaker: 'npc',
+            speakerName: 'Don Ermes',
+            npcTitle: 'PARROCCHIA · PROPAGANDA DEL GIOVEDÌ',
+            npcSeed: 4449,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/don_ermes.png',
+            text: 'Lo so perché basta guardare. Il Trono d\'Oro non tiene un santo: tiene un resto. Macguffinium, macchine, potere senza carne. E vostro figlio firma i rapporti che lo chiamano sacrificio. Arturo, vedi? Anche a tavola ti correggono.',
+            choices: [
+              { label: '[ZVAN] "Una verità non basta a giustificare tutto il resto."', next: 'p5b' },
+              { label: '[ZVAN] "Papà, senti chi ti sta dando lezione."', next: 'p6' }
+            ]
+          },
           p5b: {
             speaker: 'npc',
             speakerName: 'Gigi Malaguti',
             npcTitle: 'CANDIDATO PERMANENTE · AMICO DI ARTURO',
             npcSeed: 4438,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/gigi.png',
             text: 'Eccolo, il metodo imperiale: se non puoi smentire una cosa, chiedi il protocollo. Don Ermes ha fonti. Io ho contatti. Quando sarò sindaco renderemo tutto pubblico, tranne le donazioni: quelle sono riservate per sicurezza.',
             choices: [{ label: '[ZVAN] "Papà, senti la frase che ha appena detto?"', next: 'p6' }]
           },
@@ -146,6 +170,8 @@
             speakerName: 'Arturo Marìa',
             npcTitle: 'PADRE · BAZZANO',
             npcSeed: 4426,
+            gender: 'm',
+            portrait: 'sprites/faces/roots/arturo.png',
             text: 'Sento che sei tornato da mezz\'ora e già fai l\'interrogatorio. Però va bene, hai vinto tu: io sono il vecchio ignorante e tu quello che sa come funziona il mostro. Dev\'essere una bella soddisfazione tenergli aperta la bocca.',
             choices: [
               { label: '[FERMO] "Non ho vinto. Volevo parlare con mio padre."', next: null, fx: { rep: { bazzano: 2 }, note: 'Arturo guarda Gigi prima di rispondere. Gigi ha già ripreso a parlare della campagna elettorale.', lore: 'imperatore_trono_oro' } },
@@ -248,6 +274,7 @@
         npcSeed: 4426,
         faction: 'bazzano',
         gender: 'm',
+        portrait: 'sprites/faces/roots/arturo.png',
         blurb: 'Gigi non c\'è. Tuo padre, senza qualcuno da impressionare, sembra più vecchio e meno sicuro.',
         start: 'r1',
         nodes: {

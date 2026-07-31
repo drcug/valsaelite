@@ -131,7 +131,13 @@
     // Ritratti dedicati incontri RADICI
     const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
     Object.keys(roots).forEach((st) => {
-      (roots[st] || []).forEach((enc) => { if (enc && enc.portrait) push(enc.portrait); });
+      (roots[st] || []).forEach((enc) => {
+        if (!enc) return;
+        if (enc.portrait) push(enc.portrait);
+        Object.values(enc.nodes || {}).forEach((node) => {
+          if (node && node.portrait) push(node.portrait);
+        });
+      });
     });
     ((L.rootPortraits) || []).forEach(push);
     return urls;
@@ -162,7 +168,13 @@
       (global.CREW_POOL || []).forEach((c) => { if (c && c.portrait) push(c.portrait); });
       const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
       Object.keys(roots).forEach((st) => {
-        (roots[st] || []).forEach((enc) => { if (enc && enc.portrait) push(enc.portrait); });
+        (roots[st] || []).forEach((enc) => {
+          if (!enc) return;
+          if (enc.portrait) push(enc.portrait);
+          Object.values(enc.nodes || {}).forEach((node) => {
+            if (node && node.portrait) push(node.portrait);
+          });
+        });
       });
       if (!urls.length) return Promise.resolve(true);
       return Promise.all(urls.map((u) =>

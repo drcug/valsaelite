@@ -37,7 +37,10 @@ window.PORTRAIT_LAYOUT = {
     'sprites/faces/roots/dario.png',
     'sprites/faces/roots/serafina.png',
     'sprites/faces/roots/remo.png',
-    'sprites/faces/roots/vera.png'
+    'sprites/faces/roots/vera.png',
+    'sprites/faces/roots/arturo.png',
+    'sprites/faces/roots/gigi.png',
+    'sprites/faces/roots/don_ermes.png'
   ],
   player: {
     head: 'sprites/faces/player/zvan_complete.png',
