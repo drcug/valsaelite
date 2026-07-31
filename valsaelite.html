@@ -45,17 +45,17 @@ body.reduced-motion.low-hp{animation:none !important;filter:none !important}
   #dmgov.dfl{opacity:.2 !important}
 }
 /* Toggle UI per riduzione effetti */
-#fx-toggle{position:fixed;right:10px;top:10px;z-index:12;font:10px var(--FM);color:#88aacc;
+#fx-toggle{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:14;font:10px var(--FM);color:#88aacc;
   background:rgba(2,10,24,.72);border:1px solid rgba(70,150,230,.35);border-radius:6px;
   padding:4px 8px;cursor:pointer;letter-spacing:.08em;user-select:none;pointer-events:auto}
 #fx-toggle:hover{color:#cce4ff;border-color:rgba(120,200,255,.55)}
 body.reduced-motion #fx-toggle{color:#ffcc66;border-color:rgba(255,200,100,.4)}
 @media(max-width:700px){
-  #fx-toggle{right:6px;top:max(6px,env(safe-area-inset-top));font-size:9px;padding:3px 6px;z-index:14}
+  #fx-toggle{right:max(6px,env(safe-area-inset-right));top:max(6px,env(safe-area-inset-top));font-size:9px;padding:3px 6px;z-index:14}
 }
 #a11y-strip{
-  position:fixed;left:10px;top:10px;z-index:12;display:flex;flex-direction:column;gap:4px;
-  font:9px var(--FM);color:#88aacc;pointer-events:auto;max-width:min(200px,46vw);
+  position:fixed;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));z-index:14;display:flex;flex-direction:column;gap:4px;
+  font:9px var(--FM);color:#88aacc;pointer-events:auto;max-width:min(200px,42vw);
 }
 #a11y-strip button{
   padding:4px 8px;border-radius:6px;border:1px solid rgba(70,150,230,.38);
@@ -195,13 +195,31 @@ body.reduced-motion #autosave-cue.show{animation:none;opacity:1}
   border-radius:5px;padding:7px 22px;font-family:var(--FD);font-weight:700;font-size:13px;
   cursor:pointer;letter-spacing:.1em;width:100%;-webkit-tap-highlight-color:transparent}
 
-/* Rep panel collapsible */
-.rp .rp-toggle{display:block;width:100%;background:transparent;border:none;padding:0;margin:0 0 3px;
+/* Rep panel — fixed top-right tool (not inside .ht, avoids flight overlap) */
+#rep-panel{
+  position:fixed;right:max(10px,env(safe-area-inset-right));
+  top:max(42px,calc(env(safe-area-inset-top) + 36px));
+  z-index:14;pointer-events:auto;min-width:0;max-width:min(240px,52vw);
+  padding:6px 10px;
+}
+#tgt-panel{
+  position:fixed;right:max(10px,env(safe-area-inset-right));
+  top:max(78px,calc(env(safe-area-inset-top) + 72px));
+  z-index:13;pointer-events:none;min-width:0;max-width:min(240px,48vw);
+  padding:6px 10px;
+}
+body.rp-open #tgt-panel{top:max(200px,calc(env(safe-area-inset-top) + 190px))}
+.rp .rp-toggle{display:block;width:100%;background:transparent;border:none;padding:0;margin:0;
   color:#446688;font:9px var(--FM);letter-spacing:.12em;text-align:left;cursor:pointer;pointer-events:auto}
 .rp .rp-toggle:hover{color:var(--bright)}
 .rp.collapsed .rp-body{display:none}
-.rp:not(.collapsed) .rp-body{display:block}
+.rp:not(.collapsed) .rp-body{display:block;margin-top:6px;max-height:min(42vh,280px);overflow-y:auto}
 .rp.collapsed{padding:6px 10px;min-width:0}
+@media(max-width:700px){
+  #rep-panel{right:max(6px,env(safe-area-inset-right));top:max(38px,calc(env(safe-area-inset-top) + 32px));max-width:min(200px,48vw)}
+  #tgt-panel{right:max(6px,env(safe-area-inset-right));top:max(72px,calc(env(safe-area-inset-top) + 66px));max-width:min(46vw,190px)}
+  body.rp-open #tgt-panel{top:max(180px,calc(env(safe-area-inset-top) + 170px))}
+}
 
 /* ─ Fade overlay for animations ─ */
 #fadeov{position:fixed;inset:0;z-index:95;background:#000;opacity:0;pointer-events:none;transition:opacity .0s}
@@ -252,8 +270,9 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
 #land-title .lt-sub{font-size:12px;color:#8ab8b0;font-family:var(--FM);margin-top:6px;letter-spacing:.2em}
 
 /* ─ HUD ─ */
-#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom));gap:0}
-.ht{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;flex-wrap:wrap}
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:10px;padding-top:max(44px,calc(env(safe-area-inset-top) + 36px));padding-bottom:max(10px,env(safe-area-inset-bottom));gap:0}
+.ht{display:flex;justify-content:flex-start;align-items:flex-start;gap:6px;flex-wrap:nowrap}
+.ht .hp{max-width:min(220px,42vw)}
 .hb{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;flex-wrap:wrap}
 .hb-left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 38%}
 .hb-controls{display:flex;flex-direction:column;align-items:stretch;gap:6px;flex:1 1 58%;min-width:0;max-width:100%}
@@ -270,15 +289,15 @@ body.boarding-hulk .btouch-fire{border-color:rgba(220,80,40,.65);background:rgba
 #radar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:100px;height:100px;z-index:11;pointer-events:none}
 #rcv{border-radius:50%;border:1px solid rgba(44,100,190,.3);background:rgba(0,3,12,.75);display:block}
 
-/* Story / Mission ticker — top-left, fuori dal radar centrale e dalle barre HUD */
-#mtick{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));transform:none;
+/* Story / Mission ticker — colonna sinistra sotto HP, radar al centro libero */
+#mtick{position:fixed;top:max(150px,calc(env(safe-area-inset-top) + 138px));left:max(8px,env(safe-area-inset-left));transform:none;
   z-index:12;pointer-events:none;font:9px var(--FM);letter-spacing:.08em;color:#9ec8e8;
   background:rgba(4,12,28,.72);border:1px solid rgba(80,140,200,.35);border-radius:6px;padding:4px 9px;
-  max-width:min(46vw,280px);line-height:1.35;text-shadow:0 1px 2px #000}
-#story-obj{position:fixed;top:max(36px,calc(env(safe-area-inset-top) + 28px));left:max(8px,env(safe-area-inset-left));
+  max-width:min(42vw,260px);line-height:1.35;text-shadow:0 1px 2px #000}
+#story-obj{position:fixed;top:max(182px,calc(env(safe-area-inset-top) + 170px));left:max(8px,env(safe-area-inset-left));
   z-index:12;pointer-events:none;font:10px var(--FD);letter-spacing:.1em;color:#ffe8b0;
   background:linear-gradient(90deg,rgba(40,28,8,.88),rgba(20,14,4,.72));border:1px solid rgba(255,200,90,.4);
-  border-radius:6px;padding:5px 10px;max-width:min(62vw,340px);line-height:1.35;
+  border-radius:6px;padding:5px 10px;max-width:min(42vw,280px);line-height:1.35;
   box-shadow:0 0 16px rgba(255,160,40,.12);display:none}
 #story-obj.show{display:block}
 #story-obj .so-lab{font-size:8px;color:#c8a060;letter-spacing:.14em;margin-bottom:2px}
@@ -734,16 +753,13 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
     aspect-ratio:434 / 290;
     box-sizing:border-box;
   }
-  #hud{padding:6px 6px max(6px,env(safe-area-inset-bottom))}
-  .ht{gap:4px}
-  .ht .hp{flex:1 1 100%;min-width:0;max-width:100%}
-  .ht .hp:nth-child(2){order:3;flex:1 1 100%}
-  .ht .hp:nth-child(3){order:2;flex:1 1 100%;text-align:left !important}
-  .ht .hp:nth-child(3) .bw{margin-left:0 !important;margin-right:auto;width:100% !important;max-width:100%}
-  #radar{top:6px;width:72px;height:72px}
-  #rcv{width:72px !important;height:72px !important}
-  #mtick{top:max(8px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));max-width:min(42vw,180px);font-size:9px;padding:3px 8px}
-  #story-obj{top:max(34px,calc(env(safe-area-inset-top) + 26px));left:max(6px,env(safe-area-inset-left));max-width:min(78vw,300px);font-size:9px;padding:4px 8px}
+  #hud{padding:6px 6px max(6px,env(safe-area-inset-bottom));padding-top:max(40px,calc(env(safe-area-inset-top) + 32px))}
+  .ht{gap:6px;flex-wrap:nowrap;align-items:flex-start}
+  .ht .hp{flex:0 1 auto;min-width:0;max-width:min(42vw,160px);padding:6px 8px}
+  #radar{top:max(6px,env(safe-area-inset-top));width:64px;height:64px}
+  #rcv{width:64px !important;height:64px !important}
+  #mtick{top:max(128px,calc(env(safe-area-inset-top) + 116px));left:max(6px,env(safe-area-inset-left));max-width:min(42vw,200px);font-size:8px;padding:3px 7px}
+  #story-obj{top:max(158px,calc(env(safe-area-inset-top) + 146px));left:max(6px,env(safe-area-inset-left));max-width:min(44vw,220px);font-size:9px;padding:4px 8px}
   #notif{bottom:max(148px,24vh);z-index:28}
   #smsg{bottom:max(190px,30vh);z-index:29}
   #dlg{bottom:max(115px,17vh);max-width:94vw;max-height:min(32vh,260px)}
@@ -774,10 +790,40 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 body.suborbit-active #suborbit{display:block !important;opacity:1 !important;z-index:6000 !important}
 body.suborbit-active #suborbit-hud{display:block !important;z-index:6100 !important;top:max(72px,env(safe-area-inset-top));bottom:auto;max-width:min(96vw,460px);text-align:center;line-height:1.45}
 body.suborbit-active #suborbit-ui{display:block !important}
-/* Volo suborbitale: nasconde tutto l'HUD navetta (anche desktop — prima era rotto dentro @media) */
+/* Volo suborbitale / dock / landing: nasconde HUD navetta (anche desktop) */
 body.boarding-active #throttle-rail,
 body.suborbit-active #throttle-rail,
-body.docked-active #throttle-rail{display:none!important}
+body.docked-ui #throttle-rail,
+body.landing-active #throttle-rail,
+body.landing-pano #throttle-rail{display:none!important}
+body.docked-ui #speed-bar,
+body.landing-active #speed-bar,
+body.landing-pano #speed-bar,
+body.docked-ui #heat-bar,
+body.docked-ui #heat-lbl,
+body.landing-active #heat-bar,
+body.landing-active #heat-lbl,
+body.landing-pano #heat-bar,
+body.landing-pano #heat-lbl{display:none!important}
+body.docked-ui #rep-panel,
+body.landing-active #rep-panel,
+body.boarding-active #rep-panel,
+body.suborbit-active #rep-panel,
+body.docked-ui #tgt-panel,
+body.landing-active #tgt-panel,
+body.boarding-active #tgt-panel,
+body.suborbit-active #tgt-panel,
+body.docked-ui #fx-toggle,
+body.landing-active #fx-toggle,
+body.boarding-active #fx-toggle,
+body.docked-ui #a11y-strip,
+body.landing-active #a11y-strip,
+body.boarding-active #a11y-strip,
+body.docked-ui #story-obj,
+body.landing-active #story-obj,
+body.docked-ui #navarrow,
+body.landing-active #navarrow{display:none!important}
+body.landing-active #hud .hb{visibility:hidden;pointer-events:none}
 body.suborbit-active #hud{display:none !important;}
 body.suborbit-active #hud-overlay{display:none !important;}
 body.suborbit-active #radar,
@@ -946,15 +992,6 @@ body.suborbit-active #smsg{
       <div class="bw" id="shield-row" style="display:none"><div id="bs" class="br bg" style="width:0%"></div></div>
       <div id="shield-lb" style="display:none;font-size:8px;color:#55aadd;margin-top:1px;letter-spacing:.08em;font-family:var(--FM)"></div>
       <div id="crew-lb" style="font-size:9px;color:#446688;margin-top:2px"></div>
-    </div>
-    <div class="hp rp collapsed" id="rep-panel">
-      <button type="button" class="lb rp-toggle" id="rep-toggle" aria-expanded="false" title="Mostra/nascondi reputazione">REPUTAZIONE ▸</button>
-      <div id="rrws" class="rp-body"></div>
-    </div>
-    <div class="hp" id="tgt-panel" style="text-align:right;min-width:140px;display:none">
-      <div id="tnm" style="font-size:13px;font-weight:700;color:var(--bright)"></div>
-      <div id="tds" style="font-size:9px;color:#446688;margin-top:1px"></div>
-      <div class="bw" style="margin-top:4px;width:130px;margin-left:auto"><div id="bte" class="br bt" style="width:0%"></div></div>
     </div>
   </div>
   <div class="hb">
@@ -1198,6 +1235,15 @@ body.suborbit-active #smsg{
   </div>
 </div>
 <div id="fx-toggle" title="Riduzione effetti (shake/flash)">FX: PIENO</div>
+<div class="hp rp collapsed" id="rep-panel" title="Relazioni con le fazioni">
+  <button type="button" class="lb rp-toggle" id="rep-toggle" aria-expanded="false" aria-controls="rrws" title="Mostra/nascondi relazioni fazioni">RELAZIONI ▸</button>
+  <div id="rrws" class="rp-body"></div>
+</div>
+<div class="hp" id="tgt-panel" style="text-align:right;display:none">
+  <div id="tnm" style="font-size:13px;font-weight:700;color:var(--bright)"></div>
+  <div id="tds" style="font-size:9px;color:#446688;margin-top:1px"></div>
+  <div class="bw" style="margin-top:4px;width:min(130px,100%);margin-left:auto"><div id="bte" class="br bt" style="width:0%"></div></div>
+</div>
 <div id="tutorial-modal" aria-modal="true" role="dialog" aria-labelledby="tutorial-modal-title">
   <div style="max-width:460px;width:100%;background:rgba(3,14,32,.98);border:1px solid rgba(80,160,255,.45);border-radius:14px;padding:20px 22px;box-shadow:0 12px 48px rgba(0,40,80,.5)">
     <div id="tutorial-modal-title" style="font-family:var(--FD);font-size:16px;color:var(--bright);letter-spacing:.12em;margin-bottom:10px"></div>
@@ -2800,6 +2846,12 @@ function updateHeatHUD(){
   const bar=document.getElementById('heat-bar');
   const fill=document.getElementById('heat-fill');
   const lbl=document.getElementById('heat-lbl');
+  if(!bar||!fill||!lbl)return;
+  const flyOk=typeof GAME!=='undefined'&&GAME.state==='flying'&&!document.body.classList.contains('landing-active')&&!document.body.classList.contains('docked-ui')&&!document.body.classList.contains('boarding-active')&&!document.body.classList.contains('suborbit-active');
+  if(!flyOk){
+    bar.style.display='none';lbl.style.display='none';
+    return;
+  }
   if(BOOST.heat>0||BOOST.overheated){
     bar.style.display='block';lbl.style.display='block';
     fill.style.width=BOOST.heat+'%';
@@ -5692,7 +5744,7 @@ function continueSandbox(){
   if(GAME.pausedReasons){
     Object.keys(GAME.pausedReasons).forEach(k=>{GAME.pausedReasons[k]=false;});
   }
-  document.body.classList.remove('docked-ui','story-open','menu-open','intro-open');
+  document.body.classList.remove('docked-ui','landing-active','story-open','menu-open','intro-open');
   GAME.state='flying';
   GAME.dockedSt=null;
   playerShip.alive=true;
@@ -6944,7 +6996,7 @@ touchTap('btnboard',()=>tryBoardingTrigger());
 /** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
 const FLY_STEER={active:false,nx:0};
 (function initFlyScreenSteer(){
-  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,.btouch-pad,#boarding-hud';
+  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,#rep-panel,#tgt-panel,.btouch-pad,#boarding-hud';
   const isUi=t=>{
     if(!t||!t.closest)return false;
     return !!t.closest(uiSel);
@@ -7042,9 +7094,23 @@ function startLanding(){
   GAME.dockedSt=GAME.nearSt;
   GAME.state='landing';
   GAME.landTimer=0;
+  document.body.classList.add('landing-active');
   document.getElementById('dprompt').style.display='none';
   document.getElementById('dlg').style.display='none';
   document.getElementById('hud').style.pointerEvents='none';
+  const thrHide=document.getElementById('throttle-rail');
+  if(thrHide)thrHide.style.display='none';
+  const spdHide=document.getElementById('speed-bar');
+  if(spdHide)spdHide.style.display='none';
+  const heatB=document.getElementById('heat-bar'),heatL=document.getElementById('heat-lbl');
+  if(heatB)heatB.style.display='none';
+  if(heatL)heatL.style.display='none';
+  // Collapse rep overlay during approach
+  const repPan=document.getElementById('rep-panel');
+  const repBtn=document.getElementById('rep-toggle');
+  if(repPan){repPan.classList.add('collapsed');}
+  if(repBtn){repBtn.setAttribute('aria-expanded','false');repBtn.textContent='RELAZIONI ▸';}
+  document.body.classList.remove('rp-open');
   // Show station name
   document.getElementById('ltname').textContent=GAME.dockedSt.sd.name.toUpperCase();
   const f=FACTIONS[GAME.dockedSt.sd.faction];
@@ -7108,9 +7174,10 @@ function startSuborbit(){
   if(!sm||!SKIM_TYPES.includes(sm.sd.pType)){notify('Suborbitale disponibile solo sui pianeti.');return;}
   setPausedReason('docked',false);
   setPausedReason('dialogue',false);
-  document.body.classList.remove('docked-ui');
+  document.body.classList.remove('docked-ui','landing-active');
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
+  document.getElementById('hud').style.pointerEvents='';
   document.getElementById('radar').style.display='block';
   document.getElementById('mtick').style.display='block';
   playerShip.mesh.visible=true;
@@ -7131,6 +7198,7 @@ function completeLanding(){
   GAME.state='docked';
   setPausedReason('docked',true);
   ltEl.style.display='none';
+  document.body.classList.remove('landing-active');
   const panoEl=document.getElementById('land-pano');
   if(panoEl){panoEl.classList.remove('show');panoEl.style.opacity='0';document.body.classList.remove('landing-pano');}
   fadeEl.style.opacity='0';fadeEl.style.transition='opacity 0s';
@@ -7145,6 +7213,10 @@ function completeLanding(){
   document.getElementById('hud').style.display='none';
   document.getElementById('radar').style.display='none';
   document.getElementById('mtick').style.display='none';
+  const thrDock=document.getElementById('throttle-rail');
+  if(thrDock)thrDock.style.display='none';
+  const spdDock=document.getElementById('speed-bar');
+  if(spdDock)spdDock.style.display='none';
   document.body.classList.add('docked-ui');
   if(typeof StoryGuide!=='undefined')StoryGuide.onDock(GAME.dockedSt);
   if(typeof saveGame==='function')saveGame(true);
@@ -7161,9 +7233,10 @@ function startLaunch(){
   }
   GAME.launchTimer=0;
   const dst=GAME.dockedSt;
-  document.body.classList.remove('docked-ui');
+  document.body.classList.remove('docked-ui','landing-active');
   document.getElementById('dkscr').style.display='none';
   document.getElementById('hud').style.display='flex';
+  document.getElementById('hud').style.pointerEvents='';
   document.getElementById('radar').style.display='block';
   if(typeof saveGame==='function')saveGame(true);
   const panoEl=document.getElementById('land-pano');
@@ -7219,10 +7292,13 @@ function toggleRepPanel(){
   const open=!pan.classList.contains('collapsed');
   if(open){
     pan.classList.add('collapsed');
-    if(btn){btn.setAttribute('aria-expanded','false');btn.textContent='REPUTAZIONE ▸';}
+    document.body.classList.remove('rp-open');
+    if(btn){btn.setAttribute('aria-expanded','false');btn.textContent='RELAZIONI ▸';}
   }else{
     pan.classList.remove('collapsed');
-    if(btn){btn.setAttribute('aria-expanded','true');btn.textContent='REPUTAZIONE ▾';}
+    document.body.classList.add('rp-open');
+    if(btn){btn.setAttribute('aria-expanded','true');btn.textContent='RELAZIONI ▾';}
+    if(typeof renderRep==='function')renderRep();
   }
 }
 
@@ -14602,9 +14678,11 @@ function drawRadar(){
 // ─────────────────────────────────────────────────
 function updateHUD(){
   const thrRail=document.getElementById('throttle-rail');
+  const flyHud=GAME.state==='flying'&&!gameplayPaused()&&!document.body.classList.contains('boarding-active')&&!document.body.classList.contains('landing-active')&&!document.body.classList.contains('docked-ui')&&!document.body.classList.contains('suborbit-active');
   if(thrRail){
-    const showFly=GAME.state==='flying'&&!gameplayPaused()&&!document.body.classList.contains('boarding-active');
-    thrRail.style.display=showFly?'':'none';
+    // Desktop (fine pointer): CSS hides rail; keep inline clear so CSS media can win when flying
+    if(flyHud)thrRail.style.display='';
+    else thrRail.style.display='none';
   }
   document.getElementById('bh').style.width=Math.max(0,playerShip.health/(playerShip.maxHealth||100)*100)+'%';
   document.getElementById('bh').style.background=playerShip.health<30?'linear-gradient(90deg,#cc2200,#ff5522)':'linear-gradient(90deg,#1155ff,#33aaff)';
@@ -14623,11 +14701,15 @@ function updateHUD(){
     }
   }
   const spdBar=document.getElementById('speed-bar'),spdFill=document.getElementById('speed-fill');
-  if(spdBar&&spdFill&&playerShip.maxSpeed>0){
-    const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
-    spdBar.style.display='block';
-    spdFill.style.width=Math.round(sp*100)+'%';
-    spdFill.style.background=sp>.92?'linear-gradient(90deg,#ff6600,#ffcc33)':'linear-gradient(90deg,#2244aa,#55ccff)';
+  if(spdBar&&spdFill){
+    if(flyHud&&playerShip.maxSpeed>0){
+      const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
+      spdBar.style.display='block';
+      spdFill.style.width=Math.round(sp*100)+'%';
+      spdFill.style.background=sp>.92?'linear-gradient(90deg,#ff6600,#ffcc33)':'linear-gradient(90deg,#2244aa,#55ccff)';
+    }else{
+      spdBar.style.display='none';
+    }
   }
   document.getElementById('cval').textContent=fmt(PS.credits);
   const cc=cargoCnt();document.getElementById('sval').textContent=cc>0?'Stiva: '+cc+'/'+PS.cargoMax:'Stiva vuota';

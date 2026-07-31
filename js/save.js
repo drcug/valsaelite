@@ -231,6 +231,9 @@
         document.getElementById('radar').style.display='none';
         document.getElementById('mtick').style.display='none';
         document.body.classList.add('docked-ui');
+        document.body.classList.remove('landing-active');
+        const thr=document.getElementById('throttle-rail');
+        if(thr)thr.style.display='none';
         if(g.dockActiveTab)global.GAME.dockActiveTab=g.dockActiveTab;
         if(typeof global.buildDock==='function')global.buildDock(st);
       }
@@ -239,7 +242,7 @@
       global.GAME.dockedSt=null;
       global.setPausedReason('docked',false);
       ship.mesh.visible=true;
-      document.body.classList.remove('docked-ui','story-open','menu-open');
+      document.body.classList.remove('docked-ui','landing-active','story-open','menu-open');
       document.getElementById('dkscr').style.display='none';
       document.getElementById('hud').style.display='flex';
       document.getElementById('radar').style.display='block';

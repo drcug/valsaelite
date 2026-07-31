@@ -51,7 +51,9 @@ body.story-open #dkscr{pointer-events:none;}
   #dlg{bottom:max(160px,27vh)!important;z-index:30!important;max-height:min(26vh,200px)!important;}
   #notif{bottom:max(152px,25vh)!important;z-index:28!important;max-width:min(92vw,380px)!important;}
   #smsg{bottom:max(195px,31vh)!important;z-index:29!important;}
-  #mtick{top:max(8px,env(safe-area-inset-top))!important;left:max(6px,env(safe-area-inset-left))!important;transform:none!important;max-width:min(40vw,170px)!important;}
+  #mtick{top:max(128px,calc(env(safe-area-inset-top) + 116px))!important;left:max(6px,env(safe-area-inset-left))!important;transform:none!important;max-width:min(42vw,200px)!important;}
+  #story-obj{top:max(158px,calc(env(safe-area-inset-top) + 146px))!important;max-width:min(44vw,220px)!important;}
+  #rep-panel{z-index:15;}
   /* Extra bottom inset so controls sit above home indicator, not under chrome */
   #hud{padding-bottom:max(14px,env(safe-area-inset-bottom))!important;}
 }
@@ -72,11 +74,19 @@ body.story-open #dkscr{pointer-events:none;}
   #boarding-prompt{bottom:88px;}
   #dlg{bottom:86px;}
 }
+#rep-panel.rp{
+  background:linear-gradient(165deg,rgba(6,22,30,.94),rgba(3,12,18,.96));
+  border:1px solid rgba(70,180,160,.35);
+  box-shadow:inset 0 0 0 1px rgba(196,137,58,.12),0 8px 24px rgba(0,0,0,.4);
+  border-radius:4px;
+}
 .rp.collapsed{
   background:linear-gradient(165deg,rgba(6,22,30,.88),rgba(3,12,18,.9));
 }
 .rp .rp-toggle{color:#6a9a90!important;}
 .rp .rp-toggle:hover{color:var(--bright)!important;}
+body.docked-ui #throttle-rail,
+body.landing-active #throttle-rail{display:none!important;}
 
 
 /* Touch / coarse / narrow: full mobile controls including SX/DX */
