@@ -188,9 +188,9 @@ EST. SAVIGNO — ATMOSFERA
 Isolamento scelto. Freddo cosmico. Odore di tartufo che vale più del carburante.
 
 RADIO — SAVIGNO  
-«Il sigillo non ha prezzo in crediti. Ha prezzo in tartufo — e in quanto ricordi ancora il sapore di casa. Tre chili: non è ricatto, è tradizione.»
+«I vault della cintura non si chiudono da soli. Anomalie e macguffinium li fanno respirare. Serve un sigillo esterno — il tuo codice di volo — così nessuno finge un’ispezione. Poi tre chili di tartufo: non è ricatto, è tradizione.»
 
-Zvan scende in **suborbita**. Ispeziona i depositi. Il pianeta gli passa vicino come un ricordo.
+Zvan scende in **suborbita**. Tre depositi, tre sigilli. Il pianeta gli passa vicino come un ricordo che ha deciso di restare chiuso.
 
 Poi la consegna: tre chili. Il Consiglio assaggia. Zvan è entrato nella loro bocca — e nella loro fiducia.
 

@@ -787,6 +787,26 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 #suborbit-ui .sbtn{pointer-events:auto;width:64px;height:64px;border-radius:50%;border:1px solid rgba(90,170,240,.5);background:rgba(6,24,56,.85);color:#d8eeff;font:700 10px var(--FD);letter-spacing:.08em}
 #suborbit-ui .sbtn.sbtn-thrust{width:76px;height:76px;font-size:11px;border-color:rgba(100,255,170,.55);background:rgba(8,42,28,.9);box-shadow:0 0 18px rgba(40,200,120,.25)}
 #suborbit-ui .sbtn.fire{border-color:rgba(255,120,80,.55);background:rgba(62,14,18,.85)}
+#suborbit-ui .sbtn.sbtn-seal{
+  width:min(168px,46vw);height:58px;border-radius:12px;font-size:12px;letter-spacing:.12em;
+  border-color:rgba(90,220,200,.4);background:rgba(8,36,40,.88);color:#9ec8c0;opacity:.55;
+}
+#suborbit-ui .sbtn.sbtn-seal.ready{
+  opacity:1;border-color:rgba(120,255,210,.85);background:rgba(10,70,58,.95);color:#e8fff6;
+  box-shadow:0 0 22px rgba(60,220,180,.4);animation:suborbitPulse .9s ease-in-out infinite alternate;
+}
+#suborbit-ui .sbtn.sbtn-seal:disabled{pointer-events:none;cursor:default}
+#suborbit-seal-fab{
+  display:none;position:fixed;left:50%;bottom:max(168px,28vh);transform:translateX(-50%);
+  z-index:6210;pointer-events:auto;min-width:min(280px,78vw);padding:12px 18px;border-radius:10px;
+  border:1px solid rgba(120,255,200,.55);background:rgba(0,48,40,.92);color:#e8fff8;
+  font:700 13px var(--FD);letter-spacing:.14em;cursor:pointer;text-align:center;
+  box-shadow:0 0 24px rgba(40,180,140,.35);animation:suborbitPulse .9s ease-in-out infinite alternate;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+body.suborbit-active #suborbit-seal-fab.show{display:block}
+body:not(.suborbit-active) #suborbit-seal-fab{display:none!important}
+#suborbit-seal-fab .fab-sub{display:block;font:9px var(--FM);letter-spacing:.08em;color:#9ad0c8;margin-top:4px;font-weight:400}
 body.suborbit-active #suborbit{display:block !important;opacity:1 !important;z-index:6000 !important}
 body.suborbit-active #suborbit-hud{display:block !important;z-index:6100 !important;top:max(72px,env(safe-area-inset-top));bottom:auto;max-width:min(96vw,460px);text-align:center;line-height:1.45}
 body.suborbit-active #suborbit-ui{display:block !important}
@@ -1278,6 +1298,7 @@ body.suborbit-active #smsg{
 <div id="suborbit-ui">
   <div class="srow">
     <button type="button" id="sob-exit" class="sbtn sbtn-exit" aria-label="Esci dal volo suborbitale">ESCI</button>
+    <button type="button" id="sob-seal" class="sbtn sbtn-seal" disabled aria-label="Sigilla deposito">SIGILLA</button>
     <button type="button" id="sob-fire" class="sbtn fire">FUOCO</button>
   </div>
   <div class="srow">
@@ -1290,6 +1311,7 @@ body.suborbit-active #smsg{
     <button type="button" id="sob-down" class="sbtn">GIU</button>
   </div>
 </div>
+<button type="button" id="suborbit-seal-fab" aria-label="Sigilla il deposito vicino">SIGILLA DEPOSITO<span class="fab-sub">tocca o premi E</span></button>
 
 
 <!-- ─ Blueprint Modal ─ -->
@@ -1415,7 +1437,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · vista zoomata che segue Zvan · nave = pezzi blueprint · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario (checklist) · obiettivo fisso in alto a sinistra · mappa/radar: ★ destinazione · tab Missioni: badge STORIA</span></div>
-    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault luminosi da sigillare con <kbd>E</kbd> (3 sigilli). <kbd>WASD</kbd> · <kbd>F</kbd> trazione · <kbd>ESC</kbd> rientro in stazione. Cap.4 si sblocca solo col Circuito completo. Non confondere con le corsie commerciali nello spazio.</span></div>
+    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault con anello ciano. Avvicinati e tocca <kbd>SIGILLA</kbd> (o <kbd>E</kbd>). Tre sigilli chiudono Cap.4. WASD · F trazione · ESC stazione. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
@@ -1910,10 +1932,10 @@ const STORY = {
     },
     {
       num:4, title:'Il Terzo Sigillo',
-      intro:'Savigno custodisce il terzo frammento e non accetta promesse. Prima devi scendere in suborbita e sigillare i tre vault del Circuito Depositi. Il Consiglio vuole vedere se sai ancora sporcarti le mani. Poi pretenderà tre chili di tartufi, perché la dignità ha un prezzo fisso: 420 crediti al chilo.',
+      intro:'Savigno custodisce il terzo frammento e non si fida delle parole. Il Circuito Depositi — tre vault della cintura tartufera — ha bisogno di un sigillo esterno: le anomalie e il macguffinium fanno «respirare» i depositi, e il Consiglio rifiuta di chiuderli da solo (troppo facile fingere, troppo facile far entrare Imperium «per ispezione»). Tu scendi, richiudi i tre siti con il tuo codice di volo, e solo allora ti chiedono tre chili di tartufi: non è ricatto, è la prova che hai ancora gusto per questa casa.',
       mission:{id:'story_4', type:'delivery', sid:'savigno', targetSid:'savigno',
         title:'[STORIA] Il Prezzo del Sigillo',
-        desc:'Completa il CIRCUITO DEPOSITI in suborbita (3 sigilli con E, preferibilmente su Savigno). Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
+        desc:'Completa il CIRCUITO DEPOSITI in suborbita (3 vault: pulsante SIGILLA o E). Poi consegna 3 kg di Tartufi Spaziali al Consiglio.',
         reward:600, repGain:{savigno:25}, cargo:{type:'tartufi',qty:3}, requireSuborbit:true, done:false, active:false},
     },
     {
@@ -1955,7 +1977,7 @@ const STORY_LINES={
   story_1:'[CONSIGLIO DI BAZZANO] «A Crespellano chiedi dell\'ala chiusa. Se ti dicono che non esiste, sei nel posto giusto. Porta le credenziali e abbi pazienza.»',
   story_2:'[LIA MARÌA] «A Calcara controlla il timbro prima e dopo. Non perché siano ladri: perché per loro una copia ben fatta è un\'opinione.»',
   story_3:'[ROCCA DI MONTEVEGLIO] «Il Castellano vuole tre navi di Calcara fuori combattimento. Dice che è una prova d\'onore. Io ti consiglio di non discuterne mentre impugna la spada.»',
-  story_4:'[CONSIGLIO DI SAVIGNO] «Prima i tre sigilli del Circuito Depositi. Poi tre chili di tartufi. Quattrocentoventi al chilo. Sì, anche per chi salva il sistema.»',
+  story_4:'[CONSIGLIO DI SAVIGNO] «I vault della cintura non si chiudono da soli: anomalia e macguffinium li fanno «respirare». Serve un sigillo esterno — il tuo. Tre siti. Poi tre chili di tartufi. Quattrocentoventi al chilo. Anche per chi salva il sistema.»',
   story_5:'[BAZZANO PRIME] «I frammenti combaciano. Riportali al Mulino e non fermarti a Calcara, qualunque “controllo gratuito” ti offrano.»',
   story_6:'[IMPERIUM] «Recuperi i documenti dallo hulk e li consegni a Castelletto. Ufficialmente questa comunicazione riguarda manutenzione ordinaria.»',
   story_7:'[CASTELLETTO] «Tre navi pirata sull\'anello esterno. Toglile di mezzo. Non sappiamo chi le paga, ma sappiamo che al bar non hanno lasciato mancia.»',
@@ -2318,7 +2340,7 @@ function renderDiaryContent(){
       if(m.requireSuborbit&&!done)extra+=` <em style="color:#88ccaa">Richiede Circuito Depositi completo (3 sigilli con E). Dalla stazione: VOLO SUBORBITALE.</em>`;
       if(m.requireHulk&&!done)extra+=` <em style="color:#ffb080">Richiede abbordaggio SPACE HULK.</em>`;
       if(m.id==='story_4'&&m.cargo.type==='tartufi'&&!done){
-        extra+=` <em style="color:#88ccaa">Tracker: sigilla 3 depositi in suborbita. I tartufi della consegna arrivano all'accettazione.</em>`;
+        extra+=` <em style="color:#88ccaa">Tracker: sigilla 3 depositi in suborbita (SIGILLA o E). I tartufi della consegna arrivano all'accettazione.</em>`;
       }
       if(m.id==='story_8'&&m.cargo.type==='piadine'&&!done){
         extra+=` <em style="color:#88ccaa">Le piadine vengono fornite all'accettazione.</em>`;
@@ -5528,10 +5550,10 @@ function showTutorialOnce(lsKey,title,htmlBody){
   return true;
 }
 function tryShowTutorialSuborbit(){
-  return showTutorialOnce('valsaelite_tut_suborbit_v4','Circuito Depositi · suborbita',
-    '<p>Obiettivo: <strong>sigillare 3 depositi</strong> (vault con anello ciano). È l\'unico modo per sbloccare Cap.4 / «Il Prezzo del Sigillo».</p>'
-    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione · <strong>E</strong> sigilla · <strong>ESC</strong> rientro in stazione.</p>'
-    +'<p>I tre vault sono nella prima metà della rotta. Completata la rotta o i sigilli, rientri automaticamente in stazione.</p>'
+  return showTutorialOnce('valsaelite_tut_suborbit_v5','Circuito Depositi · suborbita',
+    '<p><strong>Perché sei qui:</strong> i tre vault del Circuito tengono stabile la cintura (tartufi, magazzini, e quel metallo che puzza di hulk). Savigno vuole un sigillo <em>esterno</em> — il tuo codice di volo — così nessuno può fingere di aver chiuso i depositi «per ispezione».</p>'
+    +'<p><strong>Come si fa:</strong> avvicinati ai vault con anello ciano, poi tocca <strong>SIGILLA</strong> (o premi <kbd>E</kbd>). Ne servono 3 per sbloccare Cap.4 / «Il Prezzo del Sigillo».</p>'
+    +'<p><strong>WASD</strong> quota/corsia · <strong>Spazio</strong> fuoco · <strong>F</strong> trazione · <strong>ESC</strong> rientro. I vault sono nella prima metà della rotta.</p>'
     +'<p style="opacity:.85;margin-top:8px;font-size:11px">Nemici: rosso Charger · ciano Strafer · viola Swarm. I detriti costano energia, non scafo.</p>');
 }
 function tryShowTutorialBlueprint(){
@@ -7020,6 +7042,19 @@ const FLY_STEER={active:false,nx:0};
 const _repToggle=document.getElementById('rep-toggle');
 if(_repToggle)_repToggle.addEventListener('click',(e)=>{e.preventDefault();toggleRepPanel();});
 touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');touch('sob-down','boost');touch('sob-fire','fire');touch('sob-tr','tractor');
+(function setupSuborbitSealBtn(){
+  const sealNow=e=>{
+    if(e){e.preventDefault();e.stopPropagation();}
+    if(!(typeof SUBORBIT!=='undefined'&&SUBORBIT.active&&GAME.state==='suborbit'))return;
+    if(typeof trySuborbitInteract==='function')trySuborbitInteract();
+  };
+  ['sob-seal','suborbit-seal-fab'].forEach(id=>{
+    const b=document.getElementById(id);
+    if(!b)return;
+    b.addEventListener('click',sealNow);
+    b.addEventListener('touchend',sealNow,{passive:false});
+  });
+})();
 (function setupSuborbitExitBtn(){
   const b=document.getElementById('sob-exit');
   if(!b)return;
@@ -7152,13 +7187,14 @@ function requestSuborbit(){
   const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
   const isSav=sm.sd.id==='savigno'||sm.sd.faction==='savigno';
   let body='Scendi nell\'atmosfera di '+name+': Circuito Depositi.\n\n'
-    +'WASD quota/corsia · Spazio fuoco · F trazione · E sigilla i vault · ESC esci.\n'
-    +'Obiettivo: sigilla 3 depositi (nella prima metà della rotta).';
+    +'I vault tengono stabile la cintura (merce e anomalie). Sigilla 3 siti col pulsante SIGILLA o E.\n\n'
+    +'WASD quota/corsia · Spazio fuoco · F trazione · ESC esci.';
   if(needsStory){
     body=(isSav
-      ?'Savigno vuole una prova: sigilla i tre depositi tartuferi del Circuito.\n\n'
+      ?'Il Consiglio di Savigno non chiude i depositi da solo: vuole un sigillo esterno (il tuo) contro frodi e «ispezioni» imperiali.\n\n'
+        +'Sigilla i tre vault della cintura tartufera. Poi torneranno i tartufi — e il frammento.\n\n'
       :'Per il Capitolo 4 serve il Circuito Depositi (3 sigilli). Su Savigno ha più senso, ma vale anche qui.\n\n')
-      +'WASD · Spazio · F trazione · E sigillo · ESC stazione.\nPoi potrai accettare «Il Prezzo del Sigillo».';
+      +'WASD · Spazio · F · SIGILLA/E · ESC stazione.';
   }
   uiConfirm({
     title:needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE',
@@ -7672,7 +7708,7 @@ function buildDlgChoices(ns){
       crespellano:()=>'Cerca negli scaffali classificati male. La chiave ce l\'ha Lia, ma non dirle che te l\'ho detto: le piace vedervi fare la fila.',
       calcara:()=>'Calcara può autenticare i frammenti. Non vuol dire che poi li restituisca senza fare una copia.',
       monteveglio:()=>'Il Castellano riconosce soltanto prove ottenute in battaglia. È poco pratico, ma molto coerente.',
-      savigno:()=>'Il terzo frammento è qui. Il Consiglio non lo cede finché non sistemi i depositi. Le chiacchiere, per loro, non sigillano niente.',
+      savigno:()=>'Il terzo frammento resta chiuso finché i vault del Circuito non hanno un sigillo esterno. Noi non lo facciamo: troppo facile fingere. Tu scendi, chiudi tre siti, poi parliamo di tartufi.',
       pirate:()=>'So chi compra copie del Patto. Ma le informazioni sono merce e tu, per ora, sei soltanto curioso.'
     };
     const fn=bits[faction];
@@ -8242,7 +8278,8 @@ function setupSuborbitDeposits(sm){
     const dep={
       id:'dep_'+i,
       name:names[i%names.length],
-      wx:(i%2===0?-1:1)*(180+i*70),
+      // Vicini alla corsia centrale: SX / DX / SX leggero
+      wx:(i===1?1:-1)*(55+i*48),
       wz:Math.round(goal*t),
       sealed:false,
       mesh:null
@@ -8300,8 +8337,8 @@ function updateSuborbitDeposits(){
     const dx=dep.wx-SUBORBIT.x;
     const ddz=dep.wz-(SUBORBIT.offset+40);
     const d2=dx*dx+ddz*ddz;
-    // Raggio generoso: avvicinati e premi E
-    if(d2<nearD&&d2<380*380&&Math.abs(SUBORBIT.y-ground)<160){
+    // Raggio generoso: basta passare vicino al vault (corsia + quota)
+    if(d2<nearD&&d2<560*560&&Math.abs(SUBORBIT.y-ground)<240){
       nearD=d2;SUBORBIT.nearDeposit=dep;
     }
   }
@@ -9788,12 +9825,16 @@ function enterSuborbit(sm){
   updateSuborbitTerrainVisual();
   GAME.state='suborbit';
   document.body.classList.add('suborbit-active');
-  notify('Circuito Depositi · '+sm.sd.name+' — sigilla '+SUBORBIT.depositsNeed+' siti con E.');
+  notify('Circuito Depositi · '+sm.sd.name+' — 3 vault da sigillare (pulsante SIGILLA o E).');
   suborbitTelemetry('enter',{planet:sm.sd.id,pType:sm.sd.pType,story:!!SUBORBIT.storyInspect});
   setTimeout(()=>tryShowTutorialSuborbit(),420);
 }
 function leaveSuborbit(opts){
   opts=opts||{};
+  const sealFabLeave=document.getElementById('suborbit-seal-fab');
+  if(sealFabLeave)sealFabLeave.classList.remove('show');
+  const sealBtnLeave=document.getElementById('sob-seal');
+  if(sealBtnLeave){sealBtnLeave.disabled=true;sealBtnLeave.classList.remove('ready');}
   const sum=suborbitSnapshotSummary(opts);
   const wasDone=typeof StorySys!=='undefined'&&StorySys.flags&&!!StorySys.flags.suborbitDone;
   // Gate Cap.4 / Prezzo del Sigillo: solo Circuito Depositi completo (non ≥55%, non morte)
@@ -10097,8 +10138,8 @@ function updatePlanetSkim(dt){
       const depPct=depNeed?Math.min(100,(depSeal/depNeed)*100):0;
       const depBarCol=depDone?'#66ffaa':'#7ee8ff';
       const depPrompt=nearDep
-        ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 4px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">E · SIGILLA · ${(nearDep.name+'').toUpperCase()}</div>`
-        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 2px;letter-spacing:.06em">Prossimo · ${nextOpen.name}</div>`:'');
+        ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 4px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">DEPOSITO IN RAGGIO · ${(nearDep.name+'').toUpperCase()} · SIGILLA / E</div>`
+        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 2px;letter-spacing:.06em">Prossimo · ${nextOpen.name} · sterza verso l'anello ciano</div>`:'');
       const objRow=`<div style="margin:4px auto 6px;max-width:min(92vw,380px);text-align:left">`
         +`<div style="font:10px var(--FM);color:${depBarCol};letter-spacing:.08em;margin-bottom:3px">`
         +(depDone?'CIRCUITO OK · ':'SIGILLI · ')
@@ -10113,7 +10154,7 @@ function updatePlanetSkim(dt){
       const guideFade=showGuide?Math.max(0,Math.min(1,(7.2-SUBORBIT.time)/1.4)):0;
       const introRow=showGuide
         ?`<div style="font:10px var(--FD);letter-spacing:.14em;color:#e8fbff;margin:0 0 6px;text-align:center;border:1px solid rgba(120,200,255,.35);border-radius:8px;padding:6px 10px;background:rgba(0,24,54,.55);opacity:${guideFade.toFixed(2)}">${
-            'SIGILLA 3 DEPOSITI · E vicino ai vault · '+(sm.sd.name+'').toUpperCase()
+            'SIGILLA 3 DEPOSITI · pulsante SIGILLA o E · '+(sm.sd.name+'').toUpperCase()
           }</div>`
         :'';
       const tipRow=(showGuide&&SUBORBIT.loadingTip)
@@ -10130,12 +10171,29 @@ function updatePlanetSkim(dt){
         +`${exitRow}`
         +`${objRow}`
         +`${soRow}`
-        +(showGuide?`<div style="opacity:.85;margin:2px 0 4px;letter-spacing:.05em;color:#b8d8ff;font-size:8px;opacity:${guideFade.toFixed(2)}">WASD · Spazio fuoco · F trazione · E sigillo · ESC stazione</div>`:'')
+        +(showGuide?`<div style="opacity:.85;margin:2px 0 4px;letter-spacing:.05em;color:#b8d8ff;font-size:8px;opacity:${guideFade.toFixed(2)}">WASD · Spazio fuoco · F trazione · SIGILLA/E · ESC stazione</div>`:'')
         +`<div style="font:9px var(--FM);letter-spacing:.04em;margin-top:2px">`
         +`<span style="${altWarn}">ALT ${altAbove}m</span> · `
         +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span>`
         +((SUBORBIT.spreadShotT||0)>0?` · <span style="color:#8fdfff">RAFFICA ${(SUBORBIT.spreadShotT).toFixed(1)}s</span>`:'')
         +`</div>`;
+      // Sync pulsanti sigillo (HUD non cliccabile: i controlli sono fuori)
+      const sealBtn=document.getElementById('sob-seal');
+      const sealFab=document.getElementById('suborbit-seal-fab');
+      if(sealBtn){
+        sealBtn.disabled=!nearDep;
+        sealBtn.classList.toggle('ready',!!nearDep);
+        sealBtn.textContent=nearDep?'SIGILLA':'SIGILLA';
+        sealBtn.title=nearDep?('Sigilla '+nearDep.name):'Avvicinati a un deposito (anello ciano)';
+      }
+      if(sealFab){
+        if(nearDep){
+          sealFab.classList.add('show');
+          sealFab.innerHTML='SIGILLA · '+(nearDep.name+'').toUpperCase()+'<span class="fab-sub">tocca qui oppure premi E</span>';
+        }else{
+          sealFab.classList.remove('show');
+        }
+      }
     }
     if(playerShip.health<28&&!SUBORBIT._lowHpPip){SUBORBIT._lowHpPip=true;playTone(280,.07,.05,'triangle');notify('Integrità scafo critica in corridoio.',1400);}
     suborbitUpdateScreenFx(dt);
@@ -12839,8 +12897,8 @@ function buildDock(st){
       const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
       subBtn.textContent=needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE';
       subBtn.title=needsStory
-        ?'Sigilla 3 depositi (E). Serve per Il Prezzo del Sigillo.'
-        :'Circuito Depositi: 3 vault da sigillare, poi rientro in stazione.';
+        ?'Sigilla 3 depositi (pulsante SIGILLA o E). Serve per Il Prezzo del Sigillo.'
+        :'Circuito Depositi: 3 vault da sigillare (SIGILLA/E), poi rientro in stazione.';
       subBtn.style.borderColor=needsStory?'rgba(120,220,160,.55)':'';
       subBtn.style.boxShadow=needsStory?'0 0 12px rgba(80,180,120,.25)':'none';
       if(needsStory&&typeof StoryGuide!=='undefined'){

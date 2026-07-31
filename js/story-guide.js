@@ -10,7 +10,7 @@
     circuit: {
       id: 'azione_circuito',
       title: 'Il Circuito ha parlato',
-      body: 'Il terzo sigillo scatta e il deposito torna stabile. Dal Consiglio arriva un messaggio di due parole: «Può bastare.» Da Savigno è quasi entusiasmo. Ora puoi chiedere il frammento; prima, però, asciugati le mani.'
+      body: 'Il terzo sigillo scatta e i vault tornano mutevoli solo sulla carta. Dal Consiglio: «Può bastare.» Hanno un registro con il tuo codice di volo e, per oggi, Imperium non ha scuse per «ispezionare» la cintura. Ora puoi chiedere il frammento; prima, però, i tartufi — e asciugati le mani.'
     },
     hulk: {
       id: 'azione_hulk',
@@ -320,7 +320,7 @@
     noteCap4Enter();
     const obj = getObjective();
     if (obj.kind === 'circuit') {
-      radio('A Savigno serve il Circuito Depositi: entra in VOLO SUBORBITALE e sigilla i tre vault.', false);
+      radio('A Savigno i vault del Circuito vogliono un sigillo esterno (il tuo). VOLO SUBORBITALE → avvicinati all\'anello ciano → SIGILLA.', false);
     } else if (obj.kind === 'accept' && st && st.sd && obj.sid === st.sd.id) {
       radio('La missione di trama è disponibile qui, nella tab Missioni.', false);
     } else if (obj.kind === 'mission' && st && st.sd && (obj.sid === st.sd.id)) {
