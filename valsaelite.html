@@ -778,6 +778,41 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 /* Speed bar + optional screen shake (set by JS) */
 #speed-bar{position:fixed;bottom:118px;left:50%;transform:translateX(-50%);width:min(200px,42vw);height:4px;background:rgba(0,0,0,.35);border-radius:3px;overflow:hidden;z-index:12;pointer-events:none;display:none;border:1px solid rgba(44,100,190,.25)}
 #speed-fill{height:100%;width:0%;background:linear-gradient(90deg,#2244aa,#55ccff);transition:width .12s ease-out}
+#speed-val{position:fixed;bottom:126px;left:50%;transform:translateX(-50%);z-index:12;pointer-events:none;display:none;
+  font:700 9px var(--FM);letter-spacing:.1em;color:#88ccff;text-shadow:0 1px 3px #000}
+#fly-vignette{display:none;position:fixed;inset:0;z-index:7;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 38%,rgba(160,30,20,.48) 100%);transition:opacity .15s}
+body.flying-ui #fly-vignette{display:block}
+body.fly-hud-min #hud .crew-lb,body.fly-hud-min #hud .cr-info,body.fly-hud-min #hud .cb-row-extra,
+body.fly-hud-min #mtick,body.fly-hud-min #story-obj,body.fly-hud-min #tgt-panel{display:none!important}
+body.fly-hud-min #hud .ht .hp .lb{font-size:7px}
+body.fly-hud-min #hud .ht .hp{padding:5px 8px}
+#flight-joy-wrap{display:none;position:fixed;left:max(10px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:18;pointer-events:none}
+#flight-fire-wrap{display:none;position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:18;pointer-events:none}
+#flight-more-btn{display:none;pointer-events:auto;position:fixed;right:max(10px,env(safe-area-inset-right));
+  bottom:max(88px,calc(env(safe-area-inset-bottom)+76px));z-index:18;width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(90,160,220,.45);background:rgba(6,18,40,.9);color:#9ec8e8;font:700 14px var(--FD)}
+body.flight-more-open #flight-more-row{display:flex!important}
+#flight-more-row{display:none;position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(148px,calc(env(safe-area-inset-bottom)+136px));
+  z-index:18;flex-direction:column;gap:6px;pointer-events:none}
+#bp-canvas-wrap{display:inline-block;transform-origin:center center;transition:transform .06s ease-out}
+#bp-fab-place,#bp-fab-erase,#bp-fab-grid{display:none;position:fixed;z-index:85;pointer-events:auto;padding:10px 14px;border-radius:10px;
+  font:700 10px var(--FD);letter-spacing:.1em;border:1px solid rgba(90,170,240,.5);background:rgba(6,20,48,.92);color:#d0ecff}
+#bp-fab-place{left:max(10px,env(safe-area-inset-left));bottom:max(72px,calc(env(safe-area-inset-bottom)+64px))}
+#bp-fab-erase{right:max(10px,env(safe-area-inset-right));bottom:max(72px,calc(env(safe-area-inset-bottom)+64px);border-color:rgba(255,140,100,.55);color:#ffd0c0}
+#bp-fab-grid{left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));font-size:9px}
+body.bp-grid-only #bp-panel{display:none!important}
+body.bp-grid-only #bp-wrap{max-height:none}
+#blueprint-modal.show #bp-fab-place,#blueprint-modal.show #bp-fab-erase,#blueprint-modal.show #bp-fab-grid{display:block}
+@media(pointer:coarse),(max-width:700px){
+  body.flying-ui #flight-joy-wrap,body.flying-ui #flight-fire-wrap,body.flying-ui #flight-more-btn{display:block}
+  body.flying-ui #hud .flight-primary .cb.fi{display:none}
+  body.flying-ui #flight-joy-wrap,body.flying-ui #flight-fire-wrap{transform:scale(var(--fly-ui-scale,1));transform-origin:bottom}
+  body.flying-ui #flight-fire-wrap{transform-origin:bottom right}
+  body.flying-ui #flight-joy-wrap{transform-origin:bottom left}
+  #bp-fab-place,#bp-fab-erase,#bp-fab-grid{display:none}
+  #blueprint-modal.show #bp-fab-place,#blueprint-modal.show #bp-fab-erase,#blueprint-modal.show #bp-fab-grid{display:block}
+}
 #cv.shake{animation:cvshake .28s ease-out}
 @keyframes cvshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}}
 @media(max-width:700px){
@@ -825,6 +860,7 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
   #heat-bar{bottom:max(125px,19vh);width:min(100px,30vw)}
   #heat-lbl{bottom:max(134px,20vh);font-size:8px}
   #speed-bar{bottom:max(108px,16vh);width:min(160px,50vw)}
+  #speed-val{bottom:max(116px,17vh);font-size:8px}
 }
 
 #skim-lbl{position:fixed;top:118px;left:50%;transform:translateX(-50%);font-family:var(--FM);font-size:10px;color:#88eeff;letter-spacing:.15em;z-index:13;pointer-events:none;display:none;text-shadow:0 0 12px rgba(0,180,255,.5)}
@@ -1298,6 +1334,21 @@ body.suborbit-active #smsg{
 <div id="heat-lbl">SURRISCALDAMENTO</div>
 <div id="heat-bar"><div id="heat-fill" style="width:0%"></div></div>
 <div id="speed-bar"><div id="speed-fill"></div></div>
+<div id="speed-val" aria-hidden="true">0.0 km/s</div>
+<div id="fly-vignette" aria-hidden="true"></div>
+<div id="flight-joy-wrap" aria-hidden="true">
+  <div class="mg-joy-base" id="flight-joy-base"><div class="mg-joy-knob" id="flight-joy-knob"></div></div>
+  <span class="mg-joy-lbl">VIRATA</span>
+</div>
+<div id="flight-fire-wrap" aria-hidden="true">
+  <button type="button" class="btouch-fire-lg" id="flight-fire-mob" aria-label="Fuoco">FUOCO</button>
+</div>
+<button type="button" id="flight-more-btn" aria-label="Altri comandi volo" title="Comandi extra">⋯</button>
+<div id="flight-more-row" aria-hidden="true">
+  <button type="button" id="flight-more-map" class="cb" style="pointer-events:auto;width:52px;height:52px;font-size:8px" title="Mappa">MAPPA</button>
+  <button type="button" id="flight-more-miss" class="cb" style="pointer-events:auto;width:52px;height:52px;font-size:8px" title="Missile">MSL</button>
+  <button type="button" id="flight-more-tgt" class="cb" style="pointer-events:auto;width:52px;height:52px;font-size:8px" title="Mira">MIRA</button>
+</div>
 <div id="skim-lbl">SORVOLO</div>
 <div id="skim-bar"><div id="skim-fill"></div></div>
 <div id="suborbit"><canvas id="suborbit-cv"></canvas></div>
@@ -1397,7 +1448,7 @@ body.suborbit-active #smsg{
   <div id="bp-sticky-sel" aria-live="polite"></div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
-      <canvas id="bp-cv"></canvas>
+      <div id="bp-canvas-wrap"><canvas id="bp-cv"></canvas></div>
       <div id="bp-mode-row">
         <button type="button" class="bp-tool mode-on" data-bp-mode="place" id="bp-mode-place" title="Piazza moduli (1–9 palette)">PIAZZA</button>
         <button type="button" class="bp-tool" data-bp-mode="erase" id="bp-mode-erase" title="Gomma: tocca per rimuovere (E)">GOMMA</button>
@@ -1448,7 +1499,10 @@ body.suborbit-active #smsg{
     <button type="button" id="bp-discard" onclick="discardBlueprintChanges()">ANNULLA MODIFICHE</button>
     <button type="button" id="bp-close" onclick="closeBlueprintModal()">CONFERMA E COSTRUISCI</button>
   </div>
-  <div id="bp-keys-hint">Esc = esci senza salvare · Z = undo · E = gomma · Q = deseleziona · 1–9 = palette</div>
+  <div id="bp-keys-hint">Esc = esci senza salvare · Z = undo · E = gomma · click destro = gomma · pinch/zoom · Q = deseleziona · 1–9 = palette</div>
+  <button type="button" id="bp-fab-place" aria-label="Modalità piazza">PIAZZA</button>
+  <button type="button" id="bp-fab-erase" aria-label="Modalità gomma">GOMMA</button>
+  <button type="button" id="bp-fab-grid" aria-label="Solo griglia">GRIGLIA</button>
 </div>
 <div id="diary-modal" aria-modal="true" role="dialog" aria-labelledby="diary-title">
   <div id="diary-inner">
@@ -1488,8 +1542,18 @@ body.suborbit-active #smsg{
       <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-vibe" checked> Vibrazione minigiochi</label>
       <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-mouse"> Suborbita: sterza col mouse (PC)</label>
       <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-autoaim"> Abbordaggio: auto-mira soft</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-fly-vibe" checked> Vibrazione volo</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-fly-mouse"> Volo: sterza col mouse (PC)</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-fly-boost" checked> Conferma SPINTA se calore &gt; 85%</label>
       <label class="mm-opt">Scala UI minigiochi
         <select id="mm-opt-mg-scale" style="margin-left:8px;font:inherit">
+          <option value="0.9">90%</option>
+          <option value="1" selected>100%</option>
+          <option value="1.1">110%</option>
+        </select>
+      </label>
+      <label class="mm-opt">Scala UI volo mobile
+        <select id="mm-opt-fly-scale" style="margin-left:8px;font:inherit">
           <option value="0.9">90%</option>
           <option value="1" selected>100%</option>
           <option value="1.1">110%</option>
@@ -1516,14 +1580,13 @@ body.suborbit-active #smsg{
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
     <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
-    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>manetta</kbd> su mobile · <kbd>A/D</kbd> virata · <kbd>S</kbd>/<kbd>Shift</kbd>/<kbd>B</kbd> o <kbd>SPINTA</kbd> · <kbd>Spazio</kbd>/<kbd>FUE</kbd> fuoco</span></div>
+    <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>manetta</kbd> · <kbd>A/D</kbd> o joystick mobile · <kbd>S</kbd>/<kbd>SPINTA</kbd> (conferma se calore alto) · <kbd>Spazio</kbd>/<kbd>FUOCO</kbd> · <kbd>H</kbd> HUD compatto · barra velocità + km/s</span></div>
+    <div class="help-grid"><span>Cantiere mobile</span><span>Pinch/zoom · FAB Piazza/Gomma · solo griglia · ghost verde/rosso · stats con delta</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Cantiere</span><span><kbd>Esc</kbd> annulla · <kbd>Z</kbd> undo · <kbd>E</kbd> gomma · <kbd>1–9</kbd> palette · <kbd>Q</kbd> deseleziona · Piazza/Gomma</span></div>
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
-    <div class="help-grid"><span>Abbordaggio</span><span><kbd>G</kbd> · vista zoomata che segue Zvan · nave = pezzi blueprint · hulk = mutazioni + O2 · <kbd>WASD</kbd> 8 dir · <kbd>Spazio</kbd> fuoco · <kbd>Esc</kbd> ritiro</span></div>
-    <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario (checklist) · obiettivo fisso in alto a sinistra · mappa/radar: ★ destinazione · tab Missioni: badge STORIA</span></div>
-    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault con anello ciano. Avvicinati e tocca <kbd>SIGILLA</kbd> (o <kbd>E</kbd>). Tre sigilli chiudono Cap.4. WASD · F trazione · ESC stazione. Non confondere con le corsie commerciali nello spazio.</span></div>
+    <div class="help-grid"><span>Abbordaggio</span><span><kbd>WASD</kbd> · <kbd>Spazio</kbd> fuoco · <kbd>Tab</kbd> bersaglio · joystick mobile · minimappa · <kbd>Esc</kbd> ritiro. Opzioni: vibrazione, auto-mira.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div id="help-lore-encyclopedia"></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
@@ -1546,6 +1609,7 @@ body.suborbit-active #smsg{
 <script src="js/story-guide.js"></script>
 <script src="js/imperial-lore.js"></script>
 <script src="js/minigame-polish.js"></script>
+<script src="js/flight-blueprint-polish.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/gameplay-polish.js"></script>
@@ -3397,11 +3461,11 @@ function drawBlueprint(){
     const placeOk=(typeof bpCanPlaceModule==='function')?bpCanPlaceModule(id,hr,hc).ok:true;
     ctx.save();
     ctx.globalAlpha=alpha==null?0.45:alpha;
-    ctx.fillStyle=placeOk?(m.color+'99'):'#ff442288';
+    ctx.fillStyle=placeOk?'rgba(72,255,168,.42)':'rgba(255,68,48,.38)';
     roundRect(ctx,gx,gy,gw,gh,4);ctx.fill();
-    ctx.globalAlpha=Math.min(0.95,(alpha==null?0.9:alpha+0.4));
-    ctx.strokeStyle=placeOk?'#a8e8ff':'#ff8866';
-    ctx.lineWidth=2;
+    ctx.globalAlpha=Math.min(0.98,(alpha==null?0.92:alpha+0.45));
+    ctx.strokeStyle=placeOk?'#5effb8':'#ff6644';
+    ctx.lineWidth=2.5;
     ctx.setLineDash([5,4]);
     roundRect(ctx,gx,gy,gw,gh,4);ctx.stroke();
     ctx.setLineDash([]);
@@ -3461,16 +3525,25 @@ function drawBlueprint(){
   // Update stats panel
   const stats=bpStats();
   const sp=document.getElementById('bp-stats-panel');
-  if(sp)sp.innerHTML=`
-    Vel. <span class="bp-stat-val">${stats.speed}</span> · Spinta <span class="bp-stat-val">${stats.thrust}</span><br>
-    Danno <span class="bp-stat-val">${stats.dmg}%</span> · Stiva <span class="bp-stat-val">${stats.cargoMax}</span><br>
-    Manegg. <span class="bp-stat-val">${stats.maneuver}%</span> · Scudo <span class="bp-stat-val">${stats.shieldHp}</span><br>
+  if(sp){
+    const fmtD=(cur,base,suf)=>{
+      suf=suf||'';
+      if(!base||cur===base)return String(cur)+suf;
+      const d=cur-base,sign=d>0?'+':'',col=d>0?'#66eeaa':(d<0?'#ff8866':'#88aacc');
+      return String(cur)+suf+' <span style="color:'+col+'">('+sign+d+suf+')</span>';
+    };
+    const base=(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish._baseline)?FlightBlueprintPolish._baseline:null;
+    sp.innerHTML=`
+    Vel. <span class="bp-stat-val">${fmtD(stats.speed,base&&base.speed)}</span> · Spinta <span class="bp-stat-val">${fmtD(stats.thrust,base&&base.thrust)}</span><br>
+    Danno <span class="bp-stat-val">${fmtD(stats.dmg,base&&base.dmg,'%')}</span> · Stiva <span class="bp-stat-val">${fmtD(stats.cargoMax,base&&base.cargoMax)}</span><br>
+    Manegg. <span class="bp-stat-val">${fmtD(stats.maneuver,base&&base.maneuver,'%')}</span> · Scudo <span class="bp-stat-val">${fmtD(stats.shieldHp,base&&base.shieldHp)}</span><br>
     Boost <span class="bp-stat-val" style="color:${stats.hasBoost?'#ff8844':'#446688'}">${stats.hasBoost?'Sì':'—'}</span>
     · Salvo <span class="bp-stat-val">${1+Math.min(4,Math.floor(Math.max(0,stats.weapons-1)/2))}</span><br>
     Rot. <span class="bp-stat-val">${(stats.turnMult*100).toFixed(0)}%</span>
     · Missili <span class="bp-stat-val">${stats.missilePods>0?(4+stats.missilePods*2):0}</span><br>
     Valore <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span> ₡
   `;
+  }
   drawBpSilhouette();
 }
 
@@ -3543,6 +3616,10 @@ function openBlueprintModal(){
   bpWarnCells=new Set();
   bpEditMode='place';
   bpSelected=null;
+  if(typeof FlightBlueprintPolish!=='undefined'){
+    FlightBlueprintPolish._baseline=bpStats();
+    FlightBlueprintPolish.resetBpView();
+  }
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
   syncBpModeUi();
@@ -6961,6 +7038,11 @@ window.addEventListener('keydown',e=>{
     notify(SUBORBIT.hudMinimal?'HUD minimo · H per dettagli':'HUD dettagliato · H per compatto',1400);
     return;
   }
+  if(GAME.state==='flying'&&!SUBORBIT.active&&e.code==='KeyH'&&!gameplayPaused()){
+    e.preventDefault();
+    if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.toggleFlyHudMinimal();
+    return;
+  }
   if(GAME.pausedReasons&&GAME.pausedReasons.diary&&e.code==='Escape'){
     e.preventDefault();closeDiary();return;
   }
@@ -7000,9 +7082,23 @@ window.addEventListener('keydown',e=>{
   if(e.code==='ArrowLeft'||e.code==='KeyA')INP.left=true;
   if(e.code==='ArrowRight'||e.code==='KeyD')INP.right=true;
   if(e.code==='ArrowUp'||e.code==='KeyW')INP.thrust=true;
-  if(e.code==='ArrowDown'||e.code==='KeyS')INP.boost=true;
+  if(e.code==='ArrowDown'||e.code==='KeyS'){
+    if(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish.shouldConfirmBoost()&&!INP.boost){
+      e.preventDefault();
+      FlightBlueprintPolish.requestBoost(()=>{INP.boost=true});
+      return;
+    }
+    INP.boost=true;
+  }
   if(e.code==='Space'){e.preventDefault();INP.fire=true;}
-  if(e.code==='ShiftLeft'||e.code==='ShiftRight'||e.code==='KeyB')INP.boost=true;
+  if(e.code==='ShiftLeft'||e.code==='ShiftRight'||e.code==='KeyB'){
+    if(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish.shouldConfirmBoost()&&!INP.boost){
+      e.preventDefault();
+      FlightBlueprintPolish.requestBoost(()=>{INP.boost=true});
+      return;
+    }
+    INP.boost=true;
+  }
   if(e.code==='KeyM')toggleMap();
   if(e.code==='KeyE')startLanding();
   if(e.code==='KeyP')openBlueprintModal();
@@ -7045,7 +7141,7 @@ function touch(id,act){
   b.addEventListener('mousedown',on);b.addEventListener('mouseup',off);b.addEventListener('mouseleave',off);
 }
 touch('btnl','left');touch('btnr','right');touch('btnth','thrust');touch('btnfi','fire');
-touch('btnboost','boost');
+// btnboost: gestito da FlightBlueprintPolish (conferma calore)
 /** Throttle analogico laterale (mobile): drag verticale 0–1. */
 const FLY_THROTTLE={v:0};
 (function initThrottleRail(){
@@ -7149,6 +7245,9 @@ const FLY_STEER={active:false,nx:0};
     if(typeof storyBannerOpen==='function'&&storyBannerOpen()){FLY_STEER.active=false;return;}
     if(GAME.pausedReasons&&Object.values(GAME.pausedReasons).some(Boolean)){FLY_STEER.active=false;return;}
     if(isUi(e.target)){FLY_STEER.active=false;return;}
+    if(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish.flySteerBlockedAt(e.clientX,e.clientY)){
+      FLY_STEER.active=false;return;
+    }
     const w=Math.max(1,window.innerWidth||1);
     const nx=(e.clientX/w)*2-1;
     FLY_STEER.active=true;
@@ -7231,6 +7330,7 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
 function clearInputState(){
   INP.left=false;INP.right=false;INP.thrust=false;INP.boost=false;INP.fire=false;INP.tractor=false;
   if(typeof FLY_STEER!=='undefined')FLY_STEER.active=false;
+  if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.resetFlyJoy();
 }
 window.addEventListener('blur',clearInputState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInputState();});
@@ -14155,26 +14255,29 @@ function drawNavArrow(){
     const margin=52;
     const cx2=cv.width/2, cy2=cv.height/2;
     const angle=Math.atan2(dz,dx);
-    // Map world angle to screen angle (camera is behind ship looking forward along +Z)
     const shipYaw=playerShip.mesh.rotation.y;
-    const relAngle=angle-shipYaw+Math.PI/2; // +PI/2 because screen X maps to world X
+    const relAngle=angle-shipYaw+Math.PI/2;
     const ex=cl(cx2+Math.cos(relAngle)*(cx2-margin),margin,cv.width-margin);
     const ey=cl(cy2+Math.sin(relAngle)*(cy2-margin),margin,cv.height-margin);
     const t=Date.now()*.003;
-    const alpha=0.6+Math.sin(t)*0.3;
+    const alpha=0.72+Math.sin(t)*0.28;
+    const pulseR=26+Math.sin(t*1.4)*4;
     ctx.save();ctx.translate(ex,ey);ctx.rotate(relAngle);
+    ctx.globalAlpha=alpha*0.35;
+    ctx.fillStyle=col;
+    ctx.beginPath();ctx.arc(0,0,pulseR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha;
     // Arrow
     ctx.fillStyle=col;
-    ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-10,10);ctx.lineTo(-6,0);ctx.lineTo(-10,-10);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(22,0);ctx.lineTo(-12,12);ctx.lineTo(-7,0);ctx.lineTo(-12,-12);ctx.closePath();ctx.fill();
     // Outer ring
-    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,24,0,Math.PI*2);ctx.stroke();
     ctx.restore();
     ctx.globalAlpha=1;
-    ctx.fillStyle=col;ctx.font='bold 10px Rajdhani';ctx.textAlign='center';
-    ctx.fillText(sm.sd.name,ex,ey+32);
-    ctx.fillStyle='#557799';ctx.font='9px Share Tech Mono';
-    ctx.fillText(distKm+'k u',ex,ey+43);
+    ctx.fillStyle=col;ctx.font='bold 11px Rajdhani';ctx.textAlign='center';
+    ctx.fillText(sm.sd.name,ex,ey+36);
+    ctx.fillStyle='#8ab8d8';ctx.font='bold 9px Share Tech Mono';
+    ctx.fillText(distKm+'k u',ex,ey+48);
   }
 }
 function drawTargetAssist(){
@@ -14963,17 +15066,34 @@ function drawRadar(){
     const hostile=(rep[ns.faction]||0)<=-15||ns.faction==='pirate'||ns.angry;
     const pri=targetNpc&&targetNpc===ns;
     let sz=ns.type==='merchant'?4.2:(ns.type==='freighter'?3.5:(ns.type==='courier'?2.4:3));
+    const tx=cl(ax,3,W-3),ty=cl(ay,3,W-3);
     ctx.save();
-    ctx.translate(cl(ax,3,W-3),cl(ay,3,W-3));
+    ctx.translate(tx,ty);
     ctx.rotate(ang);
-    ctx.fillStyle=hostile?'#ff5544':f?f.color:'#99aacc';
+    const fillCol=hostile?'#ff5544':f?f.color:'#99aacc';
+    if(ns.type==='merchant'){
+      ctx.fillStyle=fillCol;
+      ctx.fillRect(-sz,-sz*.7,sz*2,sz*1.4);
+    }else if(ns.type==='freighter'){
+      ctx.fillStyle=fillCol;
+      ctx.fillRect(-sz*1.1,-sz*.55,sz*2.2,sz*1.1);
+      ctx.fillStyle='rgba(255,255,255,.25)';
+      ctx.fillRect(-sz*.5,-sz*.2,sz,sz*.4);
+    }else if(ns.type==='courier'){
+      ctx.fillStyle=fillCol;
+      ctx.beginPath();ctx.arc(0,0,sz*.85,0,Math.PI*2);ctx.fill();
+    }else if(ns.type==='patrol'||ns.angry){
+      ctx.fillStyle=fillCol;
+      ctx.beginPath();ctx.moveTo(sz,0);ctx.lineTo(-sz*.65,sz*.72);ctx.lineTo(-sz*.65,-sz*.72);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='rgba(255,200,80,.7)';ctx.lineWidth=1;ctx.strokeRect(-sz*.5,-sz*.35,sz,sz*.7);
+    }else{
+      ctx.fillStyle=fillCol;
+      ctx.beginPath();ctx.moveTo(sz,0);ctx.lineTo(-sz*.65,sz*.72);ctx.lineTo(-sz*.65,-sz*.72);ctx.closePath();ctx.fill();
+    }
     if(pri){
       ctx.strokeStyle='rgba(255,230,160,.95)';ctx.lineWidth=1.8;
       ctx.beginPath();ctx.arc(0,0,sz+2.2,0,Math.PI*2);ctx.stroke();
     }
-    ctx.beginPath();
-    ctx.moveTo(sz,0);ctx.lineTo(-sz*.65,sz*.72);ctx.lineTo(-sz*.65,-sz*.72);ctx.closePath();
-    ctx.fill();
     ctx.restore();
   });
   ctx.fillStyle='#77ccff';ctx.beginPath();ctx.arc(cx,cy,4.2,0,Math.PI*2);ctx.fill();
@@ -15036,15 +15156,26 @@ function updateHUD(){
     }
   }
   const spdBar=document.getElementById('speed-bar'),spdFill=document.getElementById('speed-fill');
+  const spdVal=document.getElementById('speed-val');
+  document.body.classList.toggle('flying-ui',flyHud);
   if(spdBar&&spdFill){
     if(flyHud&&playerShip.maxSpeed>0){
       const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
       spdBar.style.display='block';
       spdFill.style.width=Math.round(sp*100)+'%';
       spdFill.style.background=sp>.92?'linear-gradient(90deg,#ff6600,#ffcc33)':'linear-gradient(90deg,#2244aa,#55ccff)';
+      if(spdVal){
+        spdVal.style.display='block';
+        if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.updateSpeedLabel(playerShip.velocity.length(),playerShip.maxSpeed);
+      }
     }else{
       spdBar.style.display='none';
+      if(spdVal)spdVal.style.display='none';
     }
+  }
+  if(flyHud&&typeof FlightBlueprintPolish!=='undefined'){
+    const hpPct=playerShip.maxHealth?playerShip.health/playerShip.maxHealth*100:100;
+  FlightBlueprintPolish.updateFlightVignette(hpPct,(typeof BOOST!=='undefined'?BOOST.heat:0));
   }
   document.getElementById('cval').textContent=fmt(PS.credits);
   const cc=cargoCnt();document.getElementById('sval').textContent=cc>0?'Stiva: '+cc+'/'+PS.cargoMax:'Stiva vuota';
@@ -15604,10 +15735,10 @@ function animate(){
     if(GAME.state==='flying'){
       const turnBoost=INP.thrust?1.28:1;
       let turnL=!!INP.left, turnR=!!INP.right;
-      // Steer da tap/schermo: priorità se attivo e nessun tasto SX/DX premuto dai pad
-      if(typeof FLY_STEER!=='undefined'&&FLY_STEER.active&&!INP.left&&!INP.right){
-        if(FLY_STEER.nx<-0.1)turnL=true;
-        else if(FLY_STEER.nx>0.1)turnR=true;
+      const flyNx=(typeof FlightBlueprintPolish!=='undefined')?FlightBlueprintPolish.mergeFlightSteer():0;
+      if(!INP.left&&!INP.right){
+        if(flyNx<-0.1)turnL=true;
+        else if(flyNx>0.1)turnR=true;
       }
       const turnAmt=playerShip.turnSpeed*dt*turnBoost;
       if(turnL)  playerShip.mesh.rotation.y+=turnAmt;
