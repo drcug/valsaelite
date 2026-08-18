@@ -57,6 +57,8 @@
         suborbitDone:!!global.StorySys.flags.suborbitDone,
         hulkBoarded:!!global.StorySys.flags.hulkBoarded,
         boardingsTotal:global.StorySys.flags.boardingsTotal|0,
+        circuitSealedIds:global.StorySys.flags.circuitSealedIds
+          ?Object.assign({},global.StorySys.flags.circuitSealedIds):{},
         guide:global.StorySys.flags.guide?{
           radioAt:global.StorySys.flags.guide.radioAt|0,
           stuckAt:global.StorySys.flags.guide.stuckAt|0,
@@ -142,6 +144,8 @@
       global.StorySys.flags.suborbitDone=!!data.storyFlags.suborbitDone;
       global.StorySys.flags.hulkBoarded=!!data.storyFlags.hulkBoarded;
       global.StorySys.flags.boardingsTotal=data.storyFlags.boardingsTotal|0;
+      global.StorySys.flags.circuitSealedIds=Object.assign(
+        {},data.storyFlags.circuitSealedIds||{});
       if(data.storyFlags.guide){
         global.StorySys.flags.guide=Object.assign({
           radioAt:0,stuckAt:0,cap4Since:0,actionBeats:{}

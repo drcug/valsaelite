@@ -7,7 +7,9 @@
     flags: {
       suborbitDone: false,
       hulkBoarded: false,
-      boardingsTotal: 0
+      boardingsTotal: 0,
+      /** Sigilli parziali Circuito: { planetId: ['dep_0', ...] } */
+      circuitSealedIds: {}
     },
 
     threatMul() {
@@ -49,10 +51,47 @@
       this.flags.boardingsTotal++;
       if (kind === 'hulk') {
         this.flags.hulkBoarded = true;
+        const PS = global.PS;
+        if (PS) {
+          if (!PS.loreFlags) PS.loreFlags = {};
+          PS.loreFlags.hulk_imperial_docs = 1;
+          PS.loreFlags.hulk_visited = 1;
+        }
         if (global.StoryGuide && typeof global.StoryGuide.onAction === 'function') {
           global.StoryGuide.onAction('hulk');
         }
       }
+    },
+
+    /** Registra sigillo su un vault del Circuito (persiste tra run). */
+    recordCircuitSeal(planetId, depId) {
+      if (!planetId || !depId) return;
+      if (!this.flags.circuitSealedIds) this.flags.circuitSealedIds = {};
+      const list = this.flags.circuitSealedIds[planetId];
+      if (!list) this.flags.circuitSealedIds[planetId] = [depId];
+      else if (!list.includes(depId)) list.push(depId);
+    },
+
+    circuitSealCount(planetId) {
+      const m = this.flags.circuitSealedIds;
+      if (!m || !planetId || !m[planetId]) return 0;
+      return m[planetId].length;
+    },
+
+    isCircuitDepSealed(planetId, depId) {
+      const m = this.flags.circuitSealedIds;
+      if (!m || !planetId || !m[planetId]) return false;
+      return m[planetId].includes(depId);
+    },
+
+    /** Massimo sigilli registrati su un pianeta (per progresso Cap.4). */
+    circuitBestProgress() {
+      const m = this.flags.circuitSealedIds || {};
+      let best = 0;
+      Object.values(m).forEach((arr) => {
+        best = Math.max(best, (arr && arr.length) || 0);
+      });
+      return best;
     },
 
     /** Grant mission cargo into inventory on accept (top-up to required qty). */
@@ -89,7 +128,12 @@
     canAccept(m) {
       if (!m) return { ok: true };
       if (m.requireSuborbit && !this.flags.suborbitDone) {
-        return { ok: false, msg: 'Prima completa il Circuito Depositi in suborbita (3 sigilli con E). Dalla stazione: VOLO SUBORBITALE.' };
+        const n = this.circuitBestProgress();
+        const partial = n > 0 ? ' (' + n + '/3 già registrati — rientra in suborbita per il resto)' : '';
+        return {
+          ok: false,
+          msg: 'Prima chiudi il Circuito Depositi: 3 vault sigillati in suborbita (SIGILLA o E). Dalla stazione: CIRCUITO DEPOSITI / VOLO SUBORBITALE.' + partial
+        };
       }
       if (m.requireHulk && !this.flags.hulkBoarded) {
         return { ok: false, msg: 'Prima abborda uno Space Hulk (cerca i relitti e premi ABBORDA).' };

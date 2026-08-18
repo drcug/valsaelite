@@ -1377,7 +1377,7 @@ body.suborbit-active #smsg{
 <div id="diary-modal" aria-modal="true" role="dialog" aria-labelledby="diary-title">
   <div id="diary-inner">
     <div id="diary-title">DIARIO · ZVAN MARÌA</div>
-    <div id="diary-sub">Funzionario VII · Ritorno a Valsamoggia · Il Patto del Molino</div>
+    <div id="diary-sub">40.024 E.I. · Funzionario VII · Ritorno a Valsamoggia · Il Patto del Molino</div>
     <div id="diary-body"></div>
     <div id="diary-foot">Le missioni con [STORIA] compaiono negli slot Missioni delle stazioni indicate.<br>Tasto [J] apre/chiude questo pannello.</div>
     <button type="button" id="diary-close" onclick="closeDiary()">CHIUDI</button>
@@ -1439,6 +1439,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario (checklist) · obiettivo fisso in alto a sinistra · mappa/radar: ★ destinazione · tab Missioni: badge STORIA</span></div>
     <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault con anello ciano. Avvicinati e tocca <kbd>SIGILLA</kbd> (o <kbd>E</kbd>). Tre sigilli chiudono Cap.4. WASD · F trazione · ESC stazione. Non confondere con le corsie commerciali nello spazio.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
+    <div id="help-lore-encyclopedia"></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
   </div>
@@ -1457,6 +1458,7 @@ body.suborbit-active #smsg{
 <script src="js/assets.js"></script>
 <script src="js/story-sys.js"></script>
 <script src="js/story-guide.js"></script>
+<script src="js/imperial-lore.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/gameplay-polish.js"></script>
@@ -1904,7 +1906,7 @@ const STORY = {
   won:false,   // true dopo triggerVictory (Patto restaurato)
   playerName:'Zvan Marìa',
   playerTitle:'Funzionario di settimo livello · Impero Galattico',
-  prologue:'Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Hai lasciato Valsamoggia vent\'anni fa e da allora hai imparato a scrivere rapporti impeccabili per persone che li leggono a metà. Tuo padre, intanto, ha smesso quasi del tutto di chiamarti: quando lo fa, parla dell\'Impero più che di te. Ora il Patto del Molino è stato spezzato e le cinque fazioni rischiano di trascinare con sé l\'intero anello orbitale. Imperium manda te perché sei nato lì. Nessuno ha chiesto se sei ancora di lì. Dovrai recuperare i frammenti, trattare con vecchi rancori e ricordarti come si parla senza un verbale davanti. Intanto le grandi casate osservano le anomalie ai margini del sistema. Finché il Mulino gira, Valsamoggia è periferia. Se si ferma, diventa interessante. E non nel senso buono.',
+  prologue:'Anno 40.024 Era Imperiale. Tu sei Zvan Marìa, funzionario di settimo livello dell\'Impero Galattico. Hai lasciato Valsamoggia vent\'anni fa e da allora hai imparato a scrivere rapporti impeccabili per persone che li leggono a metà. Tuo padre, intanto, ha smesso quasi del tutto di chiamarti: quando lo fa, parla dell\'Impero più che di te. Ora il Patto del Molino è stato spezzato e le cinque fazioni rischiano di trascinare con sé l\'intero anello orbitale. Imperium manda te perché sei nato lì. Nessuno ha chiesto se sei ancora di lì. Dovrai recuperare i frammenti, trattare con vecchi rancori e ricordarti come si parla senza un verbale davanti. Intanto le grandi casate osservano le anomalie ai margini del sistema. Finché il Mulino gira, Valsamoggia è periferia. Se si ferma, diventa interessante. E non nel senso buono.',
   chapters: [
     {
       num:1, title:'Il Patto del Molino',
@@ -2296,6 +2298,8 @@ const STORY_INTERLUDES=[
     body:'Un tecnico riconosce i moduli recuperati. «Questi venivano dal vecchio Molino. Vedi il foro storto? Mio padre sbagliava sempre la dima.» Ride, poi si ferma. «Portali a Bazzano. Non valgono molto, ma lì sapranno cosa sono.»'},
   {id:'il_nave_vs_hulk',after:3,minRep:{},title:'Morti e mutati',
     body:'Il tecnico dell\'osteria fa due colonne sul tovagliolo. «Nave disabilitata: ricambi. Space hulk: mutazioni.» Sotto traccia una riga. «Se confondi le due cose, il ricambio sei tu.» Poi gira il tovagliolo e annota il conto.'},
+  {id:'padre_epilogo',after:7,loreFlag:'padre_riconciliato',title:'Arturo, senza pubblico',
+    body:'Arturo ti chiama su un canale non ufficiale. Non chiede del Patto: chiede se mangi. «Gigi non deve sapere», dice. Non prometti niente. Ma per la prima volta non chiude subito. «40.024 E.I.», aggiunge, «e ancora non sanno scrivere il tuo nome. Io sì.» Poi la linea torna muta.'},
 ];
 const _shownInterludes=new Set();
 function diaryStationLabel(sid){
@@ -2351,7 +2355,12 @@ function renderDiaryContent(){
       +`<div class="dst">${done?'Completato.':active?'In corso — incassa la missione a '+where+'.':'Accetta la missione [STORIA] a '+where+'.'} ${extra}</div></div>`;
   });
   if(STORY.won){
-    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso ha ripreso a girare. Restano epilogo e missioni sandbox, se vuoi continuare a volare.</p></div>'+html;
+    html='<div class="diary-ch done"><h3>Campagna completata</h3><p class="dm">Il Patto del Molino è stato ricomposto e il Mulino Acceso ha ripreso a girare. Valsamoggia torna periferia — per ora. Puoi continuare in sandbox: abbordare gli space hulk, riascoltare le Radici, ripetere il Circuito Depositi per crediti e sfida giornaliera.</p></div>'+html;
+  }
+  if(typeof ImperialLore!=='undefined'){
+    html+='<div class="diary-ch done"><h3>Enciclopedia · '+ImperialLore.IMPERIAL_ERA+'</h3>'
+      +ImperialLore.encyclopediaHtml()
+      +'<div class="dst">Stesso universo di Imperium: Craxi, macguffinium, Dodici Casate. Qui governano le cinque fazioni locali.</div></div>';
   }
   // Note RADICI
   if(typeof RootDialogues!=='undefined'&&RootDialogues.stationsWithAvailable){
@@ -2377,6 +2386,7 @@ function renderDiaryContent(){
     if(PS.loreFlags.patto_perche||PS.loreFlags.macguffinium_capito)bits.push('Il Patto del Molino serve a evitare che il sistema si disgreghi e diventi il centro di una guerra galattica.');
     if(PS.loreFlags.imperatore_trono_oro)bits.push('L\'Imperatore è un resto umano ipermutato, mantenuto dalle macchine del Trono d\'Oro: il macguffinium gli ha dato longevità e potere psionico al prezzo della sua umanità. Tuo padre aveva ragione su questo; non su tutto ciò che Gigi e don Ermes costruiscono attorno alla verità.');
     if(PS.loreFlags.padre_riconciliato)bits.push('Arturo ha ammesso di averti ferito per compiacere Gigi e sentirsi coraggioso. Non lo hai assolto, ma avete cominciato a parlare senza pubblico.');
+    if(PS.loreFlags.hulk_imperial_docs)bits.push('Nello hulk hai trovato documenti imperiali: bollettini su ispezioni, equipaggio con nomi che riconosci dai corridoi, e la solita burocrazia di 40.024 E.I.');
     if(PS.loreFlags.padre_ferita_aperta)bits.push('Arturo ha ammesso la propria codardia e il bisogno dell\'approvazione di Gigi. La ferita fra voi resta aperta, ma almeno adesso ha un nome.');
     if(PS.loreFlags.beghelli_voce||PS.beghelliAppeared)bits.push('La Casata Beghelli, un tempo dominante e ora minore, può offrire un aiuto limitato dal Palazzo.');
     if(bits.length){
@@ -2426,6 +2436,7 @@ function checkStoryInterludes(){
       }
       if(!ok)continue;
     }
+    if(it.loreFlag&&!(PS.loreFlags&&PS.loreFlags[it.loreFlag]))continue;
     _shownInterludes.add(it.id);
     // Accoda dietro il banner capitolo — l'utente chiude ogni modal a mano
     showStoryBanner('INTERLUDIO',it.title,it.body);
@@ -5511,13 +5522,13 @@ function showSuborbitDebrief(sum,onClose){
   const circuitOk=!!sum.depositsDone;
   let storyBeat='';
   if(sum.firstInspectUnlock&&typeof STORY!=='undefined'&&STORY.chapter===4){
-    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Circuito registrato (sigilli ${sum.depositsSealed||0}/${sum.depositsNeed||3}). A Savigno puoi accettare «Il Prezzo del Sigillo».</div>`;
+    storyBeat=`<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(120,200,160,.35);border-radius:8px;background:rgba(20,60,48,.35);color:#b8e8d0;font-size:11px;line-height:1.45">Circuito chiuso (${sum.depositsSealed||0}/${sum.depositsNeed||3} sigilli). A Savigno puoi accettare «Il Prezzo del Sigillo» e consegnare i tartufi.</div>`;
   }else if(circuitOk){
-    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Tutti i depositi sigillati. Circuito chiuso — gate Cap.4 sbloccato.</div>`;
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#8ab0a0">Tutti i depositi sigillati. Il Consiglio può registrare il tuo codice — missione Cap.4 sbloccata.</div>`;
   }else if((sum.depositsSealed|0)>0){
-    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#c0a070">Sigilli ${sum.depositsSealed}/${sum.depositsNeed||3}: per sbloccare Cap.4 serve chiudere il Circuito (tutti i vault).</div>`;
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#c0a070">Sigilli ${sum.depositsSealed}/${sum.depositsNeed||3} registrati. I progressi restano salvati: rientra in suborbita per chiudere il Circuito.</div>`;
   }else if(sum.progressPct>=55&&!circuitOk){
-    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#a09070">Rotta ${sum.progressPct}%: crediti e grado ok, ma Cap.4 richiede i 3 sigilli.</div>`;
+    storyBeat=`<div style="margin-top:8px;font-size:10px;color:#a09070">Rotta ${sum.progressPct}%: crediti ok, ma Cap.4 richiede 3 sigilli sui vault (anello ciano).</div>`;
   }
   const depRow=`<div style="margin-top:6px">Depositi sigillati <strong>${sum.depositsSealed||0}/${sum.depositsNeed||3}</strong>${circuitOk?' · <span style="color:#8f8">CIRCUITO OK</span>':''}</div>`;
   b.innerHTML=
@@ -5598,6 +5609,11 @@ function tryShowTutorialMap(){
 }
 function openHelpModal(){
   if(typeof closeOverlappingModals==='function')closeOverlappingModals('help');
+  const loreEl=document.getElementById('help-lore-encyclopedia');
+  if(loreEl&&typeof ImperialLore!=='undefined'&&!loreEl.dataset.filled){
+    loreEl.innerHTML=ImperialLore.helpEncyclopediaHtml();
+    loreEl.dataset.filled='1';
+  }
   const m=document.getElementById('help-modal');if(m)m.classList.add('show');
   setPausedReason('dialogue',true);
   if(m)trapFocus(m);
@@ -7186,6 +7202,7 @@ function requestSuborbit(){
   const name=sm.sd.name||'pianeta';
   const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
   const isSav=sm.sd.id==='savigno'||sm.sd.faction==='savigno';
+  const prog=typeof StorySys!=='undefined'?StorySys.circuitBestProgress():0;
   let body='Scendi nell\'atmosfera di '+name+': Circuito Depositi.\n\n'
     +'I vault tengono stabile la cintura (merce e anomalie). Sigilla 3 siti col pulsante SIGILLA o E.\n\n'
     +'WASD quota/corsia · Spazio fuoco · F trazione · ESC esci.';
@@ -7194,6 +7211,7 @@ function requestSuborbit(){
       ?'Il Consiglio di Savigno non chiude i depositi da solo: vuole un sigillo esterno (il tuo) contro frodi e «ispezioni» imperiali.\n\n'
         +'Sigilla i tre vault della cintura tartufera. Poi torneranno i tartufi — e il frammento.\n\n'
       :'Per il Capitolo 4 serve il Circuito Depositi (3 sigilli). Su Savigno ha più senso, ma vale anche qui.\n\n')
+      +(prog>0?'Già registrati: '+prog+'/3 sigilli. Il progresso resta tra un volo e l\'altro.\n\n':'')
       +'WASD · Spazio · F · SIGILLA/E · ESC stazione.';
   }
   uiConfirm({
@@ -8258,6 +8276,22 @@ function suborbitBuildDepositMesh(dep){
   scene.add(g);
   dep.mesh=g;
 }
+function suborbitApplyDepSealedVisual(dep){
+  if(!dep||!dep.mesh)return;
+  if(dep.mesh.userData.beacon)dep.mesh.userData.beacon.material.color.setHex(0x66ffaa);
+  if(dep.mesh.userData.ring)dep.mesh.userData.ring.material.color.setHex(0x88ffcc);
+  if(dep.mesh.userData.aura)dep.mesh.userData.aura.material.color.setHex(0x44ff99);
+}
+function suborbitDepositDirHint(dep){
+  if(!dep)return '';
+  const dx=dep.wx-SUBORBIT.x;
+  const dz=dep.wz-(SUBORBIT.offset+40);
+  if(dz>120)return 'davanti';
+  if(dz<-80)return 'dietro';
+  if(dx>40)return 'a dritta';
+  if(dx<-40)return 'a sinistra';
+  return 'qui vicino';
+}
 function setupSuborbitDeposits(sm){
   // Pulisci mesh precedenti
   (SUBORBIT.deposits||[]).forEach(d=>{
@@ -8287,19 +8321,32 @@ function setupSuborbitDeposits(sm){
     suborbitBuildDepositMesh(dep);
     SUBORBIT.deposits.push(dep);
   }
+  const pid=sm&&sm.sd&&sm.sd.id;
+  let sealedCount=0;
+  SUBORBIT.deposits.forEach(dep=>{
+    if(typeof StorySys!=='undefined'&&pid&&StorySys.isCircuitDepSealed(pid,dep.id)){
+      dep.sealed=true;
+      suborbitApplyDepSealedVisual(dep);
+      sealedCount++;
+    }
+  });
+  SUBORBIT.depositsSealed=sealedCount;
+  if(sealedCount>=need){
+    SUBORBIT.corridorComplete=true;
+    const pf=SUBORBIT.profile||{};
+    SUBORBIT.autoExitRemaining=pf.autoExitDelay!=null?Math.min(4.2,pf.autoExitDelay):4.2;
+  }
   SUBORBIT.circuitMode=true;
 }
 function sealSuborbitDeposit(dep){
   if(!dep||dep.sealed)return;
   dep.sealed=true;
+  const pid=SUBORBIT.planet&&SUBORBIT.planet.sd&&SUBORBIT.planet.sd.id;
+  if(typeof StorySys!=='undefined'&&pid)StorySys.recordCircuitSeal(pid,dep.id);
   SUBORBIT.depositsSealed=(SUBORBIT.deposits.filter(d=>d.sealed).length);
   PS.credits+=28;
   grantSuborbitLoot(SUBORBIT.planet,false);
-  if(dep.mesh){
-    if(dep.mesh.userData.beacon)dep.mesh.userData.beacon.material.color.setHex(0x66ffaa);
-    if(dep.mesh.userData.ring)dep.mesh.userData.ring.material.color.setHex(0x88ffcc);
-    if(dep.mesh.userData.aura)dep.mesh.userData.aura.material.color.setHex(0x44ff99);
-  }
+  suborbitApplyDepSealedVisual(dep);
   notify('Sigillo · '+dep.name+' ('+SUBORBIT.depositsSealed+'/'+SUBORBIT.depositsNeed+') +28 Cr',2400);
   playChime('success');
   tryVibrate(36);
@@ -10139,7 +10186,7 @@ function updatePlanetSkim(dt){
       const depBarCol=depDone?'#66ffaa':'#7ee8ff';
       const depPrompt=nearDep
         ?`<div style="font:11px var(--FD);letter-spacing:.12em;color:#e8fff8;margin:4px 0 4px;text-align:center;border:1px solid rgba(120,255,200,.45);border-radius:8px;padding:7px 12px;background:rgba(0,48,40,.55);animation:suborbitPulse .9s ease-in-out infinite alternate">DEPOSITO IN RAGGIO · ${(nearDep.name+'').toUpperCase()} · SIGILLA / E</div>`
-        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 2px;letter-spacing:.06em">Prossimo · ${nextOpen.name} · sterza verso l'anello ciano</div>`:'');
+        :(nextOpen&&!depDone?`<div style="font:9px var(--FM);color:#9ad0c8;margin:2px 0 2px;letter-spacing:.06em">Prossimo · ${nextOpen.name} · sterza ${suborbitDepositDirHint(nextOpen)} · anello ciano</div>`:'');
       const objRow=`<div style="margin:4px auto 6px;max-width:min(92vw,380px);text-align:left">`
         +`<div style="font:10px var(--FM);color:${depBarCol};letter-spacing:.08em;margin-bottom:3px">`
         +(depDone?'CIRCUITO OK · ':'SIGILLI · ')
@@ -12895,7 +12942,10 @@ function buildDock(st){
     subBtn.classList.remove('story-stuck-pulse');
     if(show){
       const needsStory=typeof STORY!=='undefined'&&STORY.chapter===4&&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone);
-      subBtn.textContent=needsStory?'CIRCUITO DEPOSITI':'VOLO SUBORBITALE';
+      const prog=typeof StorySys!=='undefined'?StorySys.circuitBestProgress():0;
+      subBtn.textContent=needsStory
+        ?('CIRCUITO DEPOSITI'+(prog>0?' · '+prog+'/3':''))
+        :'VOLO SUBORBITALE';
       subBtn.title=needsStory
         ?'Sigilla 3 depositi (pulsante SIGILLA o E). Serve per Il Prezzo del Sigillo.'
         :'Circuito Depositi: 3 vault da sigillare (SIGILLA/E), poi rientro in stazione.';
@@ -13387,6 +13437,10 @@ function tTavern(pnl,st){
   ];
   const rumor=pick(uni);
   pnl.innerHTML+='<div class="tv"><span class="tvs">'+rumor.s+':</span> '+rumor.t+'</div>';
+  if(typeof ImperialLore!=='undefined'){
+    const lore=ImperialLore.tavernLoreLine();
+    if(lore)pnl.innerHTML+='<div class="tv" style="margin-top:10px;border-top:1px solid rgba(80,120,160,.25);padding-top:8px"><span class="tvs">'+lore.s+':</span> '+lore.t+'</div>';
+  }
   const clueKey=st.sd.faction||'castelletto';
   const clue=(typeof GameplayPolish!=='undefined')?GameplayPolish.pickTavernClue(clueKey):null;
   if(clue){
@@ -14371,6 +14425,15 @@ function drawMap(){
         ctx.fillStyle='#ffe08a';
         ctx.font=`bold ${Math.round(fontSize*.8)}px Rajdhani`;
         ctx.fillText('STORIA',x,y-r-5-fontSize);
+      }
+      const cap4Circuit=typeof STORY!=='undefined'&&STORY.chapter===4
+        &&!(typeof StorySys!=='undefined'&&StorySys.flags&&StorySys.flags.suborbitDone)
+        &&sm.sd.id==='savigno';
+      if(cap4Circuit){
+        const prog=typeof StorySys!=='undefined'?StorySys.circuitBestProgress():0;
+        ctx.fillStyle='#7ee8c8';
+        ctx.font=`bold ${Math.round(fontSize*.75)}px Share Tech Mono`;
+        ctx.fillText('CIRCUITO'+(prog>0?' '+prog+'/3':''),x,y+r+fontSize*1.6);
       }
       if(typeof RootDialogues!=='undefined'){
         const av=(RootDialogues.availableEncounters(sm.sd.id)||[]).length;

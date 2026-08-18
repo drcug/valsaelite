@@ -115,11 +115,14 @@
     const f = flags();
 
     if (ch === 4 && !f.suborbitDone) {
+      const sealed = (global.StorySys && global.StorySys.circuitBestProgress()) || 0;
+      const partial = sealed > 0 ? ' · ' + sealed + '/3 sigilli già registrati' : '';
       return {
-        line: 'CAP.4 · Completa il Circuito Depositi (3 sigilli) — meglio a Savigno',
+        line: 'CAP.4 · Sigilla 3 vault del Circuito (suborbita)' + partial + ' — poi Savigno',
         sid: 'savigno',
         kind: 'circuit',
-        chapter: 4
+        chapter: 4,
+        circuitSealed: sealed
       };
     }
 
@@ -199,7 +202,9 @@
       push(done || kd >= 3, 'Abbatti 3 navi di Calcara (' + Math.min(kd, 3) + '/3)');
       push(done, 'Torna alla Rocca e chiudi');
     } else if (ch === 4) {
-      push(!!f.suborbitDone, 'Completa il Circuito Depositi (3 sigilli)');
+      const sealed = (global.StorySys && global.StorySys.circuitBestProgress()) || 0;
+      push(!!f.suborbitDone, 'Completa il Circuito Depositi (3 sigilli)'
+        + (!f.suborbitDone && sealed > 0 ? ' — ' + sealed + '/3 registrati' : ''));
       push(accepted || done, 'Accetta «Il Prezzo del Sigillo» a Savigno');
       const tq = (PS && PS.cargo && PS.cargo.tartufi) | 0;
       push(done, 'Consegna i tartufi al Consiglio' + (accepted && !done ? ' (' + tq + '/3)' : ''));
@@ -304,7 +309,7 @@
     if (elapsed < STUCK_CAP4_MS) return;
     if (Date.now() - (g.stuckAt || 0) < 120000) return;
     g.stuckAt = Date.now();
-    radio('Cap.4: attracca e apri CIRCUITO DEPOSITI. Sigilla i tre vault con E; Savigno parlerà soltanto dopo.', true);
+    radio('Cap.4: attracca, apri CIRCUITO DEPOSITI. Avvicinati agli anelli ciano e usa SIGILLA o E. Servono 3 sigilli prima di Savigno.', true);
     // Evidenzia bottone se in dock
     try {
       const btn = document.getElementById('ldck-suborbit');
@@ -320,7 +325,7 @@
     noteCap4Enter();
     const obj = getObjective();
     if (obj.kind === 'circuit') {
-      radio('A Savigno i vault del Circuito vogliono un sigillo esterno (il tuo). VOLO SUBORBITALE → avvicinati all\'anello ciano → SIGILLA.', false);
+      radio('Savigno: i vault vogliono il tuo sigillo esterno (non una chiusura di ufficio). CIRCUITO DEPOSITI → anello ciano → SIGILLA.', false);
     } else if (obj.kind === 'accept' && st && st.sd && obj.sid === st.sd.id) {
       radio('La missione di trama è disponibile qui, nella tab Missioni.', false);
     } else if (obj.kind === 'mission' && st && st.sd && (obj.sid === st.sd.id)) {
