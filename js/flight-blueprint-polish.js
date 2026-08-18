@@ -177,6 +177,20 @@
       if (clientX >= r.left - 8 && clientX <= r.right + 8 &&
           clientY >= r.top - 8 && clientY <= r.bottom + 8) return true;
     }
+    const joy = document.getElementById('flight-joy-wrap');
+    if (joy && joy.offsetParent !== null) {
+      const r = joy.getBoundingClientRect();
+      const pad = 10;
+      if (clientX >= r.left - pad && clientX <= r.right + pad &&
+          clientY >= r.top - pad && clientY <= r.bottom + pad) return true;
+    }
+    const fire = document.getElementById('flight-fire-wrap');
+    if (fire && fire.offsetParent !== null) {
+      const r = fire.getBoundingClientRect();
+      const pad = 10;
+      if (clientX >= r.left - pad && clientX <= r.right + pad &&
+          clientY >= r.top - pad && clientY <= r.bottom + pad) return true;
+    }
     return false;
   }
 
@@ -261,13 +275,16 @@
       if (e) e.preventDefault();
       setBoost(false);
     };
-    b.addEventListener('pointerdown', down);
-    b.addEventListener('pointerup', up);
-    b.addEventListener('pointercancel', up);
-    b.addEventListener('pointerleave', up);
-    b.addEventListener('mousedown', down);
-    b.addEventListener('mouseup', up);
-    b.addEventListener('mouseleave', up);
+    if (window.PointerEvent) {
+      b.addEventListener('pointerdown', down);
+      b.addEventListener('pointerup', up);
+      b.addEventListener('pointercancel', up);
+      b.addEventListener('pointerleave', up);
+    } else {
+      b.addEventListener('mousedown', down);
+      b.addEventListener('mouseup', up);
+      b.addEventListener('mouseleave', up);
+    }
   }
 
   function initFlightMoreButtons() {
@@ -308,6 +325,22 @@
     BP_VIEW.panX = 0;
     BP_VIEW.panY = 0;
     applyBpViewTransform();
+  }
+
+  function resetBlueprintUi() {
+    bpGridOnly = false;
+    document.body.classList.remove('bp-grid-only');
+    const grid = document.getElementById('bp-fab-grid');
+    if (grid) grid.textContent = 'GRIGLIA';
+    resetBpView();
+  }
+
+  function syncBpFabModeUi() {
+    const place = document.getElementById('bp-fab-place');
+    const erase = document.getElementById('bp-fab-erase');
+    const mode = (typeof global.bpEditMode !== 'undefined') ? global.bpEditMode : 'place';
+    if (place) place.style.borderColor = mode === 'place' ? 'rgba(120,255,200,.75)' : '';
+    if (erase) erase.style.borderColor = (mode === 'erase' || global.bpIsEraseMode?.()) ? 'rgba(255,160,100,.85)' : '';
   }
 
   function initBlueprintZoomPan() {
@@ -393,12 +426,14 @@
       place.dataset.bound = '1';
       place.addEventListener('click', () => {
         if (typeof global.bpSetEditMode === 'function') global.bpSetEditMode('place');
+        syncBpFabModeUi();
       });
     }
     if (erase && !erase.dataset.bound) {
       erase.dataset.bound = '1';
       erase.addEventListener('click', () => {
         if (typeof global.bpSetEditMode === 'function') global.bpSetEditMode('erase');
+        syncBpFabModeUi();
       });
     }
     if (grid && !grid.dataset.bound) {
@@ -513,6 +548,8 @@
     captureBpStatsBaseline,
     enrichBpStatsHtml,
     resetBpView,
+    resetBlueprintUi,
+    syncBpFabModeUi,
     resetFlyJoy: () => { FLY_JOY.nx = 0; FLY_JOY.len = 0; },
     tryVibe
   };

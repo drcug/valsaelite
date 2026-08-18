@@ -799,7 +799,7 @@ body.flight-more-open #flight-more-row{display:flex!important}
 #bp-fab-place,#bp-fab-erase,#bp-fab-grid{display:none;position:fixed;z-index:85;pointer-events:auto;padding:10px 14px;border-radius:10px;
   font:700 10px var(--FD);letter-spacing:.1em;border:1px solid rgba(90,170,240,.5);background:rgba(6,20,48,.92);color:#d0ecff}
 #bp-fab-place{left:max(10px,env(safe-area-inset-left));bottom:max(72px,calc(env(safe-area-inset-bottom)+64px))}
-#bp-fab-erase{right:max(10px,env(safe-area-inset-right));bottom:max(72px,calc(env(safe-area-inset-bottom)+64px);border-color:rgba(255,140,100,.55);color:#ffd0c0}
+#bp-fab-erase{right:max(10px,env(safe-area-inset-right));bottom:max(72px,calc(env(safe-area-inset-bottom)+64px));border-color:rgba(255,140,100,.55);color:#ffd0c0}
 #bp-fab-grid{left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));font-size:9px}
 body.bp-grid-only #bp-panel{display:none!important}
 body.bp-grid-only #bp-wrap{max-height:none}
@@ -1587,6 +1587,8 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
     <div class="help-grid"><span>Combattimento</span><span><kbd>R</kbd>/<kbd>Tab</kbd> mira · <kbd>Q</kbd> missile · <kbd>G</kbd> abbordaggio · <kbd>T/H</kbd> radio</span></div>
     <div class="help-grid"><span>Abbordaggio</span><span><kbd>WASD</kbd> · <kbd>Spazio</kbd> fuoco · <kbd>Tab</kbd> bersaglio · joystick mobile · minimappa · <kbd>Esc</kbd> ritiro. Opzioni: vibrazione, auto-mira.</span></div>
+    <div class="help-grid"><span>Trama</span><span><kbd>J</kbd> diario (checklist) · obiettivo fisso in alto a sinistra · mappa/radar: ★ destinazione · tab Missioni: badge STORIA</span></div>
+    <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault con anello ciano. Avvicinati e tocca <kbd>SIGILLA</kbd> (o <kbd>E</kbd>). Tre sigilli chiudono Cap.4. WASD · joystick mobile · drag sullo schermo · <kbd>H</kbd> HUD compatto · <kbd>ESC</kbd> stazione.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div id="help-lore-encyclopedia"></div>
     <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
@@ -3203,6 +3205,7 @@ function bpSetEditMode(mode){
   }
   syncBpModeUi();
   buildBpPalette();drawBlueprint();
+  if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.syncBpFabModeUi();
 }
 function syncBpModeUi(){
   const place=document.getElementById('bp-mode-place');
@@ -3619,6 +3622,7 @@ function openBlueprintModal(){
   if(typeof FlightBlueprintPolish!=='undefined'){
     FlightBlueprintPolish._baseline=bpStats();
     FlightBlueprintPolish.resetBpView();
+    FlightBlueprintPolish.syncBpFabModeUi();
   }
   document.getElementById('blueprint-modal').classList.add('show');
   buildBpPalette();
@@ -3664,6 +3668,7 @@ function discardBlueprintChanges(){
   bpHoverCell=null;
   setPausedReason('blueprint',false);
   bm.classList.remove('show');
+  if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.resetBlueprintUi();
   if(typeof updateBpHullRepHint==='function')updateBpHullRepHint();
   notify('Modifiche blueprint annullate.',1600);
 }
@@ -3906,6 +3911,7 @@ function closeBlueprintModal(){
   BP_UNDO.length=0;
   setPausedReason('blueprint',false);
   document.getElementById('blueprint-modal').classList.remove('show');
+  if(typeof FlightBlueprintPolish!=='undefined')FlightBlueprintPolish.resetBlueprintUi();
   applyModules();
   rebuildPlayerMesh();
   const repAdj=applyHullPaintReputationIfChanged();
@@ -7235,7 +7241,7 @@ touchTap('btnboard',()=>tryBoardingTrigger());
 /** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
 const FLY_STEER={active:false,nx:0};
 (function initFlyScreenSteer(){
-  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,#rep-panel,#tgt-panel,.btouch-pad,#boarding-hud';
+  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,#rep-panel,#tgt-panel,.btouch-pad,#boarding-hud,#flight-joy-wrap,#flight-fire-wrap,#flight-more-btn,#flight-more-row';
   const isUi=t=>{
     if(!t||!t.closest)return false;
     return !!t.closest(uiSel);
@@ -15158,6 +15164,11 @@ function updateHUD(){
   const spdBar=document.getElementById('speed-bar'),spdFill=document.getElementById('speed-fill');
   const spdVal=document.getElementById('speed-val');
   document.body.classList.toggle('flying-ui',flyHud);
+  if(!flyHud){
+    document.body.classList.remove('flight-more-open');
+    const fv=document.getElementById('fly-vignette');
+    if(fv)fv.style.opacity='0';
+  }
   if(spdBar&&spdFill){
     if(flyHud&&playerShip.maxSpeed>0){
       const sp=Math.min(1,playerShip.velocity.length()/playerShip.maxSpeed);
