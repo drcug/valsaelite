@@ -141,9 +141,68 @@ body.suborbit-active #a11y-strip{display:none !important;}
 body.boarding-active #boarding{display:block;animation:boarding-in .28s ease-out}
 #boarding-cv{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:auto;touch-action:none}
 /* Controlli touch abbordaggio (iso = 8 direzioni: 4 assi + 4 diagonali) */
-#boarding-touch{display:none;position:fixed;left:0;right:0;bottom:0;z-index:96;padding:max(8px,env(safe-area-inset-bottom)) 10px 12px;
-  justify-content:center;align-items:flex-end;gap:10px;pointer-events:none}
-body.boarding-active #boarding-touch{display:flex}
+body.boarding-active #boarding-touch{display:none}
+@media(pointer:coarse){
+  body.boarding-active #boarding-joy-wrap{display:flex}
+  body.boarding-active #boarding-fire-wrap{display:flex}
+}
+@media(pointer:fine){
+  body.boarding-active #boarding-joy-wrap,
+  body.boarding-active #boarding-fire-wrap{display:none}
+  body.boarding-active #boarding-hud .bh-hint{display:block}
+}
+#boarding-joy-wrap{display:none;position:fixed;left:max(10px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:97;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+#boarding-fire-wrap{display:none;position:fixed;right:max(10px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:97;pointer-events:none}
+#boarding-retreat{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:93;
+  pointer-events:auto;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,140,100,.55);background:rgba(50,14,10,.88);
+  color:#ffd8c8;font:700 10px var(--FD);letter-spacing:.12em;cursor:pointer;display:none}
+body.boarding-active #boarding-retreat{display:block}
+#boarding-minimap{display:none;position:fixed;right:max(10px,env(safe-area-inset-right));top:max(48px,calc(env(safe-area-inset-top)+42px));z-index:93;
+  width:88px;height:72px;border-radius:8px;border:1px solid rgba(90,160,220,.45);background:rgba(4,12,28,.75);pointer-events:none}
+body.boarding-active #boarding-minimap{display:block}
+#boarding-o2-vignette{display:none;position:fixed;inset:0;z-index:89;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 42%,rgba(20,60,100,.55) 100%);transition:opacity .2s}
+body.boarding-active #boarding-o2-vignette.show{display:block}
+.mg-joy-wrap{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:4px}
+.mg-joy-base{width:min(28vw,112px);height:min(28vw,112px);border-radius:50%;border:1px solid rgba(90,170,240,.45);
+  background:rgba(6,20,48,.78);position:relative;touch-action:none}
+.mg-joy-knob{width:44%;height:44%;border-radius:50%;position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);background:rgba(120,200,255,.35);border:1px solid rgba(180,230,255,.55);
+  box-shadow:0 0 12px rgba(80,180,255,.25)}
+.mg-joy-lbl{font:9px var(--FM);color:#6688aa;letter-spacing:.1em}
+.btouch-fire-lg{pointer-events:auto;min-width:min(32vw,120px);padding:16px 20px;border-radius:14px;
+  border:1px solid rgba(255,140,90,.6);background:rgba(48,12,8,.9);color:#ffd0c0;font:700 12px var(--FD);letter-spacing:.1em}
+#suborbit-vignette{display:none;position:fixed;inset:0;z-index:6045;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 35%,rgba(180,30,20,.5) 100%);transition:opacity .15s}
+body.suborbit-active #suborbit-vignette{display:block}
+#suborbit-corridor-bar{display:none;position:fixed;left:max(6px,env(safe-area-inset-left));top:max(72px,calc(env(safe-area-inset-top)+64px));
+  bottom:max(100px,calc(env(safe-area-inset-bottom)+90px));width:10px;z-index:6110;pointer-events:none;
+  background:rgba(0,30,40,.55);border-radius:5px;border:1px solid rgba(90,220,200,.35);overflow:hidden}
+body.suborbit-active #suborbit-corridor-bar{display:block}
+#suborbit-corridor-fill{width:100%;height:50%;position:absolute;bottom:0;left:0;transition:height .12s,background .2s}
+#suborbit-vault-arrow{display:none;position:fixed;z-index:6120;pointer-events:none;text-align:center;transition:left .12s,top .12s}
+#suborbit-vault-arrow.show{display:block}
+#suborbit-vault-arrow .sva-icon{display:block;font-size:22px;color:#8effd8;text-shadow:0 0 14px rgba(80,255,200,.8)}
+#suborbit-vault-arrow .sva-lab{display:block;font:8px var(--FM);color:#b8f0e0;letter-spacing:.08em;margin-top:2px;transform:rotate(-90deg)}
+.suborbit-ui-grid{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 max(10px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-right))}
+.suborbit-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center;max-width:min(58vw,280px)}
+.suborbit-actions .sbtn{width:56px;height:56px}
+.suborbit-actions .sbtn.sbtn-thrust{width:64px;height:64px}
+.suborbit-actions .sbtn.sbtn-seal{width:min(140px,42vw);height:52px;border-radius:10px}
+.suborbit-actions .sbtn.sbtn-exit{width:auto;min-width:64px;height:44px;border-radius:10px;padding:0 12px}
+#suborbit-joy-wrap{display:none}
+@media(pointer:coarse),(max-width:700px){
+  body.suborbit-active #suborbit-joy-wrap{display:flex}
+  body.suborbit-active #suborbit-ui .srow.legacy-steer{display:none!important}
+}
+body.suborbit-active #suborbit-seal-fab.show~#suborbit-ui .sbtn.sbtn-seal,
+body.suborbit-active #suborbit-ui:has(~#suborbit-seal-fab.show) .sbtn.sbtn-seal{display:none}
+body.suborbit-hud-min #suborbit-hud .sob-detail{display:none}
+body.suborbit-hud-min #suborbit-hud .sob-compact{display:block}
+body.perf-low #boarding:before,body.reduced-motion #boarding:before{animation:none!important}
+html{--mg-ui-scale:1}
+body.boarding-active .mg-joy-wrap,body.suborbit-active .mg-joy-wrap{transform:scale(var(--mg-ui-scale));transform-origin:bottom left}
+body.boarding-active #boarding-fire-wrap{transform:scale(var(--mg-ui-scale));transform-origin:bottom right}
 .btouch-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto}
 .btouch-pad{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:5px;width:min(52vw,228px)}
 .btouch-pad button,.btouch-fire{
@@ -809,7 +868,8 @@ body:not(.suborbit-active) #suborbit-seal-fab{display:none!important}
 #suborbit-seal-fab .fab-sub{display:block;font:9px var(--FM);letter-spacing:.08em;color:#9ad0c8;margin-top:4px;font-weight:400}
 body.suborbit-active #suborbit{display:block !important;opacity:1 !important;z-index:6000 !important}
 body.suborbit-active #suborbit-hud{display:block !important;z-index:6100 !important;top:max(72px,env(safe-area-inset-top));bottom:auto;max-width:min(96vw,460px);text-align:center;line-height:1.45}
-body.suborbit-active #suborbit-ui{display:block !important}
+body.suborbit-active #suborbit-ui{display:block !important;pointer-events:none}
+#suborbit-ui .suborbit-ui-grid{width:100%;pointer-events:none}
 /* Volo suborbitale / dock / landing: nasconde HUD navetta (anche desktop) */
 body.boarding-active #throttle-rail,
 body.suborbit-active #throttle-rail,
@@ -1241,6 +1301,9 @@ body.suborbit-active #smsg{
 <div id="skim-lbl">SORVOLO</div>
 <div id="skim-bar"><div id="skim-fill"></div></div>
 <div id="suborbit"><canvas id="suborbit-cv"></canvas></div>
+<div id="suborbit-vignette" aria-hidden="true"></div>
+<div id="suborbit-corridor-bar" aria-hidden="true"><div id="suborbit-corridor-fill"></div></div>
+<div id="suborbit-vault-arrow" aria-hidden="true"><span class="sva-icon">▲</span><span class="sva-lab"></span></div>
 <div id="suborbit-screen-fx" aria-hidden="true"></div>
 <div id="suborbit-float-layer" aria-hidden="true"></div>
 <div id="suborbit-debrief" role="dialog" aria-modal="true" aria-labelledby="suborbit-debrief-title"><div class="sdbox"><div class="sdt" id="suborbit-debrief-title">Fine corsa</div><div class="sdg" id="suborbit-debrief-grade">—</div><div class="sdr" id="suborbit-debrief-body"></div><button type="button" id="suborbit-debrief-ok">CONTINUA</button></div></div>
@@ -1272,9 +1335,19 @@ body.suborbit-active #smsg{
   </div>
 </div>
 <div id="boarding"><canvas id="boarding-cv"></canvas></div>
-<div id="boarding-touch" aria-hidden="true">
+<div id="boarding-o2-vignette" aria-hidden="true"></div>
+<canvas id="boarding-minimap" width="88" height="72" aria-hidden="true"></canvas>
+<button type="button" id="boarding-retreat" aria-label="Ritiro dall'abbordaggio">RITIRO</button>
+<div id="boarding-joy-wrap" aria-hidden="true">
+  <div class="mg-joy-base" id="boarding-joy-base"><div class="mg-joy-knob" id="boarding-joy-knob"></div></div>
+  <span class="mg-joy-lbl">MUOVI</span>
+</div>
+<div id="boarding-fire-wrap" aria-hidden="true">
+  <button type="button" class="btouch-fire-lg" id="boarding-fire-mob" aria-label="Fuoco">FUOCO</button>
+</div>
+<div id="boarding-touch" aria-hidden="true" style="display:none!important">
   <div class="btouch-wrap">
-    <div class="btouch-hint">8 direzioni · mirino sul campo · fuoco</div>
+    <div class="btouch-hint">Legacy pad (disabilitato)</div>
     <div class="btouch-pad">
       <button type="button" data-inp="thrust,left" aria-label="Nord-ovest">↖</button>
       <button type="button" data-inp="thrust" aria-label="Nord">▲</button>
@@ -1286,7 +1359,6 @@ body.suborbit-active #smsg{
       <button type="button" data-inp="boost" aria-label="Sud">▼</button>
       <button type="button" data-inp="boost,right" aria-label="Sud-est">↘</button>
     </div>
-    <button type="button" class="btouch-fire" id="boarding-fire-mob" aria-label="Fuoco">FUOCO</button>
   </div>
 </div>
 <div id="boarding-hud"></div>
@@ -1296,18 +1368,22 @@ body.suborbit-active #smsg{
   <button type="button" id="bpbtn-board">ABBORDA</button>
 </div>
 <div id="suborbit-ui">
-  <div class="srow">
-    <button type="button" id="sob-exit" class="sbtn sbtn-exit" aria-label="Esci dal volo suborbitale">ESCI</button>
-    <button type="button" id="sob-seal" class="sbtn sbtn-seal" disabled aria-label="Sigilla deposito">SIGILLA</button>
-    <button type="button" id="sob-fire" class="sbtn fire">FUOCO</button>
+  <div class="suborbit-ui-grid">
+    <div class="mg-joy-wrap" id="suborbit-joy-wrap">
+      <div class="mg-joy-base" id="suborbit-joy-base"><div class="mg-joy-knob" id="suborbit-joy-knob"></div></div>
+      <span class="mg-joy-lbl">STERZA</span>
+    </div>
+    <div class="suborbit-actions">
+      <button type="button" id="sob-exit" class="sbtn sbtn-exit" aria-label="Esci dal volo suborbitale">ESCI</button>
+      <button type="button" id="sob-up" class="sbtn sbtn-thrust" aria-label="Motori quota">MOT</button>
+      <button type="button" id="sob-tr" class="sbtn">TRAZ.</button>
+      <button type="button" id="sob-fire" class="sbtn fire">FUOCO</button>
+      <button type="button" id="sob-seal" class="sbtn sbtn-seal" disabled aria-label="Sigilla deposito">SIGILLA</button>
+    </div>
   </div>
-  <div class="srow">
+  <div class="srow legacy-steer" style="display:none">
     <button type="button" id="sob-left" class="sbtn">SX</button>
-    <button type="button" id="sob-up" class="sbtn sbtn-thrust" aria-label="Motori quota">MOT</button>
     <button type="button" id="sob-right" class="sbtn">DX</button>
-  </div>
-  <div class="srow">
-    <button type="button" id="sob-tr" class="sbtn">TRAZ.</button>
     <button type="button" id="sob-down" class="sbtn">GIU</button>
   </div>
 </div>
@@ -1409,6 +1485,16 @@ body.suborbit-active #smsg{
       <label class="mm-opt"><input type="checkbox" id="mm-opt-fx" checked> Effetti visivi</label>
       <label class="mm-opt"><input type="checkbox" id="mm-opt-motion"> Riduci movimento</label>
       <label class="mm-opt"><input type="checkbox" id="mm-opt-skipintro"> Salta intro alla partenza</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-vibe" checked> Vibrazione minigiochi</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-mouse"> Suborbita: sterza col mouse (PC)</label>
+      <label class="mm-opt"><input type="checkbox" id="mm-opt-mg-autoaim"> Abbordaggio: auto-mira soft</label>
+      <label class="mm-opt">Scala UI minigiochi
+        <select id="mm-opt-mg-scale" style="margin-left:8px;font:inherit">
+          <option value="0.9">90%</option>
+          <option value="1" selected>100%</option>
+          <option value="1.1">110%</option>
+        </select>
+      </label>
       <button type="button" id="mm-help" class="mm-btn ghost">Controlli</button>
     </div>
     <div class="mm-foot">1956 · Forbidden Planet · Valsamoggia Spaziale</div>
@@ -1459,6 +1545,7 @@ body.suborbit-active #smsg{
 <script src="js/story-sys.js"></script>
 <script src="js/story-guide.js"></script>
 <script src="js/imperial-lore.js"></script>
+<script src="js/minigame-polish.js"></script>
 <script src="js/portrait-layout.js"></script>
 <script src="js/portrait.js"></script>
 <script src="js/gameplay-polish.js"></script>
@@ -1488,6 +1575,7 @@ const PERF_LOW=(function(){
     return !!(saveData||reduce||mem<=2||(touch&&cores<=4));
   }catch(_){return false;}
 })();
+if(PERF_LOW&&document.body)document.body.classList.add('perf-low');
 const BOOT_CFG=BOOT_FAST
   ?{initPixelRatio:1.0,finalPixelRatio:1.6,upscaleDelayMs:5600,starA:6800,starB:2400,starC:1100,asteroids:170}
   :{initPixelRatio:1.3,finalPixelRatio:2.0,upscaleDelayMs:4200,starA:9000,starB:3400,starC:1500,asteroids:240};
@@ -5599,6 +5687,12 @@ function navCorridorFeedbackAllowed(){
   if(tut&&tut.classList.contains('show'))return false;
   return true;
 }
+function tryShowTutorialBoarding(){
+  return showTutorialOnce('valsaelite_tut_boarding_v2','Abbordaggio · controlli',
+    '<p><strong>PC:</strong> <kbd>WASD</kbd> muovi · <kbd>Spazio</kbd> fuoco · puntatore per mirare · <kbd>Tab</kbd> cambia bersaglio · <kbd>Esc</kbd> ritiro.</p>'
+    +'<p><strong>Mobile:</strong> joystick a sinistra · <strong>FUOCO</strong> a destra · minimappa in alto.</p>'
+    +'<p><strong>Nave disabilitata</strong> = pezzi blueprint. <strong>Space hulk</strong> = mutazioni + ossigeno limitato.</p>');
+}
 function tryShowTutorialDock(){
   return showTutorialOnce('valsaelite_tut_dock','Attracco e missioni',
     '<p>Tab <strong>Mercato</strong> per commerciare · <strong>Missioni</strong> per contratti (cerca [STORIA]).</p><p><strong>Salva/Carica</strong> nel tab Riparazione. Auto-save all\'attracco.</p>');
@@ -6849,11 +6943,22 @@ window.addEventListener('keydown',e=>{
   }
   if(SUBORBIT.active&&e.code==='Escape'){
     e.preventDefault();
-    skimSt=null;skimT=0;
-    leaveSuborbit({toDock:true});
-    const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
-    if(bar)bar.style.display='none';
-    if(lbl)lbl.style.display='none';
+    const doExit=()=>{
+      skimSt=null;skimT=0;
+      leaveSuborbit({toDock:true});
+      const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
+      if(bar)bar.style.display='none';
+      if(lbl)lbl.style.display='none';
+    };
+    if(typeof MinigamePolish!=='undefined')MinigamePolish.suborbitConfirmExit(doExit);
+    else doExit();
+    return;
+  }
+  if(SUBORBIT.active&&e.code==='KeyH'){
+    e.preventDefault();
+    SUBORBIT.hudMinimal=!SUBORBIT.hudMinimal;
+    document.body.classList.toggle('suborbit-hud-min',SUBORBIT.hudMinimal);
+    notify(SUBORBIT.hudMinimal?'HUD minimo · H per dettagli':'HUD dettagliato · H per compatto',1400);
     return;
   }
   if(GAME.pausedReasons&&GAME.pausedReasons.diary&&e.code==='Escape'){
@@ -7077,14 +7182,26 @@ touch('sob-left','left');touch('sob-right','right');touch('sob-up','thrust');tou
   const exit=e=>{
     if(e){e.preventDefault();e.stopPropagation();}
     if(!(typeof SUBORBIT!=='undefined'&&SUBORBIT.active&&GAME.state==='suborbit'))return;
-    skimSt=null;skimT=0;
-    leaveSuborbit({toDock:true});
-    const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
-    if(bar)bar.style.display='none';
-    if(lbl)lbl.style.display='none';
+    const doExit=()=>{
+      skimSt=null;skimT=0;
+      leaveSuborbit({toDock:true});
+      const bar=document.getElementById('skim-bar'),lbl=document.getElementById('skim-lbl');
+      if(bar)bar.style.display='none';
+      if(lbl)lbl.style.display='none';
+    };
+    if(typeof MinigamePolish!=='undefined')MinigamePolish.suborbitConfirmExit(doExit);
+    else doExit();
   };
   b.addEventListener('click',exit);
   b.addEventListener('touchend',exit,{passive:false});
+})();
+(function setupBoardingRetreat(){
+  const b=document.getElementById('boarding-retreat');
+  if(!b)return;
+  b.addEventListener('click',e=>{
+    e.preventDefault();
+    if(BOARDING.active&&GAME.state==='boarding')leaveBoarding({});
+  });
 })();
 (function initBoardingTouchPad(){
   const bindKeys=(el,keys)=>{
@@ -8264,14 +8381,20 @@ function suborbitBuildDepositMesh(dep){
     new THREE.MeshBasicMaterial({color:0xa8fff0,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false})
   );
   beacon.position.y=62;g.add(beacon);
+  const beam=new THREE.Mesh(
+    new THREE.CylinderGeometry(2.2,4.5,140,8,1,true),
+    new THREE.MeshBasicMaterial({color:0x66e8ff,transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide})
+  );
+  beam.position.y=110;g.add(beam);
   const aura=new THREE.Mesh(
-    new THREE.SphereGeometry(42,16,12),
+    new THREE.SphereGeometry(52,16,12),
     new THREE.MeshBasicMaterial({color:0x44ccff,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false})
   );
   aura.position.y=24;g.add(aura);
   g.userData.beacon=beacon;
   g.userData.ring=ring;
   g.userData.aura=aura;
+  g.userData.beam=beam;
   g.visible=false;
   scene.add(g);
   dep.mesh=g;
@@ -8347,6 +8470,12 @@ function sealSuborbitDeposit(dep){
   PS.credits+=28;
   grantSuborbitLoot(SUBORBIT.planet,false);
   suborbitApplyDepSealedVisual(dep);
+  if(dep.mesh&&dep.mesh.userData.beam){
+    dep.mesh.userData.beam.material.opacity=.08;
+    dep.mesh.scale.setScalar(1.08);
+    setTimeout(()=>{if(dep.mesh)dep.mesh.scale.setScalar(1);},280);
+  }
+  if(typeof MinigamePolish!=='undefined')MinigamePolish.suborbitSealFlash();
   notify('Sigillo · '+dep.name+' ('+SUBORBIT.depositsSealed+'/'+SUBORBIT.depositsNeed+') +28 Cr',2400);
   playChime('success');
   tryVibrate(36);
@@ -8380,6 +8509,9 @@ function updateSuborbitDeposits(){
       dep.mesh.userData.beacon.position.y=62+Math.sin(SUBORBIT.time*3+(dep.wz*.001))*3;
     }
     if(dep.mesh.userData.ring)dep.mesh.userData.ring.rotation.z=SUBORBIT.time*0.8;
+    if(dep.mesh.userData.beam&&!dep.sealed){
+      dep.mesh.userData.beam.material.opacity=0.16+Math.sin(SUBORBIT.time*2.2+dep.wz*.01)*0.08;
+    }
     if(dep.sealed)continue;
     const dx=dep.wx-SUBORBIT.x;
     const ddz=dep.wz-(SUBORBIT.offset+40);
@@ -9861,6 +9993,8 @@ function enterSuborbit(sm){
   SUBORBIT.loadingTip=suborbitRandomTip(sm);
   SUBORBIT.slowMoT=0;SUBORBIT.spreadShotT=0;SUBORBIT.setPieceT=0;SUBORBIT.setPieceKind=null;SUBORBIT.stormVx=0;SUBORBIT.setPieceEdgeMul=1;
   SUBORBIT.flashHit=0;SUBORBIT.flashMiss=0;SUBORBIT._lowHpPip=false;SUBORBIT.hudStrain=1;SUBORBIT.hudStressVis=0;
+  SUBORBIT.hudMinimal=false;
+  document.body.classList.remove('suborbit-hud-min');
   SUBORBIT.terrain.lastBase=1e9;
   const fwd=FRAME_TMP.fwd.set(0,0,-1).applyEuler(playerShip.mesh.rotation);
   SUBORBIT.anchor.copy(playerShip.mesh.position).addScaledVector(fwd,260);
@@ -10034,8 +10168,12 @@ function updatePlanetSkim(dt){
     skimSt=sm;skimT+=dt;
     SUBORBIT.intro=cl(SUBORBIT.intro+dt*0.78,0,1);
     const C=suborbitControl();
-    const ax=(INP.right?-1:0)+(INP.left?1:0);
-    const ay=(INP.thrust?1:0)-(INP.boost?1:0);
+    let ax=(INP.right?-1:0)+(INP.left?1:0);
+    let ay=(INP.thrust?1:0)-(INP.boost?1:0);
+    if(typeof MinigamePolish!=='undefined'){
+      const m=MinigamePolish.mergeSuborbitInput(ax,ay);
+      ax=m.ax;ay=m.ay;
+    }
     if((SUBORBIT.setPieceT||0)>0&&SUBORBIT.setPieceKind==='storm'){
       SUBORBIT.stormVx=lerp(SUBORBIT.stormVx||0,Math.sin(SUBORBIT.time*2.35)*300,sdt*.42);
     }else SUBORBIT.stormVx=lerp(SUBORBIT.stormVx||0,0,sdt*.25);
@@ -10208,29 +10346,44 @@ function updatePlanetSkim(dt){
         ?`<div style="font:9px var(--FM);color:#7a9ec0;margin:0 0 6px;line-height:1.35;max-width:400px;margin-left:auto;margin-right:auto;font-style:italic;opacity:${guideFade.toFixed(2)}">${SUBORBIT.loadingTip}</div>`
         :'';
       suborbitApplyFogPhase(routePct);
-      shud.innerHTML=
-        `${introRow}${tipRow}`
-        +`<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-bottom:4px;font:11px var(--FD);letter-spacing:.05em">`
-        +`<span style="color:${hpC}">HP ${Math.round(playerShip.health)}%</span>`
-        +`<span style="color:${enC}">EN ${Math.round(playerShip.energy)}%</span>`
-        +`<span style="color:#eed588">${fmt(PS.credits)}</span>`
-        +`<span style="color:#a8c8e8">SPD ${Math.round(SUBORBIT.speed)}</span></div>`
-        +`${exitRow}`
-        +`${objRow}`
-        +`${soRow}`
-        +(showGuide?`<div style="opacity:.85;margin:2px 0 4px;letter-spacing:.05em;color:#b8d8ff;font-size:8px;opacity:${guideFade.toFixed(2)}">WASD · Spazio fuoco · F trazione · SIGILLA/E · ESC stazione</div>`:'')
-        +`<div style="font:9px var(--FM);letter-spacing:.04em;margin-top:2px">`
-        +`<span style="${altWarn}">ALT ${altAbove}m</span> · `
-        +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span>`
-        +((SUBORBIT.spreadShotT||0)>0?` · <span style="color:#8fdfff">RAFFICA ${(SUBORBIT.spreadShotT).toFixed(1)}s</span>`:'')
-        +`</div>`;
+      if(SUBORBIT.hudMinimal){
+        shud.innerHTML=
+          `<div class="sob-compact" style="font:11px var(--FD);letter-spacing:.08em;color:#dff">`
+          +(depDone?'CIRCUITO OK':'SIGILLI '+depSeal+'/'+depNeed)
+          +' · HP '+Math.round(playerShip.health)+'% · CORR '+corridorPct.toFixed(0)+'%'
+          +(nearDep?' · <span style="color:#8effd8">SIGILLA</span>':'')
+          +`</div>`
+          +(depPrompt||'');
+      }else{
+        shud.innerHTML=
+          `${introRow}${tipRow}`
+          +`<div class="sob-detail" style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-bottom:4px;font:11px var(--FD);letter-spacing:.05em">`
+          +`<span style="color:${hpC}">HP ${Math.round(playerShip.health)}%</span>`
+          +`<span style="color:${enC}">EN ${Math.round(playerShip.energy)}%</span>`
+          +`<span style="color:#eed588">${fmt(PS.credits)}</span>`
+          +`<span style="color:#a8c8e8">SPD ${Math.round(SUBORBIT.speed)}</span></div>`
+          +`${exitRow}`
+          +`${objRow}`
+          +`${soRow}`
+          +(showGuide?`<div class="sob-detail" style="opacity:.85;margin:2px 0 4px;letter-spacing:.05em;color:#b8d8ff;font-size:8px;opacity:${guideFade.toFixed(2)}">WASD · Spazio fuoco · F trazione · SIGILLA/E · ESC · H compatto</div>`:'')
+          +`<div class="sob-detail" style="font:9px var(--FM);letter-spacing:.04em;margin-top:2px">`
+          +`<span style="${altWarn}">ALT ${altAbove}m</span> · `
+          +`<span style="${corWarn}">CORR ${corridorPct.toFixed(0)}%</span>`
+          +((SUBORBIT.spreadShotT||0)>0?` · <span style="color:#8fdfff">RAFFICA ${(SUBORBIT.spreadShotT).toFixed(1)}s</span>`:'')
+          +`</div>`;
+      }
+      if(typeof MinigamePolish!=='undefined'){
+        MinigamePolish.updateSuborbitArrow();
+        MinigamePolish.updateSuborbitCorridorBar(corridorFrac);
+        MinigamePolish.updateSuborbitVignette(playerShip.health,corridorFrac);
+      }
       // Sync pulsanti sigillo (HUD non cliccabile: i controlli sono fuori)
       const sealBtn=document.getElementById('sob-seal');
       const sealFab=document.getElementById('suborbit-seal-fab');
       if(sealBtn){
         sealBtn.disabled=!nearDep;
         sealBtn.classList.toggle('ready',!!nearDep);
-        sealBtn.textContent=nearDep?'SIGILLA':'SIGILLA';
+        sealBtn.style.display=nearDep?'none':'';
         sealBtn.title=nearDep?('Sigilla '+nearDep.name):'Avvicinati a un deposito (anello ciano)';
       }
       if(sealFab){
@@ -10644,6 +10797,7 @@ function enterBoarding(opts){
     :'Abbordaggio nave: equipaggio fuori combattimento. Recupera pezzi per il blueprint.',2400);
   initBoardingPointer();
   if(typeof PortraitAtlas!=='undefined')PortraitAtlas.load();
+  setTimeout(()=>tryShowTutorialBoarding(),480);
 }
 function leaveBoarding(opts){
   opts=opts||{};
@@ -10652,6 +10806,7 @@ function leaveBoarding(opts){
   BOARDING.active=false;
   INP.left=INP.right=INP.thrust=INP.boost=INP.fire=false;
   BOARDING._ptrActive=false;
+  if(typeof MinigamePolish!=='undefined')MinigamePolish.boardingJoyToInp(0,0,0);
   BOARDING.selectTarget=null;
   BOARDING.camOx=null;BOARDING.camOy=null;BOARDING._camInit=false;BOARDING._camTw=0;
   document.body.classList.remove('boarding-active');
@@ -10789,8 +10944,9 @@ function boardingReadMoveVec(){
   if(INP.boost){mdx+=1;mdy+=1;}
   if(INP.left){mdx+=-1;mdy+=1;}
   if(INP.right){mdx+=1;mdy+=-1;}
-  const mlen=Math.hypot(mdx,mdy);
+  let mlen=Math.hypot(mdx,mdy);
   if(mlen>.001){mdx/=mlen;mdy/=mlen;}
+  if(typeof MinigamePolish!=='undefined')return MinigamePolish.mergeBoardingMove(mdx,mdy,mlen);
   return{dx:mdx,dy:mdy,len:mlen};
 }
 /** Movimento fluido (WASD iso, 8 direzioni) con scivolamento sui muri — niente salti a griglia. */
@@ -10864,6 +11020,20 @@ function boardingCycleTarget(){
 function boardingFire(){
   const p=BOARDING.player;
   if(p.fireCd>0||!INP.fire)return;
+  if(typeof MINIGAME_OPTS!=='undefined'&&MINIGAME_OPTS.autoAim){
+    let best=null,bd=5;
+    for(const e of BOARDING.enemies){
+      if(!e.alive)continue;
+      const d=Math.hypot(e.sx-p.sx,e.sy-p.sy);
+      if(d<bd){bd=d;best=e;}
+    }
+    if(best){
+      let sx=best.sx+.5-(p.sx+.5),sy=best.sy+.5-(p.sy+.5);
+      const nl=Math.hypot(sx,sy)||1;
+      p._aimTx=sx/nl;p._aimTy=sy/nl;
+      p._aimX=p._aimTx;p._aimY=p._aimTy;
+    }
+  }
   p.fireCd=.09;
   let dx=p._aimX, dy=p._aimY;
   const al=Math.hypot(dx,dy);
@@ -10999,17 +11169,26 @@ function updateBoarding(dt){
     e.cd-=dt;
     const dist=Math.abs(e.x-p.x)+Math.abs(e.y-p.y);
     const alx=Math.abs((e.sx+0.5)-(p.sx+0.5)),aly=Math.abs((e.sy+0.5)-(p.sy+0.5));
-    if(e.cd<=0&&dist<=4&&(alx<0.42||aly<0.42)){
-      e.cd=1.85+Math.random()*1.1;
-      let ssx=p.x-e.x, ssy=p.y-e.y;
-      const esl=Math.hypot(ssx,ssy);
-      if(esl<.01){ssx=Math.sign(e.face||1);ssy=0;}
-      else{ssx/=esl;ssy/=esl;}
-      e.aimX=ssx;e.aimY=ssy;
-      if(Math.abs(ssx)>.12)e.face=Math.sign(ssx);
-      BOARDING.shots.push({x:e.sx+.5+ssx*.3,y:e.sy+.5+ssy*.3,dx:ssx,dy:ssy,life:.62,own:'e',ph:Math.random()*Math.PI*2});
-      BOARDING.flashes.push({x:e.sx+.5+ssx*.35,y:e.sy+.5+ssy*.35,t:.11,max:.11,col:BOARDING.kind==='hulk'?'#ffbb66':'#ff8a68'});
-      if(typeof playTone==='function')playTone(320,.04,.03,'sawtooth');
+    if(dist<=4&&(alx<0.42||aly<0.42)){
+      if(e.cd<=0){
+        if(!e.windup)e.windup=0.38;
+        e.windup-=dt;
+        if(e.windup<=0){
+          e.cd=1.85+Math.random()*1.1;
+          e.windup=0;
+          let ssx=p.x-e.x, ssy=p.y-e.y;
+          const esl=Math.hypot(ssx,ssy);
+          if(esl<.01){ssx=Math.sign(e.face||1);ssy=0;}
+          else{ssx/=esl;ssy/=esl;}
+          e.aimX=ssx;e.aimY=ssy;
+          if(Math.abs(ssx)>.12)e.face=Math.sign(ssx);
+          BOARDING.shots.push({x:e.sx+.5+ssx*.3,y:e.sy+.5+ssy*.3,dx:ssx,dy:ssy,life:.62,own:'e',ph:Math.random()*Math.PI*2});
+          BOARDING.flashes.push({x:e.sx+.5+ssx*.35,y:e.sy+.5+ssy*.35,t:.11,max:.11,col:BOARDING.kind==='hulk'?'#ffbb66':'#ff8a68'});
+          if(typeof playTone==='function')playTone(320,.04,.03,'sawtooth');
+        }
+      }
+    }else{
+      e.windup=0;
     }
     const melD=Math.hypot(e.sx-p.sx,e.sy-p.sy);
     if(melD<0.58){
@@ -11133,20 +11312,35 @@ function updateBoarding(dt){
       :((BOARDING.objective.label||'Recupera l\'obiettivo (cassa dorata).')+' <span style="color:#c8e8ff">['+prog+']</span>');
     const o2Block=isHulk
       ?('<div class="bh-row"><span>OSSIGENO</span><span style="color:'+(o2w<30?'#ff6644':'#88ddff')+'">'+o2w+'%</span></div>'
-        +'<div class="bh-bar o2'+(o2w<30?' low':'')+'"><div style="width:'+o2w+'%"></div></div>')
+        +'<div class="bh-bar o2'+(o2w<30?' low':'')+'" style="height:10px"><div style="width:'+o2w+'%"></div></div>')
       :'';
     const enemiesLeft=BOARDING.enemies.filter(e=>e.hp>0).length;
     const hint=isHulk
-      ?('Ostili: <strong>'+enemiesLeft+'</strong> · <strong>WASD</strong> · <strong>Spazio</strong> fuoco · <strong>Tap/Tab</strong> mira · <strong>Esc</strong> ritiro.')
-      :('<strong>Nessun ostile</strong> · casse a contatto · <strong>WASD</strong> · uscita = pezzi blueprint · <strong>Esc</strong> ritiro.');
+      ?('Ostili: <strong>'+enemiesLeft+'</strong> · <kbd>WASD</kbd> · <kbd>Spazio</kbd> · <kbd>Tab</kbd> mira · <kbd>Esc</kbd> ritiro.')
+      :('<strong>Nessun ostile</strong> · casse a contatto · <kbd>WASD</kbd> · uscita = pezzi · <kbd>Esc</kbd> ritiro.');
     hud.innerHTML=
       '<div class="bh-title">'+title+'</div>'
       +'<div class="bh-phase'+(doneObj?' exit':'')+'">'+phase+'</div>'
       +'<div class="bh-row"><span>VITA</span><span>'+hpw+'/100</span></div>'
-      +'<div class="bh-bar"><div style="width:'+hpw+'%"></div></div>'
+      +'<div class="bh-bar" style="height:10px"><div style="width:'+hpw+'%"></div></div>'
       +o2Block
       +'<div class="bh-obj">'+obj+'</div>'
       +'<div class="bh-hint">'+hint+'</div>';
+    const o2v=document.getElementById('boarding-o2-vignette');
+    if(o2v){
+      if(isHulk&&o2w<28){
+        o2v.classList.add('show');
+        o2v.style.opacity=String(((28-o2w)/28)*0.72);
+      }else{
+        o2v.classList.remove('show');
+        o2v.style.opacity='0';
+      }
+    }
+    const mm=document.getElementById('boarding-minimap');
+    if(mm&&typeof MinigamePolish!=='undefined'){
+      const mctx=mm.getContext('2d');
+      if(mctx)MinigamePolish.drawBoardingMinimap(mctx);
+    }
   }
 }
 // ---- Antropomorphic character renderer ----
@@ -11820,6 +12014,17 @@ function drawBoarding(){
     ctx.closePath();ctx.fill();
     ctx.strokeStyle=`rgba(180,255,210,${pulse})`;ctx.lineWidth=2;ctx.stroke();
   }
+  if(objDone&&typeof MinigamePolish!=='undefined'){
+    const path=MinigamePolish.boardingGreedyPath();
+    const bcPulse=(Math.sin(BOARDING.timer*4)*.5+.5)*.35+.2;
+    for(let bi=0;bi<path.length;bi++){
+      const cell=path[bi];
+      if(!boardingIsoOnScreen(cell.x,cell.y,iso))continue;
+      const bpt=isoPt(cell.x+.5,cell.y+.5,iso);
+      ctx.fillStyle=`rgba(100,255,180,${bcPulse*(1-bi/Math.max(1,path.length)*0.4)})`;
+      ctx.beginPath();ctx.arc(bpt.x,bpt.y+th*.5,tw*.11,0,Math.PI*2);ctx.fill();
+    }
+  }
   // 4) Everything else: build sortable ops.
   const ops=[];
   for(let y=0;y<R;y++){
@@ -11949,11 +12154,12 @@ function drawBoarding(){
       const c=isoPt(k.x+.5,k.y+.5,iso);
       const cxp=c.x, cyp=c.y+th*.5;
       const wob=Math.sin((k.wob||0)+t*3)*tw*.06;
+      const pulseP=0.55+Math.sin(t*4+(k.wob||0))*0.45;
       ctx.save();
       ctx.translate(cxp,cyp+wob);
       const rg=ctx.createRadialGradient(0,0,1,0,0,tw*.55);
       const main=k.kind==='main';
-      rg.addColorStop(0,main?'rgba(255,230,140,.7)':'rgba(140,210,255,.55)');
+      rg.addColorStop(0,main?`rgba(255,230,140,${.75*pulseP})`:`rgba(140,210,255,${.6*pulseP})`);
       rg.addColorStop(1,main?'rgba(255,180,40,0)':'rgba(100,180,255,0)');
       ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,tw*.55,0,Math.PI*2);ctx.fill();
       const s=tw*.22;
@@ -12019,6 +12225,14 @@ function drawBoarding(){
         ctx.arc(cxE,cyE-tw*.1,tw*.42,0,Math.PI*2);
         ctx.stroke();
         ctx.setLineDash([]);
+      }
+      if((e.windup||0)>0){
+        const wu=Math.min(1,e.windup/0.38);
+        ctx.strokeStyle=`rgba(255,70,40,${0.35+wu*0.55})`;
+        ctx.lineWidth=2.4;
+        ctx.beginPath();
+        ctx.arc(cxE,cyE,tw*(0.36+wu*0.14),0,Math.PI*2);
+        ctx.stroke();
       }
     }else if(op.type==='player'){
       const c=isoPt(p.sx+.5,p.sy+.5,iso);
