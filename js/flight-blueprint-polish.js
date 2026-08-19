@@ -194,14 +194,23 @@
     return false;
   }
 
+  function steerDeadzone(nx) {
+    const dead = 0.16;
+    if (!nx || Math.abs(nx) < dead) return 0;
+    const sign = nx > 0 ? 1 : -1;
+    const t = (Math.abs(nx) - dead) / (1 - dead);
+    return sign * Math.min(1, t * 0.82);
+  }
+
   function mergeFlightSteer() {
-    let nx = 0;
-    if (FLY_JOY.len > 0.12) nx = FLY_JOY.nx;
-    if (global.FLY_STEER) {
-      if (global.FLY_STEER.active) nx = global.FLY_STEER.nx;
-      else if (!FLY_JOY.len && global.FLY_STEER.nx) nx = global.FLY_STEER.nx;
+    if (FLY_JOY.len > 0.12) return steerDeadzone(FLY_JOY.nx);
+    const fs = global.FLY_STEER;
+    if (!fs) return 0;
+    if (fs.active) return steerDeadzone(fs.nx);
+    if (FLIGHT_OPTS.mouseSteer && !isCoarsePointer() && !isMobileLayout()) {
+      return steerDeadzone(fs.nx);
     }
-    return nx;
+    return 0;
   }
 
   function toggleFlyHudMinimal() {
@@ -541,6 +550,7 @@
     isCoarsePointer,
     flyHudMinimal: () => flyHudMinimal,
     toggleFlyHudMinimal,
+    steerDeadzone,
     mergeFlightSteer,
     flySteerBlockedAt,
     updateSpeedLabel,
