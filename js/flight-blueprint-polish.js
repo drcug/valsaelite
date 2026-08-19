@@ -537,6 +537,8 @@
   global.FlightBlueprintPolish = {
     FLIGHT_OPTS,
     FLY_JOY,
+    isMobileLayout,
+    isCoarsePointer,
     flyHudMinimal: () => flyHudMinimal,
     toggleFlyHudMinimal,
     mergeFlightSteer,

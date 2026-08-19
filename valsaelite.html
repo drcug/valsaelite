@@ -805,11 +805,28 @@ body.bp-grid-only #bp-panel{display:none!important}
 body.bp-grid-only #bp-wrap{max-height:none}
 #blueprint-modal.show #bp-fab-place,#blueprint-modal.show #bp-fab-erase,#blueprint-modal.show #bp-fab-grid{display:block}
 @media(pointer:coarse),(max-width:700px){
-  body.flying-ui #flight-joy-wrap,body.flying-ui #flight-fire-wrap,body.flying-ui #flight-more-btn{display:block}
-  body.flying-ui #hud .flight-primary .cb.fi{display:none}
-  body.flying-ui #flight-joy-wrap,body.flying-ui #flight-fire-wrap{transform:scale(var(--fly-ui-scale,1));transform-origin:bottom}
-  body.flying-ui #flight-fire-wrap{transform-origin:bottom right}
-  body.flying-ui #flight-joy-wrap{transform-origin:bottom left}
+  /* Mobile volo: tap sullo schermo per sterzare — niente twin-stick aggiuntivo */
+  body.flying-ui #flight-joy-wrap,
+  body.flying-ui #flight-fire-wrap,
+  body.flying-ui #flight-more-btn,
+  body.flying-ui #flight-more-row{display:none!important}
+  body.flying-ui .hb-left .cg{display:none}
+  body.flying-ui .cb-row-extra{display:none}
+  body.flying-ui .hb-left .cr-info{display:none}
+  body.flying-ui .hb{flex-wrap:nowrap;align-items:flex-end;justify-content:flex-end;gap:4px}
+  body.flying-ui .hb-left{flex:0 0 auto;min-width:0}
+  body.flying-ui .hb-controls{flex:0 1 auto;max-width:100%}
+  body.flying-ui .ctrl-rows{align-items:flex-end}
+  body.flying-ui .flight-primary{justify-content:flex-end}
+  body.flying-ui #btnth.throttle-fallback{display:none!important}
+  #throttle-rail{
+    bottom:max(14px,env(safe-area-inset-bottom));
+    right:max(8px,env(safe-area-inset-right));
+  }
+  body.flying-ui #speed-bar{bottom:max(78px,calc(env(safe-area-inset-bottom)+68px))}
+  body.flying-ui #speed-val{bottom:max(86px,calc(env(safe-area-inset-bottom)+76px))}
+  body.flying-ui #heat-bar{bottom:max(92px,calc(env(safe-area-inset-bottom)+80px))}
+  body.flying-ui #heat-lbl{bottom:max(100px,calc(env(safe-area-inset-bottom)+88px))}
   #bp-fab-place,#bp-fab-erase,#bp-fab-grid{display:none}
   #blueprint-modal.show #bp-fab-place,#blueprint-modal.show #bp-fab-erase,#blueprint-modal.show #bp-fab-grid{display:block}
 }
@@ -1591,7 +1608,7 @@ body.suborbit-active #smsg{
     <div class="help-grid"><span>Suborbita</span><span>Circuito Depositi: vault con anello ciano. Avvicinati e tocca <kbd>SIGILLA</kbd> (o <kbd>E</kbd>). Tre sigilli chiudono Cap.4. WASD · joystick mobile · drag sullo schermo · <kbd>H</kbd> HUD compatto · <kbd>ESC</kbd> stazione.</span></div>
     <div class="help-grid"><span>Radici</span><span>In stazione: tab <kbd>RADICI</kbd> — dialoghi con chi conosceva Zvan prima di Imperium. In mappa: badge <kbd>R</kbd> se c’è qualcuno disponibile.</span></div>
     <div id="help-lore-encyclopedia"></div>
-    <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> verticale per i motori · <kbd>SPINTA</kbd> = postbruciatore · tap/drag per virare · SX/DX</span></div>
+    <div class="help-grid"><span>Schermo</span><span>Su mobile: <kbd>manetta</kbd> a destra per i motori · <kbd>tap/drag</kbd> sullo schermo per virare · <kbd>FUOCO</kbd> · <kbd>SPINTA</kbd> · <kbd>T</kbd> radio</span></div>
     <button type="button" id="help-close" style="margin-top:8px;width:100%;padding:11px;font-family:var(--FD);font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:8px;cursor:pointer">CHIUDI</button>
   </div>
 </div>
@@ -7240,8 +7257,9 @@ touchTap('btnboard',()=>tryBoardingTrigger());
 
 /** Mobile / touch: gira la nave verso il lato dello schermo dove tocchi (fuori dai pulsanti UI). */
 const FLY_STEER={active:false,nx:0};
+window.FLY_STEER=FLY_STEER;
 (function initFlyScreenSteer(){
-  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,#rep-panel,#tgt-panel,.btouch-pad,#boarding-hud,#flight-joy-wrap,#flight-fire-wrap,#flight-more-btn,#flight-more-row';
+  const uiSel='button,a,input,select,textarea,.cb,#throttle-rail,#boarding-prompt,#dprompt,#dlg,#idlg,#gmap,#blueprint-modal,#diary-modal,#story-banner,#hulk-cine,#help-modal,#go,#hud .hp,#hud .cr-info,#radar,#a11y-strip,#fx-toggle,#rep-panel,#tgt-panel,.btouch-pad,#boarding-hud';
   const isUi=t=>{
     if(!t||!t.closest)return false;
     return !!t.closest(uiSel);
@@ -7251,7 +7269,7 @@ const FLY_STEER={active:false,nx:0};
     if(typeof storyBannerOpen==='function'&&storyBannerOpen()){FLY_STEER.active=false;return;}
     if(GAME.pausedReasons&&Object.values(GAME.pausedReasons).some(Boolean)){FLY_STEER.active=false;return;}
     if(isUi(e.target)){FLY_STEER.active=false;return;}
-    if(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish.flySteerBlockedAt(e.clientX,e.clientY)){
+    if(typeof FlightBlueprintPolish!=='undefined'&&!FlightBlueprintPolish.isMobileLayout()&&FlightBlueprintPolish.flySteerBlockedAt(e.clientX,e.clientY)){
       FLY_STEER.active=false;return;
     }
     const w=Math.max(1,window.innerWidth||1);
@@ -15746,8 +15764,11 @@ function animate(){
     if(GAME.state==='flying'){
       const turnBoost=INP.thrust?1.28:1;
       let turnL=!!INP.left, turnR=!!INP.right;
-      const flyNx=(typeof FlightBlueprintPolish!=='undefined')?FlightBlueprintPolish.mergeFlightSteer():0;
       if(!INP.left&&!INP.right){
+        let flyNx=0;
+        if(typeof FlightBlueprintPolish!=='undefined')flyNx=FlightBlueprintPolish.mergeFlightSteer();
+        else if(FLY_STEER.active)flyNx=FLY_STEER.nx;
+        else if(FLY_STEER.nx)flyNx=FLY_STEER.nx;
         if(flyNx<-0.1)turnL=true;
         else if(flyNx>0.1)turnR=true;
       }
