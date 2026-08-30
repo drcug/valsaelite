@@ -25,7 +25,16 @@
     intro2: 'sprites/story/intro/intro_02.jpg',
     intro3: 'sprites/story/intro/intro_03.jpg',
     intro4: 'sprites/story/intro/intro_04.jpg',
-    intro5: 'sprites/story/intro/intro_05.jpg'
+    intro5: 'sprites/story/intro/intro_05.jpg',
+    uni1: 'sprites/story/universe/uni_01.jpg',
+    uni2: 'sprites/story/universe/uni_02.jpg',
+    uni3: 'sprites/story/universe/uni_03.jpg',
+    uni4: 'sprites/story/universe/uni_04.jpg',
+    uni5: 'sprites/story/universe/uni_05.jpg',
+    uni6: 'sprites/story/universe/uni_06.jpg',
+    uni7: 'sprites/story/universe/uni_07.jpg',
+    uni8: 'sprites/story/universe/uni_08.jpg',
+    uni9: 'sprites/story/universe/uni_09.jpg'
   };
 
   /** Panorami per corpo principale; satelliti ereditano dal parent */

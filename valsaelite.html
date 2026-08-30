@@ -1123,7 +1123,7 @@ body.suborbit-active #smsg{
   background:linear-gradient(180deg,rgba(4,16,22,.98),rgba(2,8,12,.99));border-top:1px solid rgba(70,180,160,.3)}
 #intro-slideshow .is-chap{font:10px var(--FM);letter-spacing:.28em;color:var(--copper);margin-bottom:6px}
 #intro-slideshow .is-title{font-size:clamp(18px,3.5vw,26px);font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.06em}
-#intro-slideshow .is-text{font:12px/1.7 var(--FM);color:#9ec4bc;max-height:min(28vh,200px);overflow-y:auto;margin-bottom:12px}
+#intro-slideshow .is-text{font:13px/1.65 var(--FM);color:#b8d4cc;max-height:min(38vh,280px);overflow-y:auto;margin-bottom:12px}
 #intro-slideshow .is-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 #intro-slideshow .is-foot #is-progress{flex:1;font:10px var(--FM);color:#4a7068;letter-spacing:.12em}
 #intro-slideshow .is-btn{font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.14em;padding:10px 18px;
@@ -1769,21 +1769,33 @@ function scheduleBootStory(){
 }
 
 const UNIVERSE_SLIDES=[
-  {chap:'UNIVERSO · I',title:'L\'Impero in stallo',
-    text:'Siamo nel 40.024 dell\'Era Imperiale. L\'Impero Galattico è una holding in coma legale: fax quantistici, OPA ostili e un Senato che firma ciò che gli mettono sotto il naso. Le Dodici Casate contano i soldi. Tu conti i verbali. A Imperium è lo stesso lavoro, solo con corridoi più lunghi.',
-    art:'sprites/story/intro/intro_01.jpg'},
-  {chap:'UNIVERSO · II',title:'Il Trono d\'Oro',
-    text:'Sul Mondo Trono, Craxi non governa: resta. Un resto umano tenuto in vita dalle macchine e dal macguffinium, materia a nove dimensioni. Longevità e potere psionico, umanità persa per strada. Il CdA Galattico cerca un CEO che lo deponga legalmente. A Valsamoggia arriva come bollettino e ispezione di settimo livello.',
-    art:'sprites/story/intro/intro_02.jpg'},
-  {chap:'UNIVERSO · III',title:'Macguffinium',
-    text:'Scoperto nel 35.123 E.I., il macguffinium è il motivo per cui le anomalie «respirano» e i depositi tartuferi non stanno mai chiusi. Nelle casate vale fortune. Nei relitti muta carne e documenti. Qui basta non aprire la porta sbagliata. Le grandi casate già fanno i conti: se il Mulino si spegne, questo sistema diventa un giacimento con abitanti.',
-    art:'sprites/story/intro/intro_03.jpg'},
-  {chap:'UNIVERSO · IV',title:'Il Vecchio Pianeta',
-    text:'Valsamoggia è periferia: cinque fazioni, non le Dodici Casate. Bazzano, Calcara, Savigno, Monteveglio, Castelletto. Micro-potenze con rancori di cortile. Il Patto del Molino tiene unite le rotte. Finché gira, Imperium osserva da lontano. Se si sgretola, arrivano gli avvocati orbitali — e il vecchio pianeta smette di essere casa.',
-    art:'sprites/story/intro/intro_04.jpg'},
-  {chap:'UNIVERSO · V',title:'Il Patto del Molino',
-    text:'Testo antico: commercio, anomalie, tartufi. Spezzato, va ricomposto pezzo a pezzo e il Mulino riacceso. Non è folclore da brochure: è la differenza tra periferia ignorata e fronte galattico. Zvan Marìa, funzionario VII, torna perché è nato lì. Nessuno ha chiesto se è ancora di lì.',
-    art:'sprites/story/intro/intro_05.jpg'}
+  {chap:'UNIVERSO · I',title:'Dove siamo',
+    text:'Siamo nel 40.024 dell\'Era Imperiale: l\'umanità ha colonizzato migliaia di mondi. L\'Impero Galattico è ancora in piedi, ma è enorme, lento e pieno di uffici. Al centro c\'è Imperium, la capitale. Questa storia, però, non si gioca lì. Si gioca su un pianeta di campagna che i funzionari chiamano «il Vecchio Pianeta». Il suo nome è Valsamoggia. Per te, un tempo, era casa.',
+    art:'sprites/story/universe/uni_01.jpg'},
+  {chap:'UNIVERSO · II',title:'L\'Impero non governa: amministra',
+    text:'A Imperium i corridoi sono di marmo e tutti uguali. Il Senato firma le carte. I ministeri mandano ispezioni. Quasi nessuno decide davvero: si inoltra, si archivia, si aspetta. Finché un mondo di periferia paga le tasse e non fa rumore, la capitale lo ignora. Il giorno in cui fa rumore, non arrivano eroi. Arrivano moduli, avvocati e, se serve, le navi.',
+    art:'sprites/story/universe/uni_02.jpg'},
+  {chap:'UNIVERSO · III',title:'Chi siede sul Trono d\'Oro',
+    text:'L\'imperatore si chiama Craxi. Non governa più come farebbe una persona: resta. Vive sul Mondo Trono, tenuto in vita da macchine e da una sostanza che ha piegato il suo corpo e la sua mente. Il Senato continua a ratificare. Un consiglio di amministratori cerca, da secoli, un modo legale per sostituirlo. Per te Craxi è una firma in cima ai moduli. Per Valsamoggia è un bollettino radio che nessuno ascolta fino in fondo.',
+    art:'sprites/story/universe/uni_03.jpg'},
+  {chap:'UNIVERSO · IV',title:'Macguffinium: perché tutti litigano',
+    text:'Esiste una materia rara, scoperta migliaia di anni fa. Si chiama macguffinium. Non è un metallo normale: i tecnici dicono che «vive» in nove dimensioni. Allunga la vita, piega la mente, fa «respirare» i relitti e i magazzini. Un grammo vale una fortuna. Dove c\'è, i potenti mandano navi. Dove non c\'è, mandano un funzionario e un sorriso. Valsamoggia, purtroppo, ne ha — nascosto nelle anomalie e nei depositi di tartufi.',
+    art:'sprites/story/universe/uni_04.jpg'},
+  {chap:'UNIVERSO · V',title:'Le Dodici Casate',
+    text:'Le vere potenze dell\'Impero non sono i ministeri. Sono le Dodici Casate: famiglie-azienda con nomi che ti suonano familiari (Mediaset, Fiat, Nutella…) e flotte che valgono più di un sistema solare. Per loro Valsamoggia non è un paese: è un giacimento con abitanti. Oggi il sistema è troppo piccolo e troppo litigioso per valere un\'invasione. Domani, se le rotte si spezzano, diventa un affare. Il tuo lavoro è fare in modo che «domani» non arrivi.',
+    art:'sprites/story/universe/uni_05.jpg'},
+  {chap:'UNIVERSO · VI',title:'Il Vecchio Pianeta',
+    text:'Valsamoggia è lontano da tutto. Cinque potenze locali si dividono il cielo: Bazzano, Calcara, Savigno, Monteveglio e Castelletto. Non sono le Dodici Casate. Sono comuni, clan, osterie e rancori che durano da generazioni. Si sparano per un corridoio, si riappacificano per un tartufo, si tradiscono per un verbale. Tu sei cresciuto qui. Poi sei andato a Imperium e per vent\'anni hai firmato carte su mondi che non rivedrai.',
+    art:'sprites/story/universe/uni_06.jpg'},
+  {chap:'UNIVERSO · VII',title:'Il Mulino tiene le rotte',
+    text:'Sopra Bazzano gira un Mulino antico. Non è solo un monumento: è il cuore delle rotte locali. Finché le pale si muovono, i commerci tengono, le anomalie restano gestibili e Imperium lascia il sistema in pace. Se il Mulino si spegne, le fazioni si chiudono, i depositi diventano bottino e le Casate sentono odore di affare. Per questo tutti, anche chi non si parla, hanno paura che si fermi.',
+    art:'sprites/story/universe/uni_07.jpg'},
+  {chap:'UNIVERSO · VIII',title:'Il Patto è spezzato',
+    text:'Le cinque fazioni avevano un accordo vecchio come le pale: il Patto del Molino. Regolava commercio, anomalie e tartufi. Qualcuno l\'ha spezzato. I pezzi — i frammenti — sono sparsi tra i clan. Finché non tornano insieme e il Mulino non riparte, Valsamoggia è un incidente in corso. Imperium non manda una flotta: costa troppo. Manda te. Sulla carta sei «di lì», e per loro basta.',
+    art:'sprites/story/universe/uni_08.jpg'},
+  {chap:'UNIVERSO · IX',title:'Tu sei Zvan Marìa',
+    text:'Funzionario di settimo livello: abbastanza in alto da firmare, troppo in basso per decidere. Nato a Valsamoggia, cresciuto nei corridoi di Imperium. Il gioco comincia quando ti mandano a casa a ricomporre il Patto, riaccendere il Mulino e tenere lontane le Casate. Nessuno a Imperium ha chiesto se, dopo vent\'anni, sei ancora di lì. Lo scoprirai volando.',
+    art:'sprites/story/universe/uni_09.jpg'}
 ];
 
 const INTRO_SLIDES=[
