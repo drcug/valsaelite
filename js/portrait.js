@@ -1,75 +1,29 @@
 'use strict';
 /**
- * Portrait — atlas bust + overlay procedurale (occhi, naso/bocca, capelli, accessori)
- * Fallback: volto interamente procedurale se atlas assente.
+ * Ritratti — busti completi con alpha (chromakey #5B8FC4 processato offline).
+ * Capelli già nel PNG. Nessun layer separato.
  */
 (function (global) {
   const L = global.PORTRAIT_LAYOUT || {
-    cols: 4, rows: 2, cellW: 128, cellH: 160,
+    cols: 4, rows: 4, cellW: 128, cellH: 160,
     atlasPath: 'sprites/portraits.png',
-    view: { pad: 0.06, centerYFrac: 0.52, scaleMul: 1.0 },
-    face: { cxFrac: 0.5, headYFrac: 0.36, hwFrac: 0.38, hhFrac: 0.40 }
+    view: { pad: 0.01, centerYFrac: 0.5, scaleMul: 1.12 },
+    player: { head: 'sprites/faces/player/zvan_complete.png', complete: true },
+    parts: { heads: [] }
   };
 
-  const SKINS = [
-    { b: '#f5cfa0', m: '#d4a56a', d: '#b07840', l: '#d4756a' },
-    { b: '#e8b880', m: '#c89050', d: '#9a6030', l: '#c06055' },
-    { b: '#c07840', m: '#9a5820', d: '#703800', l: '#a04838' },
-    { b: '#8a4820', m: '#6a3010', d: '#4a1800', l: '#803028' },
-    { b: '#fce0c0', m: '#e8b890', d: '#c08860', l: '#e06870' },
-    { b: '#d09060', m: '#a86030', d: '#784010', l: '#b05040' },
-    { b: '#a8c8a0', m: '#7a9a72', d: '#4a6848', l: '#c07080' },
-    { b: '#b0b8c8', m: '#8890a0', d: '#606878', l: '#9098a8' }
-  ];
+  const N_BUSTS = Math.max(1, ((L.parts && L.parts.heads) || []).length || 12);
+  const partCache = Object.create(null);
+  const partsState = { ready: false, loading: false, promise: null, ok: 0 };
+  const atlas = { img: null, ready: false, loading: false, promise: null };
 
-  const HAIR_COLS = ['#100808', '#281408', '#7a4018', '#b07020', '#d4b050', '#e8d8a0', '#eeeeee', '#540010', '#001035', '#224418'];
-  const EYE_COLS = ['#3a5f8a', '#2d6e3a', '#7a4a1a', '#1a4a6b', '#4a3a7b', '#1f4a2a', '#5a3a20', '#2a5a6a'];
-  const HAIR_STYLES = ['short', 'medium', 'long', 'mohawk', 'bun', 'shaved', 'wavy', 'bald'];
-  const EYE_TYPES = ['normal', 'blue', 'cyborgR', 'cyborgG', 'alien', 'stern', 'goggles', 'patch'];
-  const MOUTH_TYPES = ['smile', 'neutral', 'smirk', 'confident', 'stern', 'open', 'flat', 'grit'];
-
-  function portraitFaceFromSeed(seed) {
-    let h = (seed >>> 0) || 1;
-    h = (Math.imul(h, 1664525) + 1013904223) | 0;
-    const x = Math.abs(h);
-    return { fHead: x % 8, fEye: (x >> 3) % 8, fMouth: (x >> 6) % 8, fHair: (x >> 9) % 8 };
-  }
-
-  function portraitHueFromSeed(seed) {
-    return (Math.imul(seed | 0, 2654435761) >>> 0) % 360;
-  }
-
-  function portraitAtlasIndex(seed) {
-    return portraitFaceFromSeed(seed).fHead % (L.cols * L.rows);
-  }
-
-  function makeRng(seed) {
-    let s = ((seed || 1) * 9301 + 49297) & 0x7fffffff;
-    return (mn, mx) => {
-      s = (s * 9301 + 49297) & 0x7fffffff;
-      const v = s / 0x7fffffff;
-      return mn === undefined ? v : mn + v * (mx - mn);
-    };
-  }
-
-  function roundRectCtx(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.arcTo(x + w, y, x + w, y + r, r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-    ctx.lineTo(x + r, y + h);
-    ctx.arcTo(x, y + h, x, y + h - r, r);
-    ctx.lineTo(x, y + r);
-    ctx.arcTo(x, y, x + r, y, r);
-    ctx.closePath();
-  }
-
-  const atlas = { ready: false, loading: false, promise: null, img: null };
-
-  function absUrl(rel) {
-    try { return new URL(rel, global.location.href).href; } catch (_) { return rel; }
+  function absUrl(path) {
+    if (!path) return path;
+    if (/^https?:|^data:|^blob:/i.test(path)) return path;
+    try {
+      const base = (global.document && global.document.baseURI) || (global.location && global.location.href) || '';
+      return base ? new URL(path, base).href : path;
+    } catch (_) { return path; }
   }
 
   function loadImage(url) {
@@ -82,6 +36,153 @@
     });
   }
 
+  function allBustIndices() {
+    return Array.from({ length: N_BUSTS }, (_, i) => i);
+  }
+
+  function poolIndices(name) {
+    const pools = L.pools || {};
+    const list = pools[name];
+    if (list && list.length) return list.filter((i) => i >= 0 && i < N_BUSTS);
+    return allBustIndices();
+  }
+
+  function looksFeminineName(name) {
+    if (!name || typeof name !== 'string') return false;
+    const s = String(name).trim();
+    const masc = L.masculineNameRe || /\b(mariotto|fausto|pax|old man|sornione|jack|lupo|bardo|scudiero|sir |tenente|agente|corsaro|brigante|pirata della|assessore|direttore|ingegnere|comm\.|dir\.|ing\.|sgt\.|cap\.)\b/i;
+    if (masc.test(s)) return false;
+    const re = L.feminineNameRe || /a$|ina$|essa\b|paladina|castellana|serafina|selvaggia|vera\b|tartufa|piadina|copilota|dottore?ssa|ispettrice|notaia|capitana|dama\b|nonna|elsa\b|marina\b|lia\b|palmira\b|zia\b|cugina\b/i;
+    if (re.test(s)) return true;
+    // Controlla primo token ("Marina del Porto", "Dottoressa Baldi")
+    const first = s.split(/[\s"']+/).filter(Boolean)[0] || '';
+    return !!(first && re.test(first) && !masc.test(first));
+  }
+
+  function resolveGender(opt) {
+    opt = opt || {};
+    const kind = String(opt.kind || opt.gender || '').toLowerCase();
+    if (kind === 'f' || kind === 'female' || kind === 'women' || kind === 'woman') return 'f';
+    if (kind === 'm' || kind === 'male' || kind === 'men' || kind === 'man') return 'm';
+    if (looksFeminineName(opt.name || opt.displayName)) return 'f';
+    return 'm';
+  }
+
+  /**
+   * Sceglie il pool busto rispettando il genere.
+   * Pirati: pirate_women / pirate_men. Civili: women / men.
+   * Mai ritratti femminili su nomi maschili (e viceversa).
+   */
+  function resolvePortraitPool(seed, opt) {
+    opt = opt || {};
+    if (opt.pool && L.pools && L.pools[opt.pool]) return poolIndices(opt.pool);
+    const fac = String(opt.factionId || opt.faction || '');
+    const kind = String(opt.kind || opt.gender || '').toLowerCase();
+    const gender = resolveGender(opt);
+    const isPirate = fac === 'pirate' || kind === 'pirate' || kind === 'pirates';
+    if (isPirate) {
+      if (gender === 'f') {
+        const pw = poolIndices('pirate_women');
+        return pw.length ? pw : poolIndices('women');
+      }
+      const pm = poolIndices('pirate_men');
+      return pm.length ? pm : poolIndices('men');
+    }
+    if (gender === 'f') return poolIndices('women');
+    return poolIndices('men');
+  }
+
+  function portraitAtlasIndex(seed, opt) {
+    const pool = resolvePortraitPool(seed, opt);
+    const x = ((seed * 1103515245 + 12345) >>> 0);
+    return pool[x % Math.max(1, pool.length)];
+  }
+
+  function portraitHueFromSeed(seed) {
+    return ((seed * 37) % 360);
+  }
+
+  function portraitFaceFromSeed(seed, opt) {
+    const idx = portraitAtlasIndex(seed, opt);
+    const heads = (L.parts && L.parts.heads) || [];
+    return {
+      fHead: idx,
+      bustPath: heads[idx % Math.max(1, heads.length)] || null,
+      fHairStyle: 0,
+      hairPath: null,
+      accPath: null
+    };
+  }
+
+  function factionColor(factionId) {
+    if (factionId === 'pirate') return '#ff5533';
+    const f = global.FACTIONS && global.FACTIONS[factionId];
+    return f ? f.color : '#3ecfbb';
+  }
+
+  function PortraitParts_loadExtras() {
+    const urls = [];
+    const push = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
+    ((L.parts && L.parts.heads) || []).forEach(push);
+    if (L.player) push(L.player.head);
+    // Ritratti dedicati equipaggio (CREW_POOL.portrait)
+    const pool = global.CREW_POOL || [];
+    pool.forEach((c) => { if (c && c.portrait) push(c.portrait); });
+    // Ritratti dedicati incontri RADICI
+    const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
+    Object.keys(roots).forEach((st) => {
+      (roots[st] || []).forEach((enc) => {
+        if (!enc) return;
+        if (enc.portrait) push(enc.portrait);
+        Object.values(enc.nodes || {}).forEach((node) => {
+          if (node && node.portrait) push(node.portrait);
+        });
+      });
+    });
+    ((L.rootPortraits) || []).forEach(push);
+    return urls;
+  }
+
+  const PortraitParts = {
+    load() {
+      if (partsState.ready) return Promise.resolve(partsState.ok > 0);
+      if (partsState.promise) return partsState.promise;
+      const urls = PortraitParts_loadExtras();
+      partsState.loading = true;
+      partsState.promise = Promise.all(urls.map((u) =>
+        loadImage(absUrl(u)).then((im) => { partCache[u] = im; partsState.ok++; return true; })
+          .catch(() => false)
+      )).then(() => {
+        partsState.ready = true;
+        partsState.loading = false;
+        return partsState.ok > 0;
+      });
+      return partsState.promise;
+    },
+    get(path) { return path ? partCache[path] || null : null; },
+    get ready() { return partsState.ready && partsState.ok > 0; },
+    reloadCrew() {
+      // Permette di ricaricare se CREW_POOL / Radici arrivano dopo
+      const urls = [];
+      const push = (u) => { if (u && !partCache[u] && urls.indexOf(u) < 0) urls.push(u); };
+      (global.CREW_POOL || []).forEach((c) => { if (c && c.portrait) push(c.portrait); });
+      const roots = (global.RootDialogues && global.RootDialogues.ROOT_ENCOUNTERS) || {};
+      Object.keys(roots).forEach((st) => {
+        (roots[st] || []).forEach((enc) => {
+          if (!enc) return;
+          if (enc.portrait) push(enc.portrait);
+          Object.values(enc.nodes || {}).forEach((node) => {
+            if (node && node.portrait) push(node.portrait);
+          });
+        });
+      });
+      if (!urls.length) return Promise.resolve(true);
+      return Promise.all(urls.map((u) =>
+        loadImage(absUrl(u)).then((im) => { partCache[u] = im; partsState.ok++; return true; }).catch(() => false)
+      )).then(() => redrawAllVisiblePortraits());
+    }
+  };
+
   const PortraitAtlas = {
     load() {
       if (atlas.ready) return Promise.resolve(true);
@@ -90,14 +191,11 @@
       atlas.promise = loadImage(absUrl(L.atlasPath))
         .then((im) => {
           atlas.img = im;
-          atlas.ready = im.naturalWidth > 0 && im.naturalHeight > 0;
+          atlas.ready = im.naturalWidth > 0;
           atlas.loading = false;
-          if (atlas.ready && typeof global.console !== 'undefined') {
-            global.console.info('[portrait] Atlas bust OK:', L.atlasPath);
-          }
           return atlas.ready;
         })
-        .catch((e) => {
+        .catch(() => {
           atlas.ready = false;
           atlas.loading = false;
           atlas.promise = null;
@@ -109,454 +207,227 @@
     get img() { return atlas.img; }
   };
 
-  function factionColor(factionId) {
-    const f = global.FACTIONS && global.FACTIONS[factionId];
-    return f ? f.color : '#667788';
-  }
-
-  function faceGeomFromRect(rect) {
-    const f = L.face;
-    const { dx, dy, dw, dh } = rect;
-    return {
-      cx: dx + dw * f.cxFrac,
-      headY: dy + dh * f.headYFrac,
-      hw: dw * f.hwFrac,
-      hh: dh * f.hhFrac
-    };
-  }
-
-  function faceGeomCanvas(W, H, rng) {
-    return {
-      cx: W / 2,
-      headY: H * 0.42,
-      hw: W * 0.215 + rng(-3, 5),
-      hh: H * 0.275 + rng(-3, 4)
-    };
-  }
-
-  function computeAtlasRect(W, H, im, seed) {
-    const cols = L.cols, rows = L.rows;
-    const cw = Math.floor(im.naturalWidth / cols);
-    const ch = Math.floor(im.naturalHeight / rows);
-    if (!cw || !ch) return null;
-    const idx = portraitAtlasIndex(seed);
-    const col = idx % cols;
-    const row = (idx / cols) | 0;
-    const v = L.view;
-    const pad = v.pad;
+  function bustDestRect(W, H, iw, ih) {
+    const pad = (L.view && L.view.pad != null) ? L.view.pad : 0.01;
+    const scaleMul = (L.view && L.view.scaleMul != null) ? L.view.scaleMul : 1.12;
     const maxW = Math.max(12, W * (1 - 2 * pad));
     const maxH = Math.max(12, H * (1 - 2 * pad));
-    const sc = Math.min(maxW / cw, maxH / ch) * v.scaleMul;
-    const dw = cw * sc, dh = ch * sc;
-    return { dx: (W - dw) * 0.5, dy: H * v.centerYFrac - dh * 0.5, dw, dh, cw, ch, col, row, sc };
-  }
-
-  function drawHair(ctx, g, style, hCol, sk, rng) {
-    const { cx, headY, hw, hh } = g;
-    if (style === 'bald') return;
-    ctx.fillStyle = hCol;
-    if (style === 'short') {
-      ctx.beginPath();
-      ctx.moveTo(cx - hw, headY - 0.05 * hh);
-      ctx.bezierCurveTo(cx - hw * 1.05, headY - hh * 0.68, cx - hw * 0.58, headY - hh, cx, headY - hh);
-      ctx.bezierCurveTo(cx + hw * 0.58, headY - hh, cx + hw * 1.05, headY - hh * 0.68, cx + hw, headY - 0.05 * hh);
-      ctx.quadraticCurveTo(cx, headY - hh * 1.18, cx, headY - hh);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'medium') {
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.68, headY + hh * 0.18);
-      ctx.bezierCurveTo(cx - hw * 1.22, headY - hh * 0.32, cx - hw * 0.98, headY - hh * 1.12, cx, headY - hh * 1.1);
-      ctx.bezierCurveTo(cx + hw * 0.98, headY - hh * 1.12, cx + hw * 1.22, headY - hh * 0.32, cx + hw * 0.68, headY + hh * 0.18);
-      ctx.bezierCurveTo(cx + hw * 0.5, headY + hh * 0.44, cx + hw * 0.28, headY + hh * 0.58, cx, headY + hh * 0.52);
-      ctx.bezierCurveTo(cx - hw * 0.28, headY + hh * 0.58, cx - hw * 0.5, headY + hh * 0.44, cx - hw * 0.68, headY + hh * 0.18);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'long') {
-      const bot = headY + hh * 1.55;
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.82, bot);
-      ctx.bezierCurveTo(cx - hw * 1.18, headY - hh * 0.28, cx - hw * 0.95, headY - hh * 1.12, cx, headY - hh * 1.14);
-      ctx.bezierCurveTo(cx + hw * 0.95, headY - hh * 1.12, cx + hw * 1.18, headY - hh * 0.28, cx + hw * 0.82, bot);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'mohawk') {
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.09, headY - hh * 0.93);
-      ctx.bezierCurveTo(cx - hw * 0.18, headY - hh * 1.65, cx + hw * 0.18, headY - hh * 1.65, cx + hw * 0.09, headY - hh * 0.93);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'bun') {
-      ctx.beginPath();
-      ctx.arc(cx, headY - hh * 1.18, hw * 0.32, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(cx - hw, headY - 0.06 * hh);
-      ctx.bezierCurveTo(cx - hw, headY - hh * 0.62, cx - hw * 0.5, headY - hh, cx, headY - hh);
-      ctx.bezierCurveTo(cx + hw * 0.5, headY - hh, cx + hw, headY - hh * 0.62, cx + hw, headY - 0.06 * hh);
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'wavy') {
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.7, headY + hh * 0.22);
-      for (let i = 0; i <= 8; i++) {
-        const t = i / 8;
-        ctx.lineTo(cx - hw * (1.1 - t * 0.4) + Math.sin(t * Math.PI * 3) * hw * 0.08, headY - hh * (t * 0.95 - 0.12));
-      }
-      ctx.quadraticCurveTo(cx, headY - hh * 1.12, cx + hw * 0.6, headY - hh * 0.9);
-      for (let i = 8; i >= 0; i--) {
-        const t = i / 8;
-        ctx.lineTo(cx + hw * (1.1 - t * 0.4) + Math.sin(t * Math.PI * 3) * hw * 0.08, headY - hh * (t * 0.95 - 0.12));
-      }
-      ctx.closePath();
-      ctx.fill();
-    } else if (style === 'shaved') {
-      ctx.globalAlpha = 0.35;
-      ctx.fillStyle = sk.d;
-      for (let k = 0; k < 40; k++) {
-        ctx.fillRect(cx + (rng() - 0.5) * hw * 2, headY - hh * 0.5 + rng() * hh * 0.5, rng(0.4, 1.2), rng(0.8, 2));
-      }
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  function drawOneEye(ctx, ex, ey, ew, eh, eCol, kind) {
-    if (kind === 'patch') {
-      ctx.fillStyle = '#0a0810';
-      ctx.beginPath();
-      ctx.ellipse(ex, ey, ew * 1.1, eh * 1.05, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = Math.max(0.8, ew * 0.12);
-      ctx.stroke();
-      ctx.strokeStyle = '#444';
-      ctx.beginPath();
-      ctx.moveTo(ex - ew * 1.3, ey - eh * 0.5);
-      ctx.lineTo(ex + ew * 1.3, ey + eh * 0.5);
-      ctx.stroke();
-      return;
-    }
-    if (kind === 'cyborgR' || kind === 'cyborgG') {
-      const glow = kind === 'cyborgR' ? '#ff2244' : '#44ff88';
-      ctx.fillStyle = '#1a2030';
-      ctx.beginPath();
-      ctx.ellipse(ex, ey, ew, eh, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.ellipse(ex, ey, ew * 0.55, eh * 0.65, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.7)';
-      ctx.beginPath();
-      ctx.arc(ex + ew * 0.2, ey - eh * 0.2, ew * 0.15, 0, Math.PI * 2);
-      ctx.fill();
-      return;
-    }
-    const iris = kind === 'alien' ? '#ffcc22' : kind === 'blue' ? '#2a6aaa' : eCol;
-    ctx.fillStyle = '#eef2f8';
-    ctx.beginPath();
-    ctx.ellipse(ex, ey, ew, eh, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = iris;
-    ctx.beginPath();
-    ctx.ellipse(ex, ey, ew * 0.62, eh * 0.84, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (kind === 'alien') {
-      ctx.fillStyle = 'rgba(255,220,80,.55)';
-      ctx.beginPath();
-      ctx.ellipse(ex, ey, ew * 0.5, eh * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.fillStyle = '#050508';
-    ctx.beginPath();
-    ctx.ellipse(ex, ey + eh * 0.04, ew * 0.32, eh * 0.48, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.beginPath();
-    ctx.arc(ex + ew * 0.22, ey - eh * 0.24, ew * 0.1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawEyes(ctx, g, eyeType, eCol, hCol, rng) {
-    const { cx, headY, hw, hh } = g;
-    const eyeY = headY - hh * 0.06;
-    const eSpread = hw * 0.38;
-    const ew = hw * 0.15, eh = hh * 0.075;
-    const bCol = (hCol === '#eeeeee' || hCol === '#e8d8a0') ? '#888888' : hCol;
-
-    if (eyeType === 'goggles') {
-      ctx.fillStyle = 'rgba(20,30,40,.75)';
-      ctx.strokeStyle = '#556677';
-      ctx.lineWidth = Math.max(1, hw * 0.04);
-      const gx = cx - eSpread - ew * 1.1, gy = eyeY - eh * 1.2, gw = (eSpread + ew * 1.1) * 2, gh = eh * 2.4;
-      roundRectCtx(ctx, gx, gy, gw, gh, eh * 0.5);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(80,200,120,.35)';
-      ctx.beginPath();
-      ctx.ellipse(cx - eSpread, eyeY, ew * 0.9, eh * 0.85, 0, 0, Math.PI * 2);
-      ctx.ellipse(cx + eSpread, eyeY, ew * 0.9, eh * 0.85, 0, 0, Math.PI * 2);
-      ctx.fill();
-      return;
-    }
-
-    const leftKind = eyeType === 'patch' ? 'patch' : eyeType === 'cyborgR' ? 'cyborgR' : eyeType === 'cyborgG' ? 'normal' : eyeType;
-    const rightKind = eyeType === 'patch' ? 'normal' : eyeType === 'cyborgR' ? 'normal' : eyeType === 'cyborgG' ? 'cyborgG' : eyeType;
-
-    drawOneEye(ctx, cx - eSpread, eyeY, ew, eh, eCol, leftKind);
-    drawOneEye(ctx, cx + eSpread, eyeY, ew, eh, eCol, rightKind);
-
-    ctx.strokeStyle = bCol;
-    ctx.lineWidth = eyeType === 'stern' ? Math.max(1.8, hw * 0.035) : Math.max(1.2, hw * 0.028);
-    ctx.lineCap = 'round';
-    [-1, 1].forEach((s) => {
-      const bx = cx + s * eSpread, by = eyeY - hh * 0.15;
-      const lift = eyeType === 'stern' ? -0.04 : rng(-0.03, 0.03);
-      ctx.beginPath();
-      ctx.moveTo(bx - hw * 0.13, by + s * lift * hh);
-      ctx.quadraticCurveTo(bx, by - hh * 0.04, bx + hw * 0.13, by - s * lift * hh);
-      ctx.stroke();
-    });
-  }
-
-  function drawNoseMouth(ctx, g, mouthType, sk) {
-    const { cx, headY, hw, hh } = g;
-    const eyeY = headY - hh * 0.06;
-    const noseY = headY + hh * 0.2;
-    ctx.strokeStyle = sk.d + '99';
-    ctx.lineWidth = Math.max(0.8, hw * 0.05);
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(cx + hw * 0.04, eyeY + hh * 0.1);
-    ctx.quadraticCurveTo(cx + hw * 0.12, noseY, cx, noseY + hh * 0.05);
-    ctx.stroke();
-    [-1, 1].forEach((s) => {
-      ctx.fillStyle = sk.d + '44';
-      ctx.beginPath();
-      ctx.ellipse(cx + s * hw * 0.075, noseY + hh * 0.046, hw * 0.042, hh * 0.028, 0, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    const mY = headY + hh * 0.44, mW = hw * 0.22;
-    ctx.fillStyle = sk.l;
-    if (mouthType === 'smile') {
-      ctx.beginPath();
-      ctx.moveTo(cx - mW, mY);
-      ctx.quadraticCurveTo(cx, mY - hh * 0.065, cx + mW, mY);
-      ctx.quadraticCurveTo(cx, mY + hh * 0.075, cx - mW, mY);
-      ctx.closePath();
-      ctx.fill();
-    } else if (mouthType === 'smirk') {
-      ctx.beginPath();
-      ctx.moveTo(cx - mW * 0.92, mY + hh * 0.012);
-      ctx.quadraticCurveTo(cx + mW * 0.28, mY - hh * 0.065, cx + mW * 0.96, mY - hh * 0.02);
-      ctx.quadraticCurveTo(cx, mY + hh * 0.065, cx - mW * 0.92, mY + hh * 0.012);
-      ctx.closePath();
-      ctx.fill();
-    } else if (mouthType === 'open') {
-      ctx.fillStyle = '#401820';
-      ctx.beginPath();
-      ctx.ellipse(cx, mY, mW * 0.7, hh * 0.06, 0, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (mouthType === 'grit') {
-      ctx.fillStyle = sk.d;
-      for (let i = -3; i <= 3; i++) {
-        ctx.fillRect(cx + i * mW * 0.22 - mW * 0.08, mY - hh * 0.02, mW * 0.14, hh * 0.035);
-      }
-    } else {
-      ctx.fillRect(cx - mW, mY - hh * 0.016, mW * 2, hh * 0.032);
-    }
-    ctx.strokeStyle = sk.d + '88';
-    ctx.lineWidth = Math.max(0.6, hw * 0.04);
-    ctx.beginPath();
-    ctx.moveTo(cx - mW, mY);
-    ctx.lineTo(cx + mW, mY);
-    ctx.stroke();
-  }
-
-  function drawAccessories(ctx, g, seed, factionId, fCol, W, rng) {
-    const { cx, headY, hw, hh } = g;
-    const acc = (seed >>> 12) % 5;
-    const eyeY = headY - hh * 0.06;
-
-    if (acc === 1 || rng() > 0.82) {
-      ctx.strokeStyle = 'rgba(180,100,78,.75)';
-      ctx.lineWidth = Math.max(1.2, hw * 0.06);
-      ctx.lineCap = 'round';
-      const sxc = cx + rng(-hw * 0.35, hw * 0.35);
-      const syc = headY + rng(-hh * 0.15, hh * 0.3);
-      ctx.beginPath();
-      ctx.moveTo(sxc, syc - hh * 0.12);
-      ctx.lineTo(sxc + rng(-4, 4), syc + hh * 0.14);
-      ctx.stroke();
-    }
-
-    if (acc === 2) {
-      ctx.fillStyle = 'rgba(40,50,60,.85)';
-      ctx.strokeStyle = '#667788';
-      ctx.lineWidth = Math.max(0.8, hw * 0.04);
-      ctx.beginPath();
-      ctx.moveTo(cx - hw * 0.55, headY + hh * 0.35);
-      ctx.lineTo(cx + hw * 0.55, headY + hh * 0.35);
-      ctx.quadraticCurveTo(cx + hw * 0.5, headY + hh * 0.55, cx, headY + hh * 0.52);
-      ctx.quadraticCurveTo(cx - hw * 0.5, headY + hh * 0.55, cx - hw * 0.55, headY + hh * 0.35);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#334455';
-      ctx.fillRect(cx - hw * 0.12, headY + hh * 0.38, hw * 0.24, hh * 0.06);
-    }
-
-    if (acc === 3) {
-      ctx.strokeStyle = '#8899aa';
-      ctx.lineWidth = Math.max(1, hw * 0.05);
-      ctx.beginPath();
-      ctx.arc(cx + hw * 0.95, headY + hh * 0.05, hw * 0.12, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = fCol + 'cc';
-      ctx.beginPath();
-      ctx.arc(cx + hw * 0.95, headY + hh * 0.05, hw * 0.06, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    if (acc === 4 && factionId) {
-      ctx.fillStyle = fCol + '99';
-      ctx.font = `bold ${Math.max(8, Math.round(W * 0.09))}px sans-serif`;
-      ctx.textAlign = 'center';
-      const sym = { bazzano: '⬡', crespellano: '×', calcara: '⚙', monteveglio: '⚔', savigno: '◈', pirate: '☠' }[factionId] || '★';
-      ctx.fillText(sym, cx + hw * 0.55, eyeY - hh * 0.2);
-    }
-  }
-
-  function drawFaceOverlay(ctx, g, seed, factionId, W) {
-    const fac = portraitFaceFromSeed(seed);
-    const rng = makeRng(seed ^ 0x9e3779b9);
-    const sk = SKINS[fac.fHead % SKINS.length];
-    const hCol = HAIR_COLS[(fac.fHair + fac.fHead) % HAIR_COLS.length];
-    const eCol = EYE_COLS[fac.fEye % EYE_COLS.length];
-    const hStyle = HAIR_STYLES[fac.fHair % HAIR_STYLES.length];
-    const eyeType = EYE_TYPES[fac.fEye % EYE_TYPES.length];
-    const mouthType = MOUTH_TYPES[fac.fMouth % MOUTH_TYPES.length];
-    const fCol = factionColor(factionId);
-
-    drawHair(ctx, g, hStyle, hCol, sk, rng);
-    drawEyes(ctx, g, eyeType, eCol, hCol, rng);
-    drawNoseMouth(ctx, g, mouthType, sk);
-    drawAccessories(ctx, g, seed, factionId, fCol, W, rng);
+    const sc = Math.min(maxW / iw, maxH / ih) * scaleMul;
+    const dw = iw * sc, dh = ih * sc;
+    return {
+      dx: (W - dw) * 0.5,
+      dy: H * ((L.view && L.view.centerYFrac) || 0.5) - dh * 0.5,
+      dw, dh
+    };
   }
 
   function drawPortraitBg(ctx, W, H, factionId) {
     const fCol = factionColor(factionId);
+    // Mid-tone lit plate — faces stay readable over teal/copper uniforms
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#02060e');
-    bg.addColorStop(1, fCol + '22');
+    bg.addColorStop(0, '#4a6578');
+    bg.addColorStop(0.4, '#354858');
+    bg.addColorStop(1, '#1e303c');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W * 0.5, H * 0.38, 4, W * 0.5, H * 0.42, W * 0.62);
+    glow.addColorStop(0, 'rgba(255,240,210,.42)');
+    glow.addColorStop(0.5, 'rgba(120,200,180,.14)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    // Faction tint plate (stronger identity)
+    const tint = ctx.createLinearGradient(0, 0, W, H);
+    tint.addColorStop(0, fCol + '28');
+    tint.addColorStop(0.55, 'transparent');
+    tint.addColorStop(1, fCol + '40');
+    ctx.fillStyle = tint;
+    ctx.fillRect(0, 0, W, H);
+    // Faction tint strip at bottom
+    const strip = ctx.createLinearGradient(0, H * 0.72, 0, H);
+    strip.addColorStop(0, 'transparent');
+    strip.addColorStop(1, fCol + '77');
+    ctx.fillStyle = strip;
+    ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    // Side accent bar
+    ctx.fillStyle = fCol + 'aa';
+    ctx.fillRect(0, 0, Math.max(3, W * 0.035), H);
     return fCol;
   }
 
   function drawPortraitFrame(ctx, W, H) {
-    const vig = ctx.createRadialGradient(W * 0.5, H * 0.48, W * 0.08, W * 0.5, H * 0.5, W * 0.82);
+    const vig = ctx.createRadialGradient(W * 0.5, H * 0.48, W * 0.18, W * 0.5, H * 0.5, W * 0.95);
     vig.addColorStop(0, 'transparent');
-    vig.addColorStop(1, 'rgba(0,0,0,.45)');
+    vig.addColorStop(1, 'rgba(0,8,12,.28)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(120,200,255,.35)';
+    ctx.strokeStyle = 'rgba(120,210,190,.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+    ctx.strokeStyle = 'rgba(196,137,58,.35)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
+    ctx.strokeRect(4, 4, W - 8, H - 8);
   }
 
-  function drawAtlasComposite(ctx, W, H, seed, factionId, hue) {
-    const im = atlas.img;
-    if (!im || !im.naturalWidth) return false;
-    const rect = computeAtlasRect(W, H, im, seed);
-    if (!rect) return false;
+  function atlasTile(seed, opt) {
+    if (!atlas.ready || !atlas.img) return null;
+    const cols = L.cols || 4, rows = L.rows || 4;
+    const cw = Math.floor(atlas.img.naturalWidth / cols);
+    const ch = Math.floor(atlas.img.naturalHeight / rows);
+    const maxTile = Math.min(N_BUSTS, cols * rows);
+    const idx = portraitAtlasIndex(seed, opt) % maxTile;
+    const col = idx % cols, row = (idx / cols) | 0;
+    if (row >= rows) return null;
+    const tile = document.createElement('canvas');
+    tile.width = cw; tile.height = ch;
+    tile.getContext('2d').drawImage(atlas.img, col * cw, row * ch, cw, ch, 0, 0, cw, ch);
+    return tile;
+  }
 
-    const fCol = factionColor(factionId);
+  function resolveCrewPortraitPath(opt) {
+    opt = opt || {};
+    if (opt.portraitPath) return opt.portraitPath;
+    const id = opt.crewId || opt.crew || null;
+    if (!id || !global.CREW_POOL) return null;
+    const c = global.CREW_POOL.find((x) => x && x.id === id);
+    return c && c.portrait ? c.portrait : null;
+  }
+
+  function drawOpaqueBustImage(ctx, im, rect) {
+    // Composita su offscreen forzando alpha piena sui pixel non trasparenti
+    const tw = Math.max(1, Math.round(rect.dw));
+    const th = Math.max(1, Math.round(rect.dh));
+    const off = document.createElement('canvas');
+    off.width = tw; off.height = th;
+    const octx = off.getContext('2d');
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(im, 0, 0, tw, th);
+    try {
+      const img = octx.getImageData(0, 0, tw, th);
+      const d = img.data;
+      for (let i = 3; i < d.length; i += 4) {
+        if (d[i] > 28) d[i] = 255;
+        else d[i] = 0;
+      }
+      octx.putImageData(img, 0, 0);
+    } catch (_) { /* tainted / privacy — usa così com'è */ }
+    ctx.drawImage(off, rect.dx, rect.dy, rect.dw, rect.dh);
+  }
+
+  function drawBust(ctx, W, H, seed, factionId, opt) {
+    opt = opt || {};
+    const drawOpt = Object.assign({}, opt, { factionId: factionId || opt.factionId });
+    drawPortraitBg(ctx, W, H, factionId);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0, 0, W, H);
-    drawPortraitBg(ctx, W, H, factionId);
+    const isPlayer = !!opt.player;
+    const playerL = L.player || {};
+    let path = null;
+    if (isPlayer && playerL.head) path = playerL.head;
+    else {
+      path = resolveCrewPortraitPath(drawOpt);
+      if (!path) {
+        const heads = (L.parts && L.parts.heads) || [];
+        const idx = portraitAtlasIndex(seed, drawOpt);
+        path = heads[idx % Math.max(1, heads.length)];
+      }
+    }
+    let im = PortraitParts.get(path);
+    if (!im && path) {
+      // lazy load missing dedicated portrait (crew / radici)
+      loadImage(absUrl(path)).then((loaded) => {
+        partCache[path] = loaded;
+        partsState.ok++;
+        redrawAllVisiblePortraits();
+      }).catch(() => {});
+      PortraitParts.reloadCrew();
+    }
+    if (!im && !isPlayer && !resolveCrewPortraitPath(drawOpt)) im = atlasTile(seed, drawOpt);
+    if (!im) return false;
 
+    const iw = im.naturalWidth || im.width || 128;
+    const ih = im.naturalHeight || im.height || 160;
+    const rect = bustDestRect(W, H, iw, ih);
     ctx.save();
-    if (hue != null && !isNaN(hue)) ctx.filter = `hue-rotate(${hue}deg) saturate(1.06)`;
-    ctx.drawImage(im, rect.col * rect.cw, rect.row * rect.ch, rect.cw, rect.ch, rect.dx, rect.dy, rect.dw, rect.dh);
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.ellipse(W * 0.5, rect.dy + rect.dh * 0.92, rect.dw * 0.38, rect.dh * 0.06, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
-
-    const g = faceGeomFromRect(rect);
-    drawFaceOverlay(ctx, g, seed, factionId, W);
-
-    const suitG = ctx.createLinearGradient(0, H * 0.72, 0, H);
-    suitG.addColorStop(0, fCol + '55');
-    suitG.addColorStop(1, fCol + '88');
-    ctx.fillStyle = suitG;
-    ctx.fillRect(0, H * 0.72, W, H * 0.28);
-
+    drawOpaqueBustImage(ctx, im, rect);
     drawPortraitFrame(ctx, W, H);
     return true;
   }
 
-  function drawProcedural(ctx, W, H, seed, factionId) {
+  function drawProcedural(ctx, W, H, seed, factionId, opt) {
+    opt = opt || {};
+    const isPlayer = !!opt.player;
     const fCol = drawPortraitBg(ctx, W, H, factionId);
-    const rng = makeRng(seed);
-    const fac = portraitFaceFromSeed(seed);
-    const sk = SKINS[Math.floor(rng(0, SKINS.length))];
-    const g = faceGeomCanvas(W, H, rng);
-
-    const nkG = ctx.createLinearGradient(g.cx - g.hw * 0.5, 0, g.cx + g.hw * 0.5, 0);
-    nkG.addColorStop(0, sk.d);
-    nkG.addColorStop(0.35, sk.m);
-    nkG.addColorStop(0.65, sk.b);
-    nkG.addColorStop(1, sk.d);
-    ctx.fillStyle = nkG;
+    const cx = W / 2, headY = H * 0.42, hw = W * 0.28, hh = H * 0.28;
+    const skins = ['#f0d2b0', '#e8c4a0', '#c9956c', '#8d5a3c'];
+    const sk = isPlayer ? '#e8c8a8' : skins[seed % skins.length];
+    // shoulders
+    ctx.fillStyle = isPlayer ? '#1a3a3a' : fCol;
     ctx.beginPath();
-    ctx.moveTo(g.cx - g.hw * 0.52, g.headY + g.hh * 0.72);
-    ctx.lineTo(g.cx + g.hw * 0.52, g.headY + g.hh * 0.72);
-    ctx.lineTo(g.cx + g.hw * 0.42, H);
-    ctx.lineTo(g.cx - g.hw * 0.42, H);
-    ctx.closePath();
+    ctx.moveTo(W * 0.08, H);
+    ctx.quadraticCurveTo(W * 0.5, H * 0.62, W * 0.92, H);
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
     ctx.fill();
-
-    const hdG = ctx.createRadialGradient(g.cx - g.hw * 0.18, g.headY - g.hh * 0.08, 0, g.cx, g.headY + g.hh * 0.05, g.hw * 1.45);
-    hdG.addColorStop(0, sk.b);
-    hdG.addColorStop(0.52, sk.m);
-    hdG.addColorStop(1, sk.d);
-    ctx.fillStyle = hdG;
+    ctx.fillStyle = '#b87333';
+    ctx.fillRect(W * 0.12, H * 0.72, W * 0.18, H * 0.08);
+    ctx.fillRect(W * 0.70, H * 0.72, W * 0.18, H * 0.08);
+    // head
+    ctx.fillStyle = sk;
     ctx.beginPath();
-    ctx.moveTo(g.cx - g.hw, g.headY - 0.04 * g.hh);
-    ctx.bezierCurveTo(g.cx - g.hw * 1.06, g.headY - g.hh * 0.68, g.cx - g.hw * 0.58, g.headY - g.hh, g.cx, g.headY - g.hh);
-    ctx.bezierCurveTo(g.cx + g.hw * 0.58, g.headY - g.hh, g.cx + g.hw * 1.06, g.headY - g.hh * 0.68, g.cx + g.hw, g.headY - 0.04 * g.hh);
-    ctx.bezierCurveTo(g.cx + g.hw * 0.94, g.headY + g.hh * 0.38, g.cx + g.hw * 0.8, g.headY + g.hh * 0.85, g.cx, g.headY + g.hh * 0.9);
-    ctx.bezierCurveTo(g.cx - g.hw * 0.8, g.headY + g.hh * 0.85, g.cx - g.hw * 0.94, g.headY + g.hh * 0.38, g.cx - g.hw, g.headY - 0.04 * g.hh);
-    ctx.closePath();
+    ctx.ellipse(cx, headY, hw, hh, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    drawFaceOverlay(ctx, g, seed, factionId, W);
-
-    const suitG = ctx.createLinearGradient(0, H * 0.7, 0, H);
-    suitG.addColorStop(0, fCol + 'aa');
-    suitG.addColorStop(1, fCol + 'dd');
-    ctx.fillStyle = suitG;
-    ctx.fillRect(0, H * 0.7, W, H * 0.3);
-    ctx.fillStyle = fCol + 'cc';
+    // hair: Zvan = bianco/argento (intro_03); NPC = varietà
+    ctx.fillStyle = isPlayer ? '#e8e6e2' : ['#1a1008', '#3a2810', '#c8c8c8', '#7a2010', '#0a0a0a', '#4a3020'][seed % 6];
     ctx.beginPath();
-    ctx.moveTo(g.cx - W * 0.28, H * 0.7);
-    ctx.lineTo(g.cx - W * 0.065, H * 0.64);
-    ctx.lineTo(g.cx + W * 0.065, H * 0.64);
-    ctx.lineTo(g.cx + W * 0.28, H * 0.7);
+    ctx.ellipse(cx, headY - hh * 0.45, hw * 1.08, hh * 0.62, 0, Math.PI, 0);
     ctx.fill();
-    roundRectCtx(ctx, g.cx + W * 0.17, H * 0.74, W * 0.1, W * 0.1, 3);
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
+    ctx.beginPath();
+    ctx.ellipse(cx - hw * 0.85, headY - hh * 0.05, hw * 0.28, hh * 0.45, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(cx + hw * 0.85, headY - hh * 0.05, hw * 0.28, hh * 0.45, 0.3, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = fCol + 'ee';
-    ctx.font = `bold ${Math.round(W * 0.12)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const sym2 = { bazzano: '⬡', crespellano: '⚑', calcara: '⚙', monteveglio: '⚔', savigno: '◈', pirate: '☠' }[factionId] || '★';
-    ctx.fillText(sym2, g.cx + W * 0.22, H * 0.79);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-
+    if (isPlayer) {
+      // volume laterale / ciuffo argento come intro_03
+      ctx.fillStyle = '#f4f2ee';
+      ctx.beginPath();
+      ctx.ellipse(cx - hw * 0.15, headY - hh * 0.72, hw * 0.55, hh * 0.28, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1a1210';
+      ctx.fillRect(cx - hw * 0.42, headY - hh * 0.28, hw * 0.28, hh * 0.07);
+      ctx.fillRect(cx + hw * 0.14, headY - hh * 0.28, hw * 0.28, hh * 0.07);
+    }
+    // eyes
+    ctx.fillStyle = '#1a1210';
+    ctx.beginPath();
+    ctx.ellipse(cx - hw * 0.35, headY - hh * 0.05, hw * 0.12, hh * 0.1, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx + hw * 0.35, headY - hh * 0.05, hw * 0.12, hh * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#5a3828';
+    ctx.lineWidth = Math.max(1.5, W / 64);
+    ctx.beginPath();
+    ctx.moveTo(cx - hw * 0.28, headY + hh * 0.32);
+    ctx.quadraticCurveTo(cx, headY + hh * 0.48, cx + hw * 0.28, headY + hh * 0.32);
+    ctx.stroke();
     drawPortraitFrame(ctx, W, H);
+  }
+
+  function redrawAllVisiblePortraits() {
+    redrawActiveDialog();
+    const doc = global.document;
+    if (!doc) return;
+    doc.querySelectorAll('canvas.crew-port').forEach((cv) => {
+      const seed = +cv.dataset.seed | 0;
+      const fac = cv.dataset.fac || 'bazzano';
+      const name = cv.dataset.name || '';
+      const crewId = cv.dataset.crew || '';
+      PortraitRenderer.drawCanvas(cv, seed, fac, { name: name, crewId: crewId });
+    });
   }
 
   function redrawActiveDialog() {
@@ -568,7 +439,8 @@
     PortraitRenderer.draw(pc.getContext('2d'), pc.width, pc.height, {
       seed: npc.seed,
       factionId: npc.faction,
-      hue: portraitHueFromSeed(npc.seed)
+      name: npc.displayName || npc.name,
+      kind: npc.type === 'pirate' ? 'pirate' : undefined
     });
   }
 
@@ -578,31 +450,48 @@
       opt = opt || {};
       const seed = opt.seed != null ? opt.seed : 1;
       const factionId = opt.factionId || 'bazzano';
-      const hue = opt.hue != null ? opt.hue : portraitHueFromSeed(seed);
-      const forceProcedural = !!opt.procedural;
-
-      if (!forceProcedural && atlas.ready && drawAtlasComposite(ctx, W, H, seed, factionId, hue)) {
-        return 'atlas+overlay';
+      const ok = drawBust(ctx, W, H, seed, factionId, opt);
+      if (!ok) drawProcedural(ctx, W, H, seed, factionId, opt);
+      if (!partsState.ready && !partsState.loading) {
+        PortraitParts.load().then(() => redrawAllVisiblePortraits());
       }
-
-      drawProcedural(ctx, W, H, seed, factionId);
-
       if (!atlas.ready && !atlas.loading) {
-        PortraitAtlas.load().then((ok) => { if (ok) redrawActiveDialog(); });
+        PortraitAtlas.load().then(() => redrawAllVisiblePortraits());
       }
-      return 'procedural';
+      return ok ? 'bust' : 'procedural';
     },
     drawCanvas(canvas, seed, factionId, opt) {
       opt = Object.assign({}, opt || {}, { seed, factionId });
       return PortraitRenderer.draw(canvas.getContext('2d'), canvas.width, canvas.height, opt);
-    }
+    },
+    drawPlayer(canvas) {
+      return PortraitRenderer.drawCanvas(canvas, 1, 'bazzano', { player: true });
+    },
+    resolvePool: resolvePortraitPool,
+    poolIndices: poolIndices
   };
 
   global.portraitFaceFromSeed = portraitFaceFromSeed;
   global.portraitHueFromSeed = portraitHueFromSeed;
   global.portraitAtlasIndex = portraitAtlasIndex;
+  global.portraitLooksFeminineName = looksFeminineName;
+  global.portraitResolveGender = resolveGender;
+  global.resolvePortraitPool = resolvePortraitPool;
+  /** Capelli Zvan: argento/bianco come in sprites/story/intro/intro_03.jpg */
+  global.portraitHairTint = function () { return '#e8e6e2'; };
   global.PortraitAtlas = PortraitAtlas;
+  global.PortraitHeads = PortraitParts;
+  global.PortraitParts = PortraitParts;
   global.PortraitRenderer = PortraitRenderer;
 
-  PortraitAtlas.load().then((ok) => { if (ok) redrawActiveDialog(); });
+  Promise.all([PortraitParts.load(), PortraitAtlas.load()]).then(() => {
+    PortraitParts.reloadCrew();
+    redrawAllVisiblePortraits();
+  });
+  // CREW_POOL è definito dopo questo script: ricarica quando il DOM è pronto
+  if (global.document) {
+    global.document.addEventListener('DOMContentLoaded', () => {
+      PortraitParts.reloadCrew();
+    });
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

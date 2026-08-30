@@ -26,7 +26,17 @@
     const ps=global.PS,ship=global.playerShip;
     if(!ps||!ship||!ship.mesh)return null;
     const looted={};
-    (global.HULKS||[]).forEach(h=>{looted[h.id]=!!h.looted;});
+    const hulksPos={};
+    (global.HULKS||[]).forEach(h=>{
+      looted[h.id]=!!h.looted;
+      if(h.mesh&&h.mesh.position){
+        hulksPos[h.id]={
+          x:h.mesh.position.x,y:h.mesh.position.y,z:h.mesh.position.z,
+          rotY:h.mesh.rotation.y,rotX:h.mesh.rotation.x,rotZ:h.mesh.rotation.z,
+          driftAng:h.driftAng||0
+        };
+      }
+    });
     return{
       v:VER,t:Date.now(),
       PS:{
@@ -34,9 +44,28 @@
         crew:[...ps.crew],modules:[...ps.modules],bpInv:{...ps.bpInv},
         hullPaintHex:ps.hullPaintHex,missiles:ps.missiles,
         activeMissionIds:ps.activeMissions.map(m=>m.id),
-        sandboxMode:!!ps.sandboxMode
+        sandboxMode:!!ps.sandboxMode,
+        rootSeen:{...(ps.rootSeen||{})},
+        loreFlags:{...(ps.loreFlags||{})},
+        beghelliAppeared:!!ps.beghelliAppeared,
+        beghelliAidUsed:ps.beghelliAidUsed|0,
+        bpScanPending:ps.bpScanPending|0,
+        peacefulBoardings:ps.peacefulBoardings|0
       },
       STORY:{chapter:global.STORY.chapter,won:!!global.STORY.won},
+      storyFlags:global.StorySys&&global.StorySys.flags?{
+        suborbitDone:!!global.StorySys.flags.suborbitDone,
+        hulkBoarded:!!global.StorySys.flags.hulkBoarded,
+        boardingsTotal:global.StorySys.flags.boardingsTotal|0,
+        circuitSealedIds:global.StorySys.flags.circuitSealedIds
+          ?Object.assign({},global.StorySys.flags.circuitSealedIds):{},
+        guide:global.StorySys.flags.guide?{
+          radioAt:global.StorySys.flags.guide.radioAt|0,
+          stuckAt:global.StorySys.flags.guide.stuckAt|0,
+          cap4Since:global.StorySys.flags.guide.cap4Since|0,
+          actionBeats:Object.assign({},global.StorySys.flags.guide.actionBeats||{})
+        }:null
+      }:null,
       storyMissions:storyMissionSnap(global.STORY),
       rep:{...global.rep},
       bpGrid:global.bpGrid.map(row=>[...row]),
@@ -55,6 +84,7 @@
       },
       navDestId:global.navDestId||null,
       hulksLooted:looted,
+      hulksPos:hulksPos,
       econ:{marketMood:{...global.ECON.marketMood}},
       boost:{heat:global.BOOST.heat,overheated:global.BOOST.overheated,overheatTimer:global.BOOST.overheatTimer},
       stats:global.RUN_STATS?{...global.RUN_STATS}:null,
@@ -100,27 +130,68 @@
       credits:d.credits,cargo:{...d.cargo},cargoMax:d.cargoMax,
       crew:[...d.crew],modules:[...d.modules],bpInv:{...d.bpInv},
       hullPaintHex:d.hullPaintHex,missiles:d.missiles,
-      sandboxMode:!!d.sandboxMode,activeMissions:[]
+      sandboxMode:!!d.sandboxMode,activeMissions:[],
+      rootSeen:{...(d.rootSeen||{})},
+      loreFlags:{...(d.loreFlags||{})},
+      beghelliAppeared:!!d.beghelliAppeared,
+      beghelliAidUsed:d.beghelliAidUsed|0,
+      bpScanPending:d.bpScanPending|0,
+      peacefulBoardings:d.peacefulBoardings|0
     });
     global.STORY.chapter=data.STORY.chapter|0;
     global.STORY.won=!!data.STORY.won;
+    if(global.StorySys&&global.StorySys.flags&&data.storyFlags){
+      global.StorySys.flags.suborbitDone=!!data.storyFlags.suborbitDone;
+      global.StorySys.flags.hulkBoarded=!!data.storyFlags.hulkBoarded;
+      global.StorySys.flags.boardingsTotal=data.storyFlags.boardingsTotal|0;
+      global.StorySys.flags.circuitSealedIds=Object.assign(
+        {},data.storyFlags.circuitSealedIds||{});
+      if(data.storyFlags.guide){
+        global.StorySys.flags.guide=Object.assign({
+          radioAt:0,stuckAt:0,cap4Since:0,actionBeats:{}
+        },data.storyFlags.guide);
+        if(!global.StorySys.flags.guide.actionBeats)global.StorySys.flags.guide.actionBeats={};
+      }
+    }
     Object.assign(global.rep,data.rep||{});
     if(data.bpGrid)global.bpGrid=data.bpGrid.map(row=>[...row]);
     global.CREW_POOL.forEach(c=>{c.hired=(data.crewHired||[]).includes(c.id);});
     restoreMissionStates(data);
     const ship=global.playerShip;
     if(ship&&data.ship){
-      ship.health=data.ship.health;ship.energy=data.ship.energy;
-      ship.mesh.position.set(data.ship.x,data.ship.y,data.ship.z);
-      ship.mesh.rotation.set(0,data.ship.rotY,0);
+      // Revive dopo game over: die() rimuove la mesh e lascia alive=false.
+      ship.alive=true;
+      ship.health=Math.max(1,data.ship.health);
+      ship.energy=data.ship.energy;
+      if(ship.mesh){
+        ship.mesh.visible=true;
+        ship.mesh.position.set(data.ship.x,data.ship.y,data.ship.z);
+        ship.mesh.rotation.set(0,data.ship.rotY,0);
+        if(!ship.mesh.parent&&global.scene)global.scene.add(ship.mesh);
+      }
       ship.velocity.set(data.ship.vx,data.ship.vy,data.ship.vz);
     }
     global.navDestId=data.navDestId||null;
     global.navDestPending=null;
-    if(data.hulksLooted){
+    if(typeof global.BEGHELLI!=='undefined'){
+      global.BEGHELLI.aidUsed=ps.beghelliAidUsed|0;
+      if(ps.beghelliAppeared||(global.STORY.chapter|0)>=4||global.STORY.won){
+        if(typeof global.ensureBeghelliPalace==='function')global.ensureBeghelliPalace(true);
+      }
+    }
+    if(data.hulksLooted||data.hulksPos){
       (global.HULKS||[]).forEach(h=>{
-        if(data.hulksLooted[h.id]){
+        const pos=data.hulksPos&&data.hulksPos[h.id];
+        if(pos&&h.mesh){
+          h.mesh.position.set(pos.x,pos.y,pos.z);
+          if(pos.rotY!=null)h.mesh.rotation.y=pos.rotY;
+          if(pos.rotX!=null)h.mesh.rotation.x=pos.rotX;
+          if(pos.rotZ!=null)h.mesh.rotation.z=pos.rotZ;
+          if(pos.driftAng!=null)h.driftAng=pos.driftAng;
+        }
+        if(data.hulksLooted&&data.hulksLooted[h.id]){
           h.looted=true;
+          h.storyMarked=false;
           if(h.mesh&&typeof THREE!=='undefined')h.mesh.traverse(o=>{
             if(!o.material)return;
             if('emissiveIntensity' in o.material)o.material.emissiveIntensity*=.18;
@@ -128,6 +199,7 @@
           });
         }
       });
+      if(typeof global.refreshStoryHulkMarks==='function')global.refreshStoryHulkMarks();
     }
     if(data.econ&&data.econ.marketMood)global.ECON.marketMood={...data.econ.marketMood};
     if(data.boost){
@@ -144,6 +216,12 @@
     if(typeof global.applyModules==='function')global.applyModules();
     if(typeof global.rebuildPlayerMesh==='function')global.rebuildPlayerMesh();
     if(typeof global.renderRep==='function')global.renderRep();
+    // Pulisci pause residue (game over / story / overlay).
+    if(global.GAME&&global.GAME.pausedReasons){
+      Object.keys(global.GAME.pausedReasons).forEach(k=>{
+        if(k!=='docked')global.GAME.pausedReasons[k]=false;
+      });
+    }
     const g=data.game||{};
     if(g.state==='docked'&&g.dockedStId){
       const st=global.stations.find(s=>s.sd.id===g.dockedStId);
@@ -156,13 +234,19 @@
         document.getElementById('hud').style.display='none';
         document.getElementById('radar').style.display='none';
         document.getElementById('mtick').style.display='none';
+        document.body.classList.add('docked-ui');
+        document.body.classList.remove('landing-active');
+        const thr=document.getElementById('throttle-rail');
+        if(thr)thr.style.display='none';
         if(g.dockActiveTab)global.GAME.dockActiveTab=g.dockActiveTab;
         if(typeof global.buildDock==='function')global.buildDock(st);
       }
     }else{
       global.GAME.state='flying';
+      global.GAME.dockedSt=null;
       global.setPausedReason('docked',false);
       ship.mesh.visible=true;
+      document.body.classList.remove('docked-ui','landing-active','story-open','menu-open');
       document.getElementById('dkscr').style.display='none';
       document.getElementById('hud').style.display='flex';
       document.getElementById('radar').style.display='block';
@@ -174,24 +258,39 @@
   global.saveGame=function(silent){
     try{
       const p=global.buildSavePayload();
-      if(!p)return false;
+      if(!p){
+        if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non riuscito: stato incompleto.',2200);
+        return false;
+      }
       localStorage.setItem(KEY,JSON.stringify(p));
       if(!silent&&typeof global.notify==='function')global.notify('Partita salvata.',1800);
-      if(typeof global.playChime==='function')global.playChime('success');
+      if(typeof global.playChime==='function'&&!silent)global.playChime('success');
       return true;
-    }catch(_){return false;}
+    }catch(_){
+      if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non riuscito (memoria piena o bloccata).',2600);
+      return false;
+    }
   };
 
   global.loadGame=function(silent){
     try{
       const raw=localStorage.getItem(KEY);
-      if(!raw)return false;
+      if(!raw){
+        if(!silent&&typeof global.notify==='function')global.notify('Nessun salvataggio trovato.',1800);
+        return false;
+      }
       const data=JSON.parse(raw);
-      if(!global.applySavePayload(data))return false;
+      if(!global.applySavePayload(data)){
+        if(!silent&&typeof global.notify==='function')global.notify('Salvataggio non valido o incompatibile.',2400);
+        return false;
+      }
       if(!silent&&typeof global.notify==='function')global.notify('Partita caricata.',2000);
       if(typeof global.playChime==='function')global.playChime('success');
       return true;
-    }catch(_){return false;}
+    }catch(_){
+      if(!silent&&typeof global.notify==='function')global.notify('Errore nel caricamento del salvataggio.',2400);
+      return false;
+    }
   };
 
   global.hasSaveGame=function(){
@@ -203,9 +302,24 @@
   };
 
   global.newGameConfirm=function(){
-    if(confirm('Iniziare una nuova partita? Il salvataggio attuale verrà cancellato.')){
+    const run=function(){
       global.clearSaveGame();
       location.reload();
+    };
+    if(typeof global.uiConfirm==='function'){
+      global.uiConfirm({
+        title:'NUOVA PARTITA',
+        body:global.hasSaveGame()
+          ?'Iniziare una nuova partita?\nIl salvataggio attuale verrà cancellato.'
+          :'Iniziare una nuova partita da zero?',
+        ok:'NUOVA PARTITA',
+        cancel:'ANNULLA',
+        danger:true,
+        onOk:run
+      });
+      return;
     }
+    // Fallback senza modal: non cancellare alla cieca
+    if(typeof global.notify==='function')global.notify('Conferma non disponibile.',1800);
   };
 })(window);

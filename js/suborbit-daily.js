@@ -3,7 +3,12 @@
   function getDailySuborbitChallenge(){
     const d=(typeof Date!=='undefined'?new Date().toISOString().slice(0,10):'0');
     const seed=parseInt(d.replace(/-/g,''),10)||0;
-    const pool=['Completa un corridoio senza urti al suolo','10+ kill in una singola discesa','Raccogli 6+ container con trazione (F)'];
+    const pool=[
+      'Completa un corridoio senza urti al suolo',
+      '10+ kill in una singola discesa',
+      'Raccogli 6+ container con trazione (F)',
+      'Sigilla 3 depositi in una discesa'
+    ];
     return pool[seed%pool.length];
   }
   function getDailyChallengeKey(){
@@ -18,6 +23,7 @@
     if(ch.indexOf('senza urti')>=0)ok=sum.completed&&(sum.rough|0)===0;
     else if(ch.indexOf('10+ kill')>=0)ok=sum.kills>=10;
     else if(ch.indexOf('6+ container')>=0)ok=(tr.tractoredPickups|0)>=6;
+    else if(ch.indexOf('Sigilla 3')>=0)ok=(sum.depositsSealed|0)>=3||!!sum.depositsDone;
     return{challenge:ch,completed:ok};
   };
   global.rewardDailySuborbitChallenge=function(ok){
