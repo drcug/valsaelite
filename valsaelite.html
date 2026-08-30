@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Valsamoggia Spaziale</title>
+<title>Ritorno al Vecchio Pianeta</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link href="css/game-extras.css" rel="stylesheet">
 <style>
@@ -98,37 +98,38 @@ body.suborbit-active #a11y-strip{display:none !important;}
   pointer-events:auto;
 }
 #tutorial-modal.show{display:flex !important;}
-#bp-grid-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
-#bp-toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.bp-tool{padding:6px 12px;border-radius:4px;border:1px solid rgba(70,180,160,.45);background:rgba(20,60,70,.55);
-  color:#c8efe6;font:700 10px var(--FD);letter-spacing:.1em;cursor:pointer}
+#bp-grid-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+#bp-toolbar,#bp-mode-row,#bp-presets{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.bp-tool{padding:8px 14px;border-radius:8px;border:1px solid rgba(70,180,160,.4);background:linear-gradient(180deg,rgba(18,48,52,.85),rgba(8,22,28,.9));
+  color:#c8efe6;font:700 10px var(--FD);letter-spacing:.1em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .bp-tool:hover{background:rgba(40,120,110,.55);border-color:#7fdcc8}
 .bp-tool.ghost{opacity:.75;border-style:dashed}
+.bp-tool.kit{border-color:rgba(196,137,58,.45);color:#f0d8a8}
 .bp-tool.erase-on,.bp-tool.mode-on[data-bp-mode="erase"]{background:rgba(160,40,40,.55)!important;border-color:#ff8866!important;color:#ffd0c8!important}
 .bp-tool.mode-on[data-bp-mode="place"]{background:rgba(30,90,160,.55)!important;border-color:#88bbff!important;color:#d8ecff!important}
 .bp-tool.sym-on{background:rgba(90,60,160,.55)!important;border-color:#c8a8ff!important;color:#efe8ff!important}
-#bp-mode-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+#bp-mode-row{margin-top:2px}
 #bp-sticky-sel{
-  display:none;position:sticky;top:0;z-index:3;width:100%;max-width:min(420px,96vw);
-  margin:0 auto 6px;padding:8px 10px;border-radius:8px;
-  border:1px solid rgba(90,170,220,.4);background:rgba(6,18,36,.94);
-  font:10px var(--FM);color:#c8dde8;letter-spacing:.04em;text-align:center;
-  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  display:none;position:sticky;top:0;z-index:3;width:100%;max-width:min(720px,96vw);
+  margin:0 auto 8px;padding:9px 12px;border-radius:10px;
+  border:1px solid rgba(90,170,220,.4);background:rgba(6,18,36,.96);
+  font:11px var(--FM);color:#c8dde8;letter-spacing:.04em;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
 }
 #bp-sticky-sel.show{display:block}
 #bp-sticky-sel b{color:#eaf6ff;font-family:var(--FD);letter-spacing:.1em}
 #bp-effect-preview{
-  font:9px var(--FM);color:#7a9ab8;line-height:1.45;min-height:2.6em;
-  padding:4px 2px 2px;border-top:1px solid rgba(44,100,190,.18);margin-top:4px;
+  font:10px var(--FM);color:#8ab0c8;line-height:1.5;min-height:2.4em;
+  padding:8px 10px;border-radius:8px;background:rgba(4,14,24,.55);border:1px solid rgba(70,140,180,.18);
 }
-#bp-effect-preview strong{color:#b8d4ec;font-weight:700}
-#bp-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-top:12px;width:min(980px,100%)}
+#bp-effect-preview strong{color:#d8f0ff;font-weight:700}
+#bp-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:10px;width:min(1180px,100%)}
 #bp-discard{
-  padding:10px 22px;border-radius:6px;cursor:pointer;
-  border:1px solid rgba(180,90,70,.45);background:rgba(60,20,14,.55);
-  color:#ffc8b8;font-family:var(--FD);font-weight:700;font-size:12px;letter-spacing:.12em;
+  padding:12px 26px;border-radius:8px;cursor:pointer;
+  border:1px solid rgba(180,90,70,.5);background:rgba(60,20,14,.7);
+  color:#ffc8b8;font-family:var(--FD);font-weight:700;font-size:13px;letter-spacing:.12em;
 }
-#bp-discard:hover{background:rgba(90,30,20,.7);border-color:#ffaa88}
+#bp-discard:hover{background:rgba(90,30,20,.8);border-color:#ffaa88}
 #bp-keys-hint{font:8px var(--FM);color:#446688;letter-spacing:.06em;text-align:center;margin-top:4px;max-width:min(96vw,720px)}
 
 /* ─ Abbordaggio / Space hulk ─ */
@@ -673,16 +674,62 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 #heat-lbl{position:fixed;bottom:164px;left:50%;transform:translateX(-50%);
   font-family:var(--FM);font-size:9px;color:#ff8844;z-index:12;pointer-events:none;display:none;letter-spacing:.12em;}
 
-/* Blueprint modal — compatto, niente scroll pagina (viewport tipico) */
+/* Blueprint modal — hangar bay */
 #blueprint-modal{
   display:none;position:fixed;inset:0;z-index:80;
-  background:rgba(0,2,8,.96);backdrop-filter:blur(8px);
+  background:
+    radial-gradient(80% 50% at 50% 0%,rgba(40,90,80,.18),transparent 55%),
+    linear-gradient(180deg,#061018 0%,#02060c 40%,#010308 100%);
   flex-direction:column;align-items:center;justify-content:flex-start;
   font-family:var(--FD);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:max(6px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom));
+  padding:max(8px,env(safe-area-inset-top)) 12px max(10px,env(safe-area-inset-bottom));
   box-sizing:border-box;overscroll-behavior:contain;
 }
 #blueprint-modal.show{display:flex;}
+#blueprint-modal::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background-image:linear-gradient(rgba(90,180,160,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(90,180,160,.08) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.bp-chrome{
+  position:relative;z-index:1;width:min(1180px,100%);display:flex;justify-content:space-between;align-items:flex-end;
+  gap:12px;flex-wrap:wrap;padding:6px 4px 10px;border-bottom:1px solid rgba(70,180,160,.22);margin-bottom:8px;
+}
+.bp-chrome-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bp-mode-chip,.bp-credits-chip{
+  font:700 10px var(--FD);letter-spacing:.14em;padding:6px 10px;border-radius:999px;
+  border:1px solid rgba(70,180,160,.4);background:rgba(8,28,32,.8);color:#c8efe6;
+}
+.bp-mode-chip.erase{border-color:#ff8866;color:#ffd0c8;background:rgba(80,20,16,.8)}
+.bp-credits-chip{color:#ffd35a;border-color:rgba(255,200,80,.4)}
+.bp-hangar{
+  position:relative;padding:14px 22px;border-radius:14px;
+  background:radial-gradient(90% 80% at 50% 40%,#0a1c28,#030810 70%);
+  border:1px solid rgba(90,180,160,.32);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.45),0 0 0 1px rgba(196,137,58,.12);
+}
+.bp-hangar-lab{position:absolute;top:50%;transform:translateY(-50%) rotate(-90deg);font:700 8px var(--FD);letter-spacing:.2em;color:#5a8890}
+.bp-hangar-lab.left{left:-2px}
+.bp-hangar-lab.right{right:-2px}
+.bp-card{
+  padding:10px 12px;border-radius:12px;margin-bottom:8px;
+  background:linear-gradient(165deg,rgba(8,22,30,.88),rgba(4,10,16,.92));
+  border:1px solid rgba(70,160,150,.22);
+}
+.bp-cat-row{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}
+.bp-cat{
+  padding:4px 8px;border-radius:999px;border:1px solid rgba(70,140,160,.35);
+  background:rgba(4,16,22,.7);color:#7aa8b0;font:700 8px var(--FD);letter-spacing:.08em;cursor:pointer;
+}
+.bp-cat.on{border-color:rgba(62,207,187,.7);color:#e8fff6;background:rgba(20,70,64,.75)}
+.bp-meter{display:grid;grid-template-columns:72px 1fr 56px;gap:6px;align-items:center;margin:4px 0}
+.bp-meter span{font:8px var(--FM);color:#6a90a0;letter-spacing:.08em}
+.bp-meter-track{height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.bp-meter-track i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#1a7a6a,#3ecfbb)}
+.bp-meter b{font:9px var(--FM);color:#c8e8e0;text-align:right}
+.bp-paint-row{display:flex;align-items:center;gap:8px;font:9px var(--FM);color:#7a9ab0;margin-top:6px}
+#bp-hull-presets{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 4px}
+#bp-hull-rep-hint{font-size:8px;color:#6688aa;margin-top:4px}
 /* Diario trama */
 #diary-modal{
   display:none;position:fixed;inset:0;z-index:82;
@@ -708,17 +755,18 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 #diary-close{margin:18px auto 8px;display:block;padding:10px 36px;border-radius:6px;border:1px solid rgba(44,100,190,.45);
   background:rgba(34,119,238,.2);color:var(--bright);font-family:var(--FD);font-weight:700;letter-spacing:.12em;cursor:pointer;}
 #diary-close:hover{background:rgba(34,119,238,.35);}
-#bp-title{font-size:17px;font-weight:700;color:var(--bright);letter-spacing:.14em;margin:0 0 2px;line-height:1.1;}
-#bp-subtitle{font-size:9px;color:#557799;font-family:var(--FM);letter-spacing:.08em;margin-bottom:8px;line-height:1.4;max-width:min(96vw,720px);text-align:center;}
+#bp-title{font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.16em;margin:0 0 2px;line-height:1.1;}
+#bp-subtitle{font-size:10px;color:#6a9a90;font-family:var(--FM);letter-spacing:.08em;line-height:1.4;max-width:min(96vw,520px);}
 #bp-wrap{
-  display:flex;gap:12px;align-items:flex-start;justify-content:center;
-  width:min(980px,100%);max-height:min(78vh,calc(100vh - 110px));padding:0 4px;flex:1 1 auto;min-height:0;
+  position:relative;z-index:1;display:flex;gap:16px;align-items:flex-start;justify-content:center;
+  width:min(1180px,100%);max-height:min(78vh,calc(100vh - 128px));padding:0 4px;flex:1 1 auto;min-height:0;
   overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
-#bp-cv{border:1px solid rgba(44,100,190,.3);border-radius:8px;background:#01050f;cursor:crosshair;touch-action:pan-y;flex-shrink:0;box-sizing:border-box;}
+#bp-cv{border:1px solid rgba(80,180,160,.35);border-radius:6px;background:#01050f;cursor:crosshair;touch-action:pan-y;flex-shrink:0;box-sizing:border-box;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 12px 32px rgba(0,0,0,.4);}
 #bp-cv.bp-editing{touch-action:none;cursor:crosshair;}
 #bp-panel{
-  flex:1;min-width:0;max-width:min(420px,44vw);display:flex;flex-direction:column;gap:0;min-height:0;overflow:visible;
+  flex:1;min-width:0;max-width:min(440px,40vw);display:flex;flex-direction:column;gap:0;min-height:0;overflow:visible;
 }
 .bp-modules-section{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
 .bp-stats-section{flex:0 0 auto;}
@@ -726,14 +774,14 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 #bp-side-cv{display:block;width:100%;max-width:380px;height:88px;margin:0 auto;border-radius:6px;
   border:1px solid rgba(70,180,160,.28);background:radial-gradient(80% 90% at 50% 60%,#0a1824,#030810);touch-action:pan-y;}
 #bp-stats-hull-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
-.bp-section-title{font-size:8px;letter-spacing:.16em;color:#446688;margin:0 0 4px;font-family:var(--FM);}
+.bp-section-title{font-size:9px;letter-spacing:.16em;color:#6aa898;margin:0 0 6px;font-family:var(--FM);}
 .bp-module-list{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
-  flex:1 1 auto;min-height:160px;max-height:min(48vh,380px);
-  overflow-y:scroll;overflow-x:hidden;margin-bottom:6px;padding:4px 6px 8px 2px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+  flex:1 1 auto;min-height:160px;max-height:min(42vh,360px);
+  overflow-y:scroll;overflow-x:hidden;margin-bottom:6px;padding:6px;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
-  border:1px solid rgba(44,100,190,.22);border-radius:8px;
-  background:rgba(0,8,18,.45);
+  border:1px solid rgba(70,160,150,.2);border-radius:10px;
+  background:rgba(0,8,14,.5);
   scrollbar-width:thin;scrollbar-color:rgba(62,180,160,.55) rgba(0,0,0,.2);
 }
 .bp-module-list::-webkit-scrollbar{width:8px}
@@ -741,9 +789,9 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 .bp-module-list::-webkit-scrollbar-track{background:rgba(0,0,0,.15);border-radius:4px}
 .bp-mod-scroll-hint{font:8px var(--FM);color:#557799;letter-spacing:.08em;margin:-2px 0 4px;text-align:center}
 .bp-mod-btn{
-  padding:6px 4px;border-radius:4px;cursor:pointer;font-family:var(--FD);font-size:9px;font-weight:600;
-  border:1px solid rgba(44,100,190,.3);background:rgba(255,255,255,.03);color:var(--txt);
-  transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;min-height:52px;
+  padding:8px 6px;border-radius:8px;cursor:pointer;font-family:var(--FD);font-size:9px;font-weight:600;
+  border:1px solid rgba(70,160,150,.28);background:linear-gradient(180deg,rgba(12,28,34,.7),rgba(4,10,16,.8));color:var(--txt);
+  transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;min-height:64px;
 }
 .bp-mod-btn:hover{background:rgba(34,119,238,.12);border-color:var(--acc);color:var(--bright);}
 .bp-mod-btn.selected{background:rgba(34,119,238,.22);border-color:#77aaff;color:#fff;}
@@ -772,9 +820,10 @@ body.go-open #notif{z-index:250;top:18%;bottom:auto}
 .bp-buy:active{transform:translateY(1px);}
 .bp-stats{font-family:var(--FM);font-size:10px;color:#446688;line-height:1.9;}
 .bp-stat-val{color:#88aacc;}
-#bp-close{margin-top:0;padding:10px 32px;background:var(--acc);color:#fff;border:none;
-  border-radius:6px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.15em;cursor:pointer;}
-#bp-close:hover{background:#4499ff;}
+#bp-close{margin-top:0;padding:12px 36px;background:linear-gradient(180deg,#3ecfbb,#1f8a7a);color:#031410;border:none;
+  border-radius:8px;font-family:var(--FD);font-weight:700;font-size:14px;letter-spacing:.16em;cursor:pointer;
+  box-shadow:0 0 20px rgba(62,207,187,.25);}
+#bp-close:hover{filter:brightness(1.08);}
 /* Speed bar + optional screen shake (set by JS) */
 #speed-bar{position:fixed;bottom:118px;left:50%;transform:translateX(-50%);width:min(200px,42vw);height:4px;background:rgba(0,0,0,.35);border-radius:3px;overflow:hidden;z-index:12;pointer-events:none;display:none;border:1px solid rgba(44,100,190,.25)}
 #speed-fill{height:100%;width:0%;background:linear-gradient(90deg,#2244aa,#55ccff);transition:width .12s ease-out}
@@ -803,7 +852,6 @@ body.flight-more-open #flight-more-row{display:flex!important}
 #bp-fab-grid{left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));font-size:9px}
 body.bp-grid-only #bp-panel{display:none!important}
 body.bp-grid-only #bp-wrap{max-height:none}
-#blueprint-modal.show #bp-fab-place,#blueprint-modal.show #bp-fab-erase,#blueprint-modal.show #bp-fab-grid{display:block}
 @media(pointer:coarse),(max-width:700px){
   /* Mobile volo: tap sullo schermo per sterzare — niente twin-stick aggiuntivo */
   body.flying-ui #flight-joy-wrap,
@@ -835,8 +883,11 @@ body.bp-grid-only #bp-wrap{max-height:none}
 @keyframes cvshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,1px)}}
 @media(max-width:700px){
   #blueprint-modal{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;}
+  .bp-chrome{align-items:flex-start;padding-bottom:8px}
+  .bp-hangar{padding:10px 8px}
+  .bp-hangar-lab{display:none}
   #bp-title{font-size:14px;margin-bottom:0;}
-  #bp-subtitle{font-size:8px;margin-bottom:4px;line-height:1.45;max-height:none;overflow:visible;padding:0 4px;}
+  #bp-subtitle{font-size:8px;margin-bottom:4px;line-height:1.45;max-height:none;overflow:visible;padding:0;}
   #bp-sticky-sel{display:block;position:sticky;top:0}
   #bp-sticky-sel:not(.show){display:none}
   #bp-actions{position:sticky;bottom:0;z-index:2;padding:8px 0 max(6px,env(safe-area-inset-bottom));
@@ -1041,8 +1092,8 @@ body.suborbit-active #smsg{
   background:linear-gradient(165deg,rgba(6,22,30,.94),rgba(3,12,18,.97));
   border:1px solid rgba(70,180,160,.4);box-shadow:0 0 0 1px rgba(196,137,58,.18),0 28px 70px rgba(0,0,0,.55);
   border-radius:6px;backdrop-filter:blur(12px)}
-#main-menu .mm-brand{font-size:clamp(28px,6vw,40px);font-weight:700;letter-spacing:.18em;color:var(--bright);
-  text-shadow:0 0 28px rgba(62,207,187,.35)}
+#main-menu .mm-brand{font-size:clamp(18px,4.6vw,28px);font-weight:700;letter-spacing:.1em;color:var(--bright);
+  text-shadow:0 0 28px rgba(62,207,187,.35);line-height:1.2}
 #main-menu .mm-sub{font:10px/1.4 var(--FM);letter-spacing:.2em;color:var(--copper);margin:8px 0 4px}
 #main-menu .mm-tag{font:11px/1.4 var(--FM);color:#7aab9e;margin-bottom:22px}
 #main-menu .mm-actions{display:flex;flex-direction:column;gap:8px}
@@ -1101,7 +1152,7 @@ body.suborbit-active #smsg{
 <div id="film-grain"></div>
 <div id="preloader">
   <div style="width:min(560px,86vw);text-align:center;padding:22px 16px">
-    <div style="font-size:26px;letter-spacing:.2em;font-weight:700;margin-bottom:5px">VALSAMOGGIA SPAZIALE</div>
+    <div style="font-size:clamp(16px,4.2vw,24px);letter-spacing:.1em;font-weight:700;margin-bottom:5px;line-height:1.25">RITORNO AL VECCHIO PIANETA</div>
     <div id="preload-mode" style="font:11px/1.2 var(--FM);letter-spacing:.16em;color:#6e92c0;margin-bottom:20px">INIZIALIZZAZIONE SISTEMA</div>
     <div style="height:14px;background:rgba(255,255,255,.07);border:1px solid rgba(120,160,210,.4);border-radius:999px;overflow:hidden">
       <div id="preload-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#2277ee,#55ccff);transition:width .18s ease"></div>
@@ -1461,12 +1512,24 @@ body.suborbit-active #smsg{
 
 <!-- ─ Blueprint Modal ─ -->
 <div id="blueprint-modal">
-  <div id="bp-title">CANTIERE · BLUEPRINT</div>
-  <div id="bp-subtitle">Prua a sinistra · Poppa a destra · Modalità Piazza / Gomma · Esc annulla le modifiche</div>
+  <header class="bp-chrome">
+    <div class="bp-chrome-left">
+      <div id="bp-title">HANGAR · CANTIERE</div>
+      <div id="bp-subtitle">Prua a sinistra · Poppa a destra · ogni pezzo deve toccare lo scafo</div>
+    </div>
+    <div class="bp-chrome-right">
+      <div id="bp-mode-chip" class="bp-mode-chip place">PIAZZA</div>
+      <div id="bp-credits-chip" class="bp-credits-chip">— ₡</div>
+    </div>
+  </header>
   <div id="bp-sticky-sel" aria-live="polite"></div>
   <div id="bp-wrap">
     <div id="bp-grid-col">
-      <div id="bp-canvas-wrap"><canvas id="bp-cv"></canvas></div>
+      <div class="bp-hangar">
+        <div class="bp-hangar-lab left">PRUA</div>
+        <div id="bp-canvas-wrap"><canvas id="bp-cv"></canvas></div>
+        <div class="bp-hangar-lab right">POPPA</div>
+      </div>
       <div id="bp-mode-row">
         <button type="button" class="bp-tool mode-on" data-bp-mode="place" id="bp-mode-place" title="Piazza moduli (1–9 palette)">PIAZZA</button>
         <button type="button" class="bp-tool" data-bp-mode="erase" id="bp-mode-erase" title="Gomma: tocca per rimuovere (E)">GOMMA</button>
@@ -1477,47 +1540,56 @@ body.suborbit-active #smsg{
         <button type="button" class="bp-tool ghost" id="bp-clear-sel" title="Deseleziona (Q)">DESELEZIONA</button>
         <button type="button" class="bp-tool" id="bp-reset" title="Ripristina layout iniziale">INIZIALE</button>
       </div>
-      <div id="bp-presets" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;justify-content:center">
-        <button type="button" class="bp-tool" data-bp-preset="cargo" title="Preset stiva (controlla pezzi)">KIT STIVA</button>
-        <button type="button" class="bp-tool" data-bp-preset="combat" title="Preset combattimento (controlla pezzi)">KIT COMBATTIMENTO</button>
-        <button type="button" class="bp-tool" data-bp-preset="scout" title="Preset esplorazione (controlla pezzi)">KIT ESPLORAZIONE</button>
+      <div id="bp-presets">
+        <button type="button" class="bp-tool kit" data-bp-preset="cargo" title="Preset stiva (controlla pezzi)">KIT STIVA</button>
+        <button type="button" class="bp-tool kit" data-bp-preset="combat" title="Preset combattimento (controlla pezzi)">KIT COMBATTIMENTO</button>
+        <button type="button" class="bp-tool kit" data-bp-preset="scout" title="Preset esplorazione (controlla pezzi)">KIT ESPLORAZIONE</button>
       </div>
     </div>
     <div id="bp-panel">
-      <div class="bp-sil-section">
-        <div class="bp-section-title">SILHOUETTE · vista laterale (prua ←)</div>
+      <div class="bp-sil-section bp-card">
+        <div class="bp-section-title">PROFILO · vista laterale</div>
         <canvas id="bp-side-cv" width="380" height="88" aria-label="Silhouette laterale nave"></canvas>
       </div>
-      <div class="bp-modules-section">
-        <div class="bp-section-title">MODULI · scorri · clicca · piazza (attacca allo scafo)</div>
-        <div class="bp-mod-scroll-hint">↕ scorri la lista · 1–9 sceglie · E gomma · Z annulla</div>
+      <div class="bp-modules-section bp-card">
+        <div class="bp-section-title">MAGAZZINO PEZZI</div>
+        <div class="bp-cat-row" id="bp-cat-row">
+          <button type="button" class="bp-cat on" data-bp-cat="all">TUTTI</button>
+          <button type="button" class="bp-cat" data-bp-cat="struct">SCAFO</button>
+          <button type="button" class="bp-cat" data-bp-cat="engine">MOTORI</button>
+          <button type="button" class="bp-cat" data-bp-cat="weapon">ARMI</button>
+          <button type="button" class="bp-cat" data-bp-cat="defense">DIFESA</button>
+          <button type="button" class="bp-cat" data-bp-cat="cargo">STIVA</button>
+          <button type="button" class="bp-cat" data-bp-cat="aero">ALI</button>
+        </div>
+        <div class="bp-mod-scroll-hint">1–9 palette · E gomma · Z annulla · click destro rimuove</div>
         <div class="bp-module-list" id="bp-module-list"></div>
       </div>
       <div id="bp-effect-preview"></div>
       <div id="bp-stats-hull-row" class="bp-stats-section">
-        <div>
-          <div class="bp-section-title">STATISTICHE</div>
+        <div class="bp-card">
+          <div class="bp-section-title">TELEMETRIA</div>
           <div class="bp-stats" id="bp-stats-panel"></div>
         </div>
-        <div>
-          <div class="bp-section-title">VERNICE</div>
-          <div id="bp-hull-panel" style="font-family:var(--FM);color:#8899bb">
-            <div id="bp-hull-presets" style="display:flex;flex-wrap:wrap;gap:3px;margin:0 0 4px"></div>
-            <label style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <span style="letter-spacing:.06em;font-size:8px;color:#557799">Colore</span>
+        <div class="bp-card">
+          <div class="bp-section-title">LIVREA</div>
+          <div id="bp-hull-panel">
+            <div id="bp-hull-presets"></div>
+            <label class="bp-paint-row">
+              <span>Colore</span>
               <input type="color" id="bp-hull-color" value="#0a1e55" title="Fusoliera 3D" />
             </label>
-            <div id="bp-hull-rep-hint" style="font-size:8px;color:#6688aa"></div>
+            <div id="bp-hull-rep-hint"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div id="bp-actions">
-    <button type="button" id="bp-discard" onclick="discardBlueprintChanges()">ANNULLA MODIFICHE</button>
-    <button type="button" id="bp-close" onclick="closeBlueprintModal()">CONFERMA E COSTRUISCI</button>
+    <button type="button" id="bp-discard" onclick="discardBlueprintChanges()">ANNULLA</button>
+    <button type="button" id="bp-close" onclick="closeBlueprintModal()">COSTRUISCI</button>
   </div>
-  <div id="bp-keys-hint">Esc = esci senza salvare · Z = undo · E = gomma · click destro = gomma · pinch/zoom · Q = deseleziona · 1–9 = palette</div>
+  <div id="bp-keys-hint">Esc esce senza salvare · pinch/zoom sulla griglia · Q deseleziona</div>
   <button type="button" id="bp-fab-place" aria-label="Modalità piazza">PIAZZA</button>
   <button type="button" id="bp-fab-erase" aria-label="Modalità gomma">GOMMA</button>
   <button type="button" id="bp-fab-grid" aria-label="Solo griglia">GRIGLIA</button>
@@ -1544,13 +1616,13 @@ body.suborbit-active #smsg{
 <div id="main-menu" aria-modal="true" role="dialog" aria-label="Menu principale">
   <div class="mm-bg" aria-hidden="true"></div>
   <div class="mm-panel">
-    <div class="mm-brand">VALSAMOGGIA</div>
-    <div class="mm-sub">SPAZIALE · SISTEMA IMPERIUM → VALSAMOGGIO</div>
+    <div class="mm-brand">RITORNO AL<br>VECCHIO PIANETA</div>
+    <div class="mm-sub">40.024 E.I. · IMPERIUM → VALSAMOGGIA</div>
     <div class="mm-tag">Funzionario VII · Zvan Marìa</div>
     <div class="mm-actions">
       <button type="button" id="mm-start" class="mm-btn primary">PARTI</button>
       <button type="button" id="mm-load" class="mm-btn">CARICA</button>
-      <button type="button" id="mm-intro" class="mm-btn">INTRO</button>
+      <button type="button" id="mm-intro" class="mm-btn">UNIVERSO</button>
       <button type="button" id="mm-options" class="mm-btn">OPZIONI</button>
     </div>
     <div id="mm-options-panel" class="mm-opts" hidden>
@@ -1579,7 +1651,7 @@ body.suborbit-active #smsg{
       </label>
       <button type="button" id="mm-help" class="mm-btn ghost">Controlli</button>
     </div>
-    <div class="mm-foot">1956 · Forbidden Planet · Valsamoggia Spaziale</div>
+    <div class="mm-foot">1956 · Forbidden Planet · Ritorno al Vecchio Pianeta</div>
   </div>
 </div>
 <div id="intro-slideshow" aria-modal="true" role="dialog" aria-label="Intro">
@@ -1597,9 +1669,9 @@ body.suborbit-active #smsg{
 </div>
 <div id="help-modal" aria-modal="true" role="dialog" aria-labelledby="help-title">
   <div id="help-inner">
-    <h2 id="help-title">CONTROLLI · VALSAMOGGIA SPAZIALE</h2>
+    <h2 id="help-title">CONTROLLI · RITORNO AL VECCHIO PIANETA</h2>
     <div class="help-grid"><span>Volo</span><span><kbd>W</kbd>/<kbd>↑</kbd> o <kbd>manetta</kbd> · <kbd>A/D</kbd> o joystick mobile · <kbd>S</kbd>/<kbd>SPINTA</kbd> (conferma se calore alto) · <kbd>Spazio</kbd>/<kbd>FUOCO</kbd> · <kbd>H</kbd> HUD compatto · barra velocità + km/s</span></div>
-    <div class="help-grid"><span>Cantiere mobile</span><span>Pinch/zoom · FAB Piazza/Gomma · solo griglia · ghost verde/rosso · stats con delta</span></div>
+    <div class="help-grid"><span>Cantiere mobile</span><span>Hangar + filtri pezzi · pinch/zoom · FAB Piazza/Gomma · solo griglia · telemetria con delta</span></div>
     <div class="help-grid"><span>Navigazione</span><span><kbd>M</kbd> mappa · seleziona destinazione · <kbd>E</kbd> attracco · <kbd>P</kbd> blueprint</span></div>
     <div class="help-grid"><span>Cantiere</span><span><kbd>Esc</kbd> annulla · <kbd>Z</kbd> undo · <kbd>E</kbd> gomma · <kbd>1–9</kbd> palette · <kbd>Q</kbd> deseleziona · Piazza/Gomma</span></div>
     <div class="help-grid"><span>Corridoi spazio</span><span>Linee ciano tra pianeti = corsie commerciali. Resta sulla corsia coi motori: <kbd>+spinta</kbd>. Non sono i corridoi di suborbita. La mappa ne mostra i nomi.</span></div>
@@ -1695,6 +1767,24 @@ function scheduleBootStory(){
   // Solo prologo: il cap. 1 parte quando il giocatore preme CONTINUA.
   _bootStoryTimers.push(setTimeout(()=>showStoryBanner('PROLOGO','Zvan Marìa — Ritorno a Valsamoggia',STORY.prologue,11000),400));
 }
+
+const UNIVERSE_SLIDES=[
+  {chap:'UNIVERSO · I',title:'L\'Impero in stallo',
+    text:'Siamo nel 40.024 dell\'Era Imperiale. L\'Impero Galattico è una holding in coma legale: fax quantistici, OPA ostili e un Senato che firma ciò che gli mettono sotto il naso. Le Dodici Casate contano i soldi. Tu conti i verbali. A Imperium è lo stesso lavoro, solo con corridoi più lunghi.',
+    art:'sprites/story/intro/intro_01.jpg'},
+  {chap:'UNIVERSO · II',title:'Il Trono d\'Oro',
+    text:'Sul Mondo Trono, Craxi non governa: resta. Un resto umano tenuto in vita dalle macchine e dal macguffinium, materia a nove dimensioni. Longevità e potere psionico, umanità persa per strada. Il CdA Galattico cerca un CEO che lo deponga legalmente. A Valsamoggia arriva come bollettino e ispezione di settimo livello.',
+    art:'sprites/story/intro/intro_02.jpg'},
+  {chap:'UNIVERSO · III',title:'Macguffinium',
+    text:'Scoperto nel 35.123 E.I., il macguffinium è il motivo per cui le anomalie «respirano» e i depositi tartuferi non stanno mai chiusi. Nelle casate vale fortune. Nei relitti muta carne e documenti. Qui basta non aprire la porta sbagliata. Le grandi casate già fanno i conti: se il Mulino si spegne, questo sistema diventa un giacimento con abitanti.',
+    art:'sprites/story/intro/intro_03.jpg'},
+  {chap:'UNIVERSO · IV',title:'Il Vecchio Pianeta',
+    text:'Valsamoggia è periferia: cinque fazioni, non le Dodici Casate. Bazzano, Calcara, Savigno, Monteveglio, Castelletto. Micro-potenze con rancori di cortile. Il Patto del Molino tiene unite le rotte. Finché gira, Imperium osserva da lontano. Se si sgretola, arrivano gli avvocati orbitali — e il vecchio pianeta smette di essere casa.',
+    art:'sprites/story/intro/intro_04.jpg'},
+  {chap:'UNIVERSO · V',title:'Il Patto del Molino',
+    text:'Testo antico: commercio, anomalie, tartufi. Spezzato, va ricomposto pezzo a pezzo e il Mulino riacceso. Non è folclore da brochure: è la differenza tra periferia ignorata e fronte galattico. Zvan Marìa, funzionario VII, torna perché è nato lì. Nessuno ha chiesto se è ancora di lì.',
+    art:'sprites/story/intro/intro_05.jpg'}
+];
 
 const INTRO_SLIDES=[
   {chap:'IMPERIUM · I',title:'La Capitale di Marmo',
@@ -1799,7 +1889,10 @@ function playStorySlideshow(slides,onDone,opts){
   renderIntroSlide();
 }
 function playIntroSlideshow(onDone){
-  playStorySlideshow(INTRO_SLIDES,onDone,{endLabel:'INIZIA',ariaLabel:'Introduzione'});
+  playStorySlideshow(INTRO_SLIDES,onDone,{endLabel:'INIZIA',ariaLabel:'Introduzione — nuova partita'});
+}
+function playUniverseSlideshow(){
+  playStorySlideshow(UNIVERSE_SLIDES,()=>showMainMenu(),{endLabel:'TORNA AL MENU',ariaLabel:'Enciclopedia dell\'universo'});
 }
 function hideIntroSlideshow(silent){
   const el=document.getElementById('intro-slideshow');
@@ -1837,7 +1930,7 @@ function introSkip(){hideIntroSlideshow(false);}
   const bind=(id,fn)=>{const b=document.getElementById(id);if(b)b.addEventListener('click',e=>{e.preventDefault();fn();});};
   bind('mm-start',startNewGameFromMenu);
   bind('mm-load',loadGameFromMenu);
-  bind('mm-intro',()=>playIntroSlideshow(()=>showMainMenu()));
+  bind('mm-intro',playUniverseSlideshow);
   bind('mm-options',()=>{
     const p=document.getElementById('mm-options-panel');
     if(p)p.hidden=!p.hidden;
@@ -3078,19 +3171,19 @@ const BP_COLS=12, BP_ROWS=8, BP_CELL=36;
 // Blueprint module definitions (distinct from upgrade MODULES — these are structural)
 // unlockShop: station MODULES id required before this piece appears in the editor palette
 const BP_MODULES=[
-  {id:'hull',     label:'Scafo',         icon:'SC', color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'cockpit',  label:'Cabina',        icon:'CB', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null},
-  {id:'engine',   label:'Motore',        icon:'MT', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'engine2',  label:'Motore II',     icon:'M2', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2'},
-  {id:'boost_eng',label:'Postbruciatore',icon:'PB', color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3'},
-  {id:'weapon',   label:'Cannone',       icon:'CN', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'weapon2',  label:'Cannone II',    icon:'C2', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2'},
-  {id:'missile',  label:'Lanciamissili', icon:'MS', color:'#7a4012', desc:'Sblocca missili [Q]. +capacità.',      cost:1500,canRotate:false, w:2,h:1, unlockShop:'wep2'},
-  {id:'shield',   label:'Scudo',         icon:'SD', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:null},
-  {id:'cargo',    label:'Stiva',         icon:'ST', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:null},
-  {id:'wing_l',   label:'Ala Sinistra',  icon:'AS', color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:null},
-  {id:'wing_r',   label:'Ala Destra',    icon:'AD', color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:null},
-  {id:'fin',      label:'Timone',        icon:'TM', color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:null},
+  {id:'hull',     label:'Scafo',         icon:'SC', color:'#334466', desc:'Sezione strutturale base.',          cost:0,   canRotate:false, w:1,h:1, unlockShop:null, cat:'struct'},
+  {id:'cockpit',  label:'Cabina',        icon:'CB', color:'#1a4488', desc:'Cabina di pilotaggio. Richiesta.',   cost:0,   canRotate:false, w:2,h:1, unlockShop:null, cat:'struct'},
+  {id:'engine',   label:'Motore',        icon:'MT', color:'#884411', desc:'Propulsore principale. +spinta.',    cost:400, canRotate:false, w:1,h:1, unlockShop:null, cat:'engine'},
+  {id:'engine2',  label:'Motore II',     icon:'M2', color:'#cc5500', desc:'Propulsore potenziato. +velocità.',  cost:900, canRotate:false, w:2,h:1, unlockShop:'eng2', cat:'engine'},
+  {id:'boost_eng',label:'Postbruciatore',icon:'PB', color:'#ff6600', desc:'Postbruciatore. Attiva boost [B].',  cost:1400,canRotate:false, w:2,h:1, unlockShop:'eng3', cat:'engine'},
+  {id:'weapon',   label:'Cannone',       icon:'CN', color:'#661122', desc:'Cannone frontale.',                   cost:600, canRotate:false, w:1,h:1, unlockShop:null, cat:'weapon'},
+  {id:'weapon2',  label:'Cannone II',    icon:'C2', color:'#991133', desc:'Cannone doppio pesante.',             cost:1200,canRotate:false, w:2,h:1, unlockShop:'wep2', cat:'weapon'},
+  {id:'missile',  label:'Lanciamissili', icon:'MS', color:'#7a4012', desc:'Sblocca missili [Q]. +capacità.',      cost:1500,canRotate:false, w:2,h:1, unlockShop:'wep2', cat:'weapon'},
+  {id:'shield',   label:'Scudo',         icon:'SD', color:'#115577', desc:'Generatore di scudo.',                cost:700, canRotate:false, w:1,h:1, unlockShop:null, cat:'defense'},
+  {id:'cargo',    label:'Stiva',         icon:'ST', color:'#335522', desc:'Modulo stiva. +8 capacità.',          cost:350, canRotate:false, w:2,h:1, unlockShop:null, cat:'cargo'},
+  {id:'wing_l',   label:'Ala Sinistra',  icon:'AS', color:'#334455', desc:'Ala sinistra. Migliora manegg.',     cost:300, canRotate:false, w:1,h:2, unlockShop:null, cat:'aero'},
+  {id:'wing_r',   label:'Ala Destra',    icon:'AD', color:'#334455', desc:'Ala destra. Migliora manegg.',       cost:300, canRotate:false, w:1,h:2, unlockShop:null, cat:'aero'},
+  {id:'fin',      label:'Timone',        icon:'TM', color:'#224433', desc:'Pinna dorsale. +manovrabilità.',     cost:200, canRotate:false, w:1,h:1, unlockShop:null, cat:'aero'},
 ];
 
 /** Sblocco pezzi blueprint: il modulo richiesto O un livello superiore della stessa linea (es. eng3 sblocca anche voci «eng2»). */
@@ -3148,6 +3241,7 @@ const defaultBlueprint=(()=>{
 let bpGrid=Array.from({length:BP_ROWS},()=>new Array(BP_COLS).fill(null));
 let bpSelected=null; // module id selected in palette
 let bpEditMode='place'; // 'place' | 'erase'
+let bpCatFilter='all';
 let bpSymLive=false; // anteprima + piazzamento speculare
 let bpDragFrom=null;
 let bpHoverCell=null; // {r,c} cella sotto dito/mouse (feedback mobile)
@@ -3232,6 +3326,15 @@ function syncBpModeUi(){
   if(place)place.classList.toggle('mode-on',bpEditMode==='place');
   if(erase)erase.classList.toggle('mode-on',bpEditMode==='erase');
   if(sym)sym.classList.toggle('sym-on',!!bpSymLive);
+  const chip=document.getElementById('bp-mode-chip');
+  if(chip){
+    const er=bpIsEraseMode();
+    chip.textContent=er?'GOMMA':'PIAZZA';
+    chip.classList.toggle('erase',er);
+    chip.classList.toggle('place',!er);
+  }
+  const cred=document.getElementById('bp-credits-chip');
+  if(cred)cred.textContent=fmt(PS.credits);
   const sticky=document.getElementById('bp-sticky-sel');
   if(sticky){
     if(bpIsEraseMode()){
@@ -3554,16 +3657,21 @@ function drawBlueprint(){
       return String(cur)+suf+' <span style="color:'+col+'">('+sign+d+suf+')</span>';
     };
     const base=(typeof FlightBlueprintPolish!=='undefined'&&FlightBlueprintPolish._baseline)?FlightBlueprintPolish._baseline:null;
-    sp.innerHTML=`
-    Vel. <span class="bp-stat-val">${fmtD(stats.speed,base&&base.speed)}</span> · Spinta <span class="bp-stat-val">${fmtD(stats.thrust,base&&base.thrust)}</span><br>
-    Danno <span class="bp-stat-val">${fmtD(stats.dmg,base&&base.dmg,'%')}</span> · Stiva <span class="bp-stat-val">${fmtD(stats.cargoMax,base&&base.cargoMax)}</span><br>
-    Manegg. <span class="bp-stat-val">${fmtD(stats.maneuver,base&&base.maneuver,'%')}</span> · Scudo <span class="bp-stat-val">${fmtD(stats.shieldHp,base&&base.shieldHp)}</span><br>
-    Boost <span class="bp-stat-val" style="color:${stats.hasBoost?'#ff8844':'#446688'}">${stats.hasBoost?'Sì':'—'}</span>
-    · Salvo <span class="bp-stat-val">${1+Math.min(4,Math.floor(Math.max(0,stats.weapons-1)/2))}</span><br>
-    Rot. <span class="bp-stat-val">${(stats.turnMult*100).toFixed(0)}%</span>
-    · Missili <span class="bp-stat-val">${stats.missilePods>0?(4+stats.missilePods*2):0}</span><br>
-    Valore <span class="bp-stat-val" style="color:#ffcc33">${fmt(bpCost())}</span> ₡
-  `;
+    const meter=(lab,cur,max,baseV,suf)=>{
+      const pct=Math.max(4,Math.min(100,Math.round((cur/Math.max(1,max))*100)));
+      return `<div class="bp-meter"><span>${lab}</span><div class="bp-meter-track"><i style="width:${pct}%"></i></div><b>${fmtD(cur,baseV,suf)}</b></div>`;
+    };
+    const salvo=1+Math.min(4,Math.floor(Math.max(0,stats.weapons-1)/2));
+    const miss=stats.missilePods>0?(4+stats.missilePods*2):0;
+    sp.innerHTML=
+      meter('VEL',stats.speed,220,base&&base.speed)+
+      meter('SPINTA',stats.thrust,220,base&&base.thrust)+
+      meter('DANNO',stats.dmg,180,base&&base.dmg,'%')+
+      meter('STIVA',stats.cargoMax,48,base&&base.cargoMax)+
+      meter('MANEGG',stats.maneuver,180,base&&base.maneuver,'%')+
+      meter('SCUDO',stats.shieldHp,80,base&&base.shieldHp)+
+      `<div class="bp-meter"><span>EXTRA</span><div class="bp-meter-track"><i style="width:${stats.hasBoost?100:8}%;background:${stats.hasBoost?'linear-gradient(90deg,#ff8800,#ffcc44)':'#223344'}"></i></div><b>${stats.hasBoost?'BOOST':'—'}</b></div>`+
+      `<div style="margin-top:6px;font:9px var(--FM);color:#88aacc">Salvo ${salvo} · Rot ${(stats.turnMult*100).toFixed(0)}% · Missili ${miss}<br>Valore <span style="color:#ffcc33">${fmt(bpCost())}</span></div>`;
   }
   drawBpSilhouette();
 }
@@ -3637,6 +3745,7 @@ function openBlueprintModal(){
   bpWarnCells=new Set();
   bpEditMode='place';
   bpSelected=null;
+  bpCatFilter='all';
   if(typeof FlightBlueprintPolish!=='undefined'){
     FlightBlueprintPolish._baseline=bpStats();
     FlightBlueprintPolish.resetBpView();
@@ -4120,7 +4229,13 @@ function setupBpHullPaintUi(){
 function buildBpPalette(){
   const el=document.getElementById('bp-module-list');if(!el)return;
   el.innerHTML='';
+  document.querySelectorAll('#bp-cat-row .bp-cat').forEach(b=>{
+    b.classList.toggle('on',(b.getAttribute('data-bp-cat')||'all')===bpCatFilter);
+  });
+  const cred=document.getElementById('bp-credits-chip');
+  if(cred)cred.textContent=fmt(PS.credits);
   BP_MODULES.forEach(m=>{
+    if(bpCatFilter!=='all'&&m.cat!==bpCatFilter)return;
     const ok=bpShopUnlocked(m.unlockShop);
     const cnt=bpInvAvail(m.id);
     const free=BP_FREE.has(m.id);
@@ -4203,6 +4318,12 @@ function setupBpEvents(){
   });
   document.querySelectorAll('[data-bp-preset]').forEach(btn=>{
     btn.addEventListener('click',()=>applyBpPreset(btn.getAttribute('data-bp-preset')));
+  });
+  document.querySelectorAll('#bp-cat-row .bp-cat').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      bpCatFilter=btn.getAttribute('data-bp-cat')||'all';
+      buildBpPalette();
+    });
   });
   syncBpModeUi();
   function getPointerClient(e){
